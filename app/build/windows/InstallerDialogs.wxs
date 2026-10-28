@@ -1,0 +1,48 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <UI>
+      <Dialog Id="SchoolBotWelcome" Width="370" Height="270" Title="!(loc.Installer_windowTitle)" NoMinimize="yes">
+        <Control Id="Install" Type="PushButton" X="150" Y="214" Width="120" Height="28"
+                 Default="yes" Text="!(loc.Installer_install)">
+          <Publish Property="WixUI_InstallMode" Value="Install" Order="1" Condition="NOT Installed" />
+          <Publish Property="WixUI_InstallMode" Value="Update" Order="1" Condition="Installed AND PATCH" />
+          <Publish Event="EndDialog" Value="Return" Order="2" />
+        </Control>
+        <Control Id="Cancel" Type="PushButton" X="290" Y="219" Width="60" Height="22"
+                 Cancel="yes" Text="!(loc.Installer_cancel)">
+          <Publish Event="SpawnDialog" Value="CancelDlg" />
+        </Control>
+        <Control Id="Artwork" Type="Bitmap" X="0" Y="0" Width="370" Height="270"
+                 Text="SchoolBotScene" TabSkip="yes" />
+        <Control Id="Heading" Type="Text" X="150" Y="72" Width="202" Height="42"
+                 Transparent="yes" NoPrefix="yes" Text="{\SchoolBotHeading}!(loc.Installer_welcomeTitle)" />
+        <Control Id="Description" Type="Text" X="150" Y="122" Width="202" Height="48"
+                 Transparent="yes" NoPrefix="yes" Text="!(loc.Installer_welcomeDescription)" />
+        <Control Id="Modes" Type="Text" X="150" Y="179" Width="202" Height="24"
+                 Transparent="yes" NoPrefix="yes" Text="{\SchoolBotMuted}!(loc.Installer_modes)" />
+      </Dialog>
+      <Dialog Id="SchoolBotComplete" Width="370" Height="270" Title="!(loc.Installer_windowTitle)" NoMinimize="yes">
+        <Control Id="Finish" Type="PushButton" X="150" Y="232" Width="120" Height="28"
+                 Default="yes" Cancel="yes" Text="!(loc.Installer_finish)">
+          <!-- Launch is an optional UI action after success, never part of the install transaction. -->
+          <Publish Event="DoAction" Value="LaunchSchoolBot" Order="1"
+                   Condition="SCHOOLBOT_LAUNCH = 1 AND UILevel = 5 AND NOT Installed AND NOT REMOVE" />
+          <Publish Event="EndDialog" Value="Return" Order="2" />
+        </Control>
+        <Control Id="Launch" Type="CheckBox" X="150" Y="186" Width="204" Height="32"
+                 Property="SCHOOLBOT_LAUNCH" CheckBoxValue="1" Hidden="yes"
+                 ShowCondition="NOT Installed AND NOT REMOVE" Text="!(loc.Installer_launch)" />
+        <Control Id="Artwork" Type="Bitmap" X="0" Y="0" Width="370" Height="270"
+                 Text="SchoolBotScene" TabSkip="yes" />
+        <Control Id="Heading" Type="Text" X="150" Y="76" Width="202" Height="42"
+                 Transparent="yes" NoPrefix="yes" Text="{\SchoolBotHeading}!(loc.Installer_completeTitle)" />
+        <Control Id="Description" Type="Text" X="150" Y="128" Width="202" Height="48"
+                 Transparent="yes" NoPrefix="yes" Text="!(loc.Installer_completeDescription)"
+                 HideCondition="Installed OR REMOVE" />
+        <Control Id="Maintenance" Type="Text" X="150" Y="128" Width="202" Height="48"
+                 Transparent="yes" NoPrefix="yes" Hidden="yes" Text="!(loc.Installer_maintenanceComplete)"
+                 ShowCondition="Installed OR REMOVE" />
+      </Dialog>
+    </UI>
+  </Fragment>
+</Wix>

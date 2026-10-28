@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-26",
+  "sourceSha256": "97dde5cd7a7c46c352aa1ebe77a953a5597e3c7246b40f123828c5340fc18bdd",
+  "currentRunnerSha256": "5eb19c91b6a5be18a5d64c6a4c5129bbc8ed66108db48b894fd5ce111bab14d0",
+  "manifestSha256": "ab984fe746ba8b671b702ba4cc01627d81cb56bdf2ab701add3d061235dbaf4b",
+  "entries": 15,
+  "changed": [
+    {
+      "path": "src/app/AppDialogs.tsx",
+      "before": "d36ecc73493c1202250c6a1f9c82d9f2bff73a97715a318d44151ddbc36e6fc6",
+      "after": "4a3c6383ec4d8f4cbfbd1f3a863bacc068bb6b82a0b9281db255ddcb3829864f"
+    },
+    {
+      "path": "src/app/CloseDialog.tsx",
+      "before": "ef577c6583aa7ae7ae28cd42c8c4f3464ba240d8f9127db5278956893910ff71",
+      "after": "64282f52ff083ba124156aa65f020eda2432e9177844fcdeca762d99af257ffa"
+    },
+    {
+      "path": "src/app/useWindowClose.ts",
+      "before": "6beed52c9e4fe0c19b710c7a16355ea7f06c7bbe230c3911d6b057383b4d413a",
+      "after": "0629e135cd2a33236a9c9300dfbf9f871914c653858dcb87a2b9a92de3c1a554"
+    }
+  ],
+  "unchanged": 12
+}

@@ -1,0 +1,81 @@
+name: Verify School Bot
+on: [push, pull_request]
+jobs:
+  verify:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            platform: windows-amd64
+          - os: macos-15-intel
+            platform: darwin-amd64
+          - os: macos-15
+            platform: darwin-arm64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.27.2'
+          cache-dependency-path: app/go.sum
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: app/frontend/package-lock.json
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build and verify (i18n, Go, Zide unit and IPC tests, C# API)
+        shell: pwsh
+        run: ./scripts/verify.ps1
+      - name: Verify packaged engine (macOS)
+        if: runner.os == 'macOS'
+        shell: bash
+        env:
+          SCHOOL_BOT_TARGET: ${{ matrix.platform }}
+        run: |
+          test "darwin-$(go env GOHOSTARCH)" = "$SCHOOL_BOT_TARGET"
+          bundle="app/bin/$SCHOOL_BOT_TARGET/School Bot.app"
+          plutil -lint "$bundle/Contents/Info.plist"
+          codesign --verify --deep --strict "$bundle"
+          cd "$(mktemp -d)"
+          printf '%s\n' '{"protocol":"1.0","request_id":"bundle-smoke","mode":"robot-control","action":"robot.stop","data":{"transport":"dry-run"}}' | "$GITHUB_WORKSPACE/$bundle/Contents/MacOS/engines/zide/zide-engine" | grep '"status":"success"'
+      - name: Build Windows Desktop setup EXE and MSI
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./scripts/package-desktop.ps1 -SkipBuild
+      - name: Verify installer payload and render UI without installing (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $version = (Get-Content app/frontend/package.json -Raw | ConvertFrom-Json).version
+          ./scripts/build-installer-shell.ps1 -InstallerPath "dist/installers/school-bot-$version-windows-amd64.msi" -BrandDirectory .tools/installer-brand/th -OutputDirectory .tools/installer-shell-preview -Preview
+      - name: Install, repair and uninstall MSI (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./scripts/test-installer.ps1
+      - name: Build universal macOS Desktop installer
+        if: matrix.platform == 'darwin-arm64'
+        shell: bash
+        run: bash scripts/package-desktop.sh --skip-install
+      - name: Verify universal package payload (macOS)
+        if: matrix.platform == 'darwin-arm64'
+        shell: bash
+        run: |
+          expanded="$(mktemp -d)/expanded"
+          pkgutil --expand-full dist/installers/*.pkg "$expanded"
+          app_executable="$(find "$expanded" -type f -path '*/School Bot.app/Contents/MacOS/school-bot' -print -quit)"
+          test -n "$app_executable"
+          lipo -verify_arch x86_64 arm64 "$app_executable"
+          lipo -verify_arch x86_64 arm64 "$(dirname "$app_executable")/demo-engine"
+          lipo -verify_arch x86_64 arm64 "$(dirname "$app_executable")/engines/zide/zide-engine"
+          test -f "$(dirname "$app_executable")/engines/zide/engine.json"
+          printf '%s\n' '{"protocol":"1.0","request_id":"installer-smoke","mode":"robot-control","action":"robot.stop","data":{"transport":"dry-run"}}' | "$(dirname "$app_executable")/engines/zide/zide-engine" | grep '"status":"success"'
+      - uses: actions/upload-artifact@v4
+        if: runner.os == 'Windows' || matrix.platform == 'darwin-arm64'
+        with:
+          name: school-bot-installer-${{ runner.os }}
+          path: dist/installers/*
+          if-no-files-found: error

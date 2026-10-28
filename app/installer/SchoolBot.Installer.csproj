@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AssemblyName>SchoolBotSetup</AssemblyName>
+    <Product>School Bot</Product>
+    <Title>School Bot Setup</Title>
+    <Company>School Bot Team</Company>
+    <Description>School Bot Installer</Description>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <ApplicationIcon>../build/windows/appicon.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <RuntimeFrameworkVersion>10.0.13</RuntimeFrameworkVersion>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Resource Include="Assets/Fonts/*.ttf" />
+    <Resource Include="../build/windows/installer/hero-robot.png" Link="Assets/hero.png" />
+    <Resource Include="../build/windows/appicon.ico" Link="Assets/appicon.ico" />
+    <Resource Include="$(BrandDirectory)/wordmark.png" Link="Assets/wordmark.png" />
+    <EmbeddedResource Include="$(BrandDirectory)/strings.json" LogicalName="Setup.Strings" />
+    <EmbeddedResource Include="$(BrandDirectory)/payload.json" LogicalName="Setup.PayloadInfo" />
+    <EmbeddedResource Include="$(InstallerPackage)" LogicalName="Setup.Package" />
+    <EmbeddedResource Include="$(RuntimeNotices)" LogicalName="Setup.Notices" />
+  </ItemGroup>
+  <Target Name="RequirePackageInputs" BeforeTargets="PrepareForBuild">
+    <Error Condition="!Exists('$(InstallerPackage)')" Text="Build with scripts/package-desktop.ps1: InstallerPackage is required." />
+    <Error Condition="!Exists('$(RuntimeNotices)')" Text="RuntimeNotices must include the redistributed runtime licenses." />
+  </Target>
+</Project>

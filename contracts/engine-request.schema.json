@@ -1,0 +1,7 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://school-bot.local/contracts/engine-request.schema.json",
+  "title": "School Bot engine request",
+  "$ref": "engine/request.schema.json",
+  "description": "Compatibility entrypoint for the shared envelope. Supported modes/actions and payload limits belong to each engine; see engines/<id>/docs. Runtime validation is implemented by the host and engines."
+}

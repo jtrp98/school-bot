@@ -1,0 +1,114 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="School Bot" Manufacturer="School Bot Team" Language="!(loc.Installer_languageId)"
+           Version="$(var.AppVersion)" UpgradeCode="61D02E9C-4C33-4DA9-9510-549CA8CDD6AA"
+           Scope="perUser" InstallerVersion="500">
+    <MajorUpgrade DowngradeErrorMessage="!(loc.Installer_newerVersion)"
+                  Schedule="afterInstallInitialize" IgnoreLanguage="yes" />
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+    <SummaryInformation Description="School Bot Desktop Installer" />
+    <Icon Id="SchoolBotIcon" SourceFile="$(var.AppIcon)" />
+    <Property Id="ARPPRODUCTICON" Value="SchoolBotIcon" />
+    <Property Id="ARPCOMMENTS" Value="Robot Control, Coding Adventure and Block Programming" />
+    <!-- Use the standard FilesInUse dialog; users close the app before servicing it. -->
+    <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable" />
+    <Property Id="INSTALLFOLDER" Secure="yes">
+      <RegistrySearch Id="PreviousInstallFolder" Root="HKCU" Key="Software\SchoolBot"
+                      Name="InstallDir" Type="raw" Bitness="always64" />
+    </Property>
+    <SetProperty Id="ARPINSTALLLOCATION" Value="[INSTALLFOLDER]" After="CostFinalize" Sequence="both" />
+    <StandardDirectory Id="LocalAppDataFolder">
+      <Directory Id="UserProgramsFolder" Name="Programs">
+        <Directory Id="INSTALLFOLDER" Name="School Bot">
+          <Directory Id="EnginesFolder" Name="engines">
+            <Directory Id="ZideFolder" Name="zide">
+              <Component Id="ZideExecutable" Guid="66E5B47A-67A0-4C33-A115-F3D104C81261" Bitness="always64">
+                <File Id="ZideExe" Source="$(var.PayloadDir)\engines\zide\zide-engine.exe" />
+                <RemoveFolder Id="RemoveZideFolder" On="uninstall" />
+                <RemoveFolder Id="RemoveEnginesFolder" Directory="EnginesFolder" On="uninstall" />
+                <RegistryValue Root="HKCU" Key="Software\SchoolBot\Installer" Name="ZideExecutable" Type="integer" Value="1" KeyPath="yes" />
+              </Component>
+              <Component Id="ZideManifest" Guid="66E5B47A-67A0-4C33-A115-F3D104C81262" Bitness="always64">
+                <File Id="ZideManifestFile" Source="$(var.PayloadDir)\engines\zide\engine.json" />
+                <RegistryValue Root="HKCU" Key="Software\SchoolBot\Installer" Name="ZideManifest" Type="integer" Value="1" KeyPath="yes" />
+              </Component>
+              <Component Id="ZideNotices" Guid="66E5B47A-67A0-4C33-A115-F3D104C81263" Bitness="always64">
+                <File Id="ZideNoticesFile" Source="$(var.PayloadDir)\engines\zide\THIRD-PARTY-NOTICES.md" />
+                <RegistryValue Root="HKCU" Key="Software\SchoolBot\Installer" Name="ZideNotices" Type="integer" Value="1" KeyPath="yes" />
+              </Component>
+              <Component Id="ZideHidLicense" Guid="66E5B47A-67A0-4C33-A115-F3D104C81264" Bitness="always64">
+                <File Id="ZideHidLicenseFile" Source="$(var.PayloadDir)\engines\zide\HIDAPI-LICENSE.txt" />
+                <RegistryValue Root="HKCU" Key="Software\SchoolBot\Installer" Name="ZideHidLicense" Type="integer" Value="1" KeyPath="yes" />
+              </Component>
+              <Component Id="ZideJsonLicense" Guid="66E5B47A-67A0-4C33-A115-F3D104C81265" Bitness="always64">
+                <File Id="ZideJsonLicenseFile" Source="$(var.PayloadDir)\engines\zide\JSON-LICENSE.txt" />
+                <RegistryValue Root="HKCU" Key="Software\SchoolBot\Installer" Name="ZideJsonLicense" Type="integer" Value="1" KeyPath="yes" />
+              </Component>
+              <Component Id="ZideHash" Guid="66E5B47A-67A0-4C33-A115-F3D104C81266" Bitness="always64">
+                <File Id="ZideHashFile" Source="$(var.PayloadDir)\engines\zide\zide-engine.exe.sha256" />
+                <RegistryValue Root="HKCU" Key="Software\SchoolBot\Installer" Name="ZideHash" Type="integer" Value="1" KeyPath="yes" />
+              </Component>
+            </Directory>
+          </Directory>
+          <Component Id="DesktopExecutable" Guid="3F1DBC57-D0DA-4A26-9634-18AB874190A1" Bitness="always64">
+            <File Id="DesktopExe" Source="$(var.PayloadDir)\school-bot.exe" />
+            <RegistryValue Root="HKCU" Key="Software\SchoolBot" Name="InstallDir"
+                           Type="string" Value="[INSTALLFOLDER]" KeyPath="yes" />
+          </Component>
+          <Component Id="DemoEngine" Guid="21FBC6F0-B7BE-49A9-A490-45530908339D" Bitness="always64">
+            <File Id="EngineExe" Source="$(var.PayloadDir)\demo-engine.exe" />
+            <RegistryValue Root="HKCU" Key="Software\SchoolBot\Installer" Name="Engine"
+                           Type="integer" Value="1" KeyPath="yes" />
+          </Component>
+          <Component Id="ThirdPartyNotices" Guid="B6C06624-21B1-4230-B845-E0E46D307014" Bitness="always64">
+            <File Id="NoticesFile" Source="$(var.Notices)" />
+            <RegistryValue Root="HKCU" Key="Software\SchoolBot\Installer" Name="Notices"
+                           Type="integer" Value="1" KeyPath="yes" />
+          </Component>
+          <Component Id="WebViewBootstrapper" Guid="0840C947-74B3-4FAD-84D7-37E975EE781A" Bitness="always64">
+            <File Id="BootstrapperExe" Source="$(var.Bootstrapper)" />
+            <RegistryValue Root="HKCU" Key="Software\SchoolBot\Installer" Name="Bootstrapper"
+                           Type="integer" Value="1" KeyPath="yes" />
+          </Component>
+        </Directory>
+      </Directory>
+    </StandardDirectory>
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="SchoolBotMenu" Name="School Bot">
+        <Component Id="MenuShortcut" Guid="*" Bitness="always64">
+          <Shortcut Id="StartMenuShortcut" Name="School Bot" Target="[#DesktopExe]" WorkingDirectory="INSTALLFOLDER" Icon="SchoolBotIcon" IconIndex="0" />
+          <RemoveFolder Id="RemoveSchoolBotMenu" On="uninstall" />
+          <RegistryValue Root="HKCU" Key="Software\SchoolBot\Installer" Name="MenuShortcut"
+                         Type="integer" Value="1" KeyPath="yes" />
+        </Component>
+      </Directory>
+    </StandardDirectory>
+    <StandardDirectory Id="DesktopFolder">
+      <Component Id="DesktopShortcut" Guid="*" Bitness="always64">
+        <Shortcut Id="DesktopLink" Name="School Bot" Target="[#DesktopExe]" WorkingDirectory="INSTALLFOLDER" Icon="SchoolBotIcon" IconIndex="0" />
+        <RegistryValue Root="HKCU" Key="Software\SchoolBot\Installer" Name="DesktopShortcut"
+                       Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </StandardDirectory>
+    <Feature Id="SchoolBotDesktop" Title="School Bot" Level="1">
+      <ComponentRef Id="DesktopExecutable" />
+      <ComponentRef Id="DemoEngine" />
+      <ComponentRef Id="ZideExecutable" />
+      <ComponentRef Id="ZideManifest" />
+      <ComponentRef Id="ZideNotices" />
+      <ComponentRef Id="ZideHidLicense" />
+      <ComponentRef Id="ZideJsonLicense" />
+      <ComponentRef Id="ZideHash" />
+      <ComponentRef Id="ThirdPartyNotices" />
+      <ComponentRef Id="WebViewBootstrapper" />
+      <ComponentRef Id="MenuShortcut" />
+      <ComponentRef Id="DesktopShortcut" />
+    </Feature>
+    <Property Id="ARPNOMODIFY" Value="1" />
+    <Property Id="SCHOOLBOT_LAUNCH" Value="1" />
+    <CustomAction Id="LaunchSchoolBot" FileRef="DesktopExe" ExeCommand=""
+                  Return="asyncNoWait" Impersonate="yes" />
+    <WixVariable Id="WixUIDialogBmp" Value="$(var.BrandDir)/dialog.bmp" />
+    <WixVariable Id="WixUIBannerBmp" Value="$(var.BrandDir)/banner.bmp" />
+    <UIRef Id="SchoolBotUI" />
+  </Package>
+</Wix>

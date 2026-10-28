@@ -1,0 +1,14 @@
+{
+  "$schema": "../../contracts/engine/manifest.schema.json",
+  "id": "zide",
+  "version": "0.1.0",
+  "language": "C++17",
+  "protocol": "1.0",
+  "modes": ["robot-control"],
+  "transport": "stdio-json-lines",
+  "default_device_transport": "dry-run",
+  "entrypoints": { "windows": "zide-engine.exe", "darwin": "zide-engine", "linux": "zide-engine" },
+  "hardware_platforms": ["windows"],
+  "source": "sb-app-zide",
+  "integration": "robot-control frontend via trusted desktop host registry; bundled with the desktop app"
+}

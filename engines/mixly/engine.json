@@ -1,0 +1,18 @@
+{
+  "$schema": "../../contracts/engine/manifest.schema.json",
+  "id": "mixly",
+  "version": "0.1.0",
+  "language": "Go + upstream Mixly JavaScript generators",
+  "protocol": "1.0",
+  "modes": ["block-programming", "coding-adventure"],
+  "transport": "stdio-json-lines",
+  "default_device_transport": "dry-run",
+  "entrypoints": {
+    "windows": "mixly-engine.exe",
+    "darwin": "mixly-engine",
+    "linux": "mixly-engine"
+  },
+  "hardware_platforms": ["windows", "darwin", "linux"],
+  "source": "sb-app-mixly/resources/app/src",
+  "integration": "standalone engine only; not routed or bundled by the desktop host"
+}

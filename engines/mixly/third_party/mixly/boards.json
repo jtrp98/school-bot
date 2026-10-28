@@ -1,0 +1,43 @@
+[
+   {
+        "boardImg": "./board/arduino_avr/media/uno_compressed.png",
+        "boardType": "Arduino AVR",
+        "boardIndex": "./board/arduino_avr/index.html",
+        "env": {
+            "electron": true,
+            "web": false,
+            "webCompiler": true,
+            "webSocket": true
+        }
+    },{
+        "boardImg": "./board/arduino_esp32/media/esp32_compressed.png",
+        "boardType": "Arduino ESP32",
+        "boardIndex": "./board/arduino_esp32/index_board_Arduino_ESP32.html",
+        "env": {
+            "electron": true,
+            "web": false,
+            "webCompiler": true,
+            "webSocket": true
+        }
+    },{
+        "boardImg": "./board/micropython_esp32/media/esp32_compressed.png",
+        "boardType": "Python ESP32",
+        "boardIndex": "./board/micropython_esp32/index.html",
+        "env": {
+            "electron": true,
+            "web": true,
+            "webCompiler": true,
+            "webSocket": true
+        }
+    },{
+        "boardImg": "./board/arduino_esp8266/media/esp8266_compressed.png",
+        "boardType": "Arduino ESP8266",
+        "boardIndex": "./board/arduino_esp8266/index_board_Arduino_ESP8266.html",
+        "env": {
+            "electron": true,
+            "web": false,
+            "webCompiler": true,
+            "webSocket": true
+        }
+    }
+]

@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "School Bot common engine request envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol", "request_id", "mode", "action", "data"],
+  "properties": {
+    "protocol": { "const": "1.0" },
+    "request_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "mode": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "action": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "data": { "type": "object" }
+  },
+  "description": "Language-independent envelope only. Each engine validates its supported modes, actions and data. This schema is documentation, not host runtime validation."
+}

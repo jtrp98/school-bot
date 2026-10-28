@@ -1,0 +1,6 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://school-bot.local/contracts/engine-response.schema.json",
+  "title": "School Bot engine response",
+  "$ref": "engine/response.schema.json"
+}

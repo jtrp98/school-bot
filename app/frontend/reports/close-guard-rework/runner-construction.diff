@@ -1,0 +1,5 @@
+--- entry-independent-check.mjs
++++ entry-independent-current.mjs
+@@ manifest SHA256 @@
+-      "13041a1f5ce34aaf14033c4f221ead12e062e33ecef64c7e2aeceddba9bb06bd",
++      "ab984fe746ba8b671b702ba4cc01627d81cb56bdf2ab701add3d061235dbaf4b",
