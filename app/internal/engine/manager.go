@@ -28,14 +28,15 @@ const (
 // A trusted registry prevents the frontend from selecting executables.
 // Child processes provide crash isolation, not a security sandbox.
 type Manager struct {
-	slots    chan struct{}
-	mu       sync.Mutex
-	active   context.CancelFunc
-	stopping bool
-	done     chan struct{}
-	timeout  time.Duration
-	resolve  func(engineSpec) (string, error)
-	command  func(context.Context, string) *exec.Cmd
+	slots     chan struct{}
+	mu        sync.Mutex
+	active    context.CancelFunc
+	stopping  bool
+	done      chan struct{}
+	timeout   time.Duration
+	resolve   func(engineSpec) (string, error)
+	command   func(context.Context, string) *exec.Cmd
+	simulator *hardwareSimulator
 }
 
 type engineSpec struct{ id, relativePath string }
@@ -102,7 +103,7 @@ func locateEngine(spec engineSpec) (string, error) {
 }
 
 func NewManager() *Manager {
-	return &Manager{
+	manager := &Manager{
 		slots:   make(chan struct{}, 1),
 		timeout: requestTimeout,
 		resolve: locateEngine,
@@ -110,6 +111,10 @@ func NewManager() *Manager {
 			return exec.CommandContext(ctx, path)
 		},
 	}
+	if os.Getenv("SCHOOL_BOT_HARDWARE_SIMULATOR") == "1" {
+		manager.simulator = newHardwareSimulator(os.Getenv("SCHOOL_BOT_SIMULATOR_SCENARIO"))
+	}
+	return manager
 }
 
 func (m *Manager) Cancel() {
@@ -161,6 +166,9 @@ func (m *Manager) Execute(mode, action string, data json.RawMessage) (Response, 
 		close(done)
 		m.mu.Unlock()
 	}()
+	if mode == "robot-control" && m.simulator != nil {
+		return m.simulator.execute(ctx, action, data), nil
+	}
 	return m.runEngine(ctx, spec, mode, action, data), nil
 }
 

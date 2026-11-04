@@ -1,4 +1,5 @@
 import { t as translate } from "../../../i18n";
+import { deserializeArmProject } from "../../../core/projectStoreV2";
 import { UI_RANGES } from "../engineAdapter";
 import { JOINTS } from "./types";
 
@@ -16,7 +17,13 @@ const isValidPose = (p: any) => {
 
 export function restoreNativeProject(value: unknown): Record<string, any> | null {
   if (value == null) return null;
-  const doc = value as { kind?: unknown; version?: unknown; state?: Record<string, any> };
+  const doc = value as { kind?: unknown; version?: unknown; state?: Record<string, any>; content?: unknown };
+  if (doc.kind === "arm") {
+    return deserializeArmProject(doc);
+  }
+  if (doc.content && typeof doc.content === "object" && (doc.content as { kind?: unknown }).kind === "arm") {
+    return deserializeArmProject(doc.content);
+  }
   if (doc.kind !== "zide-workspace" || doc.version !== 1 || !doc.state) {
     throw new Error(translate("robot.workspace.error.projectFormat"));
   }

@@ -62,6 +62,24 @@ func (h *Host) Evaluate(ctx context.Context) (EntitlementProjection, error) {
 	return h.service.Evaluate(ctx)
 }
 
+func (h *Host) TrustedTime(ctx context.Context) (TrustedTimeProjection, error) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	if err := h.initialize(ctx); err != nil {
+		return TrustedTimeProjection{Trusted: false, ErrorCode: ErrCredentialStoreFailed}, err
+	}
+	return h.service.TrustedTime(ctx)
+}
+
+func (h *Host) SavedKey(ctx context.Context) (string, error) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	if err := h.initialize(ctx); err != nil {
+		return "", err
+	}
+	return h.credentials.envelope.LicenseKey, nil
+}
+
 func (h *Host) Authorize(ctx context.Context, mode string) error {
 	switch mode {
 	case "block-programming", "robot-control", "coding-adventure":

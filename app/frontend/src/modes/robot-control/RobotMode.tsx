@@ -1,3 +1,4 @@
+import { SimulatorControls } from "./SimulatorControls";
 import { t as translate } from "../../i18n";
 import { useEffect, useState } from "react";
 import "./armlab-fonts";
@@ -23,6 +24,7 @@ function ArmLabScreens() {
   useEffect(() => setArmScreen(screen), [screen, setArmScreen]);
   return (
     <div className={"arm-lab [flex:1] flex flex-col min-h-0 relative [&:has(>_.aw-host)]:min-h-[max(var(--app-viewport-height,_100vh),_780px)]"}>
+      <SimulatorControls />
       {screen === "connect" && (sample ? <ConnectScreen /> : <NativeConnectScreen />)}
       {screen === "works" && <WorksScreen />}
       {screen === "workspace" && <ArmWorkspace />}

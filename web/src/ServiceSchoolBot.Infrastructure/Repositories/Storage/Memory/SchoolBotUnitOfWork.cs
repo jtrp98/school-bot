@@ -10,7 +10,7 @@ using ServiceSchoolBot.Infrastructure.Repositories.Storage;
 
 namespace ServiceSchoolBot.Infrastructure.Repositories.Storage.Memory;
 
-public sealed class SchoolBotUnitOfWork : ISchoolBotRepositoryScope, IIdempotentSchoolBotCommit
+public sealed partial class SchoolBotUnitOfWork : ISchoolBotRepositoryScope, IIdempotentSchoolBotCommit
 {
     internal SchoolBotRepositoryState State { get; }
     public ProjectRepository Project { get; }

@@ -1,3 +1,4 @@
+import { compile } from "./blockCompiler";
 import { BlockWorkspacePanel } from "../../components/block-programming/BlockWorkspacePanel";
 import { BlockResultPanel } from "../../components/block-programming/BlockResultPanel";
 import { useEffect, useRef, useState } from "react";
@@ -8,7 +9,6 @@ import * as chineseMessages from "blockly/msg/zh-hans";
 import { useTranslation } from "react-i18next";
 import i18n, { t as translate } from "../../i18n";
 import { client } from "../../core/client";
-import type { Command } from "../../core/types";
 
 // Blockly's CJS declarations include a default export that its ESM bundle omits.
 Blockly.setLocale(
@@ -120,46 +120,6 @@ function localizeWorkspace(workspace: Blockly.WorkspaceSvg) {
   }
 }
 
-function compile(workspace: Blockly.WorkspaceSvg): Command[] {
-  const commands: Command[] = [];
-  let fuel = 0;
-  function walk(start: Blockly.Block | null, depth: number) {
-    if (++fuel > 1000)
-      throw new Error("Program exceeds the block compilation budget.");
-    if (depth > 8) throw new Error("Use at most 8 nested repeats.");
-    for (let block = start; block; block = block.getNextBlock()) {
-      if (++fuel > 1000)
-        throw new Error("Program exceeds the block compilation budget.");
-      if (!block.isEnabled()) continue;
-      if (block.type === "arm_move") {
-        const op = String(block.getFieldValue("DIRECTION"));
-        const value = Number(block.getFieldValue("TILES"));
-        if (
-          !["move_right", "move_left"].includes(op) ||
-          !Number.isInteger(value) ||
-          value < 1 ||
-          value > 10
-        )
-          throw new Error("Invalid movement");
-        commands.push({ op: op as Command["op"], value });
-      } else if (block.type === "arm_jump") commands.push({ op: "jump" });
-      else if (block.type === "arm_repeat") {
-        const times = Number(block.getFieldValue("TIMES"));
-        if (!Number.isInteger(times) || times < 1 || times > 10)
-          throw new Error("Repeat must be 1–10.");
-        for (let i = 0; i < times; i++)
-          walk(block.getInputTargetBlock("DO"), depth + 1);
-      } else throw new Error("Unsupported block type.");
-      if (commands.length > 64) throw new Error("Program exceeds 64 commands.");
-    }
-  }
-  const roots = workspace.getTopBlocks(true);
-  if (roots.length > 1)
-    throw new Error("Connect your blocks into one sequence.");
-  walk(roots[0] ?? null, 0);
-  return commands;
-}
-
 export default function BlockMode() {
   const { i18n: language } = useTranslation();
   const container = useRef<HTMLDivElement>(null);
@@ -259,6 +219,14 @@ export default function BlockMode() {
       }
       if (value.schema !== 1 || !value.workspace || !workspace.current)
         throw new Error("Invalid saved project");
+      if (new TextEncoder().encode(JSON.stringify(value.workspace)).length > 262144)
+        throw new Error("Block workspace exceeds 256 KiB");
+      const candidate = new Blockly.Workspace();
+      try {
+        Blockly.serialization.workspaces.load(value.workspace, candidate);
+        if (candidate.getAllBlocks(false).length > 1000) throw new Error("Workspace exceeds 1000 blocks");
+        compile(candidate);
+      } finally { candidate.dispose(); }
       Blockly.serialization.workspaces.load(value.workspace, workspace.current);
       setStatus("common.messages.savedBlockProjectLoaded");
     } catch (error) {

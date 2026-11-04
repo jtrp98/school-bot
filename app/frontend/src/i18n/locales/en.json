@@ -108,7 +108,8 @@
       "deviceNotConfirmed": "The device has not confirmed a real connection.",
       "robotNotSelected": "No robot is selected and no profile is confirmed.",
       "connectionSuperseded": "The previous connection attempt was cancelled. Please connect again.",
-      "deviceNotFound": "The selected device was not found. Check the USB cable and reconnect."
+      "deviceNotFound": "The selected device was not found. Check the USB cable and reconnect.",
+      "torqueOff": "Torque is disabled. Explicitly enable torque before moving."
     },
     "teacher": {
       "title": "Teacher menu",
@@ -1322,6 +1323,18 @@
       "wristRotate": "Wrist rotation",
       "gripper": "Gripper",
       "bend": "Bend"
+    },
+    "hardwareSimulator": {
+      "title": "Hardware Simulator · no physical device or measurements",
+      "open": "Open hardware simulator",
+      "ready": "Ready",
+      "stop": "Emergency stop / torque off",
+      "halted": "Stopped; torque disabled. Enable torque explicitly before motion.",
+      "disconnect": "Simulate cable loss",
+      "timeout": "Simulate timeout",
+      "restore": "Restore connection",
+      "restored": "Connection restored; reconnect and enable torque before motion.",
+      "rearm": "Enable simulator torque"
     }
   },
   "common": {

@@ -13,7 +13,7 @@ using ServiceSchoolBot.Infrastructure.Entities.SchoolBotDb;
 
 namespace ServiceSchoolBot.Infrastructure.Repositories.Databases;
 
-public sealed class SchoolBotUnitOfWork : ISchoolBotRepositoryScope, IIdempotentSchoolBotCommit
+public sealed partial class SchoolBotUnitOfWork : ISchoolBotRepositoryScope, IIdempotentSchoolBotCommit
 {
     private readonly SchoolBotDbContext db;
     internal TimeProvider Clock { get; }

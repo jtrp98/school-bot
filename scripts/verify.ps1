@@ -41,6 +41,7 @@ try {
             '--test',
             'app/frontend/tests/frontend-adapter.test.mjs',
             'app/frontend/tests/frontend-workspace.test.mjs',
+            'app/frontend/tests/phase4-simulator.test.mjs',
             'engines/zide/tests/ipc.test.mjs'
         )
     } finally { Pop-Location }

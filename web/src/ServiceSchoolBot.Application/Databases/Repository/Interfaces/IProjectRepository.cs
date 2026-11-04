@@ -1,3 +1,4 @@
+using ServiceSchoolBot.Domain.Curriculum;
 using ServiceSchoolBot.Domain.Projects;
 
 namespace ServiceSchoolBot.Application.Databases.Repository.Interfaces;
@@ -5,6 +6,11 @@ namespace ServiceSchoolBot.Application.Databases.Repository.Interfaces;
 public interface IProjectRepository
 {
     Task<ProjectCommitResult> CommitProjectAsync(CommitProjectRequest request, CancellationToken ct = default);
+    Task<IdempotentCommitResult<ProjectCommitResult>> CommitGuestImportAsync(
+        IdempotencyCommand idempotency,
+        CommitProjectRequest request,
+        SchoolBotAuditEventRecord audit,
+        CancellationToken ct = default);
     Task<SchoolBotProjectRecord?> GetProjectByIdAsync(int projectId, CancellationToken ct = default);
     Task<IReadOnlyList<SchoolBotProjectRecord>> ListProjectsByOwnerAsync(int schoolId, string ownerKind, int ownerId, CancellationToken ct = default);
     Task<IReadOnlyList<SchoolBotProjectRevisionRecord>> ListProjectRevisionsAsync(int projectId, CancellationToken ct = default);

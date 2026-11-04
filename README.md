@@ -12,6 +12,14 @@ Engine `mixly` อยู่ใน `engines/mixly/` และ build แยกด�
 `./scripts/engines/build.ps1 -Engine mixly -Test` รองรับตัวสร้างโค้ดจากต้นฉบับ Mixly;
 ยังไม่เชื่อม UI, host routing หรือรวมใน Desktop/Installer ดูขอบเขตที่ `engines/mixly/README.md`
 
+## Labs Hardware Simulator
+
+Run `npm run dev -- --port 5181` from `app/frontend`, then open
+`http://127.0.0.1:5181/?simulator=1&view=robot-control&screen=connect` and choose Guest.
+The explicit simulator supports HID/Serial profiles, poses, queues, upload/readback,
+emergency torque cutoff and fault injection entirely in memory. Code/Block Labs
+produce bounded visual traces. See [Phase 4 verification and remaining acceptance](docs/PHASE4-LABS.md).
+
 ## Quick start (Windows / PowerShell)
 
 ติดตั้ง Go (เวอร์ชันขั้นต่ำตามบรรทัด `go` ใน `app/go.mod`), Node.js **24 LTS**, .NET **10 SDK** และ WebView2 Runtime ก่อน

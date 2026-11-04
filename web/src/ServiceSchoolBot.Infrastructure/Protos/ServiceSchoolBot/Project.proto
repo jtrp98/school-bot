@@ -13,6 +13,7 @@ service ProjectService {
   rpc UpdateProject (UpdateProjectRequest) returns (ProjectDocumentResponse);
   rpc DeleteProject (DeleteProjectRequest) returns (DeleteProjectResponse);
   rpc CopyProject (CopyProjectRequest) returns (ProjectDocumentResponse);
+  rpc ImportProject (ImportProjectRequest) returns (ImportProjectResponse);
 }
 
 message ListProjectsRequest {
@@ -91,4 +92,17 @@ message DeleteProjectResponse {
   bool deleted = 2;
   google.protobuf.Timestamp update_date = 3;
   string etag = 4;
+}
+message ImportProjectRequest {
+  optional string idempotency_key = 1;
+  string local_project_id = 2;
+  string mode = 3;
+  string name = 4;
+  int32 local_revision = 5;
+  string content_json = 6;
+}
+message ImportProjectResponse {
+  ProjectDocumentItem document = 1;
+  string etag = 2;
+  bool replayed = 3;
 }

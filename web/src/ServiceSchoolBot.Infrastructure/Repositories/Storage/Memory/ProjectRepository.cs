@@ -9,7 +9,7 @@ using ServiceSchoolBot.Domain.Projects;
 
 namespace ServiceSchoolBot.Infrastructure.Repositories.Storage.Memory;
 
-public sealed class ProjectRepository : IProjectRepository
+public sealed partial class ProjectRepository : IProjectRepository
 {
     private readonly SchoolBotRepositoryState state;
 

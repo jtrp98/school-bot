@@ -55,6 +55,7 @@ frontend/src/components/
 - Public trust keys สำหรับ signer จริงยังรอการจัดเตรียมตามมติผู้ถือกุญแจ; ค่าเริ่มต้นไม่มี trusted signer จึง locked จนจัดเตรียม trust root ฝั่ง host การทดสอบใช้ ES256 test signer ผ่าน constructor โดยไม่เปิด production bypass
 - Go host normal tests ใช้ `.NET 10 SDK` สร้าง fixture ใน `internal/license/testdata/hostserver/` ซึ่งเรียก service/store เดิมของ `web/` ใน process แยกผ่าน network double โดยแยกรอบ memory/file; fixture ไม่เชื่อม DB จริงและไม่รัน web test suite
 - Host เริ่ม Engine ใหม่ต่อ Request: Robot Control ใช้ Zide; Adventure/Blockly ใช้ Demo Engine (ยังไม่ใช่ persistent engine pool)
+- Hardware Simulator / Virtual Port เปิดแยกด้วย `SCHOOL_BOT_HARDWARE_SIMULATOR=1` ก่อนเริ่มแอป ใช้ route Robot Control เดิมแต่ไม่เปิด native device และคืน `simulated:true` เสมอ; License gate ยังทำงาน ดู payload, fault scenarios และวิธีต่อ UI ใน [Zide integration](../engines/zide/docs/INTEGRATION.md#hardware-simulator--virtual-port-ผ่าน-host)
 - Student DSL รองรับ `hero.move_right(n)`, `hero.move_left(n)`, `hero.jump()` เท่านั้น
 - Save Project เป็นหนึ่ง slot ต่อ Mode ใน OS config directory `SchoolBotPoC`
 - Device ID สุ่มต่อ local installation และตรวจรูปแบบ hexadecimal ไม่อ่าน Hardware Serial Number

@@ -48,6 +48,13 @@ func MigrateLegacyProjects(configDir string, store *LocalStore) ([]MigrationResu
 			if serr == nil && sfi.Mode().IsRegular() {
 				foundApp = apps[1]
 				foundPath = secondaryPath
+			} else if os.IsNotExist(serr) {
+				directPath := filepath.Join(cleanConfig, slot.filename)
+				dfi, derr := os.Lstat(directPath)
+				if derr == nil && dfi.Mode().IsRegular() {
+					foundApp = "school-bot"
+					foundPath = directPath
+				}
 			}
 		} else if err != nil {
 			foundApp = apps[0]
@@ -60,6 +67,22 @@ func MigrateLegacyProjects(configDir string, store *LocalStore) ([]MigrationResu
 
 		res := migrateSlot(foundApp, slot.mode, slot.filename, foundPath, store)
 		results = append(results, res)
+	}
+
+	armDataCandidates := []struct {
+		app  string
+		path string
+	}{
+		{app: "SchoolBotPoC", path: filepath.Join(cleanConfig, "SchoolBotPoC", "robotarm.data.json")},
+		{app: "ArmStudioPoC", path: filepath.Join(cleanConfig, "ArmStudioPoC", "robotarm.data.json")},
+		{app: "school-bot", path: filepath.Join(cleanConfig, "robotarm.data.json")},
+	}
+	for _, cand := range armDataCandidates {
+		if fi, err := os.Lstat(cand.path); err == nil && fi.Mode().IsRegular() {
+			res := migrateSlot(cand.app, ModeArm, "robotarm.data.json", cand.path, store)
+			results = append(results, res)
+			break
+		}
 	}
 
 	return results, nil
@@ -109,7 +132,11 @@ func migrateSlot(sourceApp, mode, filename, sourcePath string, store *LocalStore
 	}
 	defer unlock()
 
-	receiptPath := filepath.Join(store.ReceiptsDir(), fmt.Sprintf("receipt_%s_%s.json", sourceApp, mode))
+	receiptKey := mode
+	if filename == "robotarm.data.json" {
+		receiptKey = "robotarm_data"
+	}
+	receiptPath := filepath.Join(store.ReceiptsDir(), fmt.Sprintf("receipt_%s_%s.json", sourceApp, receiptKey))
 	hasValidReceipt := false
 	var validReceipt MigrationReceipt
 

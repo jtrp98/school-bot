@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using ServiceSchoolBot.Application.Databases.Repository.Interfaces;
 using ServiceSchoolBot.Application.Services.Implementations.Projects;
 using ServiceSchoolBot.Domain;
+using ServiceSchoolBot.Domain.Concurrency;
+using ServiceSchoolBot.Domain.Curriculum;
 using ServiceSchoolBot.Domain.Projects;
 using ServiceSchoolBot.Infrastructure.Common.Databases;
 using ServiceSchoolBot.Infrastructure.Entities.SchoolBotDb;
@@ -12,6 +14,25 @@ namespace ServiceSchoolBot.Infrastructure.Repositories.Databases;
 
 public sealed partial class ProjectRepository(SchoolBotDbContext db, SchoolBotUnitOfWork unitOfWork) : IProjectRepository
 {
+    public Task<IdempotentCommitResult<ProjectCommitResult>> CommitGuestImportAsync(
+        IdempotencyCommand idempotency,
+        CommitProjectRequest request,
+        SchoolBotAuditEventRecord audit,
+        CancellationToken ct = default) =>
+        unitOfWork.CommitWithIdempotencyAsync(
+            idempotency,
+            (_, _, _, _) => Task.CompletedTask,
+            async (_, _, token) =>
+            {
+                var committed = await CommitProjectAsync(request, token);
+                await unitOfWork.AddAuditAsync(audit, committed.Project.SchoolBotProjectId, token);
+                return new MutationResult<ProjectCommitResult>(
+                    committed,
+                    201,
+                    committed.Project.SchoolBotProjectId,
+                    OpaqueConcurrencyToken.ToETag(committed.Project.UpdateDate));
+            },
+            ct);
     public async Task<SchoolBotProjectRecord?> GetProjectByIdAsync(
         int projectId, CancellationToken ct = default)
     {

@@ -113,7 +113,9 @@ func ValidateClaims(claims *EntitlementClaims, expectedJKT string) error {
 		strings.TrimSpace(claims.JTI) == "" ||
 		claims.LicenseID <= 0 || claims.LicenseID > 1<<31-1 ||
 		claims.SchoolID <= 0 || claims.SchoolID > 1<<31-1 ||
-		claims.BindingID <= 0 || claims.BindingID > 1<<31-1 || claims.BindingEpoch < 1 {
+		claims.BindingID <= 0 || claims.BindingID > 1<<31-1 ||
+		// The server starts a license at epoch 0 and increments it on every unbind.
+		claims.BindingEpoch < 0 || claims.BindingEpoch > 1<<31-1 {
 		return &LicenseError{
 			Code:    ErrInvalidEntitlement,
 			Message: "claims missing mandatory identification fields",

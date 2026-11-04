@@ -3,6 +3,7 @@ package license_test
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"schoolbot.local/app/internal/license"
 	"testing"
@@ -111,6 +112,14 @@ func TestHostEntitlementNormal(t *testing.T) {
 				original := a.claims(t)
 				a.network.online = false
 				server.control("time", start+3600)
+				before := server.control("snapshot", nil)
+				status, body := server.call(0, "/fixture/unbind-without-role", "", json.RawMessage("null"))
+				if status != 403 || !bytes.Contains(body, []byte(`"STAFF_ROLE_REQUIRED"`)) {
+					t.Fatal("unbind without license admin role was not denied")
+				}
+				if !bytes.Equal(before, server.control("snapshot", nil)) {
+					t.Fatal("unauthorized unbind changed server state")
+				}
 				server.control("unbind", nil)
 				b.at(start + 3600)
 				if _, err := b.host.Check(context.Background(), server.key, false); err == nil {
@@ -140,6 +149,40 @@ func TestHostEntitlementNormal(t *testing.T) {
 				}
 				if !bytes.Equal(baseline, server.control("snapshot", nil)) {
 					t.Fatal("A offline altered moved server state")
+				}
+			})
+			t.Run("moved_device_online_denial_persists", func(t *testing.T) {
+				server := startHostServer(t, binary, backend)
+				a, b := newHostComponent(server, 0), newHostComponent(server, 1)
+				start := a.clock.wall.Unix()
+				a.network.online = true
+				if _, err := a.host.Check(context.Background(), server.key, false); err != nil {
+					t.Fatal(err)
+				}
+				a.network.online = false
+				server.control("time", start+3600)
+				server.control("unbind", nil)
+				b.at(start + 3600)
+				b.network.online = true
+				if _, err := b.host.Check(context.Background(), server.key, false); err != nil {
+					t.Fatal(err)
+				}
+				before := server.control("snapshot", nil)
+				server.control("time", start+7200)
+				a.at(start + 7200)
+				a.network.online = true
+				projection, err := a.host.Check(context.Background(), server.key, true)
+				var failure *license.LicenseError
+				if !errors.As(err, &failure) || failure.Code != license.ErrBindingRevoked ||
+					projection.Status != license.StatusDenied {
+					t.Fatalf("moved device denial: %v", err)
+				}
+				assertModes(t, a, false)
+				a.network.online = false
+				a.restart()
+				assertModes(t, a, false)
+				if !bytes.Equal(before, server.control("snapshot", nil)) {
+					t.Fatal("moved device denial changed server state")
 				}
 			})
 		})

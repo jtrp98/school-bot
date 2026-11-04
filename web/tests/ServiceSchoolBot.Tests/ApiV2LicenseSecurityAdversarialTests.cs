@@ -238,7 +238,7 @@ public sealed class ApiV2LicenseSecurityAdversarialTests
     }
 
     [Fact]
-    public async Task Idempotency_SamePayloadReplays_DifferentPayloadConflicts()
+    public async Task Idempotency_SamePayloadReplays_DifferentPayloadWithStaleProofRejected()
     {
         using var factory = new ApiFactory();
         var client = GrpcTest.Licenses(factory);
@@ -258,6 +258,6 @@ public sealed class ApiV2LicenseSecurityAdversarialTests
         Assert.Equal(json1.Entitlement, json2.Entitlement);
 
         var modifiedBody = JsonSerializer.Serialize(new { key = "SBOT-different-key", device_jwk = devJwk, challenge = chal, proof }, JsonOptions);
-        await AssertCode(Activate(client, modifiedBody, idempKey), 409, ErrorCodes.IdempotencyConflict);
+        await AssertCode(Activate(client, modifiedBody, idempKey), 403, ErrorCodes.DeviceProofInvalid);
     }
 }

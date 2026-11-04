@@ -1,16 +1,19 @@
 using System.Security.Cryptography;
 using System.Text.Json;
-using ServiceSchoolBot.Application.Licensing;
+using ServiceSchoolBot.Application.Common.Model.Licensing;
+using ServiceSchoolBot.Application.Services.Implementations.Licensing;
+using ServiceSchoolBot.Application.Services.Interfaces.Licensing;
 using ServiceSchoolBot.Domain;
 using ServiceSchoolBot.Domain.Concurrency;
-using ServiceSchoolBot.Infrastructure.Persistence;
+using ServiceSchoolBot.Infrastructure.Repositories.Storage;
+using ServiceSchoolBot.Infrastructure.Repositories.Storage.Memory;
 
 var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower };
 var clock = new FixtureClock();
 var memory = new MemorySchoolBotBackingStore();
 ISchoolBotBackingStore Store() => args[0] == "memory" ? memory : new FileSchoolBotBackingStore(args[1]);
-var adapterA = new SchoolBotDbAdapter(Store(), clock);
-var adapterB = new SchoolBotDbAdapter(Store(), clock);
+var adapterA = new SchoolBotUnitOfWork(Store(), clock).License;
+var adapterB = new SchoolBotUnitOfWork(Store(), clock).License;
 using var signingKey = ECDsa.Create(ECCurve.NamedCurves.nistP256);
 using var signer = new TestLicenseTokenSigner(signingKey);
 var devices = new[] { new LicenseDeviceService(adapterA, signer, clock), new LicenseDeviceService(adapterB, signer, clock) };
@@ -40,16 +43,20 @@ while ((line = Console.ReadLine()) is not null)
                 clock.Current = DateTimeOffset.FromUnixTimeSeconds(root.GetProperty("body").GetInt64());
                 break;
             case "/fixture/snapshot":
-                var reader = new SchoolBotDbAdapter(Store(), clock);
+                var reader = new SchoolBotUnitOfWork(Store(), clock).License;
                 await reader.ListLicensesAsync();
                 result = await Store().LoadLicenseUnitAsync();
                 break;
             case "/fixture/unbind":
+            case "/fixture/unbind-without-role":
             case "/fixture/revoke":
-                var license = (await new SchoolBotDbAdapter(Store(), clock).GetLicenseByIdAsync(created.License.Id))!;
+                var license = (await new SchoolBotUnitOfWork(Store(), clock).License.GetLicenseByIdAsync(created.License.Id))!;
                 var etag = OpaqueConcurrencyToken.ToETag(license.UpdateDate);
-                result = path.EndsWith("unbind")
-                    ? await adminB.UnbindLicenseAsync(admin, created.License.Id, etag, reason: "fixture:move")
+                var principal = path.EndsWith("without-role")
+                    ? LicenseAdminPrincipalStub.CreateStaffNoRole(principal: "P2")
+                    : admin;
+                result = path != "/fixture/revoke"
+                    ? await adminB.UnbindLicenseAsync(principal, created.License.Id, etag, reason: "fixture:move")
                     : await adminB.RevokeLicenseAsync(admin, created.License.Id, etag, reason: "fixture:revoke");
                 break;
             case "/v2/device-challenges":

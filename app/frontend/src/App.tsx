@@ -1,3 +1,6 @@
+import { simulatorEnabled } from "./core/robotSimulator";
+import { simulatorEntryAdapter } from "./app/entry/simulatorEntry";
+import { hostEntryAdapter } from "./app/entry/hostEntry";
 import { AppView } from "./app/AppView";
 import { initialView, syncUrl } from "./app/appData";
 import { t as translate, languages as langs } from "./i18n";
@@ -20,7 +23,7 @@ const langSegClass = [
 ].join(" ");
 
 export function useAppScreen(
-  entryAdapter: EntryAdapter = unavailableEntryAdapter,
+  entryAdapter: EntryAdapter = simulatorEnabled ? simulatorEntryAdapter : preview ? unavailableEntryAdapter : hostEntryAdapter,
   closeActions?: CloseActions,
 ) {
   const entry = useEntry(entryAdapter);

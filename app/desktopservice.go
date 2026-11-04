@@ -14,7 +14,10 @@ import (
 	"runtime"
 	"schoolbot.local/app/internal/engine"
 	"schoolbot.local/app/internal/license"
+	"schoolbot.local/app/internal/project"
+	"schoolbot.local/app/internal/updater"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -27,12 +30,22 @@ const unreleasedVersion = "0.0.0"
 // This URL is embedded in distributed binaries, so it must not contain secrets.
 var defaultAPIURL = "http://localhost:8080"
 
+type DesktopSession struct {
+	Username  string `json:"username"`
+	Token     string `json:"token,omitempty"`
+	ExpiresAt string `json:"expires_at,omitempty"`
+}
+
 type DesktopService struct {
-	manager     *engine.Manager
-	entitlement *license.Host
-	apiURL      string
-	dataDir     string
-	closeWindow func()
+	mu           sync.Mutex
+	manager      *engine.Manager
+	entitlement  *license.Host
+	projectStore *project.LocalStore
+	updater      *updater.Client
+	session      *DesktopSession
+	apiURL       string
+	dataDir      string
+	closeWindow  func()
 }
 
 func (s *DesktopService) CloseWindow() error {
@@ -66,15 +79,20 @@ func NewDesktopService() (*DesktopService, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &DesktopService{
-		manager: engine.NewManager(),
-		entitlement: license.NewHost(
-			base, &http.Client{}, license.NewSystemClock(), &license.ES256Verifier{},
-			&license.ProtectedStore{Path: filepath.Join(dir, "entitlement.dat")},
-		),
-		apiURL:  strings.TrimRight(base, "/"),
-		dataDir: dir,
-	}, nil
+	entitlement := license.NewHost(
+		base, &http.Client{}, license.NewSystemClock(), &license.ES256Verifier{},
+		&license.ProtectedStore{Path: filepath.Join(dir, "entitlement.dat")},
+	)
+	svc := &DesktopService{
+		manager:     engine.NewManager(),
+		entitlement: entitlement,
+		apiURL:      strings.TrimRight(base, "/"),
+		dataDir:     dir,
+	}
+	if store, err := svc.ensureProjectStore(); err == nil {
+		_, _ = project.MigrateLegacyProjects(config, store)
+	}
+	return svc, nil
 }
 
 func (s *DesktopService) Info() AppInfo {
@@ -116,7 +134,120 @@ func (s *DesktopService) ActivateLicense(key string) (string, error) {
 }
 
 func (s *DesktopService) ValidateLicense(key string) (string, error) {
+	if strings.TrimSpace(key) == "" && s.entitlement != nil {
+		if saved, err := s.entitlement.SavedKey(context.Background()); err == nil && saved != "" {
+			key = saved
+		}
+	}
 	return s.checkLicense(key, true)
+}
+
+func (s *DesktopService) LoginSession(username, password string) (string, error) {
+	username = strings.TrimSpace(username)
+	if username == "" || password == "" {
+		return "invalid_credentials", nil
+	}
+	projection, err := s.LicenseStatus()
+	if err != nil || projection.Status != license.StatusValid {
+		return "unavailable", nil
+	}
+	resp, err := s.api("POST", "/v2/auth/sessions", map[string]string{
+		"username": username,
+		"password": password,
+	})
+	if err != nil {
+		msg := err.Error()
+		if strings.HasPrefix(msg, "API 401:") || strings.HasPrefix(msg, "API 403:") {
+			return "invalid_credentials", nil
+		}
+		if strings.HasPrefix(msg, "API unavailable") {
+			return "network", nil
+		}
+		return "unavailable", nil
+	}
+	var parsed struct {
+		Token     string `json:"token"`
+		SessionID string `json:"session_id"`
+		ExpiresAt string `json:"expires_at"`
+	}
+	_ = json.Unmarshal([]byte(resp), &parsed)
+	token := parsed.Token
+	if token == "" {
+		token = parsed.SessionID
+	}
+	s.mu.Lock()
+	s.session = &DesktopSession{
+		Username:  username,
+		Token:     token,
+		ExpiresAt: parsed.ExpiresAt,
+	}
+	s.mu.Unlock()
+	return "success", nil
+}
+
+func (s *DesktopService) LogoutSession() error {
+	s.mu.Lock()
+	current := s.session
+	s.session = nil
+	s.mu.Unlock()
+	if current != nil && current.Token != "" {
+		_, _ = s.api("POST", "/v2/auth/logout", map[string]string{"token": current.Token})
+	}
+	return nil
+}
+
+func (s *DesktopService) CurrentSession() *DesktopSession {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.session == nil {
+		return nil
+	}
+	if s.session.ExpiresAt != "" {
+		if exp, err := time.Parse(time.RFC3339, s.session.ExpiresAt); err == nil && !time.Now().UTC().Before(exp) {
+			s.session = nil
+			return nil
+		}
+	}
+	copySession := *s.session
+	copySession.Token = ""
+	return &copySession
+}
+
+func (s *DesktopService) CheckUpdatesV2() (updater.UpdateCheckResponse, error) {
+	return s.ensureUpdater().CheckUpdates(context.Background())
+}
+
+func (s *DesktopService) PrepareUpdateV2(manifestJWS string) (*updater.PreparedUpdate, error) {
+	return s.ensureUpdater().PrepareUpdate(context.Background(), manifestJWS)
+}
+
+func (s *DesktopService) CancelPrepareUpdateV2() {
+	s.ensureUpdater().CancelPrepare()
+}
+
+func (s *DesktopService) InstallPreparedUpdateV2(version string, hasActiveWork bool, userConfirmed bool) (*updater.InstallResult, error) {
+	return s.ensureUpdater().InstallPreparedUpdate(context.Background(), version, hasActiveWork, userConfirmed)
+}
+
+func (s *DesktopService) ensureUpdater() *updater.Client {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.updater != nil {
+		return s.updater
+	}
+	local := strings.HasPrefix(s.apiURL, "http://127.0.0.1") ||
+		strings.HasPrefix(s.apiURL, "http://localhost") ||
+		strings.HasPrefix(s.apiURL, "http://[::1]")
+	s.updater = updater.NewClient(updater.Config{
+		BaseURL:        s.apiURL,
+		DataDir:        s.dataDir,
+		CurrentVersion: appVersion,
+		Channel:        "stable",
+		Platform:       runtime.GOOS + "-" + runtime.GOARCH,
+		ExpectedPub:    "SchoolBright",
+		AllowLocalHTTP: local,
+	})
+	return s.updater
 }
 
 func (s *DesktopService) LicenseStatus() (license.EntitlementProjection, error) {

@@ -9,6 +9,7 @@ export const ENGINE_ERROR_KEYS: Record<string, string> = {
   ENGINE_TIMEOUT: "robot.errors.engineTimeout",
   ENGINE_FAILED: "robot.errors.engineFailed",
   TRANSPORT_ERROR: "robot.errors.transportError",
+  TORQUE_OFF: "robot.errors.torqueOff",
   DEVICE_TIMEOUT: "robot.errors.deviceTimeout",
   SAFETY_LIMIT: "robot.errors.safetyLimit",
   INVALID_INPUT: "robot.errors.invalidInput",

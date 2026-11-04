@@ -1,5 +1,6 @@
 #include "transport.hpp"
 #include "transport_windows.hpp"
+#include "transport_darwin.hpp"
 #include <stdexcept>
 
 #ifdef _WIN32
@@ -122,7 +123,11 @@ std::vector<Device> list_devices() {
 #else
 namespace zide {
 std::vector<Device> list_devices() {
+#ifdef __APPLE__
+    return detail::darwin_devices();
+#else
     throw std::runtime_error("native ZIDE hardware discovery is supported only on Windows");
+#endif
 }
 }
 #endif

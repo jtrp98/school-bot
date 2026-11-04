@@ -106,6 +106,13 @@ export function useEntry(adapter: EntryAdapter) {
   }), [adapter, perform]);
   const guest = useCallback(() => enter(), [enter]);
   const login = useCallback((username: string, password: string) => enter(username, password), [enter]);
+  const logout = useCallback(() => perform(async () => {
+    await adapter.logout?.();
+    if (!live.current) return;
+    admitted.current = false;
+    setAccount(undefined);
+    setEntered(false);
+  }), [adapter, perform]);
   const retryRecovery = useCallback(() => perform(async () => {
     setRecovering(true);
     try {
@@ -120,6 +127,6 @@ export function useEntry(adapter: EntryAdapter) {
 
   return {
     status, entered, hasEntered, account, busy: busy || recovering, recovering, error,
-    activate, validate, useOffline, guest, login, retryRecovery,
+    activate, validate, useOffline, guest, login, logout, retryRecovery,
   };
 }

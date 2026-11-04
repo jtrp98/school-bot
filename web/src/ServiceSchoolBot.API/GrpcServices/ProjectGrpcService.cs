@@ -94,6 +94,31 @@ public sealed class ProjectGrpcService(
             return ToResponse(document);
         });
 
+    public override Task<Rpc.ImportProjectResponse> ImportProject(
+        Rpc.ImportProjectRequest request, ServerCallContext context) =>
+        runner.RunAsync(context, async call =>
+        {
+            var auth = await AuthorizeAsync(call);
+            var imported = await service.ImportGuestProjectAsync(
+                auth,
+                new ImportGuestProjectRequest(
+                    request.LocalProjectId,
+                    request.Mode,
+                    request.Name,
+                    request.LocalRevision,
+                    ParseContentOrReject(request.ContentJson)),
+                request.HasIdempotencyKey ? request.IdempotencyKey : null,
+                call.RequestId,
+                call.CancellationToken);
+            var docResp = ToResponse(imported.Document);
+            return new Rpc.ImportProjectResponse
+            {
+                Document = docResp.Document,
+                Etag = docResp.Etag,
+                Replayed = imported.Replayed
+            };
+        });
+
     private async Task<ProjectAuthContext> AuthorizeAsync(SchoolBotRpcCall call)
     {
         var auth = await authResolver.ResolveAsync(call.Identity, call.CancellationToken);
@@ -116,6 +141,21 @@ public sealed class ProjectGrpcService(
     {
         using var document = JsonDocument.Parse(json);
         return document.RootElement.Clone();
+    }
+
+    private static JsonElement ParseContentOrReject(string json)
+    {
+        if (string.IsNullOrWhiteSpace(json))
+            throw new SchoolBotRpcFailure(StatusCodes.Status400BadRequest, ErrorCodes.InvalidInput, "Project content is required.");
+        try
+        {
+            using var document = JsonDocument.Parse(json);
+            return document.RootElement.Clone();
+        }
+        catch (JsonException)
+        {
+            throw new SchoolBotRpcFailure(StatusCodes.Status400BadRequest, ErrorCodes.InvalidInput, "Project content must be valid JSON.");
+        }
     }
 
     private static Rpc.ProjectDocumentResponse ToResponse(CloudProjectDocumentResponse document) => new()

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
@@ -8,7 +9,56 @@ import (
 	"os"
 	"path/filepath"
 	"schoolbot.local/app/internal/engine"
+	"schoolbot.local/app/internal/license"
+	"schoolbot.local/app/internal/project"
+	"time"
 )
+
+type hostEntitlementChecker struct {
+	svc *DesktopService
+}
+
+func (c *hostEntitlementChecker) CheckEntitlement(ctx context.Context) error {
+	if c.svc == nil || c.svc.entitlement == nil {
+		return nil
+	}
+	proj, err := c.svc.entitlement.Evaluate(ctx)
+	if err != nil {
+		var licErr *license.LicenseError
+		if errors.As(err, &licErr) && licErr.Code == license.ErrClockUntrusted {
+			return &project.StoreError{Code: project.ErrClockUntrusted, Message: licErr.Message}
+		}
+		return &project.StoreError{Code: project.ErrLicenseRequired, Message: err.Error()}
+	}
+	if proj.Status != license.StatusValid {
+		return &project.StoreError{Code: project.ErrLicenseRequired, Message: "valid license is required"}
+	}
+	return nil
+}
+
+func (s *DesktopService) ensureProjectStore() (*project.LocalStore, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.projectStore != nil {
+		return s.projectStore, nil
+	}
+	store, err := project.NewLocalStore(s.dataDir, &hostEntitlementChecker{svc: s})
+	if err != nil {
+		return nil, err
+	}
+	store.SetLastTrustedFunc(func() (time.Time, bool) {
+		if s.entitlement == nil {
+			return time.Time{}, false
+		}
+		tt, err := s.entitlement.TrustedTime(context.Background())
+		if err != nil || !tt.Trusted || tt.CurrentUTC.IsZero() {
+			return time.Time{}, false
+		}
+		return tt.CurrentUTC, true
+	})
+	s.projectStore = store
+	return store, nil
+}
 
 func readBoundedFile(path string, limit int64) ([]byte, error) {
 	file, err := os.Open(path)
@@ -136,3 +186,150 @@ func (s *DesktopService) LoadProject(mode string) (string, error) {
 	}
 	return string(data), nil
 }
+
+func (s *DesktopService) ListProjectsV2(mode string) ([]project.ProjectMetadata, error) {
+	store, err := s.ensureProjectStore()
+	if err != nil {
+		return nil, err
+	}
+	return store.ListProjects(context.Background(), mode)
+}
+
+func (s *DesktopService) CreateProjectV2(mode, name, contentJSON string) (*project.LocalProjectDocument, error) {
+	store, err := s.ensureProjectStore()
+	if err != nil {
+		return nil, err
+	}
+	var content project.ProjectContent
+	if err := json.Unmarshal([]byte(contentJSON), &content); err != nil {
+		return nil, &project.StoreError{Code: project.ErrProjectInvalid, Message: "invalid content JSON"}
+	}
+	return store.CreateProject(context.Background(), project.CreateProjectInput{
+		Mode:    mode,
+		Name:    name,
+		Content: &content,
+	})
+}
+
+func (s *DesktopService) GetProjectV2(projectID string) (*project.LocalProjectDocument, error) {
+	store, err := s.ensureProjectStore()
+	if err != nil {
+		return nil, err
+	}
+	return store.GetProject(context.Background(), projectID)
+}
+
+func (s *DesktopService) SaveProjectV2(projectID string, expectedRevision int64, name, contentJSON string) (*project.LocalProjectDocument, error) {
+	store, err := s.ensureProjectStore()
+	if err != nil {
+		return nil, err
+	}
+	var content project.ProjectContent
+	if err := json.Unmarshal([]byte(contentJSON), &content); err != nil {
+		return nil, &project.StoreError{Code: project.ErrProjectInvalid, Message: "invalid content JSON"}
+	}
+	return store.SaveProject(context.Background(), project.SaveProjectInput{
+		ProjectID:             projectID,
+		ExpectedLocalRevision: expectedRevision,
+		Name:                  name,
+		Content:               &content,
+	})
+}
+
+func (s *DesktopService) CopyProjectV2(sourceProjectID string, expectedRevision int64, name string) (*project.LocalProjectDocument, error) {
+	store, err := s.ensureProjectStore()
+	if err != nil {
+		return nil, err
+	}
+	return store.CopyProject(context.Background(), project.CopyProjectInput{
+		SourceProjectID:       sourceProjectID,
+		ExpectedLocalRevision: expectedRevision,
+		Name:                  name,
+	})
+}
+
+func (s *DesktopService) DeleteProjectV2(projectID string, _ int64) (*project.TrashMetadata, error) {
+	store, err := s.ensureProjectStore()
+	if err != nil {
+		return nil, err
+	}
+	return store.DeleteProject(context.Background(), projectID)
+}
+
+func (s *DesktopService) ListTrashV2(mode string) ([]project.TrashMetadata, error) {
+	store, err := s.ensureProjectStore()
+	if err != nil {
+		return nil, err
+	}
+	return store.ListTrash(context.Background(), mode)
+}
+
+func (s *DesktopService) RestoreProjectV2(projectID string) (*project.LocalProjectDocument, error) {
+	store, err := s.ensureProjectStore()
+	if err != nil {
+		return nil, err
+	}
+	return store.RestoreProject(context.Background(), projectID)
+}
+
+func (s *DesktopService) ExportProjectV2(projectID string) (string, error) {
+	store, err := s.ensureProjectStore()
+	if err != nil {
+		return "", err
+	}
+	data, err := store.ExportProject(context.Background(), projectID)
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
+}
+
+func (s *DesktopService) ExportProjectToFileV2(projectID, filePath string) error {
+	store, err := s.ensureProjectStore()
+	if err != nil {
+		return err
+	}
+	return store.ExportProjectToFile(context.Background(), projectID, filePath)
+}
+
+func (s *DesktopService) OpenExportedProjectV2(rawJSON string) (*project.LocalProjectDocument, error) {
+	store, err := s.ensureProjectStore()
+	if err != nil {
+		return nil, err
+	}
+	return store.OpenExportedProject(context.Background(), []byte(rawJSON))
+}
+
+func (s *DesktopService) OpenExportedProjectFromFileV2(filePath string) (*project.LocalProjectDocument, error) {
+	store, err := s.ensureProjectStore()
+	if err != nil {
+		return nil, err
+	}
+	return store.OpenExportedProjectFromFile(context.Background(), filePath)
+}
+
+func (s *DesktopService) ImportGuestProjectV2(localProjectID string, schoolID int, ownerKind string, ownerID int) (*project.CloudImportResponse, error) {
+	store, err := s.ensureProjectStore()
+	if err != nil {
+		return nil, err
+	}
+	dest := project.ImportDestination{
+		APIOrigin: s.apiURL,
+		SchoolID:  schoolID,
+		OwnerKind: ownerKind,
+		OwnerID:   ownerID,
+	}
+	resp, _, err := store.ImportProjectToCloud(context.Background(), localProjectID, dest, func(_ context.Context, _ project.ImportDestination, req project.CloudImportRequest) (*project.CloudImportResponse, error) {
+		raw, err := s.api("POST", "/v2/projects/import", req)
+		if err != nil {
+			return nil, err
+		}
+		var out project.CloudImportResponse
+		if err := json.Unmarshal([]byte(raw), &out); err != nil {
+			return nil, err
+		}
+		return &out, nil
+	})
+	return resp, err
+}
+

@@ -45,6 +45,19 @@ public sealed record CopyProjectRequest(
     [property: JsonPropertyName("source_project_revision_id")] int SourceProjectRevisionId
 );
 
+public sealed record ImportGuestProjectRequest(
+    [property: JsonPropertyName("local_project_id")] string LocalProjectId,
+    [property: JsonPropertyName("mode")] string Mode,
+    [property: JsonPropertyName("name")] string Name,
+    [property: JsonPropertyName("local_revision")] int LocalRevision,
+    [property: JsonPropertyName("content")] JsonElement Content
+);
+
+public sealed record ImportGuestProjectResponse(
+    CloudProjectDocumentResponse Document,
+    bool Replayed
+);
+
 public sealed record CloudProjectDocumentResponse(
     [property: JsonPropertyName("schema")] int Schema,
     [property: JsonPropertyName("project_id")] int ProjectId,

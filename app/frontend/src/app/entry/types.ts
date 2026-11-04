@@ -25,6 +25,7 @@ export interface EntryActions {
   useOffline?: () => Promise<void>;
   guest: () => Promise<void>;
   login?: (username: string, password: string) => Promise<LoginResult>;
+  logout?: () => Promise<void>;
   saveAndRequestStop?: () => Promise<void>;
 }
 

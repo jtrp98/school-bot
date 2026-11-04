@@ -43,7 +43,11 @@ if [[ "$platform" == darwin ]]; then
   fi
   flags+=(-arch "$clang_arch")
 fi
-sources=(protocol transport transport_hid transport_serial discovery actions request line_reader main)
+sources=(protocol transport transport_hid transport_serial discovery actions request line_reader
+  transport_io discovery_darwin transport_darwin_hid transport_darwin_serial main)
+if [[ "$platform" == darwin ]]; then
+  link_flags+=(-framework IOKit -framework CoreFoundation)
+fi
 source_files=()
 for source in "${sources[@]}"; do
   source_files+=("$source_dir/src/$source.cpp")
@@ -52,6 +56,9 @@ done
 if [[ "$test_requested" == true ]]; then
   "$cxx" "${flags[@]}" "$source_dir/src/protocol.cpp" "$source_dir/tests/protocol_test.cpp" -o "$build_dir/zide-protocol-tests"
   "$build_dir/zide-protocol-tests"
+  "$cxx" "${flags[@]}" "$source_dir/src/protocol.cpp" "$source_dir/src/transport_io.cpp" \
+    "$source_dir/tests/transport_test.cpp" -o "$build_dir/zide-transport-tests"
+  "$build_dir/zide-transport-tests"
 fi
 cp "$source_dir/THIRD-PARTY-NOTICES.md" "$output/THIRD-PARTY-NOTICES.md"
 cp "$source_dir/third_party/hidapi/LICENSE-bsd.txt" "$output/HIDAPI-LICENSE.txt"

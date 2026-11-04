@@ -21,7 +21,11 @@ auto as_project_work(Work&& work) -> decltype(work()) {
 
 void plan_engine_info(Plan& plan) {
     plan.result["actions"] = supported_actions();
+#ifdef __APPLE__
+    plan.result["hardware_platforms"] = {"darwin"};
+#else
     plan.result["hardware_platforms"] = {"windows"};
+#endif
     plan.result["limits"] = {{"servos_per_group", 32}, {"pwm_min", 500}, {"pwm_max", 2500},
                              {"time_ms_max", 9999}, {"command_bytes", 4096}};
 }

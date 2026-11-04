@@ -20,4 +20,7 @@ public interface IProjectService
 
     Task<CloudProjectDocumentResponse> CopyProjectAsync(
         ProjectAuthContext auth, int sourceProjectId, CopyProjectRequest request, string? expectedETag, Guid? idempotencyKey = null, CancellationToken ct = default);
+
+    Task<ImportGuestProjectResponse> ImportGuestProjectAsync(
+        ProjectAuthContext auth, ImportGuestProjectRequest request, string? idempotencyKey, Guid? requestId = null, CancellationToken ct = default);
 }

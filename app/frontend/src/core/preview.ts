@@ -11,6 +11,12 @@ export function runPreview(
     servo?: number;
     angle?: number;
   };
+  if (!data || typeof data !== "object" || new TextEncoder().encode(JSON.stringify(data)).length > 32768)
+    throw new Error("Invalid or oversized program");
+  if (!["coding-adventure", "block-programming"].includes(mode) || action !== "program.run")
+    throw new Error("Unknown mode/action");
+  if (mode === "coding-adventure" && (typeof data.source !== "string" || new TextEncoder().encode(data.source).length > 16384))
+    throw new Error("Source exceeds 16384 bytes");
   let commands = data.commands;
   if (mode === "coding-adventure") {
     commands = [];
@@ -35,6 +41,7 @@ export function runPreview(
     if (!commands.length || commands.length > 64)
       throw new Error("Use 1–64 commands.");
     for (const command of commands) {
+      if (!command || typeof command !== "object") throw new Error("Invalid command");
       if (!["move_right", "move_left", "jump"].includes(command.op))
         throw new Error("Unsupported command");
       if (
@@ -54,22 +61,5 @@ export function runPreview(
       data: { commands, steps, simulated: true },
     };
   }
-  if (mode !== "robot-control" || !["servo.set", "robot.stop"].includes(action))
-    throw new Error("Unknown mode/action");
-  if (
-    action === "servo.set" &&
-    (!Number.isInteger(data.servo) ||
-      data.servo! < 1 ||
-      data.servo! > 4 ||
-      !Number.isInteger(data.angle) ||
-      data.angle! < 0 ||
-      data.angle! > 180)
-  )
-    throw new Error("Servo safety limit exceeded");
-  return {
-    protocol: "1.0",
-    request_id: crypto.randomUUID(),
-    status: "success",
-    data: { simulated: true },
-  };
+  throw new Error("Program commands required");
 }

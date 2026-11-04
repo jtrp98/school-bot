@@ -25,6 +25,7 @@ Full contract, examples, source lineage, lifecycle and limits:
 Dependency notices: [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
 
 Both commands above must pass. Tests never exercise hardware writes or motion.
-Firmware upgrades and macOS hardware transport are not included in this extraction.
+มี source สำหรับ Darwin HID ผ่าน IOKit และ Serial ผ่าน POSIX/termios แล้ว แต่ยังต้อง build และตรวจบน
+macOS Intel/Apple Silicon แยกกันก่อนอ้าง native hardware acceptance; ไม่รวม firmware upgrades
 
 Desktop wiring and operation: [INTEGRATION.md](docs/INTEGRATION.md).

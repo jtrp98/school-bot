@@ -108,7 +108,8 @@
       "deviceNotConfirmed": "设备尚未确认真实连接。",
       "robotNotSelected": "尚未选择机器人并确认配置。",
       "connectionSuperseded": "上一次连接已取消，请重新连接。",
-      "deviceNotFound": "找不到所选设备。请检查USB线并重新连接。"
+      "deviceNotFound": "找不到所选设备。请检查USB线并重新连接。",
+      "torqueOff": "扭矩已关闭。请在运动前明确启用扭矩。"
     },
     "teacher": {
       "title": "教师菜单",
@@ -1322,6 +1323,18 @@
       "wristRotate": "腕部旋转",
       "gripper": "夹爪",
       "bend": "弯曲"
+    },
+    "hardwareSimulator": {
+      "title": "硬件模拟器 · 无实际设备或测量",
+      "open": "打开硬件模拟器",
+      "ready": "准备就绪",
+      "stop": "紧急停止 / 关闭扭矩",
+      "halted": "已停止并关闭扭矩。运动前须明确启用扭矩。",
+      "disconnect": "模拟断线",
+      "timeout": "模拟超时",
+      "restore": "恢复连接",
+      "restored": "连接已恢复。请重新连接并启用扭矩。",
+      "rearm": "启用模拟器扭矩"
     }
   },
   "common": {
