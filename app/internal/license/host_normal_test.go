@@ -185,6 +185,136 @@ func TestHostEntitlementNormal(t *testing.T) {
 					t.Fatal("moved device denial changed server state")
 				}
 			})
+			t.Run("duplicate_key_device_limit", func(t *testing.T) {
+				server := startHostServer(t, binary, backend)
+				a, b := newHostComponent(server, 0), newHostComponent(server, 1)
+				a.network.online = true
+				if _, err := a.host.Check(context.Background(), server.key, false); err != nil {
+					t.Fatal(err)
+				}
+				assertModes(t, a, true)
+				b.network.online = true
+				projection, err := b.host.Check(context.Background(), server.key, false)
+				var failure *license.LicenseError
+				if !errors.As(err, &failure) || failure.Code != license.ErrDeviceLimit || projection.Status != license.StatusDenied {
+					t.Fatalf("duplicate key expected DEVICE_LIMIT, got proj=%+v err=%v", projection, err)
+				}
+				assertModes(t, b, false)
+				assertModes(t, a, true)
+			})
+			t.Run("move_and_reauthorize_original_device", func(t *testing.T) {
+				server := startHostServer(t, binary, backend)
+				a, b := newHostComponent(server, 0), newHostComponent(server, 1)
+				start := a.clock.wall.Unix()
+				a.network.online = true
+				if _, err := a.host.Check(context.Background(), server.key, false); err != nil {
+					t.Fatal(err)
+				}
+				firstClaims := a.claims(t)
+				jktA := firstClaims.Confirmation.JKT
+
+				server.control("time", start+1800)
+				server.control("unbind", nil)
+
+				// Detached device A cannot self-reactivate without admin approval
+				a.at(start + 1800)
+				a.network.online = true
+				if _, err := a.host.Check(context.Background(), server.key, false); err == nil {
+					t.Fatal("detached device A re-activated without next_device_jkt approval")
+				}
+
+				// Device B activates on the unbound key
+				b.at(start + 1800)
+				b.network.online = true
+				if _, err := b.host.Check(context.Background(), server.key, false); err != nil {
+					t.Fatalf("device B activate after unbind: %v", err)
+				}
+				bClaims := b.claims(t)
+				if bClaims.BindingEpoch != firstClaims.BindingEpoch+1 {
+					t.Fatalf("expected epoch %d, got %d", firstClaims.BindingEpoch+1, bClaims.BindingEpoch)
+				}
+
+				// Admin unbinds B and explicitly authorizes A via next_device_jkt
+				server.control("time", start+3600)
+				server.control("unbind", jktA)
+
+				a.at(start + 3600)
+				a.network.online = true
+				if _, err := a.host.Check(context.Background(), server.key, false); err != nil {
+					t.Fatalf("reauthorized device A activate: %v", err)
+				}
+				reauthClaims := a.claims(t)
+				if reauthClaims.BindingEpoch != bClaims.BindingEpoch+1 || reauthClaims.BindingID == firstClaims.BindingID {
+					t.Fatalf("expected new binding at epoch %d, got %+v", bClaims.BindingEpoch+1, reauthClaims)
+				}
+				assertModes(t, a, true)
+			})
+			t.Run("tamper_copy_and_clock_rollback_protection", func(t *testing.T) {
+				server := startHostServer(t, binary, backend)
+				a, b := newHostComponent(server, 0), newHostComponent(server, 1)
+				start := a.clock.wall.Unix()
+				a.network.online = true
+				if _, err := a.host.Check(context.Background(), server.key, false); err != nil {
+					t.Fatal(err)
+				}
+				a.network.online = false
+				validBlob := bytes.Clone(a.storage.data)
+
+				// 1. Cross-device token copy: copy A's record into B's credential envelope
+				credA, err := license.OpenCredentials(context.Background(), a.storage)
+				if err != nil {
+					t.Fatal(err)
+				}
+				recA, err := credA.Load(context.Background())
+				if err != nil || recA == nil {
+					t.Fatal("missing record A")
+				}
+				credB, err := license.OpenCredentials(context.Background(), b.storage)
+				if err != nil {
+					t.Fatal(err)
+				}
+				if err := credB.Save(context.Background(), recA); err != nil {
+					t.Fatal(err)
+				}
+				b.restart()
+				projB, errB := b.host.Evaluate(context.Background())
+				var licErr *license.LicenseError
+				if !errors.As(errB, &licErr) || licErr.Code != license.ErrInvalidEntitlement || projB.Status != license.StatusDenied {
+					t.Fatalf("copied token to B must fail with INVALID_ENTITLEMENT, got proj=%+v err=%v", projB, errB)
+				}
+				assertModes(t, b, false)
+
+				// 2. Clock rollback on A locks offline access until online re-validation
+				a.at(start + 7200)
+				assertModes(t, a, true)
+				a.at(start + 3600) // 1 hour rollback behind observed wall time
+				projRollback, errRollback := a.host.Evaluate(context.Background())
+				if !errors.As(errRollback, &licErr) || licErr.Code != license.ErrClockUntrusted || projRollback.Status != license.StatusClockUntrusted {
+					t.Fatalf("clock rollback must fail with CLOCK_UNTRUSTED, got proj=%+v err=%v", projRollback, errRollback)
+				}
+				assertModes(t, a, false)
+
+				// Online validation at valid server time restores trust
+				server.control("time", start+10800)
+				a.at(start + 10800)
+				a.network.online = true
+				projRecovered, errRecovered := a.host.Check(context.Background(), server.key, true)
+				if errRecovered != nil || projRecovered.Status != license.StatusValid {
+					t.Fatalf("online recovery after rollback failed: proj=%+v err=%v", projRecovered, errRecovered)
+				}
+				assertModes(t, a, true)
+
+				// 3. Corrupted credential blob fails closed with CREDENTIAL_STORE_FAILED
+				a.network.online = false
+				a.storage.data = []byte("corrupted-credential-envelope")
+				a.restart()
+				_, errCorrupt := a.host.Evaluate(context.Background())
+				if !errors.As(errCorrupt, &licErr) || licErr.Code != license.ErrCredentialStoreFailed {
+					t.Fatalf("corrupted store must fail with CREDENTIAL_STORE_FAILED, got %v", errCorrupt)
+				}
+				assertModes(t, a, false)
+				a.storage.data = validBlob
+			})
 		})
 	}
 }

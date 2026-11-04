@@ -55,8 +55,11 @@ while ((line = Console.ReadLine()) is not null)
                 var principal = path.EndsWith("without-role")
                     ? LicenseAdminPrincipalStub.CreateStaffNoRole(principal: "P2")
                     : admin;
+                var nextJkt = root.GetProperty("body").ValueKind == JsonValueKind.String
+                    ? root.GetProperty("body").GetString()
+                    : null;
                 result = path != "/fixture/revoke"
-                    ? await adminB.UnbindLicenseAsync(principal, created.License.Id, etag, reason: "fixture:move")
+                    ? await adminB.UnbindLicenseAsync(principal, created.License.Id, etag, nextDeviceJkt: nextJkt, reason: "fixture:move")
                     : await adminB.RevokeLicenseAsync(admin, created.License.Id, etag, reason: "fixture:revoke");
                 break;
             case "/v2/device-challenges":

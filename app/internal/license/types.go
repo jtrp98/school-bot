@@ -21,6 +21,8 @@ const (
 	ErrClockUntrusted        = "CLOCK_UNTRUSTED"
 	ErrDeviceNotActivated    = "DEVICE_NOT_ACTIVATED"
 	ErrDeviceProofInvalid    = "DEVICE_PROOF_INVALID"
+	ErrDeviceLimit           = "DEVICE_LIMIT"
+	ErrChallengeExpired      = "CHALLENGE_EXPIRED"
 	ErrLicenseInvalid        = "LICENSE_INVALID"
 	ErrLicenseInactive       = "LICENSE_INACTIVE"
 	ErrBindingRevoked        = "BINDING_REVOKED"

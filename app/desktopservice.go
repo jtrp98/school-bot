@@ -133,7 +133,11 @@ func (s *DesktopService) ActivateLicense(key string) (string, error) {
 	return s.checkLicense(key, false)
 }
 
-func (s *DesktopService) ValidateLicense(key string) (string, error) {
+func (s *DesktopService) ValidateLicense(keys ...string) (string, error) {
+	key := ""
+	if len(keys) > 0 {
+		key = keys[0]
+	}
 	if strings.TrimSpace(key) == "" && s.entitlement != nil {
 		if saved, err := s.entitlement.SavedKey(context.Background()); err == nil && saved != "" {
 			key = saved

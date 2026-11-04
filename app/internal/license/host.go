@@ -88,6 +88,10 @@ func (h *Host) Authorize(ctx context.Context, mode string) error {
 	}
 	projection, err := h.Evaluate(ctx)
 	if err != nil {
+		var licErr *LicenseError
+		if errors.As(err, &licErr) && !strings.Contains(licErr.Message, "online") && !strings.Contains(licErr.Message, "denied") {
+			return &LicenseError{Code: licErr.Code, Message: licErr.Message + "; connect online to recover"}
+		}
 		return err
 	}
 	if projection.Status != StatusValid {

@@ -118,8 +118,10 @@ export const client = {
         expiresAt: new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString(),
       };
     }
-    const raw = await native<string>("LicenseStatus");
-    return JSON.parse(raw) as PublicEntitlement;
+    const raw = await native<unknown>("LicenseStatus");
+    return typeof raw === "string"
+      ? (JSON.parse(raw) as PublicEntitlement)
+      : (raw as PublicEntitlement);
   },
   activateLicense: async (key: string): Promise<PublicEntitlement> => {
     if (preview) {
@@ -135,7 +137,7 @@ export const client = {
         expiresAt: new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString(),
       };
     }
-    const raw = await native<string>("ValidateLicense");
+    const raw = await native<string>("ValidateLicense", "");
     return JSON.parse(raw) as PublicEntitlement;
   },
   loginSession: async (username: string, password: string): Promise<LoginResult> => {

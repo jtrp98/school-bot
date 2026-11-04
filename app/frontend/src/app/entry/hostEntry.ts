@@ -1,6 +1,157 @@
 import { client } from "../../core/client";
 import { prepareWindowClose } from "../../core/windowLifecycle";
-import type { EntryAdapter, LoginResult, PublicEntitlement } from "./types";
+import {
+  allowsEntry,
+  type EntitlementState,
+  type EntryAdapter,
+  type EntryError,
+  type LoginResult,
+  type PublicEntitlement,
+} from "./types";
+
+const VALID_STATES = new Set<EntitlementState>([
+  "unactivated", "checking", "valid", "offline-valid", "expired",
+  "denied", "clock_untrusted", "locked", "unavailable",
+]);
+
+const VALID_ERRORS = new Set<EntryError>([
+  "network", "DEVICE_LIMIT", "DEVICE_NOT_ACTIVATED", "DEVICE_PROOF_INVALID",
+  "LICENSE_INVALID", "LICENSE_INACTIVE", "BINDING_REVOKED", "INVALID_ENTITLEMENT",
+  "UNKNOWN_FORBIDDEN", "CREDENTIAL_STORE_FAILED", "CHALLENGE_EXPIRED", "unavailable",
+]);
+
+export function normalizePublicEntitlement(
+  raw: unknown,
+  nowMs: number = Date.now(),
+): PublicEntitlement {
+  let parsed: unknown = raw;
+  if (typeof raw === "string") {
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      return { status: "unavailable", error: "unavailable" };
+    }
+  }
+  if (!parsed || typeof parsed !== "object") {
+    return { status: "unavailable", error: "unavailable" };
+  }
+  const obj = parsed as Record<string, unknown>;
+  const rawStatus = typeof obj.status === "string" ? obj.status : "unavailable";
+  const status: EntitlementState = VALID_STATES.has(rawStatus as EntitlementState)
+    ? (rawStatus as EntitlementState)
+    : "unavailable";
+  const expiresAt = typeof obj.expiresAt === "string"
+    ? obj.expiresAt
+    : typeof obj.expires_at === "string"
+      ? obj.expires_at
+      : undefined;
+  const result: PublicEntitlement = { status };
+  if (expiresAt) {
+    result.expiresAt = expiresAt;
+  }
+  if (typeof obj.expiringSoon === "boolean") {
+    result.expiringSoon = obj.expiringSoon;
+  } else if (expiresAt && (status === "valid" || status === "offline-valid")) {
+    const expiryMs = Date.parse(expiresAt);
+    const remainingMs = expiryMs - nowMs;
+    if (Number.isFinite(remainingMs) && remainingMs > 0 && remainingMs <= 24 * 3600 * 1000) {
+      result.expiringSoon = true;
+    }
+  }
+  const rawError = typeof obj.error === "string"
+    ? obj.error
+    : typeof obj.error_code === "string"
+      ? obj.error_code
+      : undefined;
+  if (rawError && VALID_ERRORS.has(rawError as EntryError)) {
+    result.error = rawError as EntryError;
+  }
+  if (typeof obj.canUseOffline === "boolean") {
+    result.canUseOffline = obj.canUseOffline;
+  }
+  return result;
+}
+
+export function parseHostLicenseError(
+  err: unknown,
+  currentStatus: PublicEntitlement = { status: "unactivated" },
+): PublicEntitlement | null {
+  let code = "";
+  let message = "";
+  if (err && typeof err === "object" && typeof (err as { code?: unknown }).code === "string") {
+    code = (err as { code: string }).code.trim();
+    message = typeof (err as { message?: unknown }).message === "string"
+      ? (err as { message: string }).message
+      : "";
+  } else {
+    const text = err instanceof Error ? err.message : typeof err === "string" ? err : "";
+    const match = /^\[([A-Z_]+)\]\s*(.*)$/.exec(text.trim());
+    if (match) {
+      code = match[1];
+      message = match[2];
+    }
+  }
+  if (!code) return null;
+
+  const isFirstRun = currentStatus.status === "unactivated";
+  switch (code) {
+    case "DEVICE_LIMIT":
+    case "LICENSE_INVALID":
+    case "LICENSE_INACTIVE":
+    case "DEVICE_NOT_ACTIVATED":
+    case "DEVICE_PROOF_INVALID":
+      return {
+        status: isFirstRun ? "unactivated" : "denied",
+        error: code as EntryError,
+      };
+    case "BINDING_REVOKED":
+    case "UNKNOWN_FORBIDDEN":
+      return {
+        status: "denied",
+        error: code as EntryError,
+      };
+    case "INVALID_ENTITLEMENT":
+    case "CREDENTIAL_STORE_FAILED":
+    case "CHALLENGE_EXPIRED":
+      return {
+        status: isFirstRun ? "unactivated" : "locked",
+        error: code as EntryError,
+      };
+    case "CLOCK_UNTRUSTED":
+      return {
+        status: "clock_untrusted",
+      };
+    case "STORE_UNAVAILABLE":
+    case "NETWORK": {
+      if (allowsEntry(currentStatus)) {
+        return {
+          status: "offline-valid",
+          expiresAt: currentStatus.expiresAt,
+          expiringSoon: currentStatus.expiringSoon,
+          error: "network",
+        };
+      }
+      if (message.toLowerCase().includes("credential store")) {
+        return {
+          status: isFirstRun ? "unactivated" : "locked",
+          error: "CREDENTIAL_STORE_FAILED",
+        };
+      }
+      return {
+        status: isFirstRun ? "unactivated" : "locked",
+        error: "network",
+      };
+    }
+    case "CONFIG_UNAVAILABLE":
+    case "VERIFIER_UNAVAILABLE":
+      return {
+        status: "unavailable",
+        error: "unavailable",
+      };
+    default:
+      return null;
+  }
+}
 
 export interface HostEntryDependencies {
   licenseStatus: () => Promise<PublicEntitlement>;
@@ -44,9 +195,19 @@ export function createHostEntryAdapter(
 
   return {
     readStatus: async () => {
-      const next = await resolved.licenseStatus();
-      lastStatus = next;
-      return next;
+      try {
+        const raw = await resolved.licenseStatus();
+        const next = normalizePublicEntitlement(raw);
+        lastStatus = next;
+        return next;
+      } catch (err) {
+        const mapped = parseHostLicenseError(err, lastStatus);
+        if (mapped) {
+          lastStatus = mapped;
+          return mapped;
+        }
+        throw err;
+      }
     },
     subscribe: (listener) => {
       listeners.add(listener);
@@ -59,12 +220,32 @@ export function createHostEntryAdapter(
       if (!trimmed || trimmed.length > 256 || /\s/.test(trimmed)) {
         throw new Error("Invalid license key");
       }
-      const next = await resolved.activateLicense(trimmed);
-      emit(next);
+      try {
+        const raw = await resolved.activateLicense(trimmed);
+        const next = normalizePublicEntitlement(raw);
+        emit(next);
+      } catch (err) {
+        const mapped = parseHostLicenseError(err, lastStatus);
+        if (mapped) {
+          emit(mapped);
+          return;
+        }
+        throw err;
+      }
     },
     validate: async () => {
-      const next = await resolved.validateLicense();
-      emit(next);
+      try {
+        const raw = await resolved.validateLicense();
+        const next = normalizePublicEntitlement(raw);
+        emit(next);
+      } catch (err) {
+        const mapped = parseHostLicenseError(err, lastStatus);
+        if (mapped) {
+          emit(mapped);
+          return;
+        }
+        throw err;
+      }
     },
     useOffline: async () => {
       if (lastStatus.status === "checking" && lastStatus.canUseOffline && lastStatus.expiresAt) {
@@ -75,7 +256,8 @@ export function createHostEntryAdapter(
         });
         return;
       }
-      const next = await resolved.licenseStatus();
+      const raw = await resolved.licenseStatus();
+      const next = normalizePublicEntitlement(raw);
       emit(next);
     },
     guest: async () => {

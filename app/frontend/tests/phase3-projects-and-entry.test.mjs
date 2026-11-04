@@ -37,16 +37,28 @@ const vite = await createServer({
 let projectStoreV2;
 let restoreNativeProject;
 let createHostEntryAdapter;
+let normalizePublicEntitlement;
+let parseHostLicenseError;
+let EntryScreen;
 let allowsEntry;
 let registerWindowCloseGuard;
 let i18nModule;
+let React;
+let renderToStaticMarkup;
 
 try {
+  React = (await import(pathToFileURL(require.resolve("react")).href)).default;
+  ({ renderToStaticMarkup } = await import(pathToFileURL(require.resolve("react-dom/server")).href));
   projectStoreV2 = await vite.ssrLoadModule("/src/core/projectStoreV2.ts");
   ({ restoreNativeProject } = await vite.ssrLoadModule(
     "/src/modes/robot-control/workspace/projectStore.ts",
   ));
-  ({ createHostEntryAdapter } = await vite.ssrLoadModule("/src/app/entry/hostEntry.ts"));
+  ({
+    createHostEntryAdapter,
+    normalizePublicEntitlement,
+    parseHostLicenseError,
+  } = await vite.ssrLoadModule("/src/app/entry/hostEntry.ts"));
+  ({ EntryScreen } = await vite.ssrLoadModule("/src/app/entry/EntryScreen.tsx"));
   ({ allowsEntry } = await vite.ssrLoadModule("/src/app/entry/types.ts"));
   ({ registerWindowCloseGuard } = await vite.ssrLoadModule("/src/core/windowLifecycle.ts"));
   i18nModule = await vite.ssrLoadModule("/src/i18n/index.ts");
@@ -391,4 +403,162 @@ test("FE-002 & FE-005: HostEntryAdapter + close guard + i18n offline fallback an
   await i18nModule.default.changeLanguage("en");
   assert.equal(i18nModule.default.resolvedLanguage, "en");
   await i18nModule.default.changeLanguage("th");
+});
+
+test("FE-001: License UI entry gate, key activation, duplicate/invalid/expired/migrated states, and expiration display", async () => {
+  await i18nModule.default.changeLanguage("th");
+  const { t } = i18nModule;
+
+  const renderScreen = (status, overrides = {}) =>
+    renderToStaticMarkup(
+      React.createElement(EntryScreen, {
+        status,
+        busy: false,
+        recovering: false,
+        error: "",
+        loginAvailable: true,
+        offlineAvailable: true,
+        onActivate: async () => {},
+        onValidate: async () => {},
+        onOffline: async () => {},
+        onGuest: async () => {},
+        onRetryRecovery: async () => {},
+        onLogin: async () => {},
+        ...overrides,
+      }),
+    );
+
+  // 1. Unactivated state (AC-009-01, AC-009-02): locks Guest & Login entry, renders License Key input
+  let latestStatus = { status: "unactivated" };
+  let hostBackendState = "unactivated";
+  const adapter = createHostEntryAdapter({
+    licenseStatus: async () => {
+      if (hostBackendState === "unactivated") {
+        return JSON.stringify({ status: "unactivated" });
+      }
+      return JSON.stringify({ status: "valid", expires_at: "2026-11-07T12:00:00Z" });
+    },
+    activateLicense: async (key) => {
+      if (key === "SBOT-DUPLICATE") {
+        throw new Error("[DEVICE_LIMIT] license server rejected request");
+      }
+      if (key === "SBOT-INVALID") {
+        throw new Error("[LICENSE_INVALID] license is no longer active");
+      }
+      if (key === "SBOT-EXPIRED") {
+        throw new Error("[LICENSE_INACTIVE] license is no longer active");
+      }
+      if (key === "SBOT-OFFLINE") {
+        throw new Error(
+          "[STORE_UNAVAILABLE] license server unreachable and local entitlement is expired or unactivated",
+        );
+      }
+      hostBackendState = "valid";
+      return JSON.stringify({ status: "valid", expires_at: "2026-11-07T12:00:00Z" });
+    },
+    validateLicense: async () => {
+      if (hostBackendState === "moved") {
+        throw new Error("[BINDING_REVOKED] license is no longer active");
+      }
+      if (hostBackendState === "offline_during_valid") {
+        throw new Error(
+          "[STORE_UNAVAILABLE] license server unreachable and local entitlement is expired or unactivated",
+        );
+      }
+      if (hostBackendState === "lease_expired") {
+        return JSON.stringify({ status: "expired", expires_at: "2026-11-07T12:00:00Z" });
+      }
+      return JSON.stringify({ status: "valid", expires_at: "2026-11-10T12:00:00Z" });
+    },
+  });
+
+  adapter.subscribe((next) => {
+    latestStatus = next;
+  });
+
+  latestStatus = await adapter.readStatus();
+  assert.equal(allowsEntry(latestStatus), false);
+  const unactivatedHtml = renderScreen(latestStatus);
+  assert.ok(unactivatedHtml.includes('id="entry-license-key"'));
+  assert.ok(unactivatedHtml.includes(t("entry.activation.title")));
+  assert.ok(!unactivatedHtml.includes(t("entry.choice.guest")));
+  assert.ok(!unactivatedHtml.includes(t("entry.choice.login")));
+
+  // 2. Duplicate key (DEVICE_LIMIT), Invalid key (LICENSE_INVALID), Inactive key (LICENSE_INACTIVE) (AC-028-04)
+  for (const [badKey, expectedCode] of [
+    ["SBOT-DUPLICATE", "DEVICE_LIMIT"],
+    ["SBOT-INVALID", "LICENSE_INVALID"],
+    ["SBOT-EXPIRED", "LICENSE_INACTIVE"],
+    ["SBOT-OFFLINE", "network"],
+  ]) {
+    await adapter.activate(badKey);
+    assert.equal(allowsEntry(latestStatus), false);
+    assert.equal(latestStatus.status, "unactivated");
+    assert.equal(latestStatus.error, expectedCode);
+    const errHtml = renderScreen(latestStatus);
+    assert.ok(errHtml.includes(t(`entry.errors.${expectedCode}`)), `Missing error alert for ${expectedCode}`);
+    assert.ok(
+      errHtml.includes('id="entry-license-key"'),
+      `Key input must remain available after ${expectedCode} failure`,
+    );
+    assert.ok(!errHtml.includes(t("entry.choice.guest")));
+  }
+
+  // 3. Successful activation normalizes Go snake_case expires_at -> expiresAt and unlocks Guest/Login
+  await adapter.activate("SBOT-VALID-KEY-2026");
+  assert.equal(latestStatus.status, "valid");
+  assert.equal(latestStatus.expiresAt, "2026-11-07T12:00:00Z");
+  assert.equal(allowsEntry(latestStatus), true);
+  const validHtml = renderScreen(latestStatus);
+  assert.ok(validHtml.includes(t("entry.choice.title")));
+  assert.ok(validHtml.includes(t("entry.choice.guest")));
+  assert.ok(validHtml.includes(t("entry.choice.login")));
+  assert.ok(!validHtml.includes(t("entry.license.expiryUnknown")));
+
+  // 4. Expiring soon warning when remaining time <= 24h
+  const nowMs = Date.parse("2026-11-07T00:00:00Z");
+  const soonStatus = normalizePublicEntitlement(
+    { status: "valid", expires_at: "2026-11-07T12:00:00Z" },
+    nowMs,
+  );
+  assert.equal(soonStatus.expiringSoon, true);
+  const soonHtml = renderScreen(soonStatus);
+  assert.ok(soonHtml.includes(t("entry.license.expiringSoon")));
+
+  // 5. Network failure during active lease keeps offline-valid until original expiresAt
+  hostBackendState = "offline_during_valid";
+  await adapter.validate();
+  assert.equal(latestStatus.status, "offline-valid");
+  assert.equal(latestStatus.expiresAt, "2026-11-07T12:00:00Z");
+  assert.equal(latestStatus.error, "network");
+  assert.equal(allowsEntry(latestStatus), true);
+
+  // 6. Lease expiration locks UI and offers retry / reactivate
+  hostBackendState = "lease_expired";
+  await adapter.validate();
+  assert.equal(latestStatus.status, "expired");
+  assert.equal(allowsEntry(latestStatus), false);
+  const expiredHtml = renderScreen(latestStatus);
+  assert.ok(expiredHtml.includes(t("entry.states.expired")));
+  assert.ok(expiredHtml.includes(t("entry.lock.retry")));
+  assert.ok(expiredHtml.includes(t("entry.lock.reactivate")));
+  assert.ok(!expiredHtml.includes(t("entry.choice.guest")));
+
+  // 7. Key migration / unbind revokes old device online (BINDING_REVOKED) and locks UI
+  hostBackendState = "moved";
+  await adapter.validate();
+  assert.equal(latestStatus.status, "denied");
+  assert.equal(latestStatus.error, "BINDING_REVOKED");
+  assert.equal(allowsEntry(latestStatus), false);
+  const movedHtml = renderScreen(latestStatus);
+  assert.ok(movedHtml.includes(t("entry.errors.BINDING_REVOKED")));
+  assert.ok(movedHtml.includes(t("entry.lock.reactivate")));
+  assert.ok(!movedHtml.includes(t("entry.choice.guest")));
+
+  // 8. Clock rollback maps to clock_untrusted state
+  const clockUntrusted = parseHostLicenseError(new Error("[CLOCK_UNTRUSTED] wall clock rollback"), latestStatus);
+  assert.deepEqual(clockUntrusted, { status: "clock_untrusted" });
+  assert.equal(allowsEntry(clockUntrusted), false);
+  const clockHtml = renderScreen(clockUntrusted);
+  assert.ok(clockHtml.includes(t("entry.states.clock_untrusted")));
 });

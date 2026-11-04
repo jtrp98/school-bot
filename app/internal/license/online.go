@@ -24,10 +24,15 @@ func (s *EntitlementService) ProcessOnlineOutcome(ctx context.Context, outcome O
 		return s.handleOnlineUnavailable(ctx)
 	}
 
-	// Any other 4xx status denies activation.
+	// Any other 4xx status denies activation while preserving known server error codes.
 	s.cachedStatus = StatusDenied
+	code := ErrLicenseInvalid
+	switch strings.TrimSpace(outcome.ServerCode) {
+	case ErrDeviceLimit, ErrChallengeExpired, ErrDeviceNotActivated, ErrDeviceProofInvalid, ErrLicenseInvalid, ErrLicenseInactive, ErrBindingRevoked:
+		code = strings.TrimSpace(outcome.ServerCode)
+	}
 	return EntitlementProjection{Status: StatusDenied}, &LicenseError{
-		Code:    ErrLicenseInvalid,
+		Code:    code,
 		Message: "license server rejected request",
 	}
 }
@@ -127,7 +132,7 @@ func (s *EntitlementService) handleOnlineForbidden(ctx context.Context, outcome 
 			Code:    code,
 			Message: "license is no longer active",
 		}
-	case "DEVICE_NOT_ACTIVATED", "DEVICE_PROOF_INVALID":
+	case "DEVICE_NOT_ACTIVATED", "DEVICE_PROOF_INVALID", "CHALLENGE_EXPIRED", "DEVICE_LIMIT":
 		if err := s.invalidateLocalCache(ctx, StatusDenied); err != nil {
 			return EntitlementProjection{Status: StatusDenied}, err
 		}
