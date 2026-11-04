@@ -6,7 +6,7 @@ It can also be built and exercised independently using dry-run requests.
 
 ```powershell
 # From repository root
-./scripts/build-engine.ps1 -Engine zide -Test
+./scripts/engines/build.ps1 -Engine zide -Test
 node --test engines/zide/tests/ipc.test.mjs
 ```
 

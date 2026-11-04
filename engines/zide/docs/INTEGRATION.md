@@ -21,7 +21,7 @@ engine, so the webview cannot reach engine actions its UI does not use.
 
 ## Use and configuration
 
-Build the desktop with `scripts/build-desktop.ps1 -SkipInstall` on Windows when
+Build the desktop with `scripts/desktop/build.ps1 -SkipInstall` on Windows when
 dependencies are installed. The script builds and places the C++ engine plus its
 manifest, hash and notices in `app/bin/engines/zide/`. The same folder is installed
 under the application's installation directory by the MSI. macOS builds include
@@ -108,7 +108,7 @@ assumptions without physical evidence.
 ```powershell
 node --test app/frontend/tests/frontend-adapter.test.mjs app/frontend/tests/frontend-workspace.test.mjs
 ./scripts/verify.ps1 -SkipInstall
-./scripts/package-desktop.ps1 -SkipBuild
+./scripts/desktop/package.ps1 -SkipBuild
 ```
 
 MSI install/repair/uninstall testing belongs on a disposable Windows account/CI;

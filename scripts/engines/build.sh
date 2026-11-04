@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
-root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 engine="${1:-}"
 if [[ ! "$engine" =~ ^[a-z][a-z0-9-]*$ ]]; then
-  echo 'Usage: bash scripts/build-engine.sh <engine-id> [output-directory] [--test]' >&2
+  echo 'Usage: bash scripts/engines/build.sh <engine-id> [output-directory] [--test]' >&2
   exit 1
 fi
 shift

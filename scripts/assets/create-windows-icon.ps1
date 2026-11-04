@@ -1,7 +1,7 @@
 # Reuse the embedded original PNG to preserve the mascot artwork.
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing
-$projectRoot = Split-Path $PSScriptRoot -Parent
+$projectRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $iconRoot = Join-Path $projectRoot 'app/build/windows'
 $svg = [IO.File]::ReadAllText((Join-Path $projectRoot 'app/frontend/src/assets/logo-school-bot.svg'))
 $embedded = [regex]::Match($svg, 'data:image/png;base64,([A-Za-z0-9+/=\r\n]+)')

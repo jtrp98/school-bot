@@ -2,7 +2,7 @@ param(
     [Parameter(Mandatory)][string]$OutputDirectory,
     [ValidateSet('th','en','zh')][string]$Language = 'th'
 )
-. "$PSScriptRoot/common.ps1"
+. "$PSScriptRoot/../lib/common.ps1"
 Add-Type -AssemblyName System.Drawing
 $brandDirectory = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputDirectory)
 New-Item -ItemType Directory -Path $brandDirectory -Force | Out-Null

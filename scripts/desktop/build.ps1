@@ -1,9 +1,9 @@
 param([switch]$SkipInstall, [string]$OutputDirectory)
-. "$PSScriptRoot/common.ps1"
+. "$PSScriptRoot/../lib/common.ps1"
 Assert-SchoolBotGo
 if ($IsMacOS) {
     if ($OutputDirectory) { throw 'OutputDirectory is currently supported by the Windows build only.' }
-    $schoolBotArguments = @("$PSScriptRoot/build-desktop.sh")
+    $schoolBotArguments = @("$PSScriptRoot/build.sh")
     if ($SkipInstall) { $schoolBotArguments += '--skip-install' }
     Invoke-SchoolBotCommand 'bash' $schoolBotArguments
     return
@@ -19,7 +19,7 @@ try {
     if (-not $SkipInstall) { Invoke-SchoolBotCommand $SchoolBotNpm @('ci','--no-audit','--no-fund') }
     Invoke-SchoolBotCommand $SchoolBotNpm @('run','build')
 } finally { Pop-Location }
-& "$PSScriptRoot/build-engine.ps1" -Engine zide -OutputDirectory (Join-Path $schoolBotDesktopOutput 'engines/zide')
+& "$PSScriptRoot/../engines/build.ps1" -Engine zide -OutputDirectory (Join-Path $schoolBotDesktopOutput 'engines/zide')
 $schoolBotManifest = Join-Path $SchoolBotRoot 'app/frontend/package.json'
 $schoolBotResourceVersion = (Get-Content -LiteralPath $schoolBotManifest -Raw | ConvertFrom-Json).version
 if ($schoolBotResourceVersion -cnotmatch '^\d+\.\d+\.\d+$') { throw 'package.json version must be x.y.z.' }

@@ -19,7 +19,7 @@ Go DesktopService (thin Wails adapter)
 ## Boundaries
 
 Standalone engine sources live in `engines/<engine-id>/`; each owns its language,
-dependencies, build scripts, tests, docs and platform outputs. Root build-engine
+dependencies, build scripts, tests, docs and platform outputs. The `scripts/engines/build.*`
 scripts only dispatch by ID. Shared manifest metadata lives in `contracts/engine/`.
 Mode and engine identity are separate; they are not a one-to-one mapping.
 See `engines/README.md` for the workspace convention. The host's trusted registry

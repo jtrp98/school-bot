@@ -2,7 +2,7 @@
 
 Go + Wails **v3.0.0-beta.30** / React / TypeScript
 
-Run/build commands: ดู `../README.md` ใช้ `../scripts/build-desktop.ps1`
+Run/build commands: ดู `../README.md` ใช้ `../scripts/desktop/build.ps1`
 
 Host ยังใช้ HTTP API สำหรับ local development. เป้าหมาย online คือ Host→HTTPS Gateway→gRPC SchoolBot ซึ่งยังรอ integration; frontend คงผ่าน core/client.ts และ host ไม่รับหน้าที่เป็น gRPC client. Engine JSON Lines, local storage และ hardware transport คงเดิม ดู `../docs/DEPLOYMENT.md`.
 
@@ -49,7 +49,11 @@ frontend/src/components/
 - เมื่อเพิ่มคำแปลให้ใช้ key ที่สื่อความหมายตามหมวด `nav`, `modal`, `home`, `lessons`, `blocks`, `adventure`, `robot` พร้อม interpolation แทนการต่อข้อความกับข้อมูลผู้ใช้ ตรวจด้วย `npm run test:i18n` จาก `frontend` ซึ่งตรวจ key, placeholders, การเก็บข้อมูลเมื่อสลับภาษา และ render ของ workspace/บทเรียนครบทั้งสามภาษา และสแกนว่าไม่มีอักษรไทย/จีนใน source นอกไฟล์ข้อมูลตัวอย่างที่ระบุใน `tests/i18n.test.mjs` กับไม่มีการต่อข้อความแปลด้วย `+`
 - ใช้ tokens เช่น `bg-surface`, `font-body` และค่า px เพื่อรักษาขนาดเดิม (root font-size เป็น 14px); ไม่ประกอบชื่อ utility แบบ dynamic ค่าที่คำนวณขณะใช้งาน เช่น progress, ตำแหน่ง และ workspace state ยังใช้ inline styles ได้ รวมถึง rendering helper ที่ต้องรักษาลำดับ shorthand/longhand และ `!important`
 - สีของ UI ใช้ semantic tokens ใน `frontend/src/tailwind.css` รวมถึงสีโปร่งใสผ่าน RGB tokens ของสีเดียวกัน ปุ่มควบคุมทิศทาง ท่าพัก เพิ่มท่า อัปโหลด เล่น และหยุดใช้ `Button`/`HoldButton` และ variants กลาง ไม่ประกอบสีปุ่มเป็น CSS strings ซ้ำใน workspace; สีสำหรับภาพวาดมาสคอต แขนกล และ Phaser แยกจากสี UI
-- Native `Run` รับ Mode, Action และ JSON เท่านั้น Frontend เลือก executable ไม่ได้
+- Native `Run` รับ Mode, Action และ JSON เท่านั้น Frontend เลือก executable ไม่ได้ และ host ตรวจ signed entitlement ก่อนเรียก engine ทุกโหมด โดยไม่ขึ้นกับ Guest/Login
+- `ActivateLicense` และ `ValidateLicense` ใช้ challenge/device proof ของ `/v2`; frontend ได้เฉพาะ `status`/`expires_at` เช่นเดียวกับ `LicenseStatus` ไม่ได้รับ token, License Key หรือ device private key
+- Host เก็บ P-256 key, License Key, signed lease และ clock anchor ใน atomic credential generation ผ่าน Windows DPAPI หรือ macOS Keychain; ไม่ fallback เป็น plaintext/temp หาก secure storage ใช้ไม่ได้ การเปิดใหม่ไม่เลื่อน expiry และผล denial ออนไลน์คงอยู่ข้าม restart
+- Public trust keys สำหรับ signer จริงยังรอการจัดเตรียมตามมติผู้ถือกุญแจ; ค่าเริ่มต้นไม่มี trusted signer จึง locked จนจัดเตรียม trust root ฝั่ง host การทดสอบใช้ ES256 test signer ผ่าน constructor โดยไม่เปิด production bypass
+- Go host normal tests ใช้ `.NET 10 SDK` สร้าง fixture ใน `internal/license/testdata/hostserver/` ซึ่งเรียก service/store เดิมของ `web/` ใน process แยกผ่าน network double โดยแยกรอบ memory/file; fixture ไม่เชื่อม DB จริงและไม่รัน web test suite
 - Host เริ่ม Engine ใหม่ต่อ Request: Robot Control ใช้ Zide; Adventure/Blockly ใช้ Demo Engine (ยังไม่ใช่ persistent engine pool)
 - Student DSL รองรับ `hero.move_right(n)`, `hero.move_left(n)`, `hero.jump()` เท่านั้น
 - Save Project เป็นหนึ่ง slot ต่อ Mode ใน OS config directory `SchoolBotPoC`
@@ -62,7 +66,7 @@ frontend/src/components/
 การพัฒนา UI ใช้ Vite preview; หลังแก้ Go หรือทดสอบ Native ให้ build ใหม่ด้วย script
 Hot reload แบบ Wails CLI/Taskfile ยังไม่ได้ตั้งค่า; การสร้าง Installer ดู `../docs/INSTALLERS.md`
 
-macOS: `bash ../scripts/build-desktop.sh` สร้าง `bin/darwin-<arch>/School Bot.app`
+macOS: `bash ../scripts/desktop/build.sh` สร้าง `bin/darwin-<arch>/School Bot.app`
 พร้อม Engine ใน `Contents/MacOS` และ ZIP ที่รักษา executable permissions
 ดู `../docs/INSTALLERS.md` สำหรับการแพ็กและขอบเขต signing/verification
 ข้อมูลจาก `ArmStudioPoC` ถูกคัดลอกเข้า `SchoolBotPoC` แบบไม่ทับไฟล์ที่มีอยู่แล้ว

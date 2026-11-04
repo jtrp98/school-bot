@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 if [[ "$(uname -s)" != Darwin ]]; then
   echo 'Build macOS packages on a Mac with Xcode Command Line Tools.' >&2
   exit 1
@@ -11,13 +11,13 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --skip-install) skip_install=true ;;
     --universal) universal=true ;;
-    *) echo 'Usage: bash scripts/build-desktop.sh [--skip-install] [--universal]' >&2; exit 1 ;;
+    *) echo 'Usage: bash scripts/desktop/build.sh [--skip-install] [--universal]' >&2; exit 1 ;;
   esac
   shift
 done
 link_flags=(-ldflags '-s -w')
 if [[ -n "${SCHOOL_BOT_BUILD_API_URL:-}" ]]; then
-  api_pattern="$(tr -d '\r\n' < "$root/scripts/api-url-pattern.txt")"
+  api_pattern="$(tr -d '\r\n' < "$root/scripts/desktop/api-url-pattern.txt")"
   if [[ ! "$SCHOOL_BOT_BUILD_API_URL" =~ $api_pattern ]]; then
     echo 'SCHOOL_BOT_BUILD_API_URL must be HTTPS (HTTP only for localhost),' \
       'without credentials, query, fragment or spaces.' >&2
@@ -54,7 +54,7 @@ if [[ "$universal" == true ]]; then
     if [[ "$thin_arch" == arm64 ]]; then clang_arch=arm64; fi
     thin_dir="$root/app/bin/$target/thin/$thin_arch"
     mkdir -p "$thin_dir"
-    ENGINE_ARCH="$thin_arch" bash "$root/scripts/build-engine.sh" zide "$thin_dir/engines/zide"
+    ENGINE_ARCH="$thin_arch" bash "$root/scripts/engines/build.sh" zide "$thin_dir/engines/zide"
     GOARCH="$thin_arch" \
       CGO_CFLAGS="${CGO_CFLAGS:-} -arch $clang_arch" \
       CGO_LDFLAGS="${CGO_LDFLAGS:-} -arch $clang_arch" \
@@ -80,7 +80,7 @@ if [[ "$universal" == true ]]; then
     -output "$zide_bundle/zide-engine"
   lipo -verify_arch x86_64 arm64 "$zide_bundle/zide-engine"
 else
-  ENGINE_ARCH="$arch" bash "$root/scripts/build-engine.sh" zide "$bundle/Contents/MacOS/engines/zide"
+  ENGINE_ARCH="$arch" bash "$root/scripts/engines/build.sh" zide "$bundle/Contents/MacOS/engines/zide"
   "$go_command" build -trimpath -buildvcs=false -ldflags '-s -w' \
     -o "$bundle/Contents/MacOS/demo-engine" ./cmd/demo-engine
   "$go_command" build -trimpath -buildvcs=false -tags production "${link_flags[@]}" \

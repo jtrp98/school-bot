@@ -17,7 +17,7 @@ so release CPU requirements do not depend on the build machine's detected CPU.
 The CMake/MSVC path keeps its own toolchain defaults and needs separate validation.
 
 ```powershell
-./scripts/build-engine.ps1 -Engine zide -Test
+./scripts/engines/build.ps1 -Engine zide -Test
 node --test engines/zide/tests/ipc.test.mjs
 ```
 
@@ -25,7 +25,7 @@ Output: `engines/zide/bin/windows-amd64/zide-engine.exe`. No Qt installation, wi
 HID DLL is needed. `-OutputDirectory <path>` changes the output location.
 `CMakeLists.txt` is also provided for conventional C++ builds and CTest.
 
-On macOS/Linux, `bash scripts/build-engine.sh zide` builds dry-run/compilation support.
+On macOS/Linux, `bash scripts/engines/build.sh zide` builds dry-run/compilation support.
 Pass an output directory and `--test` to run protocol tests. Native HID/serial
 transport in this extraction is Windows-only; other platforms return a clear error.
 Those OS builds are not covered by the Windows tests.
@@ -183,7 +183,7 @@ Protocol golden tests and executable IPC tests run without sending any hardware
 commands. Real USB/serial motion, unplug/replug behavior, stopping a real moving
 arm and calibration still require device acceptance testing.
 
-`scripts/build-engine.ps1 -Engine zide -Test` and `node --test engines/zide/tests/ipc.test.mjs`
+`scripts/engines/build.ps1 -Engine zide -Test` and `node --test engines/zide/tests/ipc.test.mjs`
 must both pass. Tests cover all command builders, HID boundaries, INI roundtrips, JSON input
 rejection, multi-request recovery and the request size bound. The build refuses a locked/in-use output with an instruction to use `-OutputDirectory`;
 it does not stop the running engine. The build writes the binary,

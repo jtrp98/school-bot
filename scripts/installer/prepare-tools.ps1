@@ -1,4 +1,4 @@
-. "$PSScriptRoot/common.ps1"
+. "$PSScriptRoot/../lib/common.ps1"
 if ($env:OS -ne 'Windows_NT') { throw 'Run this script on Windows.' }
 $schoolBotTools = Join-Path $SchoolBotRoot '.tools'
 $schoolBotDownloads = Join-Path $schoolBotTools 'installer-downloads'

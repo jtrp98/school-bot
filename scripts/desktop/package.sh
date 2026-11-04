@@ -1,22 +1,22 @@
 #!/usr/bin/env bash
 set -euo pipefail
-root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 if [[ "$(uname -s)" != Darwin ]]; then
   echo 'Build the macOS .pkg on a Mac with Xcode Command Line Tools.' >&2
   exit 1
 fi
-node "$root/scripts/check-notices.mjs"
+node "$root/scripts/checks/third-party-notices.mjs"
 skip_build=false
 build_flags=(--universal)
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --skip-build) skip_build=true ;;
     --skip-install) build_flags+=(--skip-install) ;;
-    *) echo 'Usage: bash scripts/package-desktop.sh [--skip-build] [--skip-install]' >&2; exit 1 ;;
+    *) echo 'Usage: bash scripts/desktop/package.sh [--skip-build] [--skip-install]' >&2; exit 1 ;;
   esac
   shift
 done
-if [[ "$skip_build" == false ]]; then bash "$root/scripts/build-desktop.sh" "${build_flags[@]}"; fi
+if [[ "$skip_build" == false ]]; then bash "$root/scripts/desktop/build.sh" "${build_flags[@]}"; fi
 bundle="$root/app/bin/darwin-universal/School Bot.app"
 for executable in school-bot demo-engine engines/zide/zide-engine; do
   test -x "$bundle/Contents/MacOS/$executable"

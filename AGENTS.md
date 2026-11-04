@@ -40,7 +40,7 @@
 - Host เป็นผู้เลือก engine จาก trusted routing เท่านั้น ห้ามรับ executable path จาก frontend หรือ project file
 - Engine อยู่ใน `engines/<engine-id>/` แยก source, dependencies, tests, build scripts และ metadata ของตัวเอง
 - ใช้ภาษาที่เหมาะกับ engine เดิมได้ เช่น C++ ไม่ต้องเขียนใหม่ด้วย Go และไม่ผูก engine ID กับ mode ID แบบหนึ่งต่อหนึ่ง
-- Root build-engine scripts มีหน้าที่ dispatch ไม่รวม compiler logic ของทุก engine เข้าด้วยกัน
+- `scripts/engines/build.*` มีหน้าที่ dispatch ไม่รวม compiler logic ของทุก engine เข้าด้วยกัน
 - ใช้ JSON Lines UTF-8: stdout สำหรับ protocol เท่านั้น diagnostics ไป stderr ต้องรักษา request matching, bounds, timeout และ cancellation
 - การเปลี่ยน action/payload ต้องปรับ engine validation, contract/types, ผู้เรียก และ tests ที่เกี่ยวข้องให้ตรงกัน
 - Installer เดียวรวม desktop และ engines ที่ใช้งาน แต่ API ฝั่ง server deploy แยก ไม่บรรจุใน desktop installer
@@ -79,7 +79,7 @@ key ใหม่ต้องจัดตามโครงสร้างหน�
 - Frontend ที่ฝังใน binary ยังตรวจสอบย้อนหลังได้ ห้ามอ้างว่าป้องกันการคัดลอกหรือ reverse engineering ได้ทั้งหมด
 - ใช้ build/package scripts ของ repository ไม่ข้ามขั้นตอนสร้าง icon/version resources หรือ release asset checks
 - อ่านเวอร์ชันจาก manifests ที่มีอยู่ ไม่สร้างแหล่งเวอร์ชันซ้ำ และไม่อ้างว่า build/signing ผ่านโดยไม่มีผลตรวจจริง
-- ไม่ overwrite binary ที่ผู้ใช้กำลังเปิดอยู่ ใช้ `scripts/build-desktop.ps1 -OutputDirectory <path>` และ `scripts/package-desktop.ps1 -PayloadDirectory <path>` เมื่อต้องแยก Windows output
+- ไม่ overwrite binary ที่ผู้ใช้กำลังเปิดอยู่ ใช้ `scripts/desktop/build.ps1 -OutputDirectory <path>` และ `scripts/desktop/package.ps1 -PayloadDirectory <path>` เมื่อต้องแยก Windows output
 - ไม่ปิด process ของผู้ใช้ ติดตั้งทับ หรือถอนการติดตั้งเพื่อทดสอบโดยพลการ
 - ก่อนลบไฟล์/โฟลเดอร์ให้ตรวจ absolute path ว่าอยู่ในขอบเขตงาน บน Windows ใช้ PowerShell `-LiteralPath` และตรวจ junction/symlink ก่อน recursive deletion
 - เก็บ source, user projects, SDK/dependencies ที่ยังใช้ และ release ที่ผู้ใช้กำลังทดสอบ ลบเฉพาะสิ่งที่ตรวจแล้วว่าไม่จำเป็นตามขอบเขตคำสั่ง
@@ -91,8 +91,8 @@ key ใหม่ต้องจัดตามโครงสร้างหน�
 - Frontend: รัน `npm run typecheck` และ `npm run build` จาก `app/frontend`; ถ้าเปลี่ยน robot behavior ให้รัน adapter/workspace regression tests ใน `app/frontend/tests/`
 - เมื่อเพิ่มหรือแก้ข้อความ UI, i18n keys หรือไฟล์คำแปล ให้รัน `npm run test:i18n` จาก `app/frontend` เพิ่มด้วย
 - Go host/engine manager: รัน `go test ./...` และ `go vet ./...` จาก `app` โดยใช้ SDK ตาม repository
-- C++ engine: ใช้ `scripts/build-engine.ps1 -Engine zide -Test` และ IPC tests กับ binary ที่ build จาก source ล่าสุด ใช้ dry-run สำหรับการตรวจอัตโนมัติ
-- C# API: รัน `dotnet test SchoolBot.slnx --disable-build-servers -m:1` จาก `web` เมื่อเปลี่ยน behavior
+- C++ engine: ใช้ `scripts/engines/build.ps1 -Engine zide -Test` และ IPC tests กับ binary ที่ build จาก source ล่าสุด ใช้ dry-run สำหรับการตรวจอัตโนมัติ
+- C# API: รัน `dotnet test ServiceSchoolBot.slnx --disable-build-servers -m:1` จาก `web` เมื่อเปลี่ยน behavior
 - งาน integration/release ใช้ `scripts/verify.ps1` ตามความเหมาะสม โดยตรวจ output และ process ที่เปิดอยู่ก่อน เพราะสคริปต์นี้ build desktop ด้วย
 - เอกสารหรือคอมเมนต์อย่างเดียวให้ตรวจ diff/references ตามความจำเป็น ไม่ต้อง rebuild installer
 - สรุปภาษาไทยแบบกระชับว่าแก้อะไร ตรวจอะไรผ่าน และมีข้อจำกัดอะไร แยกผล build/tests จากการทดสอบ UI หรือ hardware จริง

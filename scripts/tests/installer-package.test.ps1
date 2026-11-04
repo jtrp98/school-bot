@@ -1,5 +1,5 @@
 param([string]$InstallerPath)
-. "$PSScriptRoot/../common.ps1"
+. "$PSScriptRoot/../lib/common.ps1"
 if (-not $InstallerPath) {
     $version = (Get-Content -LiteralPath "$SchoolBotRoot/app/frontend/package.json" -Raw | ConvertFrom-Json).version
     $InstallerPath = Join-Path $SchoolBotRoot "dist/installers/school-bot-$version-windows-amd64.msi"

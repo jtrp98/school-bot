@@ -1,5 +1,5 @@
 $ErrorActionPreference = 'Stop'
-$script = Join-Path $PSScriptRoot '../scaffold-databases.ps1'
+$script = Join-Path $PSScriptRoot '../api/scaffold-databases.ps1'
 $tempFile = Join-Path ([IO.Path]::GetTempPath()) ("school-bot-scaffold-" + [guid]::NewGuid() + '.env')
 $original = @{}
 foreach ($key in @('MASTER_DB_CONNECTION_STRING', 'ConnectionStrings__Scaffold', 'PGOPTIONS')) {

@@ -1,8 +1,8 @@
 param([switch]$SkipBuild)
-. "$PSScriptRoot/common.ps1"
-if (-not $SkipBuild) { & "$PSScriptRoot/build-desktop.ps1" -SkipInstall }
+. "$PSScriptRoot/../lib/common.ps1"
+if (-not $SkipBuild) { & "$PSScriptRoot/build.ps1" -SkipInstall }
 if ($IsMacOS) {
-    Invoke-SchoolBotCommand 'bash' @("$PSScriptRoot/start-desktop.sh", '--skip-build')
+    Invoke-SchoolBotCommand 'bash' @("$PSScriptRoot/run.sh", '--skip-build')
     return
 }
 $schoolBotSuffix = if ($env:OS -eq 'Windows_NT') { '.exe' } else { '' }

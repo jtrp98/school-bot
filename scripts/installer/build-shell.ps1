@@ -4,7 +4,7 @@ param(
     [Parameter(Mandatory)][string]$OutputDirectory,
     [switch]$Preview
 )
-. "$PSScriptRoot/common.ps1"
+. "$PSScriptRoot/../lib/common.ps1"
 $project = Join-Path $SchoolBotRoot 'app/installer'
 $version = (Get-Content -LiteralPath "$SchoolBotRoot/app/frontend/package.json" -Raw | ConvertFrom-Json).version
 $package = (Resolve-Path -LiteralPath $InstallerPath).Path

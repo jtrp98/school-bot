@@ -3,13 +3,13 @@ param(
     [Parameter(Mandatory)]
     [ValidateSet('SchoolBot', 'Master', 'School', 'Logs', 'PGGrade')]
     [string]$Database,
-    [string]$EnvFile = (Join-Path $PSScriptRoot '../web/.env'),
+    [string]$EnvFile = (Join-Path $PSScriptRoot '../../web/.env'),
     [switch]$Force
 )
 
 $ErrorActionPreference = 'Stop'
-$webRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../web'))
-$infrastructure = Join-Path $webRoot 'src/SchoolBot.Infrastructure'
+$webRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../web'))
+$infrastructure = Join-Path $webRoot 'src/ServiceSchoolBot.Infrastructure'
 $databases = @{
     SchoolBot = @('SCHOOL_BOT_DB_CONNECTION_STRING', 'SchoolBotDb', 'SchoolBotDbContext')
     Master = @('MASTER_DB_CONNECTION_STRING', 'JabjaiMasterSingleDB', 'JabjaiMasterSingleDBPostgreSQLDBContext')
@@ -74,10 +74,10 @@ try {
     # EF/provider diagnostics can contain connection details, so keep raw output out of logs.
     $output = & dotnet tool run dotnet-ef -- dbcontext scaffold 'Name=ConnectionStrings:Scaffold' `
         Npgsql.EntityFrameworkCore.PostgreSQL `
-        --project src/SchoolBot.Infrastructure --startup-project src/SchoolBot.Api `
+        --project src/ServiceSchoolBot.Infrastructure --startup-project src/ServiceSchoolBot.API `
         --context $context --context-dir Common/Databases --output-dir "Entities/$entityDirectory" `
-        --namespace "SchoolBot.Infrastructure.Entities.$entityDirectory" `
-        --context-namespace SchoolBot.Infrastructure.Common.Databases --no-onconfiguring `
+        --namespace "ServiceSchoolBot.Infrastructure.Entities.$entityDirectory" `
+        --context-namespace ServiceSchoolBot.Infrastructure.Common.Databases --no-onconfiguring `
         --force -- --environment Development 2>&1
     if ($LASTEXITCODE -ne 0) {
         throw 'Scaffold failed. Check tool restore, build, database access and metadata permissions; diagnostics suppressed.'

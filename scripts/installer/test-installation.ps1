@@ -1,5 +1,5 @@
 param([string]$PayloadDirectory)
-. "$PSScriptRoot/common.ps1"
+. "$PSScriptRoot/../lib/common.ps1"
 if ($env:OS -ne 'Windows_NT') { throw 'Run the installer smoke test on Windows.' }
 $schoolBotPayload = if ($PayloadDirectory) {
     $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($PayloadDirectory)

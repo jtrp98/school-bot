@@ -4,22 +4,22 @@ param(
     [string]$PayloadDirectory,
     [ValidateSet('th','en','zh')][string]$Language = 'th'
 )
-. "$PSScriptRoot/common.ps1"
+. "$PSScriptRoot/../lib/common.ps1"
 if ($IsMacOS) {
     if ($PayloadDirectory) { throw 'PayloadDirectory is currently supported by the Windows package only.' }
-    $schoolBotArguments = @("$PSScriptRoot/package-desktop.sh")
+    $schoolBotArguments = @("$PSScriptRoot/package.sh")
     if ($SkipBuild) { $schoolBotArguments += '--skip-build' }
     if ($SkipInstall) { $schoolBotArguments += '--skip-install' }
     Invoke-SchoolBotCommand 'bash' $schoolBotArguments
     return
 }
 if ($env:OS -ne 'Windows_NT') { throw 'Installer packaging supports Windows and macOS.' }
-Invoke-SchoolBotCommand 'node' @("$PSScriptRoot/check-notices.mjs")
+Invoke-SchoolBotCommand 'node' @("$PSScriptRoot/../checks/third-party-notices.mjs")
 $schoolBotPayload = if ($PayloadDirectory) { $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($PayloadDirectory) } else { Join-Path $SchoolBotRoot 'app/bin' }
-if (-not $SkipBuild) { & "$PSScriptRoot/build-desktop.ps1" -SkipInstall:$SkipInstall -OutputDirectory $schoolBotPayload }
-& "$PSScriptRoot/prepare-installer-tools.ps1"
+if (-not $SkipBuild) { & "$PSScriptRoot/build.ps1" -SkipInstall:$SkipInstall -OutputDirectory $schoolBotPayload }
+& "$PSScriptRoot/../installer/prepare-tools.ps1"
 $schoolBotBrandDirectory = Join-Path $SchoolBotRoot ".tools/installer-brand/$Language"
-& "$PSScriptRoot/prepare-installer-brand.ps1" -OutputDirectory $schoolBotBrandDirectory -Language $Language
+& "$PSScriptRoot/../installer/prepare-brand.ps1" -OutputDirectory $schoolBotBrandDirectory -Language $Language
 $schoolBotCulture = @{ th = 'th-TH'; en = 'en-US'; zh = 'zh-CN' }[$Language]
 $schoolBotVersion = (Get-Content -LiteralPath (Join-Path $SchoolBotRoot 'app/frontend/package.json') -Raw | ConvertFrom-Json).version
 if ($schoolBotVersion -notmatch '^\d+\.\d+\.\d+$') { throw 'Installer version must be x.y.z.' }
@@ -43,11 +43,11 @@ Invoke-SchoolBotCommand (Join-Path $SchoolBotRoot '.tools/wix5/wix.exe') @(
     (Join-Path $SchoolBotRoot 'app/build/windows/InstallerUI.wxs'),
     (Join-Path $SchoolBotRoot 'app/build/windows/InstallerDialogs.wxs')
 )
-& "$PSScriptRoot/tests/installer-package.test.ps1" -InstallerPath $schoolBotInstaller
+& "$PSScriptRoot/../tests/installer-package.test.ps1" -InstallerPath $schoolBotInstaller
 $schoolBotInstallerHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $schoolBotInstaller).Hash.ToLowerInvariant()
 [IO.File]::WriteAllText("$schoolBotInstaller.sha256", "$schoolBotInstallerHash  $([IO.Path]::GetFileName($schoolBotInstaller))`n")
 $schoolBotShellOutput = Join-Path $SchoolBotRoot ".tools/installer-shell/$Language/$schoolBotVersion"
-& "$PSScriptRoot/build-installer-shell.ps1" -InstallerPath $schoolBotInstaller `
+& "$PSScriptRoot/../installer/build-shell.ps1" -InstallerPath $schoolBotInstaller `
     -BrandDirectory $schoolBotBrandDirectory -OutputDirectory $schoolBotShellOutput
 $schoolBotSetup = Join-Path $schoolBotOutputDir "school-bot-$schoolBotVersion-windows-amd64-setup.exe"
 Copy-Item -LiteralPath (Join-Path $schoolBotShellOutput 'SchoolBotSetup.exe') -Destination $schoolBotSetup -Force

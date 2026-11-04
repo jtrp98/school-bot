@@ -5,7 +5,7 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 if ($Engine -cnotmatch '^[a-z][a-z0-9-]*$') { throw 'Engine must be a lowercase engine ID, e.g. zide.' }
-$engineDirectory = Join-Path (Split-Path $PSScriptRoot -Parent) "engines/$Engine"
+$engineDirectory = Join-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) "engines/$Engine"
 $engineManifestPath = Join-Path $engineDirectory 'engine.json'
 if (-not (Test-Path -LiteralPath $engineManifestPath -PathType Leaf)) { throw "Unknown engine: $Engine" }
 $engineManifest = Get-Content -LiteralPath $engineManifestPath -Raw | ConvertFrom-Json

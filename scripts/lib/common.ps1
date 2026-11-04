@@ -1,5 +1,5 @@
 $ErrorActionPreference = 'Stop'
-$script:SchoolBotRoot = Split-Path $PSScriptRoot -Parent
+$script:SchoolBotRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $schoolBotGoName = if ($env:OS -eq 'Windows_NT') { 'go.exe' } else { 'go' }
 $schoolBotPortable = Join-Path $script:SchoolBotRoot ".tools/go/bin/$schoolBotGoName"
 if (Test-Path -LiteralPath $schoolBotPortable) {
@@ -27,7 +27,7 @@ function Assert-SchoolBotDesktopExecutable {
     $schoolBotPlain = Join-Path $Directory "school-bot$schoolBotSuffix"
     foreach ($schoolBotExecutable in @($schoolBotVersioned, $schoolBotPlain)) {
         if (-not (Test-Path -LiteralPath $schoolBotExecutable -PathType Leaf)) {
-            throw "Desktop executable missing: $schoolBotExecutable. Run scripts/build-desktop.ps1 first."
+            throw "Desktop executable missing: $schoolBotExecutable. Run scripts/desktop/build.ps1 first."
         }
     }
     $schoolBotVersionedHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $schoolBotVersioned).Hash
@@ -43,7 +43,7 @@ function Invoke-SchoolBotWindowsResources {
     param([string]$Version, [string]$Output, [string]$Verify)
     if ($env:OS -ne 'Windows_NT') { return }
     $schoolBotPreviousGoWork = $env:GOWORK
-    Push-Location (Join-Path $PSScriptRoot 'windows-resources')
+    Push-Location (Join-Path $PSScriptRoot '../assets/windows-resources')
     try {
         $env:GOWORK = 'off'
         $schoolBotResourceArguments = @(
