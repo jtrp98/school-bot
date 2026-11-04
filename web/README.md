@@ -5,6 +5,7 @@
 คัดลอก [web/local.example.json](local.example.json) ไปเป็น `local.json` ที่ root เพื่อปรับค่า; หากไม่กำหนด ใช้ `C:/src/schoolbright/target/sb-api-gateway`
 Relative path อิง root ของ School Bot ไฟล์ `local.json` ถูก git-ignore และไม่ใช่ config ของ API runtime
 ตัวอย่างเดียวกันมี `teacherWebRoot` สำหรับ [งานเว็บครู](../docs/teacher-web.md) ใช้เมื่อทำงานเชื่อม Frontend/BFF กับ Gateway และ School Bot
+และ `adminWebRoot` สำหรับ [หน้า Admin FE](../docs/admin-web.md) ใน `sb-web-helper` ใช้อ้างอิงเฉพาะ Frontend
 
 ```text
 ServiceSchoolBot.API ───────────→ Application ───→ Domain

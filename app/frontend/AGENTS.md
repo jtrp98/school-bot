@@ -4,6 +4,8 @@
 
 ไฟล์นี้ใช้กับ Desktop Frontend งานเว็บครูใน repo `sb-tech-upgrade-web-system` หรือการเชื่อมกับเว็บครูให้อ่าน [แนวทางเว็บครู](../../docs/teacher-web.md) และ resolve `teacherWebRoot` จาก `local.json` ไม่ใช้โครงสร้าง Next.js ของเว็บครูมาบังคับ Desktop
 
+งานหน้า Admin FE ใน `sb-web-helper` ให้อ่าน [แนวทาง Admin FE](../../docs/admin-web.md) และใช้ `adminWebRoot` จาก `local.json` แนวทางนี้ไม่ครอบคลุม Backend ของ sb-web-helper
+
 - รักษา TypeScript strict mode, `noUnusedLocals` และ `noUnusedParameters` ห้ามปิดกฎเพื่อให้ build ผ่าน
 - Frontend เรียกผ่าน `app/frontend/src/core/client.ts` ไม่เรียก filesystem, shell, executable หรือ database โดยตรง
 

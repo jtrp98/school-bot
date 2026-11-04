@@ -9,6 +9,7 @@
 | Desktop / Go + Wails | [app/AGENTS.md](app/AGENTS.md) |
 | Desktop Frontend / React + TypeScript | [app/frontend/AGENTS.md](app/frontend/AGENTS.md) และกฎแม่ใน `app/` |
 | เว็บครู / Next.js ใน repo แยก | [แนวทางอ้างอิงเว็บครู](docs/teacher-web.md) อ่านเมื่อทำงานเว็บครูหรือเชื่อม School Bot กับเว็บครู |
+| หน้า Admin / FE ใน sb-web-helper | [แนวทางอ้างอิง Admin FE](docs/admin-web.md) อ่านเฉพาะงานหน้าจอ Admin |
 | Backend / C# API | [web/AGENTS.md](web/AGENTS.md) |
 | Engines | [engines/AGENTS.md](engines/AGENTS.md) |
 | Scripts / build / package / release | [scripts/AGENTS.md](scripts/AGENTS.md) |
