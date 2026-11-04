@@ -72,10 +72,7 @@ func prepareDataDirectory(config string) (string, error) {
 			return "", errors.New("legacy project exceeds 1 MB")
 		}
 		if name == "device-id" {
-			if len(data) != 32 {
-				return "", errors.New("invalid legacy device ID")
-			}
-			if _, err := hex.DecodeString(string(data)); err != nil {
+			if !validDeviceID(data) {
 				return "", errors.New("invalid legacy device ID")
 			}
 		} else if !json.Valid(data) {

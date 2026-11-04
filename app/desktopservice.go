@@ -3,8 +3,6 @@ package main
 import (
 	"bytes"
 	"context"
-	"crypto/rand"
-	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -15,6 +13,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"schoolbot.local/app/internal/engine"
+	"schoolbot.local/app/internal/license"
 	"strings"
 	"time"
 )
@@ -30,9 +29,9 @@ var defaultAPIURL = "http://localhost:8080"
 
 type DesktopService struct {
 	manager     *engine.Manager
+	entitlement *license.Host
 	apiURL      string
 	dataDir     string
-	deviceID    string
 	closeWindow func()
 }
 
@@ -61,29 +60,20 @@ func NewDesktopService() (*DesktopService, error) {
 	}
 	config, err := os.UserConfigDir()
 	if err != nil {
-		config = os.TempDir()
+		return nil, err
 	}
 	dir, err := prepareDataDirectory(config)
 	if err != nil {
 		return nil, err
 	}
-	deviceFile := filepath.Join(dir, "device-id")
-	device, err := readBoundedFile(deviceFile, 32)
-	if err != nil || !validDeviceID(device) {
-		value := make([]byte, 16)
-		if _, err := rand.Read(value); err != nil {
-			return nil, err
-		}
-		device = []byte(hex.EncodeToString(value))
-		if err := os.WriteFile(deviceFile, device, 0600); err != nil {
-			return nil, err
-		}
-	}
 	return &DesktopService{
-		manager:  engine.NewManager(),
-		apiURL:   strings.TrimRight(base, "/"),
-		dataDir:  dir,
-		deviceID: string(device),
+		manager: engine.NewManager(),
+		entitlement: license.NewHost(
+			base, &http.Client{}, license.NewSystemClock(), &license.ES256Verifier{},
+			&license.ProtectedStore{Path: filepath.Join(dir, "entitlement.dat")},
+		),
+		apiURL:  strings.TrimRight(base, "/"),
+		dataDir: dir,
 	}, nil
 }
 
@@ -102,6 +92,12 @@ func (s *DesktopService) Run(mode, action, data string) (engine.Response, error)
 	if !json.Valid([]byte(data)) {
 		return engine.Response{}, errors.New("invalid engine JSON")
 	}
+	if s.entitlement == nil {
+		return engine.Response{}, &license.LicenseError{Code: license.ErrDeviceNotActivated, Message: "connect online to activate this device"}
+	}
+	if err := s.entitlement.Authorize(context.Background(), mode); err != nil {
+		return engine.Response{}, err
+	}
 	return s.manager.Execute(mode, action, json.RawMessage(data))
 }
 func (s *DesktopService) CancelRun() { s.manager.Cancel() }
@@ -116,11 +112,30 @@ func (s *DesktopService) CheckUpdates() (string, error) {
 }
 
 func (s *DesktopService) ActivateLicense(key string) (string, error) {
-	key = strings.TrimSpace(key)
-	if key == "" || len(key) > 256 {
-		return "", errors.New("invalid key")
+	return s.checkLicense(key, false)
+}
+
+func (s *DesktopService) ValidateLicense(key string) (string, error) {
+	return s.checkLicense(key, true)
+}
+
+func (s *DesktopService) LicenseStatus() (license.EntitlementProjection, error) {
+	if s.entitlement == nil {
+		return license.EntitlementProjection{Status: license.StatusUnactivated}, nil
 	}
-	return s.api("POST", "/v1/licenses/activate", map[string]string{"key": key, "device_id": s.deviceID})
+	return s.entitlement.Evaluate(context.Background())
+}
+
+func (s *DesktopService) checkLicense(key string, validate bool) (string, error) {
+	if s.entitlement == nil {
+		return "", &license.LicenseError{Code: license.ErrConfigUnavailable, Message: "license host unavailable; connect online to recover"}
+	}
+	projection, err := s.entitlement.Check(context.Background(), key, validate)
+	if err != nil {
+		return "", err
+	}
+	data, err := json.Marshal(projection)
+	return string(data), err
 }
 func (s *DesktopService) api(method, path string, body any) (string, error) {
 	if err := validateAPIURL(s.apiURL); err != nil {

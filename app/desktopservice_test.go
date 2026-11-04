@@ -23,34 +23,16 @@ func TestAPIEndpointPolicy(t *testing.T) {
 	}
 }
 
-func TestOnlineActivationContractWithoutPersistingKey(t *testing.T) {
-	calls := 0
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		calls++
-		var body map[string]string
-		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-			t.Error(err)
-		}
-		if r.Method != http.MethodPost || r.URL.Path != "/v1/licenses/activate" || r.URL.RawQuery != "" || body["key"] != "SBOT-test" || body["device_id"] != "test-device" {
-			t.Error("activation must POST key and device ID in JSON")
-		}
-		_, _ = w.Write([]byte(`{"valid":true,"license_id":"test-license","school":"Demo school","expires_at":"2027-10-16T00:00:00Z","offline_entitlement":false}`))
-	}))
-	defer server.Close()
-	s := &DesktopService{apiURL: server.URL, deviceID: "test-device", dataDir: t.TempDir()}
-	if _, err := s.ActivateLicense(" \t"); err == nil {
-		t.Fatal("empty key accepted")
+func TestActivationRequiresConfiguredEntitlementHost(t *testing.T) {
+	service := &DesktopService{dataDir: t.TempDir()}
+	if _, err := service.ActivateLicense("SBOT-test"); err == nil {
+		t.Fatal("activation without a configured entitlement host must fail closed")
 	}
-	result, err := s.ActivateLicense(" SBOT-test ")
-	if err != nil || !strings.Contains(result, `"valid":true`) || calls != 1 {
-		t.Fatalf("online activation failed: %s, calls %d, %v", result, calls, err)
-	}
-	files, err := os.ReadDir(s.dataDir)
+	files, err := os.ReadDir(service.dataDir)
 	if err != nil || len(files) != 0 {
-		t.Fatal("activation must not persist the raw key", err)
+		t.Fatal("unconfigured activation wrote credentials")
 	}
 }
-
 func TestRenamePreservesLegacyProjectsAndDeviceID(t *testing.T) {
 	root := t.TempDir()
 	legacy := filepath.Join(root, "ArmStudioPoC")

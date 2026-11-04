@@ -109,17 +109,20 @@ func ValidateClaims(claims *EntitlementClaims, expectedJKT string) error {
 			Message: "missing entitlement claims",
 		}
 	}
-	if claims.Audience != "schoolbot-desktop" ||
+	if strings.TrimSpace(claims.Issuer) == "" || claims.Audience != "schoolbot-desktop" ||
 		strings.TrimSpace(claims.JTI) == "" ||
-		strings.TrimSpace(claims.LicenseID) == "" ||
-		strings.TrimSpace(claims.SchoolID) == "" ||
-		strings.TrimSpace(claims.BindingID) == "" {
+		claims.LicenseID <= 0 || claims.LicenseID > 1<<31-1 ||
+		claims.SchoolID <= 0 || claims.SchoolID > 1<<31-1 ||
+		claims.BindingID <= 0 || claims.BindingID > 1<<31-1 || claims.BindingEpoch < 1 {
 		return &LicenseError{
 			Code:    ErrInvalidEntitlement,
 			Message: "claims missing mandatory identification fields",
 		}
 	}
 
+	if len(claims.Modes) != 3 || claims.Modes[0] != "block" || claims.Modes[1] != "arm" || claims.Modes[2] != "code" {
+		return &LicenseError{Code: ErrInvalidEntitlement, Message: "invalid entitlement modes"}
+	}
 	// Device binding must match verified device identity, preventing cross-machine token reuse.
 	if expectedJKT == "" || claims.Confirmation.JKT != expectedJKT {
 		return &LicenseError{

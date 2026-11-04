@@ -187,7 +187,10 @@ func (s *EntitlementService) evaluateLocked(ctx context.Context) (EntitlementPro
 	s.currentRecord.ClockAnchor.ObservedWallUTC = wallNow
 	s.currentRecord.ClockAnchor.MaxEffectiveUTC = effectiveTime
 	s.sessionBaseMono = s.clock.MonotonicElapsed()
-	_ = s.store.Save(ctx, s.currentRecord)
+	if err := s.store.Save(ctx, s.currentRecord); err != nil {
+		s.cachedStatus = StatusDenied
+		return EntitlementProjection{Status: StatusDenied}, &LicenseError{Code: ErrCredentialStoreFailed, Message: "failed to persist clock anchor"}
+	}
 
 	s.cachedStatus = StatusValid
 	return EntitlementProjection{

@@ -76,6 +76,9 @@ func (s *EntitlementService) handleOnlineActive(ctx context.Context, outcome Onl
 		maxEffective = s.currentRecord.ClockAnchor.MaxEffectiveUTC
 	}
 
+	if maxEffective >= claims.ExpiresAt {
+		return EntitlementProjection{Status: s.cachedStatus}, &LicenseError{Code: ErrInvalidEntitlement, Message: "received entitlement has expired; connect online to renew"}
+	}
 	nextGen := int64(1)
 	if s.currentRecord != nil {
 		nextGen = s.currentRecord.Generation + 1
@@ -117,20 +120,26 @@ func (s *EntitlementService) handleOnlineForbidden(ctx context.Context, outcome 
 	code := strings.TrimSpace(outcome.ServerCode)
 	switch code {
 	case "LICENSE_INVALID", "LICENSE_INACTIVE", "BINDING_REVOKED":
-		s.invalidateLocalCache(ctx, StatusDenied)
+		if err := s.invalidateLocalCache(ctx, StatusDenied); err != nil {
+			return EntitlementProjection{Status: StatusDenied}, err
+		}
 		return EntitlementProjection{Status: StatusDenied}, &LicenseError{
 			Code:    code,
 			Message: "license is no longer active",
 		}
 	case "DEVICE_NOT_ACTIVATED", "DEVICE_PROOF_INVALID":
-		s.invalidateLocalCache(ctx, StatusDenied)
+		if err := s.invalidateLocalCache(ctx, StatusDenied); err != nil {
+			return EntitlementProjection{Status: StatusDenied}, err
+		}
 		return EntitlementProjection{Status: StatusDenied}, &LicenseError{
 			Code:    code,
 			Message: "device is not activated or proof invalid",
 		}
 	default:
 		// Unknown 403 response must fail closed into denied recovery.
-		s.invalidateLocalCache(ctx, StatusDenied)
+		if err := s.invalidateLocalCache(ctx, StatusDenied); err != nil {
+			return EntitlementProjection{Status: StatusDenied}, err
+		}
 		return EntitlementProjection{Status: StatusDenied}, &LicenseError{
 			Code:    ErrLicenseInvalid,
 			Message: "unknown denial response from license server",
@@ -149,7 +158,7 @@ func (s *EntitlementService) handleOnlineUnavailable(ctx context.Context) (Entit
 	}
 }
 
-func (s *EntitlementService) invalidateLocalCache(ctx context.Context, status string) {
+func (s *EntitlementService) invalidateLocalCache(ctx context.Context, status string) error {
 	s.cachedStatus = status
 	s.currentClaims = nil
 	if s.store != nil {
@@ -166,6 +175,9 @@ func (s *EntitlementService) invalidateLocalCache(ctx context.Context, status st
 			ClockAnchor: anchor,
 			Status:      status,
 		}
-		_ = s.store.Save(ctx, s.currentRecord)
+		if err := s.store.Save(ctx, s.currentRecord); err != nil {
+			return &LicenseError{Code: ErrCredentialStoreFailed, Message: "failed to persist denial"}
+		}
 	}
+	return nil
 }
