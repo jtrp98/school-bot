@@ -1,5 +1,11 @@
 # School Bot API — C# Clean Architecture
 
+กฎ Backend อยู่ที่ [AGENTS.md](AGENTS.md) และแยกรายละเอียดโครงสร้าง/gRPC/tests ใน `rules/` ให้อ่านตามขอบเขตงาน
+ตำแหน่ง Gateway checkout สำหรับ agent ตั้งด้วย `gatewayRoot` ใน `local.json` ที่ root ของ School Bot
+คัดลอก [web/local.example.json](local.example.json) ไปเป็น `local.json` ที่ root เพื่อปรับค่า; หากไม่กำหนด ใช้ `C:/src/schoolbright/target/sb-api-gateway`
+Relative path อิง root ของ School Bot ไฟล์ `local.json` ถูก git-ignore และไม่ใช่ config ของ API runtime
+ตัวอย่างเดียวกันมี `teacherWebRoot` สำหรับ [งานเว็บครู](../docs/teacher-web.md) ใช้เมื่อทำงานเชื่อม Frontend/BFF กับ Gateway และ School Bot
+
 ```text
 ServiceSchoolBot.API ───────────→ Application ───→ Domain
        └───────────────→ Infrastructure ──→ Application

@@ -52,3 +52,4 @@ app/resource_windows_amd64.syso
 !.env.example
 appsettings.Local.json
 settings.local.json
+/local.json

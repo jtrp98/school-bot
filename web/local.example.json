@@ -1,0 +1,4 @@
+{
+  "gatewayRoot": "C:/src/schoolbright/target/sb-api-gateway",
+  "teacherWebRoot": "C:/src/schoolbright/target/sb-tech-upgrade-web-system"
+}
