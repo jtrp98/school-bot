@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <ItemGroup>
+    <ProjectReference Include="../ServiceSchoolBot.Application/ServiceSchoolBot.Application.csproj" />
+    <ProjectReference Include="../ServiceSchoolBot.Infrastructure/ServiceSchoolBot.Infrastructure.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.5" PrivateAssets="all" />
+    <PackageReference Include="Grpc.AspNetCore.Server" Version="2.76.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.78.0" PrivateAssets="All" />
+    <PackageReference Include="Google.Protobuf" Version="3.31.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Protobuf Include="..\ServiceSchoolBot.Infrastructure\Protos\ServiceSchoolBot\*.proto" GrpcServices="Both" ProtoRoot="..\ServiceSchoolBot.Infrastructure\Protos\ServiceSchoolBot" Link="Protos\ServiceSchoolBot\%(Filename)%(Extension)" />
+  </ItemGroup>
+</Project>

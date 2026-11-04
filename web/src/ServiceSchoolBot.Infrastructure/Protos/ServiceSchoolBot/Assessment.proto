@@ -1,0 +1,272 @@
+syntax = "proto3";
+
+option csharp_namespace = "SchoolBot.Infrastructure.Protos";
+
+package ServiceSchoolBot;
+
+// Gateway /api/school-bot/service: admin/question-banks, course-runs, attempts and progress.
+// Localized texts and prompts are free-form JSON and travel as JSON text (absent = missing member).
+// Keys are UUID text; times are ISO 8601 round-trip text.
+service AssessmentService {
+  rpc GetProgress (GetProgressRequest) returns (ProgressResponse);
+  rpc CreateQuestionBank (CreateQuestionBankRequest) returns (QuestionBankMutationResponse);
+  rpc UpdateQuestionBank (UpdateQuestionBankRequest) returns (QuestionBankMutationResponse);
+  rpc PublishQuestionBank (PublishQuestionBankRequest) returns (QuestionBankMutationResponse);
+  rpc GetQuestionBank (GetQuestionBankRequest) returns (QuestionBankResponse);
+  rpc ListQuestionBanks (ListQuestionBanksRequest) returns (QuestionBankListResponse);
+  rpc GetActivityPolicy (GetActivityPolicyRequest) returns (ActivityPolicyResponse);
+  rpc GetAttempt (GetAttemptRequest) returns (AttemptResponse);
+  rpc ListAttempts (ListAttemptsRequest) returns (AttemptListResponse);
+}
+
+// These routes authenticate before reading the body, so the Gateway reports how the body bound and
+// SchoolBot rejects it in its original order.
+enum AssessmentBody {
+  ASSESSMENT_BODY_VALID = 0;
+  ASSESSMENT_BODY_NOT_JSON = 1;
+  ASSESSMENT_BODY_MALFORMED = 2;
+  ASSESSMENT_BODY_DUPLICATE_PROPERTY = 3;
+  ASSESSMENT_BODY_NULL = 4;
+}
+
+message QuestionBankOptionItem {
+  string option_key = 1;
+  optional string text_json = 2;
+}
+message QuestionBankOptionList {
+  repeated QuestionBankOptionItem items = 1;
+}
+message KeyList {
+  repeated string items = 1;
+}
+message QuestionBankQuestionItem {
+  string question_key = 1;
+  optional string kind = 2;
+  optional string prompt_json = 3;
+  QuestionBankOptionList options = 4;
+  KeyList correct_option_keys = 5;
+  optional string max_score = 6;
+}
+message QuestionBankQuestionList {
+  repeated QuestionBankQuestionItem items = 1;
+}
+message AssessmentPolicyItem {
+  optional int32 max_attempts = 1;
+  string selection = 2;
+  optional int32 time_limit_seconds = 3;
+  string reveal = 4;
+  bool shuffle_questions = 5;
+  bool shuffle_options = 6;
+}
+message AssessmentApprovalItem {
+  string actor = 1;
+  string approved_at = 2;
+  string approval_ref = 3;
+}
+
+message CreateQuestionBankRequest {
+  reserved 1;
+  reserved "authorization";
+  repeated string idempotency_key = 2;
+  AssessmentBody body = 3;
+  string bank_key = 4;
+  int32 revision = 5;
+  optional string title_json = 6;
+  QuestionBankQuestionList questions = 7;
+  optional string source_ref = 8;
+}
+message UpdateQuestionBankRequest {
+  reserved 1;
+  reserved "authorization";
+  repeated string idempotency_key = 2;
+  AssessmentBody body = 3;
+  int32 id = 4;
+  string if_match = 5;
+  optional string title_json = 6;
+  QuestionBankQuestionList questions = 7;
+  optional string source_ref = 8;
+}
+message PublishQuestionBankRequest {
+  reserved 1;
+  reserved "authorization";
+  repeated string idempotency_key = 2;
+  AssessmentBody body = 3;
+  int32 id = 4;
+  string if_match = 5;
+  optional string approval_ref = 6;
+}
+message QuestionBankMutationResponse {
+  int32 id = 1;
+  string update_date = 2;
+  optional string published_at = 3;
+  string etag = 4;
+}
+
+message GetQuestionBankRequest {
+  reserved 1;
+  reserved "authorization";
+  int32 id = 2;
+}
+message QuestionBankResponse {
+  int32 id = 1;
+  string bank_key = 2;
+  int32 revision = 3;
+  string title_json = 4;
+  repeated QuestionBankQuestionItem questions = 5;
+  string source_ref = 6;
+  string lifecycle = 7;
+  optional string published_at = 8;
+  string update_date = 9;
+  optional AssessmentApprovalItem approval = 10;
+  string etag = 11;
+}
+message ListQuestionBanksRequest {
+  reserved 1;
+  reserved "authorization";
+  optional string bank_key = 2;
+  optional string lifecycle = 3;
+  optional int32 limit = 4;
+  optional string cursor = 5;
+}
+message QuestionBankSummaryItem {
+  int32 id = 1;
+  string bank_key = 2;
+  int32 revision = 3;
+  string title_json = 4;
+  string source_ref = 5;
+  string lifecycle = 6;
+  optional string published_at = 7;
+  string update_date = 8;
+}
+message QuestionBankListResponse {
+  repeated QuestionBankSummaryItem items = 1;
+  optional string next_cursor = 2;
+}
+
+message GetActivityPolicyRequest {
+  reserved 1;
+  reserved "authorization";
+  int32 course_run_id = 2;
+  int32 activity_id = 3;
+}
+message ActivityPolicyResponse {
+  int32 course_run_id = 1;
+  int32 activity_id = 2;
+  optional string opens_at = 3;
+  optional string closes_at = 4;
+  AssessmentPolicyItem effective_policy = 5;
+  string update_date = 6;
+  string etag = 7;
+}
+
+message PublicQuestionItem {
+  string question_key = 1;
+  string kind = 2;
+  string prompt_json = 3;
+  repeated QuestionBankOptionItem options = 4;
+  string max_score = 5;
+}
+message AttemptFeedbackItem {
+  string question_key = 1;
+  bool correct = 2;
+  repeated string correct_option_keys = 3;
+}
+message AttemptFeedbackList {
+  repeated AttemptFeedbackItem items = 1;
+}
+message AssessmentAnswerItem {
+  string question_key = 1;
+  repeated string selected_option_keys = 2;
+}
+message GetAttemptRequest {
+  reserved 1;
+  reserved "authorization";
+  int32 id = 2;
+}
+message AttemptResponse {
+  int32 id = 1;
+  string update_date = 2;
+  int32 sequence = 3;
+  string state = 4;
+  int32 activity_id = 5;
+  int32 course_run_id = 6;
+  string started_at = 7;
+  optional string deadline_at = 8;
+  optional string submitted_at = 9;
+  repeated PublicQuestionItem questions = 10;
+  optional string earned = 11;
+  string max_score = 12;
+  AttemptFeedbackList feedback = 13;
+  repeated AssessmentAnswerItem answers = 14;
+  AssessmentPolicyItem effective_policy = 15;
+  optional string opens_at = 16;
+  optional string closes_at = 17;
+  int32 bank_id = 18;
+  int32 bank_revision = 19;
+  int32 curriculum_revision = 20;
+  int32 policy_id = 21;
+  string evaluator_version = 22;
+  string server_now = 23;
+  string etag = 24;
+}
+message ListAttemptsRequest {
+  reserved 1;
+  reserved "authorization";
+  int32 course_run_id = 2;
+  optional int32 activity_id = 3;
+  optional string state = 4;
+  optional int32 limit = 5;
+  optional string cursor = 6;
+}
+message AttemptSummaryItem {
+  int32 id = 1;
+  string update_date = 2;
+  int32 sequence = 3;
+  string state = 4;
+  int32 course_run_id = 5;
+  int32 activity_id = 6;
+  string started_at = 7;
+  optional string deadline_at = 8;
+  optional string submitted_at = 9;
+  optional string earned = 10;
+  string max_score = 11;
+}
+message AttemptListResponse {
+  repeated AttemptSummaryItem items = 1;
+  optional string next_cursor = 2;
+}
+
+message GetProgressRequest {
+  reserved 1;
+  reserved "authorization";
+  optional int32 course_run_id = 2;
+  optional int32 curriculum_id = 3;
+  optional string mode = 4;
+}
+message SelectedAttemptItem {
+  int32 attempt_id = 1;
+  int32 sequence = 2;
+  string state = 3;
+  optional string earned = 4;
+  string max_score = 5;
+}
+message ActivityProgressItem {
+  int32 activity_id = 1;
+  string type = 2;
+  optional string mode = 3;
+  optional string latest_submission_json = 4;
+  optional SelectedAttemptItem selected_attempt = 5;
+}
+message MissionProgressItem {
+  int32 mission_id = 1;
+  optional string latest_submission_json = 2;
+}
+message ProgressResponse {
+  int32 learner_id = 1;
+  optional int32 course_run_id = 2;
+  int32 curriculum_id = 3;
+  int32 level_id = 4;
+  repeated ActivityProgressItem activities = 5;
+  repeated MissionProgressItem missions = 6;
+  string computed_at = 7;
+}

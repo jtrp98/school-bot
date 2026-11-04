@@ -1,0 +1,12 @@
+global using SchoolBotUnitOfWork = ServiceSchoolBot.Infrastructure.Repositories.Storage.Memory.SchoolBotUnitOfWork;
+global using ProjectRepository = ServiceSchoolBot.Infrastructure.Repositories.Storage.Memory.ProjectRepository;
+global using LicenseRepository = ServiceSchoolBot.Infrastructure.Repositories.Storage.Memory.LicenseRepository;
+global using WebSessionRepository = ServiceSchoolBot.Infrastructure.Repositories.Storage.Memory.WebSessionRepository;
+global using CurriculumRepository = ServiceSchoolBot.Infrastructure.Repositories.Storage.Memory.CurriculumRepository;
+global using AssessmentRepository = ServiceSchoolBot.Infrastructure.Repositories.Storage.Memory.AssessmentRepository;
+global using IdempotencyRepository = ServiceSchoolBot.Infrastructure.Repositories.Storage.Memory.IdempotencyRepository;
+global using CurriculumImportRepository = ServiceSchoolBot.Infrastructure.Repositories.Storage.Memory.CurriculumImportRepository;
+global using MasterAccountRepository = ServiceSchoolBot.Infrastructure.Repositories.Storage.Memory.MasterAccountRepository;
+global using SchoolProfileRepository = ServiceSchoolBot.Infrastructure.Repositories.Storage.Memory.SchoolProfileRepository;
+global using LogsRepository = ServiceSchoolBot.Infrastructure.Repositories.Storage.Memory.LogsRepository;
+global using GradeRepository = ServiceSchoolBot.Infrastructure.Repositories.Storage.Memory.GradeRepository;

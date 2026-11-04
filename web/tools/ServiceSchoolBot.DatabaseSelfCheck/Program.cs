@@ -2,11 +2,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SchoolBot.Application.Databases.Repository.Interfaces;
-using SchoolBot.Infrastructure.Common.Databases;
-using SchoolBot.Infrastructure.Configuration;
-using SchoolBot.Infrastructure.Extensions;
-using SchoolBot.Infrastructure.Repositories.Storage;
+using ServiceSchoolBot.Application.Databases.Repository.Interfaces;
+using ServiceSchoolBot.Infrastructure.Common.Databases;
+using ServiceSchoolBot.Infrastructure.Configuration;
+using ServiceSchoolBot.Infrastructure.Extensions;
+using ServiceSchoolBot.Infrastructure.Repositories.Storage;
+using ServiceSchoolBot.Infrastructure.Repositories.Databases;
 
 const string syntheticConnection = "Host=localhost;Database=self_check;Username=self_check;Password=synthetic_only";
 var variables = new[]
@@ -49,8 +50,11 @@ try
     CheckModel<JabjaiSchoolSingleDBPostgreSQLDBContext>(scope.ServiceProvider, "School");
     CheckModel<JabjaiSchoolLogsPostgreSQLDBContext>(scope.ServiceProvider, "Logs");
     CheckModel<PGGradeDBPostgreSQLDBContext>(scope.ServiceProvider, "PGGrade");
-    Assert(provider.GetRequiredService<ISchoolBotBackingStore>() is MemorySchoolBotBackingStore,
-        "Business backing store changed.");
+    Assert(scope.ServiceProvider.GetRequiredService<IProjectRepository>() is ProjectRepository,
+        "Production repository is not PostgreSQL.");
+    Assert(ReferenceEquals(scope.ServiceProvider.GetRequiredService<IProjectRepository>(),
+        ((SchoolBotUnitOfWork)scope.ServiceProvider.GetRequiredService<ISchoolBotRepositoryScope>()).Project), "Repositories do not share the transaction scope.");
+    Assert(provider.GetService<ISchoolBotBackingStore>() is null, "Production registered a memory backing store.");
     Environment.SetEnvironmentVariable(DatabaseConnectionConfig.MasterDbEnvVar, "invalid=synthetic_only");
     using var invalidScope = provider.CreateScope();
     try
@@ -64,7 +68,7 @@ try
     }
     CheckSchoolBotConfigurationError("invalid=synthetic_only", "Invalid");
     CheckSchoolBotConfigurationError(null, "Missing");
-    Console.WriteLine("PASS: configuration, DI, models and unchanged memory repository; no database connection opened.");
+    Console.WriteLine("PASS: configuration, scoped PostgreSQL repositories and models; no database connection opened.");
 }
 finally
 {

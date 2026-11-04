@@ -1,0 +1,88 @@
+syntax = "proto3";
+
+option csharp_namespace = "SchoolBot.Infrastructure.Protos";
+
+package ServiceSchoolBot;
+
+// Gateway /api/school-bot/service: device-challenges, licenses/* and admin/licenses.
+// Device calls carry the request body verbatim because activation proofs and replay fingerprints are
+// computed over the exact text the device sent. Times are ISO 8601 round-trip text so a client-supplied
+// offset (expires_at) is returned unchanged.
+service LicenseService {
+  rpc CreateDeviceChallenge (DeviceBodyRequest) returns (DeviceChallengeResponse);
+  rpc ActivateLicense (DeviceBodyRequest) returns (EntitlementResponse);
+  rpc ValidateLicense (DeviceBodyRequest) returns (EntitlementResponse);
+  rpc ListLicenses (ListLicensesRequest) returns (ListLicensesResponse);
+  rpc CreateLicense (CreateLicenseRequest) returns (CreatedLicenseResponse);
+  rpc RevokeLicense (RevokeLicenseRequest) returns (LicenseViewResponse);
+  rpc UnbindLicense (UnbindLicenseRequest) returns (LicenseViewResponse);
+}
+
+message DeviceBodyRequest {
+  string raw_body = 1;
+  optional string idempotency_key = 2;
+}
+message DeviceChallengeResponse {
+  string challenge = 1;
+  string server_time = 2;
+  string expires_at = 3;
+}
+message EntitlementResponse {
+  bool valid = 1;
+  int32 license_id = 2;
+  int32 binding_id = 3;
+  string entitlement = 4;
+  string checked_at = 5;
+  string expires_at = 6;
+}
+
+message LicenseItem {
+  int32 id = 1;
+  int32 school_id = 2;
+  string school_name = 3;
+  string key_hint = 4;
+  string expires_at = 5;
+  bool revoked = 6;
+  int32 activated_devices = 7;
+  optional string update_date = 8;
+}
+message ListLicensesRequest {
+  reserved 1;
+  reserved "authorization";
+  optional int32 school_id = 2;
+}
+message ListLicensesResponse {
+  repeated LicenseItem licenses = 1;
+}
+message CreateLicenseRequest {
+  reserved 1;
+  reserved "authorization";
+  optional string idempotency_key = 2;
+  int32 school_id = 3;
+  string school_name = 4;
+  string expires_at = 5;
+  optional int32 device_limit = 6;
+}
+message CreatedLicenseResponse {
+  LicenseItem license = 1;
+  string key = 2;
+}
+message RevokeLicenseRequest {
+  reserved 1;
+  reserved "authorization";
+  optional string if_match = 2;
+  int32 id = 3;
+  optional string reason = 4;
+}
+message UnbindLicenseRequest {
+  reserved 1;
+  reserved "authorization";
+  optional string if_match = 2;
+  int32 id = 3;
+  optional string reason = 4;
+  optional string next_device_jkt = 5;
+}
+message LicenseViewResponse {
+  LicenseItem license = 1;
+  optional string etag = 2;
+}

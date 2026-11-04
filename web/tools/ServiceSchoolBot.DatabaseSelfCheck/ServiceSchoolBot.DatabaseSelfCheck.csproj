@@ -3,7 +3,7 @@
     <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="../../src/SchoolBot.Infrastructure/SchoolBot.Infrastructure.csproj" />
+    <ProjectReference Include="../../src/ServiceSchoolBot.Infrastructure/ServiceSchoolBot.Infrastructure.csproj" />
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 </Project>
