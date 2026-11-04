@@ -1,0 +1,17 @@
+using System;
+using System.Collections.Generic;
+
+namespace SchoolBot.Infrastructure.Entities.JabjaiSchoolLogs;
+
+public partial class UpdatedUser
+{
+    public int Id { get; set; }
+
+    public int SchoolId { get; set; }
+
+    public string DeviceId { get; set; } = null!;
+
+    public int UserId { get; set; }
+
+    public int SId { get; set; }
+}

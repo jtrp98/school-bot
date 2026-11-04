@@ -1,0 +1,51 @@
+using System;
+using System.Collections.Generic;
+
+namespace SchoolBot.Infrastructure.Entities.JabjaiMasterSingleDB;
+
+public partial class TapproveEmployeeFamily
+{
+    public int Id { get; set; }
+
+    public int? Version { get; set; }
+
+    public int EmployeeId { get; set; }
+
+    public int SchoolId { get; set; }
+
+    public int? No { get; set; }
+
+    public string? FamilyRelationship { get; set; }
+
+    public int? Title { get; set; }
+
+    public string? Name { get; set; }
+
+    public string? Surname { get; set; }
+
+    public DateTime? Birthday { get; set; }
+
+    public int? MaritalStatus { get; set; }
+
+    public string? LivingStatus { get; set; }
+
+    public string? DeathStatus { get; set; }
+
+    public string? FamilyOccupation { get; set; }
+
+    public int? Education { get; set; }
+
+    public DateTime? RequestApproveDate { get; set; }
+
+    public DateTime? ApproveDate { get; set; }
+
+    public int? ApproveBy { get; set; }
+
+    public string? ApproveStatus { get; set; }
+
+    public string? ApproveComment { get; set; }
+
+    public bool? UserAcknowledge { get; set; }
+
+    public DateTime? EndDateShowResult { get; set; }
+}
