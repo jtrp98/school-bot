@@ -1,0 +1,14 @@
+# CODEOWNERS file
+
+# Each line is a file pattern followed by one or more owners.
+
+# Default owner for everything in the repository
+
+-       @light
+
+# Specific owners for certain directories or files
+
+.github/ @light
+src/ @light @team-lead
+docs/ @documentation-team
+tests/ @qa-team
