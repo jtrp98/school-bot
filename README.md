@@ -3,7 +3,7 @@
 Starter สำหรับแบ่งทีมพัฒนา 3 Mode ไม่ใช่ Production Release
 
 - `app/` — **Go + Wails v3 + React + TypeScript**, Desktop ทั้งหมด
-- `web/` — **C# / ASP.NET Core .NET 10**, API แบบ **Clean Architecture**; ดู [database-first scaffold และคำสั่ง re-scaffold](web/README.md#ef-core-database-first-scaffold)
+- `service-school-bot/` — **C# / ASP.NET Core .NET 10**, API แบบ **Clean Architecture**; ดู [database-first scaffold และคำสั่ง re-scaffold](service-school-bot/README.md#ef-core-database-first-scaffold)
 - `contracts/` — Engine JSON contract ที่ทุกทีมใช้ร่วมกัน
 - `engines/` — Engine แยกตาม ID แต่ละตัวมี source, dependencies, tests และ build ของตัวเอง; ดู `engines/README.md`
 - `docs/` — Architecture, API, การติดตั้ง/Deploy และการปกป้องโค้ด
@@ -66,7 +66,7 @@ go build -trimpath -tags production -ldflags '-s -w -H windowsgui' -o bin/school
 ./bin/school-bot.exe
 
 # อีก terminal
-cd web
+cd service-school-bot
 dotnet run --project src/ServiceSchoolBot.API --no-launch-profile
 ```
 
@@ -121,7 +121,7 @@ TAdmin (`admin_id`) เป็น staff ส่วนกลาง ส่วน `Is
 SchoolBot ไม่มี admin key, logout หรือ web-session exchange ของตัวเองแล้ว
 Device challenge, activate/validate และ update check เป็น anonymous ที่ Gateway แต่ device licensing ยังตรวจ key และ signed proof
 
-ค่าเริ่มต้นใช้ Memory Store: **ข้อมูลหายเมื่อ restart**; file store มีไว้สำหรับการทดสอบ persistence ตามข้อจำกัดใน [web/README.md](web/README.md)
+ค่าเริ่มต้นใช้ Memory Store: **ข้อมูลหายเมื่อ restart**; file store มีไว้สำหรับการทดสอบ persistence ตามข้อจำกัดใน [service-school-bot/README.md](service-school-bot/README.md)
 License key สุ่มด้วย cryptographic RNG และเก็บ hash; การสร้างคืน key และรองรับ replay ตามสัญญา idempotency
 Device activation คืน signed entitlement ของ stub ซึ่งยังต้องมี production signing/key management
 Publish release เปิดเผย metadata เท่านั้น ไม่ดาวน์โหลด ติดตั้ง หรือตรวจ artifact signature ให้
@@ -151,7 +151,7 @@ $env:SCHOOL_BOT_BUILD_API_URL = 'https://api.example.com'
 | Mode 2 Adventure | `app/frontend/src/modes/coding-adventure/`, `app/frontend/src/components/coding-adventure/` |
 | Mode 3 Blocks | `app/frontend/src/modes/block-programming/` |
 | Desktop Core | `app/desktopservice.go`, `app/internal/engine/`, `app/frontend/src/core/` |
-| API | `web/ServiceSchoolBot.slnx` และ 4 layers ใน `web/src/` |
+| API | `service-school-bot/ServiceSchoolBot.slnx` และ 4 layers ใน `service-school-bot/src/` |
 
 อ่าน `docs/ARCHITECTURE.md` และ `engines/README.md` ก่อนแก้ shared contract
 Mode ใช้ `app/frontend/src/core/client.ts` ร่วมกัน; การเพิ่ม Action ต้องปรับ contract, engine และ frontend types ให้ตรงกัน
@@ -197,7 +197,7 @@ Setup EXE วาดหน้าต่างไร้กรอบ มุมโค
 หากเครื่องไม่มี WebView2 แอปจะขอให้ติดตั้งผ่านอินเทอร์เน็ตตอนเปิดครั้งแรก
 Mac Installer ลง `School Bot.app` ใน `/Applications`
 Installer นี้ยังเป็น development build ที่ไม่ลงนาม ต้องทำ Windows signing / Mac Developer ID + notarization ก่อนแจกภายนอก
-API ใน `web/` Deploy แยกบน Server ไม่รวมใน Desktop Installer
+API ใน `service-school-bot/` Deploy แยกบน Server ไม่รวมใน Desktop Installer
 
 ส่ง Source พร้อม `go.mod`, `go.sum`, `package-lock.json` และ solution ทั้งชุด
 สร้าง ZIP สำหรับส่งให้ทีมด้วย `./scripts/package-source.ps1` จะได้ `dist/school-bot-team-starter.zip`

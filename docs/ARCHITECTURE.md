@@ -95,7 +95,7 @@ flowchart TB
 
 ## 3. Backend & gRPC Microservices Architecture
 
-### 3.1 Layered Design (`web/src/`)
+### 3.1 Layered Design (`service-school-bot/src/`)
 - **Domain Layer (`ServiceSchoolBot.Domain`)**: Pure business logic, immutable domain records, invariants, and validation rules. No database or web dependencies.
 - **Application Layer (`ServiceSchoolBot.Application`)**: Use cases, DTOs, repository interfaces (`ISchoolBotRepositoryScope`), and domain service orchestrators (`AssessmentReadService`, `LearningSubmissionService`, `ScoreExportService`, `QuestionBankService`, `LevelPromotionService`).
 - **Infrastructure Layer (`ServiceSchoolBot.Infrastructure`)**: EF Core PostgreSQL repository implementations (`SchoolBotDbContext`, `SchoolBotUnitOfWork`), memory cache, Protobuf serialization, and external system adapters.

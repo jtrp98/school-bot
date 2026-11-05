@@ -6,7 +6,7 @@ New-Item -ItemType Directory -Path $schoolBotDownloads -Force | Out-Null
 $schoolBotWixDir = Join-Path $schoolBotTools 'wix5'
 $schoolBotWix = Join-Path $schoolBotWixDir 'wix.exe'
 if (-not (Test-Path -LiteralPath $schoolBotWix)) {
-    Push-Location (Join-Path $SchoolBotRoot 'web')
+    Push-Location (Join-Path $SchoolBotRoot 'service-school-bot')
     try {
         Invoke-SchoolBotCommand 'dotnet' @('tool','install','wix','--version','5.0.2','--allow-roll-forward','--tool-path',$schoolBotWixDir,'--add-source','https://api.nuget.org/v3/index.json')
     } finally { Pop-Location }

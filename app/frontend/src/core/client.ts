@@ -1,7 +1,7 @@
 import { robotSimulator, simulatorEnabled } from "./robotSimulator";
 import { EngineError } from "./engineError";
 import { t } from "../i18n";
-import type { AppInfo, EngineResponse, ModeID, ProgramEngineData } from "./types";
+import type { AppInfo, EngineResponse, EnvironmentInfo, ModeID, ProgramEngineData } from "./types";
 import {
   InMemoryProjectLibraryBackend,
   type ExportBundleV2,
@@ -73,6 +73,50 @@ export const client = {
           runtime: "Browser simulation · no native IPC",
         })
       : native("Info"),
+  getEnvironment: (): Promise<EnvironmentInfo> =>
+    preview
+      ? Promise.resolve({
+          current_url: localStorage.getItem("school-bot:dev-url") || "http://localhost:8080",
+          active_env: (localStorage.getItem("school-bot:dev-env") as "local" | "dev" | "prod" | "custom") || "local",
+          presets: {
+            local: "http://localhost:8080",
+            dev: "https://api-dev.schoolbright.co",
+            prod: "https://api.schoolbright.co",
+          },
+        })
+      : native("GetEnvironment"),
+  setEnvironment: async (env: string, customURL?: string): Promise<AppInfo> => {
+    if (preview) {
+      localStorage.setItem("school-bot:dev-env", env);
+      const presets: Record<string, string> = {
+        local: "http://localhost:8080",
+        dev: "https://api-dev.schoolbright.co",
+        prod: "https://api.schoolbright.co",
+      };
+      const resolved = env === "custom" ? (customURL || "") : (presets[env] || "http://localhost:8080");
+      localStorage.setItem("school-bot:dev-url", resolved);
+      return {
+        version: "preview",
+        platform: "browser-preview",
+        api_url: resolved,
+        runtime: "Browser simulation · no native IPC",
+      };
+    }
+    return native("SetEnvironment", env, customURL || "");
+  },
+  resetEnvironment: async (): Promise<AppInfo> => {
+    if (preview) {
+      localStorage.removeItem("school-bot:dev-env");
+      localStorage.removeItem("school-bot:dev-url");
+      return {
+        version: "preview",
+        platform: "browser-preview",
+        api_url: "http://localhost:8080",
+        runtime: "Browser simulation · no native IPC",
+      };
+    }
+    return native("ResetEnvironment");
+  },
   run: async <TData = ProgramEngineData>(
     mode: ModeID,
     action: string,

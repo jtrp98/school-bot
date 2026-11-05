@@ -132,6 +132,22 @@
   "settings": {
     "title": "设置"
   },
+  "devEnv": {
+    "title": "开发者环境设置",
+    "description": "选择用于测试的 API 后端环境",
+    "warning": "仅限内部测试使用。切换环境会影响网络目标和许可证。",
+    "active": "当前处于: {{env}}",
+    "local": "本地环境 (localhost:8080)",
+    "dev": "开发环境 (api-dev)",
+    "prod": "生产环境 (api)",
+    "custom": "自定义 URL",
+    "customPlaceholder": "https://custom-gateway.example.com",
+    "apply": "保存并切换",
+    "reset": "重置为默认",
+    "close": "关闭",
+    "success": "已切换环境至 {{url}}",
+    "error": "切换环境失败: {{error}}"
+  },
   "robot": {
     "errors": {
       "engineBusy": "机器人仍在处理上一条指令，请稍候或按停止。",

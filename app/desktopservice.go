@@ -30,6 +30,53 @@ const unreleasedVersion = "0.0.0"
 // This URL is embedded in distributed binaries, so it must not contain secrets.
 var defaultAPIURL = "http://localhost:8080"
 
+var EnvironmentPresets = map[string]string{
+	"local": "http://localhost:8080",
+	"dev":   "https://api-dev.schoolbright.co",
+	"prod":  "https://api.schoolbright.co",
+}
+
+type EnvironmentInfo struct {
+	CurrentURL string            `json:"current_url"`
+	ActiveEnv  string            `json:"active_env"`
+	Presets    map[string]string `json:"presets"`
+}
+
+type savedEnvironment struct {
+	ActiveEnv string `json:"active_env"`
+	CustomURL string `json:"custom_url,omitempty"`
+}
+
+func determineActiveEnv(currentURL string) string {
+	clean := strings.TrimRight(currentURL, "/")
+	for env, url := range EnvironmentPresets {
+		if clean == strings.TrimRight(url, "/") {
+			return env
+		}
+	}
+	return "custom"
+}
+
+func readSavedEnvironment(dir string) string {
+	path := filepath.Join(dir, "environment.json")
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return ""
+	}
+	var saved savedEnvironment
+	if err := json.Unmarshal(data, &saved); err != nil {
+		return ""
+	}
+	if saved.ActiveEnv == "custom" && saved.CustomURL != "" {
+		if err := validateAPIURL(saved.CustomURL); err == nil {
+			return saved.CustomURL
+		}
+	} else if url, ok := EnvironmentPresets[saved.ActiveEnv]; ok {
+		return url
+	}
+	return ""
+}
+
 type DesktopSession struct {
 	Username  string `json:"username"`
 	Token     string `json:"token,omitempty"`
@@ -64,13 +111,6 @@ type AppInfo struct {
 }
 
 func NewDesktopService() (*DesktopService, error) {
-	base := os.Getenv("SCHOOL_BOT_API_URL")
-	if base == "" {
-		base = os.Getenv("ARM_API_URL")
-	}
-	if base == "" {
-		base = defaultAPIURL
-	}
 	config, err := os.UserConfigDir()
 	if err != nil {
 		return nil, err
@@ -78,6 +118,16 @@ func NewDesktopService() (*DesktopService, error) {
 	dir, err := prepareDataDirectory(config)
 	if err != nil {
 		return nil, err
+	}
+	base := os.Getenv("SCHOOL_BOT_API_URL")
+	if base == "" {
+		base = os.Getenv("ARM_API_URL")
+	}
+	if base == "" {
+		base = readSavedEnvironment(dir)
+	}
+	if base == "" {
+		base = defaultAPIURL
 	}
 	entitlement := license.NewHost(
 		base, &http.Client{}, license.NewSystemClock(), &license.ES256Verifier{},
@@ -93,6 +143,78 @@ func NewDesktopService() (*DesktopService, error) {
 		_, _ = project.MigrateLegacyProjects(config, store)
 	}
 	return svc, nil
+}
+
+func (s *DesktopService) GetEnvironment() EnvironmentInfo {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return EnvironmentInfo{
+		CurrentURL: s.apiURL,
+		ActiveEnv:  determineActiveEnv(s.apiURL),
+		Presets:    EnvironmentPresets,
+	}
+}
+
+func (s *DesktopService) SetEnvironment(env string, customURL string) (AppInfo, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	var targetURL string
+	if env == "custom" {
+		targetURL = strings.TrimSpace(customURL)
+	} else if preset, ok := EnvironmentPresets[env]; ok {
+		targetURL = preset
+	} else {
+		return AppInfo{}, fmt.Errorf("unknown environment preset: %s", env)
+	}
+
+	targetURL = strings.TrimRight(targetURL, "/")
+	if err := validateAPIURL(targetURL); err != nil {
+		return AppInfo{}, err
+	}
+
+	s.apiURL = targetURL
+	s.entitlement = license.NewHost(
+		targetURL, &http.Client{}, license.NewSystemClock(), &license.ES256Verifier{},
+		&license.ProtectedStore{Path: filepath.Join(s.dataDir, "entitlement.dat")},
+	)
+	s.updater = nil
+
+	saved := savedEnvironment{
+		ActiveEnv: env,
+		CustomURL: customURL,
+	}
+	if data, err := json.MarshalIndent(saved, "", "  "); err == nil {
+		_ = os.WriteFile(filepath.Join(s.dataDir, "environment.json"), data, 0600)
+	}
+
+	return AppInfo{
+		Version:  appVersion,
+		Platform: runtime.GOOS + "-" + runtime.GOARCH,
+		APIURL:   s.apiURL,
+		Runtime:  "Wails v3 · native engine IPC",
+	}, nil
+}
+
+func (s *DesktopService) ResetEnvironment() (AppInfo, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	_ = os.Remove(filepath.Join(s.dataDir, "environment.json"))
+	base := defaultAPIURL
+	s.apiURL = strings.TrimRight(base, "/")
+	s.entitlement = license.NewHost(
+		base, &http.Client{}, license.NewSystemClock(), &license.ES256Verifier{},
+		&license.ProtectedStore{Path: filepath.Join(s.dataDir, "entitlement.dat")},
+	)
+	s.updater = nil
+
+	return AppInfo{
+		Version:  appVersion,
+		Platform: runtime.GOOS + "-" + runtime.GOARCH,
+		APIURL:   s.apiURL,
+		Runtime:  "Wails v3 · native engine IPC",
+	}, nil
 }
 
 func (s *DesktopService) Info() AppInfo {

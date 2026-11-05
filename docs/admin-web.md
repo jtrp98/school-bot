@@ -4,7 +4,7 @@
 
 ## ตำแหน่งบนเครื่อง
 
-อ่าน `adminWebRoot` จาก `local.json` ที่ root ของ School Bot หากไม่มีไฟล์หรือไม่ได้กำหนด key ใช้ `C:/src/schoolbright/target/sb-web-helper` เป็นค่าเริ่มต้น ดู [ตัวอย่าง config](../web/local.example.json)
+อ่าน `adminWebRoot` จาก `local.json` ที่ root ของ School Bot หากไม่มีไฟล์หรือไม่ได้กำหนด key ใช้ `C:/src/schoolbright/target/sb-web-helper` เป็นค่าเริ่มต้น ดู [ตัวอย่าง config](../service-school-bot/local.example.json)
 
 Relative path อิง root ของ School Bot ค่าที่กำหนดแต่ใช้ไม่ได้ต้องรายงาน ไม่เลือก checkout อื่นเงียบ ๆ ค่านี้เป็น path เอกสาร/source สำหรับ agent ไม่ใช่ URL หรือ runtime config และ `local.json` ไม่เข้า Git หากไม่มี checkout ให้ระบุส่วนที่ยังตรวจไม่ได้
 

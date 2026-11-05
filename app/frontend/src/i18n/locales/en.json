@@ -132,6 +132,22 @@
   "settings": {
     "title": "Settings"
   },
+  "devEnv": {
+    "title": "Developer Environment",
+    "description": "Select the API backend environment for testing.",
+    "warning": "Internal testing only. Switching environments affects network targets and licensing.",
+    "active": "Active: {{env}}",
+    "local": "Local (localhost:8080)",
+    "dev": "Development (api-dev)",
+    "prod": "Production (api)",
+    "custom": "Custom URL",
+    "customPlaceholder": "https://custom-gateway.example.com",
+    "apply": "Apply & Switch",
+    "reset": "Reset to Default",
+    "close": "Close",
+    "success": "Environment updated to {{url}}",
+    "error": "Failed to set environment: {{error}}"
+  },
   "robot": {
     "errors": {
       "engineBusy": "The robot is still handling the previous command. Wait a moment or press Stop.",

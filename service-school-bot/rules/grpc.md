@@ -1,6 +1,6 @@
 # gRPC และการทำงานร่วมกับ Gateway
 
-อ่าน [web/README.md](../README.md) และ [docs/API.md](../../docs/API.md) เป็น contract ของ School Bot ก่อน เมื่อแตะการเชื่อม Gateway ให้ resolve `gatewayRoot` ตาม [web/AGENTS.md](../AGENTS.md) แล้วอ่านเฉพาะส่วนที่เกี่ยวข้องใน `_docs/handbook/05-microservice-grpc-standard.md`; งาน route อ่าน `_docs/handbook/phase-1/01-naming-and-routing-conventions.md` เพิ่ม
+อ่าน [service-school-bot/README.md](../README.md) และ [docs/API.md](../../docs/API.md) เป็น contract ของ School Bot ก่อน เมื่อแตะการเชื่อม Gateway ให้ resolve `gatewayRoot` ตาม [service-school-bot/AGENTS.md](../AGENTS.md) แล้วอ่านเฉพาะส่วนที่เกี่ยวข้องใน `_docs/handbook/05-microservice-grpc-standard.md`; งาน route อ่าน `_docs/handbook/phase-1/01-naming-and-routing-conventions.md` เพิ่ม
 
 Handbook เป็นแนวทางกลาง ต้องเทียบโค้ด/contract School Bot จริงด้วย ไม่เปลี่ยน ports, auth, error envelope หรือจัดโครงสร้างใหม่ทั้งหมดเพียงให้ตรงตัวอย่าง หากขัดกันให้รายงานความต่าง
 
@@ -14,7 +14,7 @@ Handbook เป็นแนวทางกลาง ต้องเทียบ�
 
 ## Proto และ naming
 
-- Source of truth อยู่ `web/src/ServiceSchoolBot.Infrastructure/Protos/ServiceSchoolBot/`; หนึ่ง `.proto` ต่อ aggregate ตามเดิม เช่น `Assessment.proto`, `Project.proto`
+- Source of truth อยู่ `service-school-bot/src/ServiceSchoolBot.Infrastructure/Protos/ServiceSchoolBot/`; หนึ่ง `.proto` ต่อ aggregate ตามเดิม เช่น `Assessment.proto`, `Project.proto`
 - message/service/RPC ใช้ PascalCase, fields ใช้ snake_case; รักษา package และ `csharp_namespace` เดิม ไม่แก้ generated C# ด้วยมือ
 - ห้ามเปลี่ยน/reuse field numbers; เมื่อลบ field ให้ reserved number/name รักษา optional/default semantics และความเข้ากันได้ของ client เก่า ประเมิน breaking change ก่อนเปลี่ยน type, enum หรือความหมาย
 - เมื่อแก้ proto ให้ sync สำเนาที่ `<gatewayRoot>/src/ApiGateway.Infrastructure/Protos/ServiceSchoolBot/` จากต้นฉบับ ตรวจ SHA-256 ตรงกันทุกไฟล์ ไม่แก้สำเนา Gateway แยกเอง การเปลี่ยนข้าม repo ต้องอยู่ในขอบเขตงานที่ได้รับและทำตามกฎของ repo ปลายทาง

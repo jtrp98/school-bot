@@ -1,10 +1,10 @@
 # โครงสร้าง ชื่อ และขนาดไฟล์ Backend
 
-ใช้กับ C# ที่เพิ่มหรือแก้ใน `web/` รักษาโครงสร้างจริงตาม [web/README.md](../README.md) ไม่ย้ายทั้ง repo เพียงให้ตรงตัวอย่าง
+ใช้กับ C# ที่เพิ่มหรือแก้ใน `service-school-bot/` รักษาโครงสร้างจริงตาม [service-school-bot/README.md](../README.md) ไม่ย้ายทั้ง repo เพียงให้ตรงตัวอย่าง
 
 ## ขอบเขตและ category
 
-| Layer / ตำแหน่งใต้ `web/src/` | หน้าที่ |
+| Layer / ตำแหน่งใต้ `service-school-bot/src/` | หน้าที่ |
 |---|---|
 | `ServiceSchoolBot.API/GrpcServices/` | รับ/ตอบ RPC, proto mapping, trusted metadata และ error transport |
 | `ServiceSchoolBot.Application/Services/Implementations/<Feature>/` | Use case, workflow และ validation ของฟีเจอร์ |

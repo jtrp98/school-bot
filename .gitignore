@@ -25,7 +25,7 @@ dist/
 app/frontend/dist/
 app/frontend/public/blockly-media/
 app/frontend/bindings/
-web/data/
+service-school-bot/data/
 *.log
 *.test
 *.trx

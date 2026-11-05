@@ -23,6 +23,67 @@ func TestAPIEndpointPolicy(t *testing.T) {
 	}
 }
 
+func TestEnvironmentManagement(t *testing.T) {
+	tempDir := t.TempDir()
+	s := &DesktopService{
+		apiURL:  "http://localhost:8080",
+		dataDir: tempDir,
+	}
+
+	env := s.GetEnvironment()
+	if env.ActiveEnv != "local" || env.CurrentURL != "http://localhost:8080" {
+		t.Fatalf("expected initial local environment, got %+v", env)
+	}
+
+	// Switch to dev preset
+	info, err := s.SetEnvironment("dev", "")
+	if err != nil {
+		t.Fatalf("SetEnvironment dev failed: %v", err)
+	}
+	if info.APIURL != EnvironmentPresets["dev"] {
+		t.Fatalf("expected APIURL to match dev preset, got %s", info.APIURL)
+	}
+	if s.GetEnvironment().ActiveEnv != "dev" {
+		t.Fatalf("expected active env dev, got %s", s.GetEnvironment().ActiveEnv)
+	}
+
+	// Verify persistence in environment.json
+	restoredURL := readSavedEnvironment(tempDir)
+	if restoredURL != EnvironmentPresets["dev"] {
+		t.Fatalf("expected saved environment to be %s, got %s", EnvironmentPresets["dev"], restoredURL)
+	}
+
+	// Switch to custom URL
+	custom := "https://staging.schoolbright.co/api"
+	info, err = s.SetEnvironment("custom", custom)
+	if err != nil {
+		t.Fatalf("SetEnvironment custom failed: %v", err)
+	}
+	if info.APIURL != custom {
+		t.Fatalf("expected custom APIURL, got %s", info.APIURL)
+	}
+	if s.GetEnvironment().ActiveEnv != "custom" {
+		t.Fatalf("expected active env custom, got %s", s.GetEnvironment().ActiveEnv)
+	}
+
+	// Unsafe custom URL must fail
+	if _, err := s.SetEnvironment("custom", "http://insecure.example.com"); err == nil {
+		t.Fatal("expected insecure custom HTTP to fail")
+	}
+
+	// Reset to default
+	info, err = s.ResetEnvironment()
+	if err != nil {
+		t.Fatalf("ResetEnvironment failed: %v", err)
+	}
+	if info.APIURL != defaultAPIURL {
+		t.Fatalf("expected defaultAPIURL %s, got %s", defaultAPIURL, info.APIURL)
+	}
+	if restored := readSavedEnvironment(tempDir); restored != "" {
+		t.Fatalf("expected environment.json to be cleared on reset, got %s", restored)
+	}
+}
+
 func TestActivationRequiresConfiguredEntitlementHost(t *testing.T) {
 	service := &DesktopService{dataDir: t.TempDir()}
 	if _, err := service.ActivateLicense("SBOT-test"); err == nil {

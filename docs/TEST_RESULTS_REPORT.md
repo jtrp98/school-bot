@@ -16,7 +16,7 @@
 
 | ชุดการทดสอบ | เครื่องมือ / คำสั่งทดสอบ | จำนวนเคสที่รัน | ผ่าน (PASS) | ล้มเหลว (FAIL) | ข้าม (SKIP) | สถานะ |
 |---|---|---:|---:|---:|---:|:---:|
-| **.NET Backend Tests** | `dotnet test web/tests/ServiceSchoolBot.Tests` | 4,447 | 4,447 | 0 | 0 | **PASS** |
+| **.NET Backend Tests** | `dotnet test service-school-bot/tests/ServiceSchoolBot.Tests` | 4,447 | 4,447 | 0 | 0 | **PASS** |
 | **Node.js Engine & Workspace** | `node --test tests/*.mjs` | 68 | 68 | 0 | 0 | **PASS** |
 | **Frontend i18n & Localization** | `npm run test:i18n` (Node test runner) | 14 | 14 | 0 | 0 | **PASS** |
 | **Go Host & Desktop Tests** | `go test ./...` (`app/` packages) | 6 packages | 6 | 0 | 0 | **PASS** |

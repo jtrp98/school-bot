@@ -132,6 +132,22 @@
   "settings": {
     "title": "ตั้งค่า"
   },
+  "devEnv": {
+    "title": "ตั้งค่าสภาพแวดล้อม (สำหรับทดสอบ)",
+    "description": "เลือก API backend environment สำหรับการทดสอบ",
+    "warning": "สำหรับทีมพัฒนาและทดสอบภายในเท่านั้น การเปลี่ยนสภาพแวดล้อมมีผลต่อเป้าหมายเน็ตเวิร์กและใบอนุญาต",
+    "active": "ใช้งานอยู่: {{env}}",
+    "local": "Local (localhost:8080)",
+    "dev": "Development (api-dev)",
+    "prod": "Production (api)",
+    "custom": "กำหนด URL เอง",
+    "customPlaceholder": "https://custom-gateway.example.com",
+    "apply": "บันทึกและสลับ",
+    "reset": "รีเซ็ตค่าเริ่มต้น",
+    "close": "ปิด",
+    "success": "สลับสภาพแวดล้อมไปยัง {{url}} เรียบร้อย",
+    "error": "ไม่สามารถสลับสภาพแวดล้อมได้: {{error}}"
+  },
   "robot": {
     "errors": {
       "engineBusy": "หุ่นกำลังทำงานตามคำสั่งก่อนหน้า กรุณารอสักครู่หรือกดหยุด",

@@ -45,7 +45,7 @@ if ($baseContent -notmatch 'kind:\s*NetworkPolicy' -or $baseContent -notmatch 'a
 }
 
 # 3. Verify proto parity with sb-api-gateway
-$schoolBotProtoDir = Join-Path $SchoolBotRoot 'web/src/ServiceSchoolBot.Infrastructure/Protos/ServiceSchoolBot'
+$schoolBotProtoDir = Join-Path $SchoolBotRoot 'service-school-bot/src/ServiceSchoolBot.Infrastructure/Protos/ServiceSchoolBot'
 $protoFiles = @(Get-ChildItem -LiteralPath $schoolBotProtoDir -Filter '*.proto' | Sort-Object Name)
 if ($protoFiles.Count -ne 6) {
     throw "Expected 6 .proto files in $schoolBotProtoDir, found $($protoFiles.Count)."

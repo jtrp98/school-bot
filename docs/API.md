@@ -13,19 +13,19 @@ SchoolBot ใช้ `DenyAllGatewayPeerVerifier` โดยปริยาย จ
 
 เมื่อไม่ได้ตั้ง binding เอง SchoolBot เปิด gRPC h2c ที่ `127.0.0.1:8080` และ health HTTP/1.1 ที่
 `127.0.0.1:8081`; HTTP เหลือ `GET /healthz` ไม่มี business REST fallback
-Proto ต้นฉบับอยู่ใน `web/src/ServiceSchoolBot.Infrastructure/Protos/ServiceSchoolBot/`
+Proto ต้นฉบับอยู่ใน `service-school-bot/src/ServiceSchoolBot.Infrastructure/Protos/ServiceSchoolBot/`
 ใช้ `package ServiceSchoolBot;` และ Gateway ต้องใช้สำเนาที่ hash ตรงทุกไบต์
 field `authorization` เดิมถูก reserve ไม่ส่ง token ใน message; ตัวตนส่งผ่าน trusted metadata
 
 | Service | สัญญาต้นฉบับ | หน้าที่ |
 |---|---|---|
-| `ProjectService` | [Project.proto](../web/src/ServiceSchoolBot.Infrastructure/Protos/ServiceSchoolBot/Project.proto) | โครงงาน, revision, copy |
-| `LicenseService` | [License.proto](../web/src/ServiceSchoolBot.Infrastructure/Protos/ServiceSchoolBot/License.proto) | Device challenge, entitlement และ license admin |
-| `CurriculumService` | [Curriculum.proto](../web/src/ServiceSchoolBot.Infrastructure/Protos/ServiceSchoolBot/Curriculum.proto) | หลักสูตร, draft, publish, import |
-| `AssessmentService` | [Assessment.proto](../web/src/ServiceSchoolBot.Infrastructure/Protos/ServiceSchoolBot/Assessment.proto) | Question banks, activity policy, attempts, progress |
-| `ReleaseService` | [Release.proto](../web/src/ServiceSchoolBot.Infrastructure/Protos/ServiceSchoolBot/Release.proto) | Release metadata และ update check |
+| `ProjectService` | [Project.proto](../service-school-bot/src/ServiceSchoolBot.Infrastructure/Protos/ServiceSchoolBot/Project.proto) | โครงงาน, revision, copy |
+| `LicenseService` | [License.proto](../service-school-bot/src/ServiceSchoolBot.Infrastructure/Protos/ServiceSchoolBot/License.proto) | Device challenge, entitlement และ license admin |
+| `CurriculumService` | [Curriculum.proto](../service-school-bot/src/ServiceSchoolBot.Infrastructure/Protos/ServiceSchoolBot/Curriculum.proto) | หลักสูตร, draft, publish, import |
+| `AssessmentService` | [Assessment.proto](../service-school-bot/src/ServiceSchoolBot.Infrastructure/Protos/ServiceSchoolBot/Assessment.proto) | Question banks, activity policy, attempts, progress |
+| `ReleaseService` | [Release.proto](../service-school-bot/src/ServiceSchoolBot.Infrastructure/Protos/ServiceSchoolBot/Release.proto) | Release metadata และ update check |
 
-[Common.proto](../web/src/ServiceSchoolBot.Infrastructure/Protos/ServiceSchoolBot/Common.proto) กำหนด error trailers ร่วม
+[Common.proto](../service-school-bot/src/ServiceSchoolBot.Infrastructure/Protos/ServiceSchoolBot/Common.proto) กำหนด error trailers ร่วม
 JSON ของ Gateway ใช้ `snake_case`; รายละเอียดชนิดและ optional fields อยู่ใน proto และ Gateway DTOs
 
 ## Login และสิทธิ์
@@ -142,7 +142,7 @@ Missing precondition ที่บังคับคืน 428 `PRECONDITION_REQU
 Project create/copy, license create/activate และ curriculum/bank mutations มี replay ตามขอบเขตของ service
 payload ต่างบน key เดิมคืน `IDEMPOTENCY_CONFLICT`; หมด replay window คืน `IDEMPOTENCY_EXPIRED`
 License replay window 15 นาทีและเก็บใน process; curriculum/bank ledger อายุ 24 ชั่วโมงพร้อม snapshot/AES-GCM
-ไม่รับรอง cross-process/restart สำหรับ replay ของทุก service ดูข้อจำกัดใน [web/README.md](../web/README.md)
+ไม่รับรอง cross-process/restart สำหรับ replay ของทุก service ดูข้อจำกัดใน [service-school-bot/README.md](../service-school-bot/README.md)
 
 | กลุ่ม | เพดาน body ที่ Gateway |
 |---|---:|

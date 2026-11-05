@@ -46,6 +46,7 @@ export function useAppScreen(
   const [message, setMessage] = useState("");
   const [cloudBusy, setCloudBusy] = useState(false);
   const [settings, setSettings] = useState(false);
+  const [devMenu, setDevMenu] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [profile, setProfile] = useState(false);
   const { i18n } = useTranslation();
@@ -79,12 +80,18 @@ export function useAppScreen(
   }, [lang]);
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
+      if ((event.ctrlKey || event.metaKey) && event.shiftKey && (event.key === "D" || event.code === "KeyD")) {
+        event.preventDefault();
+        setDevMenu((open) => !open);
+        return;
+      }
       if (event.key !== "Escape") return;
-      if (!(closeRequested || settings || pending || profile || menuOpen)) return;
+      if (!(closeRequested || settings || pending || profile || menuOpen || devMenu)) return;
       // App overlays own this Escape; do not pass it to a mode's stop shortcut.
       event.preventDefault();
       event.stopImmediatePropagation();
-      if (closeRequested) {
+      if (devMenu) setDevMenu(false);
+      else if (closeRequested) {
         if (!closeBusy) setCloseRequested(false);
       }
       else if (settings) setSettings(false);
@@ -94,7 +101,7 @@ export function useAppScreen(
     }
     window.addEventListener("keydown", onKey, true);
     return () => window.removeEventListener("keydown", onKey, true);
-  }, [settings, profile, pending, menuOpen, closeRequested, closeBusy]);
+  }, [settings, profile, pending, menuOpen, closeRequested, closeBusy, devMenu]);
 
   useEffect(() => {
     if (!desktop) return;
@@ -178,11 +185,14 @@ export function useAppScreen(
     view,
     nonce,
     info,
+    setInfo,
     message,
     setMessage,
     cloudBusy,
     settings,
     setSettings,
+    devMenu,
+    setDevMenu,
     menuOpen,
     setMenuOpen,
     profile,

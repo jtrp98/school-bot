@@ -72,7 +72,7 @@ flowchart LR
 
 ## 3. สรุปบริการ gRPC (Service Contracts)
 
-ไฟล์ Protocol Buffers ต้นทางอยู่ที่ `web/src/ServiceSchoolBot.Infrastructure/Protos/ServiceSchoolBot/`:
+ไฟล์ Protocol Buffers ต้นทางอยู่ที่ `service-school-bot/src/ServiceSchoolBot.Infrastructure/Protos/ServiceSchoolBot/`:
 
 ### 3.1 LicenseService (`License.proto`)
 จัดการ License Key, การ Activate ผูกเครื่อง, และการตรวจสิทธิ์:

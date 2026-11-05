@@ -2,6 +2,7 @@
 
 ใช้ร่วมกับกฎแม่ที่ [../AGENTS.md](../AGENTS.md) อ่าน [README.md](README.md) และกฎของส่วนที่สคริปต์จะ build หรือทดสอบ
 
+- จะรันขั้นตอน release app, build installer สำหรับ release หรือ publish ก็ต่อเมื่อผู้ใช้มีคำสั่งชัดเจนเท่านั้น หากยังไม่มีคำสั่งระบุเวอร์ชัน ให้ใช้ 1.0.0 เป็นค่าเริ่มต้น
 - Installer เดียวรวม desktop และ engines ที่ใช้งาน แต่ API ฝั่ง server deploy แยก ไม่บรรจุใน desktop installer
 - Release ต้องไม่มี source maps, original sources, debug symbols, development tools, secrets หรือ private keys ใน payload เก็บ third-party notices/licenses ให้ครบ
 - Frontend ที่ฝังใน binary ยังตรวจสอบย้อนหลังได้ ห้ามอ้างว่าป้องกันการคัดลอกหรือ reverse engineering ได้ทั้งหมด

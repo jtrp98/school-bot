@@ -20,7 +20,7 @@ $schoolBotExcludedExtensions = @(
     '.suo','.user','.userosscache','.docstates','.tsbuildinfo','.trx','.coverage','.coveragexml','.pyc','.pyo',
     '.nupkg','.snupkg'
 )
-foreach ($schoolBotDirectory in @('app','engines','web','contracts','docs','scripts','.github')) {
+foreach ($schoolBotDirectory in @('app','engines','service-school-bot','contracts','docs','scripts','.github')) {
     $schoolBotPath = Join-Path $SchoolBotRoot $schoolBotDirectory
     if (Test-Path -LiteralPath $schoolBotPath -PathType Container) {
         $schoolBotPending.Push($schoolBotPath)
@@ -35,7 +35,7 @@ while ($schoolBotPending.Count -gt 0) {
         $schoolBotRelative = $schoolBotItem.FullName.Substring($SchoolBotRoot.Length + 1).Replace('\','/')
         if ($schoolBotItem.PSIsContainer) {
             if ($schoolBotItem.Name -in $schoolBotExcludedDirectories) { continue }
-            if ($schoolBotRelative -in @('app/frontend/public/blockly-media','web/data')) { continue }
+            if ($schoolBotRelative -in @('app/frontend/public/blockly-media','service-school-bot/data')) { continue }
             $schoolBotPending.Push($schoolBotItem.FullName)
         } elseif (
             $schoolBotItem.Name -notlike '.env*' -and

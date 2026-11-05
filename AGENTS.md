@@ -10,7 +10,7 @@
 | Desktop Frontend / React + TypeScript | [app/frontend/AGENTS.md](app/frontend/AGENTS.md) และกฎแม่ใน `app/` |
 | เว็บครู / Next.js ใน repo แยก | [แนวทางอ้างอิงเว็บครู](docs/teacher-web.md) อ่านเมื่อทำงานเว็บครูหรือเชื่อม School Bot กับเว็บครู |
 | หน้า Admin / FE ใน sb-web-helper | [แนวทางอ้างอิง Admin FE](docs/admin-web.md) อ่านเฉพาะงานหน้าจอ Admin |
-| Backend / C# API | [web/AGENTS.md](web/AGENTS.md) |
+| Backend / C# API | [service-school-bot/AGENTS.md](service-school-bot/AGENTS.md) |
 | Engines | [engines/AGENTS.md](engines/AGENTS.md) |
 | Scripts / build / package / release | [scripts/AGENTS.md](scripts/AGENTS.md) |
 
@@ -55,5 +55,6 @@
 - รัน checks ตามส่วนที่เปลี่ยน ไม่เพิ่ม tests ที่เพียงทวน implementation หรือรัน build ใหญ่ซ้ำโดยไม่มีเหตุผล
 - งาน integration/release ใช้ `scripts/verify.ps1` ตามความเหมาะสม โดยตรวจ output และ process ที่เปิดอยู่ก่อน เพราะสคริปต์นี้ build desktop ด้วย
 - เอกสารหรือคอมเมนต์อย่างเดียวให้ตรวจ diff/references ตามความจำเป็น ไม่ต้อง rebuild installer
+- จะ release app, ตัดรอบเวอร์ชัน หรือสร้าง release artifacts/installer สำหรับ release ก็ต่อเมื่อผู้ใช้สั่งชัดเจนเท่านั้น หากยังไม่มีคำสั่งระบุเวอร์ชัน ให้ใช้ 1.0.0 เป็นค่าเริ่มต้น
 - สรุปภาษาไทยแบบกระชับว่าแก้อะไร ตรวจอะไรผ่าน และมีข้อจำกัดอะไร แยกผล build/tests จากการทดสอบ UI หรือ hardware จริง
 - หาก checks ถูก sandbox/toolchain ขวาง ให้รายงานตามจริง ไม่อ้างว่าผ่าน และระบุเมื่อ EXE/installer ยังไม่ได้ rebuild

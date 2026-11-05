@@ -3,13 +3,13 @@ param(
     [Parameter(Mandatory)]
     [ValidateSet('SchoolBot', 'Master', 'School', 'Logs', 'PGGrade')]
     [string]$Database,
-    [string]$EnvFile = (Join-Path $PSScriptRoot '../../web/.env'),
+    [string]$EnvFile = (Join-Path $PSScriptRoot '../../service-school-bot/.env'),
     [switch]$Force
 )
 
 $ErrorActionPreference = 'Stop'
-$webRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../web'))
-$infrastructure = Join-Path $webRoot 'src/ServiceSchoolBot.Infrastructure'
+$serviceRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../service-school-bot'))
+$infrastructure = Join-Path $serviceRoot 'src/ServiceSchoolBot.Infrastructure'
 $databases = @{
     SchoolBot = @('SCHOOL_BOT_DB_CONNECTION_STRING', 'SchoolBotDb', 'SchoolBotDbContext')
     Master = @('MASTER_DB_CONNECTION_STRING', 'JabjaiMasterSingleDB', 'JabjaiMasterSingleDBPostgreSQLDBContext')

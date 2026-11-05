@@ -1,5 +1,4 @@
 import { AppDialogs } from "./AppDialogs";
-import { CloseDialog } from "./CloseDialog";
 import { EntryGate } from "./entry/EntryGate";
 import { LicenseStatus } from "./entry/LicenseStatus";
 import { AppNavigation } from "./AppNavigation";
@@ -167,7 +166,7 @@ export function AppView({ v }: Props) {
       <WindowChromeProvider
         desktop={desktop}
         preview={preview}
-        escapeBlocked={!entry.entered || settings || !!pending || profile || menuOpen || closeRequested}
+        escapeBlocked={!entry.entered || settings || !!pending || profile || menuOpen || closeRequested || v.devMenu}
         onClose={() => {
           if (closeBusy) return;
           if (!entry.entered || view === "home") void closeWindow();
@@ -180,8 +179,15 @@ export function AppView({ v }: Props) {
           "--app-viewport-height": `calc(100vh - ${licenseBarHeight}px)`,
         } as CSSProperties : undefined}
       >
-      {!entry.entered && <EntryGate entry={entry} adapter={entryAdapter} language={langSeg} preview={preview} />}
-      {!entry.entered && closeRequested && <CloseDialog {...v} />}
+      {!entry.entered && (
+        <EntryGate
+          entry={entry}
+          adapter={entryAdapter}
+          language={langSeg}
+          preview={preview}
+          onSecretTrigger={() => v.setDevMenu(true)}
+        />
+      )}
       {entry.entered && (
         <div ref={licenseBar} className="min-w-0 [overflow-wrap:anywhere]">
           <LicenseStatus status={entry.status} />
@@ -404,12 +410,9 @@ export function AppView({ v }: Props) {
           </div>
         )}
 
-        {entry.entered && <AppDialogs v={v} />}
-
-
-
       </div>
       )}
+      <AppDialogs v={v} />
       </div>
       </WindowChromeProvider>
     </ShellContext.Provider>
