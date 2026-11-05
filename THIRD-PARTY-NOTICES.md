@@ -5,7 +5,8 @@ Wails being MIT does not require School Bot to be open source.
 
 This file covers the third-party code and assets linked into or bundled with the School Bot desktop
 application: the Go host built with `-tags production` for Windows (amd64) and macOS, the frontend bundle in
-`app/frontend/dist` (including fonts and Blockly media), and the Zide engine under `engines/zide`.
+`app/frontend/dist` (including fonts and Blockly media), the Zide engine under `engines/zide` and the Mixly
+engine under `engines/mixly`.
 The inventory below is derived from `go list -deps`, `app/go.mod`, `app/frontend/package-lock.json`
 (production `dependencies` and their runtime dependencies only), the built bundle, and `engines/zide/third_party`.
 `scripts/checks/third-party-notices.mjs` fails the release when a delivered Go module or npm package is missing from this inventory.
@@ -56,12 +57,27 @@ Tailwind CSS (MIT) is a build tool whose generated CSS keeps its notice, so its 
 
 The engine also installs its own `engines/zide/THIRD-PARTY-NOTICES.md`, `HIDAPI-LICENSE.txt` and `JSON-LICENSE.txt`.
 
-### Other redistributed software
+### Mixly engine (`engines/mixly`)
 
-The standalone Mixly engine under `engines/mixly` is not yet bundled with the
-desktop. Its original Mixly/Blockly snapshot, Go runtime dependencies, pinned
-versions and full license texts are covered separately by
-`engines/mixly/THIRD-PARTY-NOTICES.md` and `engines/mixly/licenses/`.
+The desktop installs the Mixly engine for Block Lab code generation, compile and upload. Its original
+Mixly/Blockly snapshot, Go runtime dependencies, pinned versions and full license texts are covered by the
+engine's own `engines/mixly/THIRD-PARTY-NOTICES.md` and `engines/mixly/licenses/`, installed beside
+`mixly-engine.exe`.
+
+The engine also ships Arduino libraries as source in `engines/mixly/libraries/`, because arduino-cli
+compiles them into Block Lab programs. Each library's license and where its text lives are listed below:
+
+| Component | Version | License | Notes |
+| --- | --- | --- | --- |
+| Servo | 1.2.1 | LGPL-2.1 | `libraries/Servo/LICENSE.txt` |
+| Adafruit NeoPixel | 1.12.0 | LGPL-3.0 | `libraries/Adafruit_NeoPixel/COPYING` |
+| U8g2 | 2.34.22 | BSD-2-Clause; fonts per `LICENSE` | `libraries/U8g2/LICENSE` |
+| IRremote | 3.7.1 | MIT | `libraries/IRremote/LICENSE` |
+| ZLTech dht (DHTLib 0.1.01, modified) | 0.1.01 | Purchased | Source purchased from ZLTech by the School Bot publisher; based on Rob Tillaart's DHTLib 0.1.01 (Arduino Playground); no license text in the files |
+| ZLTech APDS9960 (RTrobot) | 1.0.0 | Beerware | Stated in `libraries/ZLTech_APDS9960/src/APDS9960.h` |
+| ZLTech Adafruit TCS34725 | 1.3.1 | BSD-3-Clause | `libraries/ZLTech_Adafruit_TCS34725/license.txt` |
+
+### Other redistributed software
 
 Windows MSI build tools and dialog library: WiX Toolset / WixUI 5.0.2, Microsoft Reciprocal License (MS-RL),
 Copyright (c) .NET Foundation and contributors. The application has its own licensing terms.

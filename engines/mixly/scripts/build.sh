@@ -18,6 +18,13 @@ cd "$source_dir"
 platform="$("$go_command" env GOOS)"
 arch="${ENGINE_ARCH:-$("$go_command" env GOARCH)}"
 export GOARCH="$arch" CGO_ENABLED=0
+if [[ "$platform" == darwin ]]; then
+  # The board list's USB IDs come from IOKit, which go.bug.st/serial reaches only through cgo;
+  # without it the enumerator does not build. -arch lets one Mac build both thin binaries.
+  clang_arch=x86_64
+  if [[ "$arch" == arm64 ]]; then clang_arch=arm64; fi
+  export CGO_ENABLED=1 CGO_CFLAGS="${CGO_CFLAGS:-} -arch $clang_arch" CGO_LDFLAGS="${CGO_LDFLAGS:-} -arch $clang_arch"
+fi
 suffix=''
 if [[ "$platform" == windows ]]; then suffix=.exe; fi
 if [[ -z "$output" ]]; then output="$source_dir/bin/$platform-$arch"; fi
@@ -30,6 +37,10 @@ fi
 "$go_command" build -mod=readonly -trimpath -buildvcs=false -ldflags '-s -w' -o "$output/mixly-engine$suffix" .
 cp "$source_dir/engine.json" "$source_dir/THIRD-PARTY-NOTICES.md" "$output/"
 cp "$source_dir"/licenses/*.txt "$output/licenses/"
+# arduino-cli compiles these Arduino libraries from source, so they ship as they are vendored.
+# Replace the copy so a library removed from the source tree does not linger in the payload.
+rm -rf "$output/libraries"
+cp -R "$source_dir/libraries" "$output/libraries"
 if command -v sha256sum >/dev/null; then
   (cd "$output" && sha256sum "mixly-engine$suffix" > "mixly-engine$suffix.sha256")
 else

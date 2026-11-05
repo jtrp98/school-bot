@@ -12,7 +12,7 @@ $locale = switch ($Language) {
     'zh' { @{ Culture = 'zh-CN'; Codepage = '936'; LanguageId = '2052' } }
 }
 $catalogPath = Join-Path $SchoolBotRoot "app/frontend/src/i18n/locales/$Language.json"
-$catalog = Get-Content -LiteralPath $catalogPath -Raw | ConvertFrom-Json
+$catalog = Get-Content -LiteralPath $catalogPath -Raw -Encoding UTF8 | ConvertFrom-Json
 [IO.File]::WriteAllText((Join-Path $brandDirectory 'strings.json'),
     ($catalog.installer | ConvertTo-Json -Depth 5), [Text.UTF8Encoding]::new($false))
 $xmlSettings = [Xml.XmlWriterSettings]::new()
@@ -36,7 +36,7 @@ try {
     $writer.WriteEndElement()
 } finally { $writer.Dispose() }
 
-$logoSvg = Get-Content -LiteralPath (Join-Path $SchoolBotRoot 'app/frontend/src/assets/logo-school-bot.svg') -Raw
+$logoSvg = Get-Content -LiteralPath (Join-Path $SchoolBotRoot 'app/frontend/src/assets/logo-school-bot.svg') -Raw -Encoding UTF8
 $embedded = [regex]::Match($logoSvg, 'data:image/png;base64,([A-Za-z0-9+/=\r\n]+)')
 if (-not $embedded.Success) { throw 'School Bot embedded logo PNG not found.' }
 $logoStream = [IO.MemoryStream]::new([Convert]::FromBase64String($embedded.Groups[1].Value))

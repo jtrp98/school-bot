@@ -1,0 +1,157 @@
+{
+  "blocks": [
+    {
+      "type": "base_setup",
+      "statements": {
+        "DO": {
+          "type": "sb_rgb_setup",
+          "fields": {
+            "PIN": "2",
+            "COUNT": "4",
+            "BRIGHTNESS": "20"
+          }
+        }
+      }
+    },
+    {
+      "type": "sb_loop",
+      "statements": {
+        "DO": {
+          "type": "sb_relay",
+          "fields": {
+            "PIN": "8",
+            "STATE": "HIGH"
+          },
+          "next": {
+            "type": "sb_led_brightness",
+            "fields": {
+              "PIN": "6"
+            },
+            "values": {
+              "BRIGHTNESS": {
+                "type": "math_number",
+                "fields": {
+                  "NUM": "50"
+                }
+              }
+            },
+            "next": {
+              "type": "sb_fan",
+              "fields": {
+                "PIN_A": "5",
+                "PIN_B": "7",
+                "DIRECTION": "REVERSE"
+              },
+              "values": {
+                "SPEED": {
+                  "type": "math_number",
+                  "fields": {
+                    "NUM": "80"
+                  }
+                }
+              },
+              "next": {
+                "type": "sb_buzzer_tone_for",
+                "fields": {
+                  "PIN": "4"
+                },
+                "values": {
+                  "FREQUENCY": {
+                    "type": "math_number",
+                    "fields": {
+                      "NUM": "262"
+                    }
+                  },
+                  "DURATION": {
+                    "type": "math_number",
+                    "fields": {
+                      "NUM": "500"
+                    }
+                  }
+                },
+                "next": {
+                  "type": "sb_servo",
+                  "fields": {
+                    "PIN": "10"
+                  },
+                  "values": {
+                    "ANGLE": {
+                      "type": "math_number",
+                      "fields": {
+                        "NUM": "90"
+                      }
+                    }
+                  },
+                  "next": {
+                    "type": "sb_rgb_set",
+                    "fields": {
+                      "PIN": "2"
+                    },
+                    "values": {
+                      "PIXEL": {
+                        "type": "math_number",
+                        "fields": {
+                          "NUM": "1"
+                        }
+                      },
+                      "COLOR": {
+                        "type": "sb_rgb_color",
+                        "values": {
+                          "RED": {
+                            "type": "math_number",
+                            "fields": {
+                              "NUM": "255"
+                            }
+                          },
+                          "GREEN": {
+                            "type": "math_number",
+                            "fields": {
+                              "NUM": "128"
+                            }
+                          },
+                          "BLUE": {
+                            "type": "math_number",
+                            "fields": {
+                              "NUM": "0"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "next": {
+                      "type": "sb_rgb_set",
+                      "fields": {
+                        "PIN": "2"
+                      },
+                      "values": {
+                        "PIXEL": {
+                          "type": "math_number",
+                          "fields": {
+                            "NUM": "2"
+                          }
+                        },
+                        "COLOR": {
+                          "type": "sb_rgb_named_color",
+                          "fields": {
+                            "COLOR": "RED"
+                          }
+                        }
+                      },
+                      "next": {
+                        "type": "sb_fan_stop",
+                        "fields": {
+                          "PIN_A": "5",
+                          "PIN_B": "7"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

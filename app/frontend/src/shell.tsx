@@ -27,6 +27,10 @@ export const useSampleData = () => !simulatorEnabled && (preview || !!param("sce
 export type ShellApi = {
 
   go: (view: View, screen?: string, confirmed?: boolean) => void;
+  // For a mode that already asked about its own work: cancels its running engine request, then
+  // switches without the app's dialog. Cancelling stops no hardware: a mode that moves a device
+  // drains its work and sends its own stop before calling this.
+  leaveMode: (view: View, screen?: string) => void;
   menuOpen: boolean;
   openMenu: () => void;
   closeMenu: () => void;
@@ -38,11 +42,16 @@ export type ShellApi = {
   setLang: (lang: Lang) => void;
 
   setArmScreen: (screen: string) => void;
+  // A mode with its own unsaved-work dialog takes over the window's close request while it is
+  // open; once the child has decided, it calls closeApp, which runs the usual close steps.
+  setCloseGuard: (guard: (() => void) | null) => void;
+  closeApp: () => void;
 };
 
 const noop = () => undefined;
 const defaults: ShellApi = {
   go: noop,
+  leaveMode: noop,
   menuOpen: false,
   openMenu: noop,
   closeMenu: noop,
@@ -53,6 +62,8 @@ const defaults: ShellApi = {
   lang: "th",
   setLang: noop,
   setArmScreen: noop,
+  setCloseGuard: noop,
+  closeApp: noop,
 };
 
 export const ShellContext = createContext<ShellApi>(defaults);

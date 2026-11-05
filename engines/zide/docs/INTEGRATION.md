@@ -5,19 +5,20 @@ application and both built-in engines. The engine source remains self-contained.
 
 ```text
 React Robot Control
-  → core/client.ts (Wails Run / CancelRun)
+  → core/client.ts (Wails Run / CancelRun / StopUpload)
   → Go DesktopService
   → trusted Engine Manager routing
   → engines/zide/zide-engine[.exe]
   → Windows / Darwin HID or Serial
 ```
 
-Adventure and Blockly route to the existing demo engine. Frontends cannot supply
-executable paths or choose an arbitrary executable. Registry entries are host code;
-engine.json documents metadata and is not an executable trust decision.
-The host also keeps a per-mode action allowlist (`modeActions` in
-`app/internal/engine/manager.go`) and rejects any other action before starting an
-engine, so the webview cannot reach engine actions its UI does not use.
+Adventure routes to the existing demo engine, and Block Lab code generation, port list,
+compile, upload (Windows) and Serial monitor route to mixly; the host refuses Block Lab an
+upload or Serial monitor on a serial port Robot Control drove. Frontends cannot supply executable paths or choose
+an arbitrary executable. Registry entries are host code; engine.json documents
+metadata and is not an executable trust decision. The host's routing table
+(`modeRoutes` in `app/internal/engine/routes.go`) lists every allowed action per mode
+and rejects any other action before starting an engine.
 
 ## Use and configuration
 
@@ -111,7 +112,9 @@ to cancellation/drain and OS/device delays. CHECK_FW remains before passthrough
 because skipping it could write TRAN_DATA to bootloader flash. The host protects an
 already-active `robot.stop` from concurrent navigation/close cancellation, while
 retaining its five-second deadline. Inherited pipes can add at most one second of
-drain after child exit/kill. A successful write is not proof
+drain after child exit/kill. The host lets a Block Lab upload finish the same way, so a stop
+that arrives while one holds the slot waits behind it (about two minutes at most) or gets
+`ENGINE_BUSY`. A successful write is not proof
 that a moving arm stopped. Communication loss can prevent delivery; physical
 emergency-stop provisions are still required for actual hardware acceptance.
 

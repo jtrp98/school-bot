@@ -8,7 +8,7 @@
 | macOS 15+ Intel / Apple Silicon | `school-bot-<version>-macos-universal.pkg` | เปิดไฟล์ → Continue → Install → เปิด School Bot จาก Applications |
 
 เวอร์ชันในชื่อไฟล์อ่านจาก `app/frontend/package.json`; อยู่ใน `dist/installers/`
-แต่ละแพ็กเกจมีทั้งสาม Mode, Frontend/Media, Demo Engine และ C++ Zide Engine ในตัว ผู้ใช้ติดตั้งครั้งเดียว ไม่ต้องติดตั้ง Go, Node, .NET หรือ Qt
+แต่ละแพ็กเกจมีทั้งสาม Mode, Frontend/Media, Demo Engine, C++ Zide Engine และ Mixly Engine (สร้างโค้ด แปลงโค้ด และส่งลงบอร์ดของ Block Lab · ส่งลงบอร์ดได้เฉพาะ Windows และต้องติดตั้ง Arduino IDE 2.2 ขึ้นไปแยก ตามคู่มือครู [TEACHER-SETUP.md](TEACHER-SETUP.md)) ในตัว ผู้ใช้ติดตั้งครั้งเดียว ไม่ต้องติดตั้ง Go, Node, .NET หรือ Qt
 C# API ไม่รวมใน Installer. เป้าหมาย online คือ Desktop→HTTPS Gateway→gRPC SchoolBot; ต้องให้ integration พร้อมก่อนฝัง public Gateway URL ที่ยืนยันแล้วตอน Build. ตัวอย่าง URL ด้านล่างเป็น placeholder ไม่ใช่หลักฐานว่า gRPC พร้อม
 ค่า localhost คงใช้ทดลอง HTTP API บนเครื่องนักพัฒนา ดู `DEPLOYMENT.md`; engine/local hardware ไม่เปลี่ยน
 

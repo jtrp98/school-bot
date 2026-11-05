@@ -101,8 +101,10 @@ const loadingNoticeClass =
   "text-blue-press rounded-control py-[12px] px-[16px] text-[13px] [&.error]:text-err-ink [&.error]:bg-err-tint " +
   "[&.error]:border-err-line sh-loading my-[28px] mx-[36px]";
 
+// The page fills the window; a touchpad scroll past its end must not bounce the whole mode.
 const pageClass =
-  "page [flex:1] min-w-0 h-[var(--app-viewport-height,_100vh)] flex flex-col [&.is-full]:overflow-auto";
+  "page [flex:1] min-w-0 h-[var(--app-viewport-height,_100vh)] flex flex-col [&.is-full]:overflow-auto " +
+  "[overscroll-behavior:none]";
 
 const pageBodyClass =
   "page-body [flex:1] min-h-0 overflow-auto py-[28px] px-[36px] [@media(max-width:_1100px)]:p-[24px] " +
@@ -158,7 +160,7 @@ const msgPreClass =
 export function AppView({ v }: Props) {
   const {
     view, nonce, message, setMessage, settings, menuOpen, setMenuOpen, profile, setProfile,
-    pending, closeRequested, setCloseRequested, closeBusy, desktop, classLine, closeWindow,
+    pending, closeRequested, closeBusy, closeWindow, desktop, classLine, requestClose,
     go, shell, langName, langSeg, full, entry, entryAdapter, licenseBar, licenseBarHeight,
   } = v;
   return (
@@ -169,8 +171,8 @@ export function AppView({ v }: Props) {
         escapeBlocked={!entry.entered || settings || !!pending || profile || menuOpen || closeRequested || v.devMenu}
         onClose={() => {
           if (closeBusy) return;
-          if (!entry.entered || view === "home") void closeWindow();
-          else setCloseRequested(true);
+          if (!entry.entered) void closeWindow();
+          else requestClose();
         }}
       >
       <div className={`${windowLayoutClass} ${(desktop || preview) ? windowChromeClass : ""} ${entry.entered
@@ -262,6 +264,8 @@ export function AppView({ v }: Props) {
               >
                 {view === "robot-control" ? (
                   <Robot />
+                ) : view === "block-programming" ? (
+                  <Blocks />
                 ) : (
                   <>
                     <AppBar
@@ -277,7 +281,6 @@ export function AppView({ v }: Props) {
                     <div className={view === "coding-adventure" ? lessonsBodyClass : pageBodyClass}>
                       {view === "coding-adventure" && <Lessons />}
                       {view === "code-lab" && <CodeLab />}
-                      {view === "block-programming" && <Blocks />}
                     </div>
                   </>
                 )}

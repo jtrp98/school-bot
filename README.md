@@ -7,11 +7,15 @@ Starter สำหรับแบ่งทีมพัฒนา 3 Mode ไม่�
 - `backend/` — **C# / ASP.NET Core .NET 10**, Backend API แบบ **Clean Architecture**; ดู [database-first scaffold และคำสั่ง re-scaffold](backend/README.md#ef-core-database-first-scaffold)
 - `contracts/` — Engine JSON contract ที่ทุกทีมใช้ร่วมกัน
 - `engines/` — Engine แยกตาม ID แต่ละตัวมี source, dependencies, tests และ build ของตัวเอง; ดู `engines/README.md`
-- `docs/` — Architecture, API, การติดตั้ง/Deploy และการปกป้องโค้ด
+- `docs/` — Architecture, การติดตั้ง/Deploy, การเตรียมเครื่องครู และการปกป้องโค้ด
 
 Engine `mixly` อยู่ใน `engines/mixly/` และ build แยกด้วย
 `./scripts/engines/build.ps1 -Engine mixly -Test` รองรับตัวสร้างโค้ดจากต้นฉบับ Mixly;
-ยังไม่เชื่อม UI, host routing หรือรวมใน Desktop/Installer ดูขอบเขตที่ `engines/mixly/README.md`
+host route การสร้างโค้ด (`program.generate`, `project.validate`), รายการพอร์ต (`device.list` ไม่เปิดพอร์ต)
+และการแปลงโค้ด/ส่งลงบอร์ด (`program.compile`, `program.upload` รับเฉพาะบล็อกของ Block Lab ไม่รับโค้ด C++ ดิบ
+field ที่ generator แปะลง C++ ต้องเป็นค่าที่บล็อกมีให้เลือก ส่งลงบอร์ดได้เฉพาะ Windows) และ Serial ของบอร์ดที่เลือก
+(`serial.open`/`read`/`write`/`close` เปิดพอร์ตค้างใน engine process เดียว) ของ Block Lab มาที่ engine นี้ Desktop/Installer รวม engine และ Arduino library
+ที่บล็อกใช้ไว้แล้ว ส่วน arduino-cli + AVR core ต้องติดตั้งแยกผ่าน Arduino IDE 2.2 ขึ้นไป ดูขอบเขตที่ `engines/mixly/README.md`
 
 ## Labs Hardware Simulator
 
@@ -23,7 +27,8 @@ produce bounded visual traces. See [Phase 4 verification and remaining acceptanc
 
 ## Quick start (Windows / PowerShell)
 
-ติดตั้ง Go (เวอร์ชันขั้นต่ำตามบรรทัด `go` ใน `app/go.mod`), Node.js **24 LTS**, .NET **10 SDK** และ WebView2 Runtime ก่อน
+ติดตั้ง Go (เวอร์ชันขั้นต่ำตามบรรทัด `go` ใน `app/go.mod`), Node.js **24 LTS** และ WebView2 Runtime ก่อน
+ถ้าจะทดลองส่งโปรแกรมลงบอร์ด UNO จาก Block Lab ให้เตรียมเครื่องตาม `docs/TEACHER-SETUP.md` (Arduino IDE 2.2 ขึ้นไป + Arduino AVR Boards)
 Wails Go module และ JS runtime ล็อกไว้ที่ **v3.0.0-beta.30** ซึ่งยังเป็น Beta
 สคริปต์ใช้ portable Go ใน `.tools/go` ถ้ามี ไม่เช่นนั้นใช้ `go` จาก PATH (สคริปต์ไม่ตรวจเวอร์ชัน Go);
 โฟลเดอร์ `.tools/` ไม่ใช่ส่วนที่ต้องส่งให้ทีม
@@ -38,7 +43,7 @@ Wails Go module และ JS runtime ล็อกไว้ที่ **v3.0.0-bet
 # อีก terminal: เปิด SchoolBot gRPC ที่ 127.0.0.1:8080 และ health HTTP ที่ 127.0.0.1:8081
 ./scripts/api/run.ps1
 
-# ตรวจ frontend, i18n, Go, JSON IPC (smoke + ipc.test.mjs), Zide C++ tests, C# integration และ architecture tests
+# ตรวจ frontend, i18n, Go, JSON IPC (smoke + ipc.test.mjs), Zide C++ tests, Mixly engine tests, C# integration และ architecture tests
 ./scripts/verify.ps1 -SkipInstall
 
 # ถ้า app/bin มีแอปที่กำลังเปิดอยู่ ให้ build และตรวจในโฟลเดอร์แยก (Windows)
@@ -62,6 +67,7 @@ npm ci
 npm run build
 cd ..
 ../scripts/engines/build.ps1 -Engine zide -OutputDirectory ./bin/engines/zide
+../scripts/engines/build.ps1 -Engine mixly -OutputDirectory "$PWD/bin/engines/mixly"
 go build -trimpath -ldflags '-s -w' -o bin/demo-engine.exe ./cmd/demo-engine
 go build -trimpath -tags production -ldflags '-s -w -H windowsgui' -o bin/school-bot.exe .
 ./bin/school-bot.exe
@@ -75,7 +81,6 @@ dotnet run --project src/ServiceSchoolBot.API --no-launch-profile
 
 รองรับการ Build เป็น **School Bot.app** สำหรับเครื่อง Mac ที่ใช้ macOS **15 ขึ้นไป**
 ติดตั้ง Go (ตาม `app/go.mod`), Node.js 24 LTS และ Xcode Command Line Tools (`xcode-select --install`)
-ติดตั้ง .NET 10 SDK เพิ่มเฉพาะเมื่อจะรัน/พัฒนา C# API หรือชุดทดสอบ API บนเครื่องนั้น
 
 ```bash
 # รันจาก repository root บน Mac ไม่ต้องติดตั้ง PowerShell
@@ -88,7 +93,7 @@ bash scripts/api/run.sh
 
 - Apple Silicon → `app/bin/darwin-arm64/School Bot.app`
 - Intel → `app/bin/darwin-amd64/School Bot.app`
-- ZIP ของแต่ละ architecture อยู่ข้าง `.app` และรวม Demo Engine กับ C++ Zide Engine แล้ว
+- ZIP ของแต่ละ architecture อยู่ข้าง `.app` และรวม Demo Engine, C++ Zide Engine และ Mixly Engine แล้ว
 - Build บน Mac ตาม architecture ของ Go SDK ในเครื่อง; CI แยก Intel และ ARM64
 - โปรแกรมหลักและ Engine อยู่ใน `Contents/MacOS` จึงไม่พึ่ง current working directory ตอนเปิดผ่าน Finder
 - ใช้ WKWebView ของ macOS ไม่ต้องติดตั้ง WebView2
@@ -102,12 +107,12 @@ bash scripts/api/run.sh
 |---|---|---|
 | Robot Control | Native Arm Lab ผ่าน C++ Zide: ค้นหา HID/Serial บน Windows, โปรไฟล์ 6 ข้อ, ส่งท่า/เล่นลำดับ/อัปโหลด/อ่าน servo/หยุด, Save/Load; preview แยกจำลอง | Hardware acceptance, macOS USB, firmware upgrade, calibrated home/fold presets |
 | Coding Adventure | Phaser scene, movement/jump playback, textarea editor, bounded DSL, Save/Load | Python เต็ม, levels, grading, language sandbox |
-| Block Programming | Blockly, move/jump/repeat, bounded compilation, JSON engine trace, Save/Load | Variables, functions, conditions, full Scratch runtime |
+| Block Lab | บล็อก Arduino UNO ผ่าน Mixly engine, ดูโค้ด C++, ตรวจก่อนส่ง, ส่งลงบอร์ด (Windows), อ่าน/ส่งข้อความ Serial, Save/Load; preview แยกจำลอง | บอร์ดอื่นนอก UNO, ส่งลงบอร์ดบน macOS, ติดตั้ง Arduino CLI ให้อัตโนมัติ |
 | Engine Manager | Native child process, JSON Lines, request matching, 5-second timeout, bounded output, cancellation | Dynamic engine installer, OS sandbox, process-tree containment |
-| API | License create/list/activate/validate/revoke, device limits, release draft/publish/check | Database, admin website, user accounts, signing pipeline |
 | Updates | ตรวจ metadata จาก API ผ่าน Host | Download, signature verification, installation, rollback |
 
 Robot Control แบบ Native ส่งคำสั่งไป Hardware ได้เมื่อเลือกอุปกรณ์และยืนยันโปรไฟล์ ส่วน Browser Preview เป็นจำลอง **ยังต้องทดสอบหุ่นจริงก่อนใช้งานกับนักเรียน**; DSL ไม่ใช่ Python และไม่มีการ `eval` Source นักเรียน
+Block Lab ส่งลงบอร์ดจริงเมื่อเลือกบอร์ด กดเชื่อมต่อ และกดส่งเอง ส่วน Browser Preview ไม่เปิดพอร์ตจริง **ยังต้องทดสอบกับบอร์ดจริง**
 
 ## API / License
 
@@ -150,7 +155,7 @@ $env:SCHOOL_BOT_BUILD_API_URL = 'https://api.example.com'
 |---|---|
 | Mode 1 Robot | `app/frontend/src/modes/robot-control/` |
 | Mode 2 Adventure | `app/frontend/src/modes/coding-adventure/`, `app/frontend/src/components/coding-adventure/` |
-| Mode 3 Blocks | `app/frontend/src/modes/block-programming/` |
+| Mode 3 Block Lab | `app/frontend/src/modes/block-programming/`, `engines/mixly/` |
 | Desktop Core | `app/desktopservice.go`, `app/internal/engine/`, `app/frontend/src/core/` |
 | API | `backend/ServiceSchoolBot.slnx` และ 4 layers ใน `backend/src/` |
 
@@ -171,10 +176,15 @@ npm run dev
 Browser ไม่ใส่ parameter จะไม่แอบ fallback เป็น Mock และแจ้งว่า Native Bridge ใช้ไม่ได้
 Desktop ใช้ Go Process และ filesystem จริง
 
+Block Lab ใน preview: `?preview=1&view=block-programming` · หน้าเชื่อมบอร์ดใช้พอร์ตจำลองจาก `app/frontend/src/core/previewBoards.ts`
+เลือกชุดเริ่มต้นด้วย `&devices=none|one|many|clone|clones` (ค่าเริ่มต้น `one`) แล้วเสียบ/ถอด/ย้ายช่องได้จากแผง "อุปกรณ์จำลอง" (เฉพาะ `npm run dev`) ไม่มีการเปิดพอร์ตจริง
+ผลส่งลงบอร์ดจำลองเลือกด้วย `&send=success|compile-fail|upload-fail|no-toolchain|timeout|nodevice` (`core/previewSend.ts`) และ `&serial=fail` ให้เปิดอ่านข้อความจากบอร์ดล้มเหมือนโปรแกรมอื่นถือพอร์ตอยู่ (`core/previewSerial.ts`) ไม่มีอะไรถึงบอร์ดจริง
+
 ## ส่งต่อให้ทีม
 
 สำหรับผู้ใช้ทั่วไป ใช้ **Desktop Installer**: Windows `-setup.exe` และ macOS Universal `.pkg`
-ทั้งสองแบบรวมแอปสาม Mode กับ Engine แล้ว ไม่ต้องติดตั้ง Go/Node/.NET ที่เครื่องผู้ใช้
+ทั้งสองแบบรวมแอปสาม Mode กับ Engine แล้ว ไม่ต้องติดตั้ง Go/Node ที่เครื่องผู้ใช้
+การส่งลงบอร์ด UNO ยังต้องติดตั้ง Arduino IDE แยกตาม `docs/TEACHER-SETUP.md`
 
 ```powershell
 # Windows: Build แอปและสร้าง setup EXE พร้อม MSI สำหรับ IT
@@ -200,14 +210,14 @@ Mac Installer ลง `School Bot.app` ใน `/Applications`
 Installer นี้ยังเป็น development build ที่ไม่ลงนาม ต้องทำ Windows signing / Mac Developer ID + notarization ก่อนแจกภายนอก
 API ใน `backend/` Deploy แยกบน Server ไม่รวมใน Desktop Installer
 
-ส่ง Source พร้อม `go.mod`, `go.sum`, `package-lock.json` และ solution ทั้งชุด
+ส่ง Source พร้อม `go.mod`, `go.sum` และ `package-lock.json` ทั้งชุด
 สร้าง ZIP สำหรับส่งให้ทีมด้วย `./scripts/package-source.ps1` จะได้ `dist/school-bot-team-starter.zip`
 ตัวแพ็ก prune `.tools`, `node_modules`, `bin`, `obj`, build output และ junction/symlink ก่อนเดินลงไป;
 ตัด `.env*`, `appsettings.*.json`, key/certificate และ debug artifacts ตาม denylist และรวม `AGENTS.md`/`CLAUDE.md`
 การกรองชื่อไฟล์ไม่ยืนยันว่า source ไม่มี secret ที่ฝังไว้ ต้องตรวจเนื้อหาก่อนส่งจริง
 ใช้ `./scripts/package-source.ps1 -OutputDirectory <path>` เพื่อแยก ZIP และตรวจตัวแพ็กด้วย
 `./scripts/tests/source-package.test.ps1`
-Windows executable ที่ build แล้วอยู่ใน `app/bin/` (หรือโฟลเดอร์ที่ระบุด้วย `-OutputDirectory`) พร้อม `demo-engine.exe` และ `engines/zide/` ต้องเก็บโครงสร้างนี้ครบเมื่อใช้แบบ portable
+Windows executable ที่ build แล้วอยู่ใน `app/bin/` (หรือโฟลเดอร์ที่ระบุด้วย `-OutputDirectory`) พร้อม `demo-engine.exe`, `engines/zide/` และ `engines/mixly/` ต้องเก็บโครงสร้างนี้ครบเมื่อใช้แบบ portable
 Frontend/Phaser/Blockly/Media ฝังอยู่ใน executable แล้ว ไม่โหลดจาก CDN
 MSI รวม WebView2 Bootstrapper ไว้ แอปจะเรียก Microsoft Setup เมื่อผู้ใช้ยืนยันตอนเปิดครั้งแรกหากยังขาด Runtime
 Portable executable ที่ไม่มี Bootstrapper ต้องติดตั้ง WebView2 อยู่ก่อน

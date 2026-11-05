@@ -1,0 +1,381 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "BlockA2.dc.html": {
+      "h": 120,
+      "title": "ชิ้นส่วน · บล็อก A2 (component เดียว · รายการ + พื้นที่ต่อบล็อก)",
+      "w": 260,
+      "x": 6086,
+      "y": 10716
+    },
+    "ContextMenuA2.dc.html": {
+      "h": 800,
+      "is_interactive": true,
+      "title": "A2 · R21 เมนูคลิกขวา/กดค้าง 3 แบบ + ไอคอนทึบ + สถานะย่อ/ปิดใช้/คอมเมนต์ + ค้นหา + กระเป๋า (ต้นแบบ)",
+      "w": 1280,
+      "x": 2800,
+      "y": 9013
+    },
+    "BlockSheetA2.dc.html": {
+      "h": 2780,
+      "title": "แผ่นตัวอย่าง · บล็อก A2 (ชนิด × สถานะ · 16 หมวด · contrast ตัวเข้ม)",
+      "w": 1440,
+      "x": 1810,
+      "y": 10612
+    },
+    "BlocksPane-5af0.dc.html": {
+      "h": 704,
+      "page": "page-56trpd",
+      "title": "ชิ้นส่วน · แผงบล็อก + พื้นที่ต่อ + โค้ด copy",
+      "w": 760,
+      "x": -3260,
+      "y": 324
+    },
+    "BlocksPaneA2.dc.html": {
+      "h": 840,
+      "title": "ชิ้นส่วน · แผงบล็อก A2 (สำเนา BlocksPane + ลิ้นชัก Output | C++)",
+      "w": 1440,
+      "x": -270,
+      "y": 10716
+    },
+    "BottomBar-bfkl.dc.html": {
+      "h": 76,
+      "page": "page-56trpd",
+      "title": "ชิ้นส่วน · แถบล่าง copy",
+      "w": 1440,
+      "x": 20,
+      "y": 324
+    },
+    "Cards-6q71.dc.html": {
+      "h": 300,
+      "page": "page-56trpd",
+      "title": "ชิ้นส่วน · การ์ดสถานะ copy",
+      "w": 420,
+      "x": 1580,
+      "y": 324
+    },
+    "CardsA2.dc.html": {
+      "h": 300,
+      "title": "ชิ้นส่วน · การ์ดสถานะ/dialog A2 (CI)",
+      "w": 420,
+      "x": 5586,
+      "y": 10716
+    },
+    "CatRail-p92d-kvex.dc.html": {
+      "h": 756,
+      "page": "page-56trpd",
+      "title": "ชิ้นส่วน · แถบหมวดบล็อก 16 หมวด copy 2",
+      "w": 112,
+      "x": -1884,
+      "y": 2597
+    },
+    "CatRail-thxk.dc.html": {
+      "h": 704,
+      "page": "page-56trpd",
+      "title": "ชิ้นส่วน · แถบหมวดบล็อก 16 หมวด copy",
+      "w": 112,
+      "x": 3152,
+      "y": 400
+    },
+    "CatRailA2.dc.html": {
+      "h": 740,
+      "title": "ชิ้นส่วน · แถบหมวดบล็อก A2 (selected แบบ tab · OQ127)",
+      "w": 112,
+      "x": 1434,
+      "y": 10716
+    },
+    "CodeEditorA2.dc.html": {
+      "h": 516,
+      "title": "ชิ้นส่วน · ตัวแก้โค้ด Arduino C++ A2 (โหมดโค้ด · เช็ก syntax จำลอง)",
+      "w": 1392,
+      "x": 6426,
+      "y": 10716
+    },
+    "ConnectUnoA2.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "title": "A2 · หน้าเชื่อมบอร์ด Uno (ยกโครง Arm Lab ConnectV3 · กด เปลี่ยน จาก Main-A2)",
+      "w": 1440,
+      "x": 1248,
+      "y": 9013
+    },
+    "Main-1D-hhnp-zzbd.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "page-56trpd",
+      "title": "1D · ลากต่อบล็อกได้จริง — สีชุด B (8 กลุ่ม, ตัวอักษรไม่หนา) copy",
+      "w": 1440,
+      "x": -1884,
+      "y": 2537
+    },
+    "Main-1D-sxby-uji6.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "page-56trpd",
+      "title": "1D · ลากต่อบล็อกได้จริง — สีชุด B (8 กลุ่ม, ตัวอักษรไม่หนา) copy 2",
+      "w": 1440,
+      "x": -3527,
+      "y": 3694
+    },
+    "Main-A2.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "title": "A2 · SCR-16 สำรวจ: พื้นที่ต่อบล็อกขยาย + ลิ้นชัก Output | โค้ด C++ (ซ่อนตัวจำลอง/stage ด้วย prop panels)",
+      "w": 1440,
+      "x": -292,
+      "y": 9013
+    },
+    "Main-jbj0.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "page-56trpd",
+      "title": "A · SCR-16 พื้นที่ต่อบล็อก + ตัวจำลอง/stage + แผงข้อความ (หน้าหลัก) copy",
+      "w": 1440,
+      "x": -3260,
+      "y": -2376
+    },
+    "Main-ls5b-tm9t.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "page": "page-56trpd",
+      "title": "A · SCR-16 พื้นที่ต่อบล็อก + ตัวจำลอง/stage + แผงข้อความ (หน้าหลัก) copy 2",
+      "w": 1440,
+      "x": -3587,
+      "y": 1529
+    },
+    "Mascot-ccpp.dc.html": {
+      "h": 144,
+      "page": "page-56trpd",
+      "title": "ชิ้นส่วน · มาสคอต copy",
+      "w": 96,
+      "x": 2120,
+      "y": 324
+    },
+    "MascotA2.dc.html": {
+      "h": 144,
+      "title": "ชิ้นส่วน · มาสคอต A2 (สำเนา Mascot ของ A2)",
+      "w": 96,
+      "x": 7946,
+      "y": 11675
+    },
+    "Piece-r6cn-rppy.dc.html": {
+      "frameless": true,
+      "h": 76,
+      "page": "page-56trpd",
+      "title": "Box copy",
+      "w": 1440,
+      "x": -3189,
+      "y": -282
+    },
+    "PreflightDialog-zyku.dc.html": {
+      "h": 500,
+      "page": "page-56trpd",
+      "title": "ชิ้นส่วน · ผลตรวจก่อนรัน (R17) copy",
+      "w": 560,
+      "x": 2488,
+      "y": 324
+    },
+    "PreflightDialogA2.dc.html": {
+      "h": 540,
+      "title": "ชิ้นส่วน · ผลตรวจก่อนรัน A2 (R17 · dialog CI 520)",
+      "w": 520,
+      "x": 4986,
+      "y": 10716
+    },
+    "SendStates-bmmg.dc.html": {
+      "h": 2364,
+      "page": "page-56trpd",
+      "title": "E · SCR-19 เชื่อม Uno + ส่งลงบอร์ด · สถานะ copy",
+      "w": 1440,
+      "x": 2980,
+      "y": -2376
+    },
+    "SerialPane-eknh.dc.html": {
+      "h": 150,
+      "page": "page-56trpd",
+      "title": "ชิ้นส่วน · แผงข้อความจากบอร์ด copy",
+      "w": 680,
+      "x": -780,
+      "y": 324
+    },
+    "SerialStates-nep8.dc.html": {
+      "h": 1060,
+      "page": "page-56trpd",
+      "title": "D · SCR-26 แผงข้อความจากบอร์ด · สถานะ copy",
+      "w": 1440,
+      "x": 1420,
+      "y": -2376
+    },
+    "SimPane-2ann.dc.html": {
+      "h": 498,
+      "page": "page-56trpd",
+      "title": "ชิ้นส่วน · ตัวจำลองบอร์ด copy",
+      "w": 680,
+      "x": -2380,
+      "y": 324
+    },
+    "SimPaneA2.dc.html": {
+      "h": 498,
+      "title": "ชิ้นส่วน · ตัวจำลองบอร์ด A2 (สำเนา SimPane ของ A2)",
+      "w": 680,
+      "x": 6426,
+      "y": 11675
+    },
+    "SimStates-piam.dc.html": {
+      "h": 1900,
+      "page": "page-56trpd",
+      "title": "B · SCR-17 ตัวจำลองบอร์ด · สถานะ copy",
+      "w": 1440,
+      "x": -1700,
+      "y": -2376
+    },
+    "Spec.dc.html": {
+      "h": 5000,
+      "title": "F · สเปก: หมวดบล็อก 16 หมวด · อุปกรณ์ · ผลตรวจก่อนรัน · effect · มาสคอต · ทางเลือกไม่ต้องลาก · โค้ด",
+      "w": 1440,
+      "x": 3398,
+      "y": 10612
+    },
+    "StagePane-rvjr.dc.html": {
+      "h": 498,
+      "page": "page-56trpd",
+      "title": "ชิ้นส่วน · stage copy",
+      "w": 680,
+      "x": -1580,
+      "y": 324
+    },
+    "StagePaneA2.dc.html": {
+      "h": 498,
+      "title": "ชิ้นส่วน · stage A2 (สำเนา StagePane ของ A2)",
+      "w": 680,
+      "x": 7186,
+      "y": 11675
+    },
+    "StageStates-urpu.dc.html": {
+      "h": 1900,
+      "page": "page-56trpd",
+      "title": "C · SCR-18 stage · สถานะ copy",
+      "w": 1440,
+      "x": -140,
+      "y": -2376
+    },
+    "TerminalA2.dc.html": {
+      "h": 223,
+      "title": "ชิ้นส่วน · Output terminal A2 (พิมพ์ส่งเข้า Serial ได้)",
+      "w": 1392,
+      "x": 6426,
+      "y": 11332
+    },
+    "WindowBar-l26o.dc.html": {
+      "h": 60,
+      "page": "page-56trpd",
+      "title": "ชิ้นส่วน · แถบหน้าต่าง (ชั่วคราว) copy",
+      "w": 1440,
+      "x": 20,
+      "y": 524
+    },
+    "WindowBar-ldq4-j6db.dc.html": {
+      "h": 60,
+      "page": "page-56trpd",
+      "title": "ชิ้นส่วน · แถบหน้าต่าง (ชั่วคราว) copy 2",
+      "w": 1440,
+      "x": -2087,
+      "y": 1250
+    },
+    "WindowBar-ldq4-xof1-2gbe.dc.html": {
+      "h": 60,
+      "page": "page-56trpd",
+      "title": "ชิ้นส่วน · แถบหน้าต่าง (ชั่วคราว) copy 3",
+      "w": 1440,
+      "x": -2087,
+      "y": 1374
+    },
+    "WindowBarA2.dc.html": {
+      "h": 60,
+      "title": "ชิ้นส่วน · แถบหน้าต่าง A2 (ชิป Uno ซ้าย · ไม่มีชิปคลาวด์)",
+      "w": 1440,
+      "x": 106,
+      "y": 11932
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-10-21T09:00:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas"
+  },
+  "notes": {
+    "note-12tqcf": {
+      "kind": "title1",
+      "maxW": 8000,
+      "page": "page-56trpd",
+      "text": "Block Lab · หน้าจอและสถานะ (พื้นที่ 1440×840 + แถบหน้าต่าง 60)",
+      "w": 240,
+      "x": -3260,
+      "y": -2676
+    },
+    "note-ew9l2a": {
+      "kind": "title1",
+      "maxW": 5500,
+      "page": "page-56trpd",
+      "text": "ชิ้นส่วนที่ใช้ร่วม (ไม่ใช่หน้าจอ)",
+      "w": 240,
+      "x": -3260,
+      "y": 64
+    }
+  },
+  "order": [
+    "Main-jbj0.dc.html",
+    "SimStates-piam.dc.html",
+    "StageStates-urpu.dc.html",
+    "SerialStates-nep8.dc.html",
+    "SendStates-bmmg.dc.html",
+    "BlocksPane-5af0.dc.html",
+    "SimPane-2ann.dc.html",
+    "StagePane-rvjr.dc.html",
+    "SerialPane-eknh.dc.html",
+    "BottomBar-bfkl.dc.html",
+    "WindowBar-l26o.dc.html",
+    "Cards-6q71.dc.html",
+    "Mascot-ccpp.dc.html",
+    "CatRail-thxk.dc.html",
+    "PreflightDialog-zyku.dc.html",
+    "Main-ls5b-tm9t.dc.html",
+    "Main-1D-hhnp-zzbd.dc.html",
+    "WindowBar-ldq4-j6db.dc.html",
+    "WindowBar-ldq4-xof1-2gbe.dc.html",
+    "CatRail-p92d-kvex.dc.html",
+    "Main-1D-sxby-uji6.dc.html",
+    "Piece-r6cn-rppy.dc.html",
+    "Spec.dc.html",
+    "Main-A2.dc.html",
+    "ConnectUnoA2.dc.html",
+    "BlocksPaneA2.dc.html",
+    "WindowBarA2.dc.html",
+    "CatRailA2.dc.html",
+    "PreflightDialogA2.dc.html",
+    "CardsA2.dc.html",
+    "BlockA2.dc.html",
+    "BlockSheetA2.dc.html",
+    "CodeEditorA2.dc.html",
+    "TerminalA2.dc.html",
+    "SimPaneA2.dc.html",
+    "StagePaneA2.dc.html",
+    "MascotA2.dc.html",
+    "ContextMenuA2.dc.html"
+  ],
+  "pages": [
+    {
+      "id": "page-1",
+      "name": "Ver.1"
+    },
+    {
+      "id": "page-56trpd",
+      "name": "Achive"
+    }
+  ],
+  "title": "School Bot – Block Lab"
+}

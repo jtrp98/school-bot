@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>Block Lab หน้าหลัก</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'IBM Plex Sans Thai',system-ui,sans-serif;color:#14243D}
+button{font-family:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid #B85E00;outline-offset:2px}
+.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border-radius:12px;border:2px solid #C6D6EA;border-bottom-width:4px;background:#fff;color:#14243D;font-size:16px;font-weight:600;line-height:1.6}
+.sp{animation:bl-spin .8s linear infinite}
+@keyframes bl-spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.sp{animation:none}}
+</style>
+</helmet>
+<div style="position:relative;width:1440px;height:900px;background:#F4F7FB;overflow:hidden;color:#14243D">
+
+  <!-- แถบหน้าต่าง 60 + พื้นที่ 840 = 900 (ชั่วคราว: รอสำเนาจาก app-shell · ชั้นต่ำกว่า z-stop ตาม CR-10) -->
+  <div style="position:absolute;left:0;top:0;width:1440px;height:60px;z-index:10">
+    <dc-import name="WindowBar" os="{{os}}" chip="{{chip}}" save="saved" work="{{workSave}}" menu="{{menuState}}" job="กดปุ่มแล้วไฟติด" time="10:20" port="COM3" hint-size="1440px,60px"></dc-import>
+  </div>
+
+  <!-- เมนูงาน (เปิดจากปุ่มเมนูบนแถบหน้าต่าง · z-popover 40 ต่ำกว่าแถบล่าง/z-stop) -->
+  <sc-if value="{{menuOpen}}" hint-placeholder-val="{{false}}">
+    <div style="{{menuPopStyle}}" role="menu">
+      <div style="display:flex;justify-content:space-between;align-items:center;min-height:44px;padding:0 12px;font-size:16px;font-weight:500" role="menuitem"><span>บันทึกงาน</span><span style="font-size:14px;color:#5A6377">Ctrl+S</span></div>
+      <div style="display:flex;align-items:center;min-height:44px;padding:0 12px;font-size:16px;font-weight:500" role="menuitem">บันทึกสำเนา…</div>
+      <div style="display:flex;align-items:center;min-height:44px;padding:0 12px;font-size:16px;font-weight:500" role="menuitem">ส่งออกเป็นไฟล์ .sbb</div>
+    </div>
+  </sc-if>
+
+  <!-- หัวหน้า 60: งานใหม่ · งานของฉัน · ต่อบล็อกให้ (บอร์ด Uno | ตัวละคร) · ปัญหาก่อนรัน · เสียง · เริ่ม/หยุดจำลอง (หน้าหลัก · ชื่องาน · สถานะบันทึก · เมนู อยู่บนแถบหน้าต่างแล้ว) -->
+  <div style="position:absolute;left:0;top:60px;width:1440px;height:60px;box-sizing:border-box;background:#fff;border-bottom:2px solid #DCE3EC;display:flex;align-items:center;gap:12px;padding:0 16px;z-index:5">
+    <button class="btn"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg><span>งานใหม่</span><span style="font-size:14px;font-weight:500;color:#5A6377">Ctrl+N</span></button>
+    <button class="btn"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg><span>งานของฉัน</span></button>
+    <span style="width:2px;height:28px;background:#DCE3EC;margin:0 4px" aria-hidden="true"></span>
+    <!-- เลือกเป้าหมายของพาเลตบล็อก (แบบเลือก sprite ของ mBlock · R1/OQ66 ง: ปุ่มโฟกัสได้ทำหน้าที่เดียวกับการคลิก stage) -->
+    <div role="group" aria-label="ต่อบล็อกให้" style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:16px;font-weight:600;color:#5A6377">ต่อบล็อกให้</span>
+      <div style="display:inline-flex;gap:4px;padding:3px;border-radius:14px;background:#F4F7FB;border:2px solid #DCE3EC">
+        <button aria-pressed="{{isBoardTarget}}" onClick="{{setBoard}}" style="{{boardBtnStyle}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2v6M15 2v6M6 8h12v4a6 6 0 0 1-12 0zM12 18v4"></path></svg><span>บอร์ด Uno</span></button>
+        <button aria-pressed="{{isStageTarget}}" onClick="{{setStage}}" style="{{stageBtnStyle}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"></path></svg><span>ตัวละคร</span></button>
+      </div>
+    </div>
+    <div style="flex:1"></div>
+    <sc-if value="{{showChip}}" hint-placeholder-val="{{false}}">
+      <button class="btn" onClick="{{openPf}}" aria-label="{{chipAria}}" style="min-height:48px;padding:0 14px;background:#FFF4CC;border-color:#B07F00;border-bottom-color:#B07F00;font-weight:700"><svg class="i" viewBox="0 0 24 24" style="color:#B07F00" aria-hidden="true"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01"></path></svg><span>{{chipText}}</span></button>
+    </sc-if>
+    <!-- เสียง (R14): ไอคอนเล็กอย่างเดียว ปุ่มเดียวคุมทุกเสียง ค่าเริ่มต้นเปิด · aria-label บอกสถานะ -->
+    <button class="btn" aria-pressed="{{soundOn}}" aria-label="{{soundAria}}" title="{{soundAria}}" onClick="{{toggleSound}}" style="{{soundStyle}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{soundIcon}}"></path></svg></button>
+    <button class="btn" onClick="{{toggleRun}}" aria-disabled="{{runDisabled}}" style="{{runStyle}}"><svg class="{{runIconClass}}" viewBox="0 0 24 24" aria-hidden="true"><path d="{{runIcon}}"></path></svg><span>{{runLabel}}</span></button>
+  </div>
+
+  <!-- ซ้าย: แถบหมวด 16 + รายการบล็อก + พื้นที่ต่อบล็อก + ดูโค้ด 760×704 (พื้นที่ 840 = หัว 60 + 704 + แถบล่าง 76) -->
+  <div style="position:absolute;left:0;top:120px;width:760px;height:704px">
+    <dc-import name="BlocksPane" program="{{program}}" code="{{code}}" cat="{{cat}}" target="{{target}}" dd="{{ddProp}}" skip="{{skipFlag}}" hl="{{hlFlag}}" onToggleCode="{{toggleCode}}" on-cat="{{pickCat}}" on-go-sim="{{goSim}}" hint-size="760px,704px"></dc-import>
+  </div>
+
+  <!-- ขวา 680×704: แท็บ + ตัวจำลอง/stage + แผงข้อความ -->
+  <div style="position:absolute;left:760px;top:120px;width:680px;height:704px;background:#fff;box-shadow:inset 2px 0 0 #DCE3EC">
+    <div style="position:absolute;left:0;top:0;width:680px;height:56px;box-sizing:border-box;background:#F4F7FB;border-bottom:2px solid #DCE3EC;display:flex;align-items:flex-end;gap:4px;padding:0 12px 0 14px" role="tablist">
+      <button role="tab" aria-selected="{{isSim}}" onClick="{{tabSim}}" style="{{tabSimStyle}}" class="tabb"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h10v10H7zM9 3v4M15 3v4M9 17v4M15 17v4M3 9h4M3 15h4M17 9h4M17 15h4"></path></svg><span>ตัวจำลอง</span></button>
+      <button role="tab" aria-selected="{{isStage}}" onClick="{{tabStage}}" style="{{tabStageStyle}}" class="tabb"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"></path></svg><span>เวที (stage)</span></button>
+      <div style="flex:1"></div>
+      <div style="display:flex;align-items:center;gap:8px;padding-bottom:7px">
+        <div style="{{pillStyle}}" role="status"><svg class="{{pillIconClass}}" viewBox="0 0 24 24" aria-hidden="true"><path d="{{pillIcon}}"></path></svg><span>{{pillText}}</span></div>
+      </div>
+    </div>
+
+    <sc-if value="{{isSim}}" hint-placeholder-val="{{true}}">
+      <div style="{{contentStyle}}">
+        <dc-import name="SimPane" circuit="{{circuit}}" run="{{run}}" pressed="{{pressedFlag}}" pot="{{pot}}" led="{{ledState}}" h="{{contentH}}" onPress="{{press}}" onRelease="{{release}}" onKeyDown="{{kd}}" onKeyUp="{{ku}}" onPot="{{onPot}}" hint-size="680px,514px"></dc-import>
+      </div>
+    </sc-if>
+    <sc-if value="{{isStage}}" hint-placeholder-val="{{false}}">
+      <div style="{{contentStyle}}">
+        <dc-import name="StagePane" pose="{{stagePose}}" say="" x="0" y="0" frozen="{{frozenText}}" fast="no" state="{{stageState}}" h="{{contentH}}" hint-size="680px,514px"></dc-import>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{hasBanner}}" hint-placeholder-val="{{false}}">
+      <div style="{{bannerStyle}}" role="status">
+        <svg class="{{bannerIconClass}}" viewBox="0 0 24 24" style="width:24px;height:24px" aria-hidden="true"><path d="{{bannerIcon}}"></path></svg>
+        <div style="flex:1;min-width:0;font-size:18px;font-weight:600;line-height:1.5">{{bannerText}}<span style="font-size:14px;font-weight:500;color:#5A6377">{{bannerCode}}</span></div>
+        <button class="btn" onClick="{{bannerAction}}" style="min-height:44px">{{bannerButton}}</button>
+      </div>
+    </sc-if>
+
+    <div style="{{serialStyle}}">
+      <dc-import name="SerialPane" state="{{serial}}" open="{{serialOpenFlag}}" paused="no" onToggle="{{toggleSerial}}" hint-size="680px,150px"></dc-import>
+    </div>
+  </div>
+
+  <!-- แถบล่าง 76: หยุดทั้งหมด (ซ้าย · z-stop) / ส่งลงบอร์ด (ขวา) -->
+  <div style="position:absolute;left:0;top:824px;width:1440px;height:76px;z-index:60">
+    <dc-import name="BottomBar" busy="{{busy}}" note="{{bottomNote}}" noteIcon="{{noteIcon}}" hint-size="1440px,76px"></dc-import>
+  </div>
+
+  <!-- การ์ดสถานะ SCR-19 (เปิดขึ้นด้านบนของแถบล่าง ไม่บังปุ่มหยุด) -->
+  <sc-if value="{{cardRight}}" hint-placeholder-val="{{false}}">
+    <div style="position:absolute;right:16px;bottom:92px;z-index:40">
+      <dc-import name="Cards" kind="{{cardKind}}" stage="{{cardStage}}" why="{{cardWhy}}" hint-size="420px,260px"></dc-import>
+    </div>
+  </sc-if>
+  <sc-if value="{{cardLeft}}" hint-placeholder-val="{{false}}">
+    <div style="position:absolute;left:16px;bottom:92px;z-index:40">
+      <dc-import name="Cards" kind="{{cardKind}}" stage="no" why="usb" hint-size="420px,200px"></dc-import>
+    </div>
+  </sc-if>
+
+  <!-- dialog (z-dialog) เว้นแถบล่าง 76 -->
+  <sc-if value="{{dialogOn}}" hint-placeholder-val="{{false}}">
+    <div style="position:absolute;left:0;top:0;width:1440px;height:824px;background:rgba(20,36,61,.45);display:flex;align-items:center;justify-content:center;z-index:30">
+      <dc-import name="Cards" kind="{{dialogKind}}" stage="no" why="usb" hint-size="520px,420px"></dc-import>
+    </div>
+  </sc-if>
+
+  <!-- R17 ป๊อปอัปผลตรวจก่อนรัน (มาสคอต + จำนวนข้อ + ลิสต์) · z-dialog · เว้นแถบล่าง 76 ไม่บังปุ่มหยุด -->
+  <sc-if value="{{pfOn}}" hint-placeholder-val="{{false}}">
+    <div style="position:absolute;left:0;top:0;width:1440px;height:824px;background:rgba(20,36,61,.45);display:flex;align-items:center;justify-content:center;z-index:30">
+      <dc-import name="PreflightDialog" mode="{{pfMode}}" n="{{pfN}}" on-back="{{pfBack}}" on-continue="{{pfContinue}}" on-pick="{{pfPick}}" hint-size="560px,500px"></dc-import>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"tab":{"editor":"enum","default":"sim","options":["sim","stage"],"section":"หน้าจอ"},"run":{"editor":"enum","default":"running","options":["idle","compiling","running","compile-error","ended","edited","broken"],"section":"หน้าจอ"},"circuit":{"editor":"enum","default":"ok","options":["empty","ok","led-no-r","short"],"section":"หน้าจอ"},"program":{"editor":"enum","default":"sample","options":["empty","sample","loose","gap","orphan","unset"],"section":"หน้าจอ"},"code":{"editor":"enum","default":"open","options":["open","closed"],"section":"แผง"},"cat":{"editor":"int","default":2,"min":1,"max":16,"section":"แผง"},"target":{"editor":"enum","default":"board","options":["board","stage"],"section":"แผง"},"dd":{"editor":"enum","default":"closed","options":["closed","led","btn"],"section":"แผง"},"issues":{"editor":"int","default":0,"min":0,"max":6,"section":"ตรวจก่อนรัน (R17)"},"serial":{"editor":"enum","default":"sim","options":["empty","sim","uno","uno-manual","unreadable"],"section":"แผง"},"serialOpen":{"editor":"enum","default":"open","options":["open","closed"],"section":"แผง"},"led":{"editor":"enum","default":"auto","options":["auto","on","off","fast"],"section":"ตัวจำลอง"},"sound":{"editor":"enum","default":"on","options":["on","off"],"section":"ตัวจำลอง"},"chip":{"editor":"enum","default":"connected","options":["disconnected","connecting","connected","lost"],"section":"บอร์ด"},"card":{"editor":"enum","default":"none","options":["none","nodevice","compile","send","success","success-stage","fail-usb","fail-compile","stop0","stopA","stopB"],"section":"ส่งลงบอร์ด (SCR-19)"},"dialog":{"editor":"enum","default":"none","options":["none","preflightRun","preflightSend","warn","guardRun","guardSend"],"section":"ตรวจก่อนรัน (R17) / ส่งลงบอร์ด (SCR-19)"},"os":{"editor":"enum","default":"win","options":["win","mac"],"section":"แถบหน้าต่าง"},"save":{"editor":"enum","default":"saved","options":["saved","dirty","unsaved"],"section":"แถบหน้าต่าง"},"menu":{"editor":"enum","default":"closed","options":["closed","open"],"section":"แถบหน้าต่าง"},"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const P = this.props || {};
+    const S = this.state || {};
+    const pick = (k, d) => (S[k] !== undefined ? S[k] : ((P[k] !== undefined && P[k] !== null && P[k] !== '') ? P[k] : d));
+
+    const tab = pick('tab', 'sim');
+    const run = pick('run', 'running');
+    let circuit = pick('circuit', 'ok');
+    if (run === 'broken' && (circuit === 'ok' || circuit === 'empty')) circuit = 'led-no-r';
+    const program = pick('program', 'sample');
+    const code = pick('code', 'open');
+    const serialOpen = pick('serialOpen', 'open') === 'open';
+    const sound = pick('sound', 'on');
+    const dialog = pick('dialog', 'none');
+    const card = pick('card', 'none');
+    const pressed = !!S.pressed && run === 'running';
+    const ever = !!S.ever;
+
+    // เป้าหมายของพาเลตบล็อก (R1/R18 · OQ66 Proposed): บอร์ด (ค่าเริ่มต้น) | ตัวละคร (หมวด "ตัวละคร" + หัวกลุ่ม "อื่น ๆ" โผล่ · เลื่อนเข้าจอ) · กลับไปบอร์ดแล้วหมวดตัวละครหาย → กลับหมวดก่อนหน้า
+    const target = pick('target', 'board') === 'stage' ? 'stage' : 'board';
+    let cat = Math.min(16, Math.max(1, Number(pick('cat', 2)) || 2));
+    if (target === 'stage' && S.cat === undefined) cat = 16;
+    if (target !== 'stage' && cat === 16) cat = S.prevCat || 2;
+    const prevCat = S.prevCat || 2;
+
+    // ตรวจก่อนรัน (R17): จำนวนข้อ · program orphan/unset = มีอย่างน้อย 1 ข้อ (บล็อกใช้อุปกรณ์ที่ไม่มี/ยังไม่เลือก)
+    const issuesT = Math.min(6, Math.max(0, Number(pick('issues', 0)) || 0));
+    const issueN = issuesT > 0 ? issuesT : ((program === 'orphan' || program === 'unset') ? 1 : 0);
+    const pfOn = S.pf !== undefined ? S.pf === 'open' : (dialog === 'preflightRun' || dialog === 'preflightSend');
+    const pfMode = (S.pf === undefined && dialog === 'preflightSend') ? 'send' : 'run';
+    const pfN = issueN > 0 ? issueN : 3;
+    const skipFlag = (run === 'running' && (program === 'orphan' || program === 'unset')) ? 'yes' : 'no';
+
+    const serialH = serialOpen ? 150 : 52;
+    const contentH = 648 - serialH;
+
+    // เริ่ม/หยุดจำลอง (OQ31: ปุ่มเดียวสลับ)
+    let runLabel = 'เริ่มจำลอง', runIcon = 'M6 4l14 8-14 8z', runIconClass = 'i', runDisabled = false;
+    let runStyle = 'background:#1866C9;border-color:#1866C9;border-bottom-color:#0F4C99;color:#fff;min-height:48px;padding:0 20px;font-size:18px;font-weight:700';
+    if (run === 'running') {
+      runLabel = 'หยุดจำลอง'; runIcon = 'M8 5v14M16 5v14';
+      runStyle = 'background:#fff;border-color:#1866C9;border-bottom-color:#1866C9;color:#1866C9;min-height:48px;padding:0 20px;font-size:18px;font-weight:700';
+    } else if (run === 'compiling') {
+      runLabel = 'กำลังแปลงโค้ด…'; runIcon = 'M12 2v4M12 18v4M4.9 4.9l2.9 2.9M16.2 16.2l2.9 2.9M2 12h4M18 12h4M4.9 19.1l2.9-2.9M16.2 7.8l2.9-2.9'; runIconClass = 'i sp'; runDisabled = true;
+      runStyle = 'background:#EAF2FD;border-color:#C6D6EA;border-bottom-color:#C6D6EA;color:#14243D;min-height:48px;padding:0 20px;font-size:18px;font-weight:700';
+    }
+
+    // สถานะ (pill) ที่เห็นจากทั้งสองแท็บ
+    const pillBase = 'display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:0 12px;border-radius:999px;font-size:16px;font-weight:600;line-height:1.6;white-space:nowrap;border:2px solid ';
+    const P_PLAY = 'M6 4l14 8-14 8z', P_ALERT = 'M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01', P_INFO = 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 16v-4M12 8h.01', P_FLAG = 'M5 21V4M5 4h11l-2 4 2 4H5', P_ACT = 'M22 12h-4l-3 9L9 3l-3 9H2', P_SPIN = 'M12 2v4M12 18v4M4.9 4.9l2.9 2.9M16.2 16.2l2.9 2.9M2 12h4M18 12h4M4.9 19.1l2.9-2.9M16.2 7.8l2.9-2.9';
+    let pillText = 'พร้อมจำลอง', pillIcon = P_PLAY, pillIconClass = 'i', pillStyle = pillBase + '#DCE3EC;background:#F4F6F8;color:#5A6377';
+    if (run === 'compiling') { pillText = 'กำลังแปลงโค้ด'; pillIcon = P_SPIN; pillIconClass = 'i sp'; pillStyle = pillBase + '#C6D6EA;background:#EAF2FD;color:#14243D'; }
+    if (run === 'running') { pillText = 'กำลังจำลอง'; pillIcon = P_ACT; pillStyle = pillBase + '#1866C9;background:#EAF2FD;color:#0F4C99'; }
+    if (run === 'compile-error') { pillText = 'แปลงโค้ดไม่ผ่าน'; pillIcon = P_ALERT; pillStyle = pillBase + '#B07F00;background:#FFF4CC;color:#14243D'; }
+    if (run === 'ended') { pillText = 'โปรแกรมจบแล้ว'; pillIcon = P_FLAG; pillStyle = pillBase + '#5A6377;background:#F4F6F8;color:#14243D'; }
+    if (run === 'edited') { pillText = 'หยุดเพราะแก้ไข'; pillIcon = P_INFO; pillStyle = pillBase + '#5A6377;background:#F4F6F8;color:#14243D'; }
+    if (run === 'broken') { pillText = circuit === 'short' ? 'หยุด: ลัดวงจร' : 'หยุด: LED เสีย'; pillIcon = P_ALERT; pillStyle = pillBase + '#B07F00;background:#FFF4CC;color:#14243D'; }
+
+    // แถบแจ้งเหนือแผงข้อความ (ไม่หายเอง มีปุ่ม)
+    let hasBanner = false, bannerText = '', bannerCode = '', bannerButton = '', bannerWarn = false, bannerIcon = P_INFO, bannerIconClass = 'i', bannerAction = () => {};
+    const restart = () => this.setState({ run: 'running', pressed: false });
+    if (run === 'compiling') { hasBanner = true; bannerText = 'กำลังแปลงโค้ดก่อนเริ่มจำลอง รอสักครู่'; bannerIcon = P_SPIN; bannerIconClass = 'i sp'; bannerButton = 'รอสักครู่'; }
+    if (run === 'compile-error') { hasBanner = true; bannerWarn = true; bannerIcon = P_ALERT; bannerText = 'เริ่มจำลองไม่ได้ ช่อง "ถ้า" ยังว่าง '; bannerCode = 'E-BUILD'; bannerButton = 'ไปที่บล็อก'; }
+    if (run === 'ended') { hasBanner = true; bannerText = 'โปรแกรมจบแล้ว (บล็อก "หยุดโปรแกรม")'; bannerButton = 'เริ่มใหม่'; bannerAction = restart; }
+    if (run === 'edited') { hasBanner = true; bannerText = 'หยุดจำลองแล้ว เพราะมีการแก้ไข'; bannerButton = 'เริ่มใหม่'; bannerAction = restart; }
+    if (run === 'broken' && tab === 'stage') { hasBanner = true; bannerWarn = true; bannerIcon = P_ALERT; bannerText = (circuit === 'short' ? 'หยุดจำลองแล้ว สายลัดวงจร ' : 'หยุดจำลองแล้ว LED เสีย ') ; bannerCode = circuit === 'short' ? 'E-SIM-02' : 'E-SIM-01'; bannerButton = 'ไปดูที่ตัวจำลอง'; bannerAction = () => this.setState({ tab: 'sim' }); }
+    const bannerTop = 56 + contentH - 72;
+
+    // การ์ด SCR-19
+    const cardMap = { 'nodevice': ['nodevice', 'no', 'usb'], 'compile': ['compile', 'no', 'usb'], 'send': ['send', 'no', 'usb'], 'success': ['success', 'no', 'usb'], 'success-stage': ['success', 'yes', 'usb'], 'fail-usb': ['fail', 'no', 'usb'], 'fail-compile': ['fail', 'no', 'compile'], 'stop0': ['stop0', 'no', 'usb'], 'stopA': ['stopA', 'no', 'usb'], 'stopB': ['stopB', 'no', 'usb'] };
+    const cm = cardMap[card] || null;
+    const cardLeft = !!cm && cm[0].indexOf('stop') === 0;
+    const cardRight = !!cm && !cardLeft;
+    const busy = (card === 'compile' || card === 'send') ? 'yes' : 'no';
+    const ok = card === 'success' || card === 'success-stage';
+
+    // LED (OQ34: ไม่เกิน 3 ครั้ง/วินาที เกินแล้วแสดงแสงคงที่กลาง ๆ)
+    const ledP = pick('led', 'auto');
+    let ledState = 'off';
+    if (run === 'running') ledState = ledP === 'auto' ? (pressed ? 'on' : 'off') : ledP;
+
+    const segBase = 'display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 14px;border-radius:11px;font-size:16px;color:#14243D;';
+    const segOn = segBase + 'border:3px solid #1866C9;background:#EAF2FD;font-weight:700';
+    const segOff = segBase + 'border:3px solid transparent;background:transparent;font-weight:600';
+
+    return {
+      os: pick('os', 'win'), chip: pick('chip', 'connected'),
+      workSave: pick('save', 'saved'),
+      menuOpen: pick('menu', 'closed') === 'open',
+      menuState: pick('menu', 'closed'),
+      menuPopStyle: 'position:absolute;top:58px;left:' + (pick('os', 'win') === 'mac' ? 200 : 60) + 'px;width:280px;box-sizing:border-box;background:#fff;border:2px solid #DCE3EC;border-radius:16px;box-shadow:0 8px 20px rgba(20,36,61,.2);padding:8px;z-index:40;display:flex;flex-direction:column;gap:2px',
+      runLabel, runIcon, runIconClass, runStyle, runDisabled,
+      // R17: ถ้ามีปัญหา กดเริ่มจำลองแล้วเด้งป๊อปอัป (ตรวจใหม่ทุกครั้งที่กด · OQ55 ค) · หยุดจำลองไม่ตรวจ
+      toggleRun: () => {
+        if (run === 'compiling') return;
+        if (run === 'running') { this.setState({ run: 'idle', pressed: false }); return; }
+        if (issueN > 0) { this.setState({ pf: 'open' }); return; }
+        this.setState({ run: 'running', pressed: false });
+      },
+      program, code, cat: String(cat), target,
+      ddProp: pick('dd', 'closed'),
+      skipFlag, hlFlag: S.hl === 'yes' ? 'yes' : 'no',
+      toggleCode: () => this.setState({ code: code === 'open' ? 'closed' : 'open' }),
+      pickCat: (n) => this.setState({ cat: n }),
+      goSim: () => this.setState({ tab: 'sim' }),
+      isBoardTarget: target === 'board', isStageTarget: target === 'stage',
+      boardBtnStyle: target === 'board' ? segOn : segOff, stageBtnStyle: target === 'stage' ? segOn : segOff,
+      setBoard: () => this.setState({ target: 'board', cat: cat === 16 ? prevCat : cat }),
+      setStage: () => this.setState({ target: 'stage', prevCat: cat === 16 ? prevCat : cat, cat: 16 }),
+      showChip: issueN > 0 && !pfOn,
+      chipText: 'ปัญหา ' + issueN + ' ข้อ',
+      chipAria: 'ปัญหาก่อนรัน ' + issueN + ' ข้อ กดเพื่อดูรายการ',
+      openPf: () => this.setState({ pf: 'open' }),
+      pfOn, pfMode, pfN: String(pfN),
+      pfBack: () => this.setState({ pf: 'closed' }),
+      pfContinue: () => this.setState({ pf: 'closed', run: 'running', pressed: false }),
+      pfPick: (idx) => this.setState({ pf: 'closed', hl: idx === 0 ? 'yes' : 'no' }),
+      isSim: tab === 'sim', isStage: tab === 'stage',
+      tabSim: () => this.setState({ tab: 'sim' }), tabStage: () => this.setState({ tab: 'stage' }),
+      tabSimStyle: tab === 'sim' ? 'display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 16px;border:2px solid #DCE3EC;border-bottom:0;border-radius:12px 12px 0 0;background:#fff;color:#14243D;font-size:16px;font-weight:700;box-shadow:inset 0 -4px 0 #1866C9;margin-bottom:-2px' : 'display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 16px;border:2px solid transparent;border-bottom:0;border-radius:12px 12px 0 0;background:transparent;color:#5A6377;font-size:16px;font-weight:600',
+      tabStageStyle: tab === 'stage' ? 'display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 16px;border:2px solid #DCE3EC;border-bottom:0;border-radius:12px 12px 0 0;background:#fff;color:#14243D;font-size:16px;font-weight:700;box-shadow:inset 0 -4px 0 #1866C9;margin-bottom:-2px' : 'display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 16px;border:2px solid transparent;border-bottom:0;border-radius:12px 12px 0 0;background:transparent;color:#5A6377;font-size:16px;font-weight:600',
+      pillText, pillIcon, pillIconClass, pillStyle,
+      soundOn: sound === 'on',
+      soundAria: sound === 'on' ? 'เสียงเปิดอยู่ กดเพื่อปิดเสียงทั้งหมด' : 'เสียงปิดอยู่ กดเพื่อเปิดเสียง',
+      soundStyle: 'min-height:48px;width:48px;padding:0;' + (sound === 'on' ? 'background:#EAF2FD;border-color:#1866C9;border-bottom-color:#1866C9' : 'background:#F4F6F8;border-color:#DCE3EC;border-bottom-color:#DCE3EC'),
+      soundIcon: sound === 'on' ? 'M11 5L6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14' : 'M11 5L6 9H2v6h4l5 4zM22 9l-6 6M16 9l6 6',
+      toggleSound: () => this.setState({ sound: sound === 'on' ? 'off' : 'on' }),
+      contentStyle: 'position:absolute;left:0;top:56px;width:680px;height:' + contentH + 'px',
+      contentH: String(contentH),
+      circuit, run,
+      pressedFlag: pressed ? 'yes' : 'no',
+      pot: String(S.pot !== undefined ? S.pot : 512),
+      ledState,
+      press: () => this.setState({ pressed: true, ever: true }),
+      release: () => this.setState({ pressed: false }),
+      kd: (e) => { if (e && (e.key === ' ' || e.key === 'Enter')) { if (e.preventDefault) e.preventDefault(); this.setState({ pressed: true, ever: true }); } },
+      ku: (e) => { if (e && (e.key === ' ' || e.key === 'Enter')) this.setState({ pressed: false }); },
+      onPot: (e) => this.setState({ pot: Number(e && e.target ? e.target.value : 512) }),
+      stagePose: String(ever ? 2 : 1),
+      stageState: run === 'running' ? 'running' : 'idle',
+      frozenText: run === 'broken' ? (circuit === 'short' ? 'หยุดอยู่ เพราะสายลัดวงจร' : 'หยุดอยู่ เพราะ LED เสีย') : '',
+      hasBanner, bannerText, bannerCode, bannerButton, bannerIcon, bannerIconClass, bannerAction,
+      bannerStyle: 'position:absolute;left:8px;top:' + bannerTop + 'px;width:664px;height:64px;box-sizing:border-box;display:flex;align-items:center;gap:12px;padding:0 10px 0 14px;border-radius:12px;z-index:10;box-shadow:0 8px 20px rgba(20,36,61,.2);border:2px solid ' + (bannerWarn ? '#B07F00;background:#FFF4CC' : '#C6D6EA;background:#EAF2FD'),
+      serial: pick('serial', 'sim'), serialOpenFlag: serialOpen ? 'open' : 'closed',
+      toggleSerial: () => this.setState({ serialOpen: serialOpen ? 'closed' : 'open' }),
+      serialStyle: 'position:absolute;left:0;top:' + (704 - serialH) + 'px;width:680px;height:' + serialH + 'px',
+      busy, bottomNote: ok ? 'ส่งลงบอร์ดสำเร็จ 10:42' : 'ยังไม่ได้ส่งโปรแกรมลงบอร์ด', noteIcon: ok ? 'ok' : 'none',
+      cardRight, cardLeft, cardKind: cm ? cm[0] : 'success', cardStage: cm ? cm[1] : 'no', cardWhy: cm ? cm[2] : 'usb',
+      dialogOn: dialog === 'warn' || dialog === 'guardRun' || dialog === 'guardSend', dialogKind: (dialog === 'warn' || dialog === 'guardRun' || dialog === 'guardSend') ? dialog : 'warn'
+    };
+  }
+}
+</script>
+</body>
+</html>

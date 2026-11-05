@@ -1,4 +1,4 @@
-import { robotSimulator, simulatorEnabled } from "./robotSimulator";
+﻿import { robotSimulator, simulatorEnabled } from "./robotSimulator";
 import { EngineError } from "./engineError";
 import { t } from "../i18n";
 import type { AppInfo, EngineResponse, EnvironmentInfo, ModeID, ProgramEngineData } from "./types";
@@ -125,7 +125,7 @@ export const client = {
     if (simulatorEnabled && mode === "robot-control")
       return { protocol: "1.0", request_id: crypto.randomUUID(), status: "success", ...await robotSimulator.run(mode, action, data) } as EngineResponse<TData>;
     if (preview)
-      return (await import("./preview")).runPreview(mode, action, data) as EngineResponse<TData>;
+      return (await (await import("./preview")).runPreview(mode, action, data)) as EngineResponse<TData>;
     const result = await native<EngineResponse<TData>>(
       "Run",
       mode,
@@ -136,10 +136,20 @@ export const client = {
       throw new EngineError(result.error?.code ?? "ENGINE_FAILED", result.error?.message ?? "");
     return result;
   },
+  // Leaving a mode and closing the window: the host lets a running Block Lab upload finish.
   cancel: async () => {
     if (simulatorEnabled) await robotSimulator.cancel();
-    else if (!preview) await native("CancelRun");
+    if (preview) (await import("./preview")).cancelPreview();
+    else await native("CancelRun");
   },
+  // Block Lab's confirmed stop, the only cancel that also ends an upload.
+  stopUpload: async () => {
+    if (preview) (await import("./preview")).stopPreviewUpload();
+    else await native("StopUpload");
+  },
+  // Lets the close dialog say why it waits even when the page that started the upload lost its
+  // own guard (Block Lab after a crash or a reload).
+  uploadRunning: async (): Promise<boolean> => (preview ? false : native<boolean>("UploadRunning")),
   save: async (mode: ModeID, data: unknown) => {
     if (preview) localStorage.setItem(`school-bot:project:${mode}`, JSON.stringify(data));
     else await native("SaveProject", mode, JSON.stringify(data));

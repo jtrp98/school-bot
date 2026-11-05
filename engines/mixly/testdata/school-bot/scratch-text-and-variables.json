@@ -1,0 +1,64 @@
+{
+  "blocks": [
+    {
+      "type": "base_setup",
+      "statements": {
+        "DO": {
+          "type": "variables_declare",
+          "fields": {"VAR": "score", "TYPE": "int", "variables_type": "global_variate"},
+          "values": {"VALUE": {"type": "math_number", "fields": {"NUM": "0"}}}
+        }
+      }
+    },
+    {
+      "type": "sb_loop",
+      "statements": {
+        "DO": {
+          "type": "sb_variable_change",
+          "fields": {"VAR": "score"},
+          "values": {"DELTA": {"type": "math_number", "fields": {"NUM": "2"}}},
+          "next": {
+            "type": "controls_if",
+            "values": {
+              "IF0": {
+                "type": "sb_text_contains",
+                "values": {
+                  "TEXT": {"type": "text", "fields": {"TEXT": "hello"}},
+                  "PART": {"type": "text", "fields": {"TEXT": "ell"}}
+                }
+              }
+            },
+            "statements": {
+              "DO0": {
+                "type": "serial_print",
+                "fields": {"serial_select": "Serial", "new_line": "println"},
+                "values": {
+                  "CONTENT": {
+                    "type": "sb_text_letter",
+                    "values": {
+                      "TEXT": {"type": "text", "fields": {"TEXT": "hello"}},
+                      "POSITION": {"type": "math_number", "fields": {"NUM": "1"}}
+                    }
+                  }
+                },
+                "next": {
+                  "type": "serial_print",
+                  "fields": {"serial_select": "Serial", "new_line": "println"},
+                  "values": {
+                    "CONTENT": {
+                      "type": "sb_text_letter",
+                      "values": {
+                        "TEXT": {"type": "text", "fields": {"TEXT": "hello"}},
+                        "POSITION": {"type": "variables_get", "fields": {"VAR": "score"}}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

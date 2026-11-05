@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>Block Lab สเปก</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'IBM Plex Sans Thai',system-ui,sans-serif;color:#14243D}
+button,select{font-family:inherit}
+button:focus-visible,select:focus-visible{outline:3px solid #B85E00;outline-offset:2px}
+.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.sh{box-sizing:border-box;display:inline-flex;padding:2px}
+.bi{box-sizing:border-box;display:flex;align-items:center;gap:2px 8px;width:100%;min-height:40px;padding:4px 12px;font-size:16px;font-weight:500;line-height:1.5;color:#14243D;white-space:nowrap}
+.sl{display:inline-flex;align-items:center;min-height:28px;padding:0 10px;background:#fff;border:2px solid #C6D6EA;border-radius:999px;font-weight:600;line-height:1.4}
+.dd{position:relative;display:inline-flex;align-items:center;gap:6px;box-sizing:border-box;max-width:100%;min-height:32px;padding:0 8px;border-radius:999px;border:2px solid #C6D6EA;background:#fff;color:#14243D;font-size:16px;font-weight:600;line-height:1.7;text-align:left;cursor:pointer}
+.dd::after{content:"";position:absolute;left:-6px;right:-6px;top:-6px;bottom:-6px}
+.dn{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card{box-sizing:border-box;background:#fff;border:2px solid #DCE3EC;border-radius:16px;padding:14px;min-width:0}
+.h2{margin:0 0 4px 0;font-size:24px;font-weight:700;line-height:1.4}
+.sub{margin:0 0 14px 0;font-size:16px;line-height:1.6;color:#5A6377;max-width:1150px}
+.cap{font-size:16px;line-height:1.6;color:#5A6377;margin-top:6px}
+.ln{display:flex;align-items:center;height:22px;font-family:Consolas,ui-monospace,monospace;font-size:14px;line-height:22px;white-space:pre}
+.nt{display:inline-flex;align-items:center;height:20px;padding:0 8px;margin-left:12px;border-radius:10px;background:#EAF2FD;color:#0F4C99;font-family:'IBM Plex Sans Thai',system-ui,sans-serif;font-size:14px;font-weight:600}
+.bt{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border-radius:12px;border:2px solid #C6D6EA;border-bottom-width:4px;background:#fff;color:#14243D;font-size:16px;font-weight:600}
+.tg{display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:0 10px;border-radius:16px;background:#FFF4CC;border:2px solid #B07F00;font-size:16px;font-weight:600;line-height:1.5;color:#14243D}
+.dots{background-color:#F8FAFD;background-image:radial-gradient(#C6D6EA 1.6px,transparent 1.6px);background-size:20px 20px;border:2px solid #DCE3EC;border-radius:12px}
+.fly{box-sizing:border-box;width:184px;background:#fff;border:2px solid #DCE3EC;border-radius:12px;overflow:hidden}
+.msg{display:flex;flex-direction:column;gap:8px;padding:10px;font-size:16px;line-height:1.6}
+ul.rl{margin:0;padding-left:22px;font-size:16px;line-height:1.7}
+ul.rl li{margin:0 0 4px 0}
+</style>
+</helmet>
+<div style="width:1440px;min-height:5000px;box-sizing:border-box;background:#F4F7FB;padding:32px 20px 48px 20px">
+  <h1 style="margin:0;font-size:28px;font-weight:700;line-height:1.4">สเปกชิ้นส่วน Block Lab</h1>
+  <p class="sub" style="margin-top:4px">แถบหมวด 16 หมวด 4 กลุ่ม (เลื่อนในแถบ) · หมวดว่างและหมวดอุปกรณ์ที่ยังไม่มีอุปกรณ์ · รูปทรงและสถานะบล็อก · บล็อกอ้างอุปกรณ์จาก dropdown ชื่อ · ผลตรวจก่อนรัน · effect ลาก/วาง · มาสคอต · ทางเลือกที่ไม่ต้องลาก · ตัวอย่างโค้ด · สีหมวด 16 สีและสีภาพประกอบเป็น "ค่าชั่วคราว" (ยังไม่มี token ใน design system · DSG-13) · ที่ 1440×840 (แถบหน้าต่าง 60)</p>
+
+  <!-- 1. แถบหมวด -->
+  <h2 class="h2" style="margin-top:20px">1 · แถบหมวดบล็อก 16 หมวด 4 กลุ่ม (R1 · R18)</h2>
+  <p class="sub">ชื่อ + ไอคอน + สี ไม่แยกด้วยสีอย่างเดียว · กลุ่มต่อเนื่อง ไม่สลับลำดับ (หัวกลุ่มเป็นตัวคั่น ไม่เปลี่ยนตำแหน่งหมวด) · ตัวอักษรบนบล็อกใช้ text-primary (#14243D) ทุกหมวด · ตัวเลข = contrast ที่คำนวณจริง (ตัวอักษรบนพื้น ต้อง ≥ 4.5 / ขอบบนพื้นที่ทำงาน #F4F7FB ต้อง ≥ 3) · ซ้ำเฉดบางหมวดได้เพราะมีไอคอน + ชื่อ + กลุ่มกำกับ (UD4 · OQ64)</p>
+  <div style="display:flex;gap:28px;align-items:flex-start">
+    <div style="display:flex;gap:16px;align-items:flex-start;flex-shrink:0">
+      <div style="width:112px">
+        <div style="border:2px solid #DCE3EC;border-radius:12px;overflow:hidden;width:112px;height:704px"><dc-import name="CatRail" uid="s1" cat="2" stage="no" pos="top" h="704" empty-mark="yes" hint-size="112px,704px"></dc-import></div>
+        <div class="cap" style="font-weight:700;color:#14243D">A · เลื่อนบนสุด</div>
+        <div class="cap" style="margin-top:0;font-size:14px">เลือก "ควบคุม" · เห็นถึง "เซอร์โว" · ปุ่ม เลื่อนลง</div>
+      </div>
+      <div style="width:112px">
+        <div style="border:2px solid #DCE3EC;border-radius:12px;overflow:hidden;width:112px;height:704px"><dc-import name="CatRail" uid="s2" cat="15" stage="no" pos="end" h="704" empty-mark="yes" hint-size="112px,704px"></dc-import></div>
+        <div class="cap" style="font-weight:700;color:#14243D">B · ท้ายแถบ</div>
+        <div class="cap" style="margin-top:0;font-size:14px">เลือก "ไฟ" · ไม่เลือก stage = 15 หมวด 3 กลุ่ม · ปุ่ม เลื่อนขึ้น</div>
+      </div>
+      <div style="width:112px">
+        <div style="border:2px solid #DCE3EC;border-radius:12px;overflow:hidden;width:112px;height:704px"><dc-import name="CatRail" uid="s3" cat="16" stage="yes" pos="end" h="704" empty-mark="yes" hint-size="112px,704px"></dc-import></div>
+        <div class="cap" style="font-weight:700;color:#14243D">C · เลือกตัวละคร</div>
+        <div class="cap" style="margin-top:0;font-size:14px">โผล่หัวกลุ่ม "อื่น ๆ" + "ตัวละคร" ท้ายแถบ</div>
+      </div>
+    </div>
+    <div style="flex:1;min-width:0">
+      <div class="card" style="margin-bottom:14px">
+        <div style="font-size:18px;font-weight:700;margin-bottom:6px">กฎของแถบ (R18 · ตัดสินที่ OQ57 OQ59 OQ60 OQ65)</div>
+        <ul class="rl">
+          <li><b>ขนาด:</b> กว้าง 112 · สูง 704 · รายการสูง 60 + ช่อง 2 (เป้ากด ≥ 44) · หัวกลุ่ม 30–36 (14px ตัวหนา เป็นตัวคั่น ไม่ใช่ปุ่ม · <code>role=group</code> + ชื่อกลุ่ม) · ความสูงรวม ≈ 1,040 (ไม่เลือก stage) / ≈ 1,140 (เลือก stage) เทียบ 704 → <b>ต้องเลื่อนในแถบ</b></li>
+          <li><b>เห็นว่ายังมีต่อโดยไม่พึ่ง hover:</b> แถบเลื่อนกว้าง 14 เห็นตลอด + แถบปุ่ม "เลื่อนขึ้น / เลื่อนลง" (สูง 44 · ไอคอน + ข้อความ) โผล่ตามตำแหน่ง · ไม่มีเฟดที่ซ่อนข้อความ</li>
+          <li><b>หมวดที่เลือกเลื่อนเข้าจอเสมอ</b> (เว้นที่ให้แถบปุ่ม) · <b>จำตำแหน่งเลื่อนข้ามการเปลี่ยนหมวด</b> (ไม่รีเซ็ต) · ไม่บันทึกกับงาน · หมวดตั้งต้น = "ควบคุม" (หมวดแรกที่มีบล็อกใช้ได้ · OQ68 Proposed)</li>
+          <li><b>คีย์บอร์ด:</b> ลูกศรขึ้น/ลง · Home · End ย้ายโฟกัสระหว่างหมวด (เลื่อนตามโฟกัส) · Enter/Space เลือก · มีหมวดเดียวที่ Tab ถึง (roving tabindex) · <b>reduced-motion:</b> เลื่อนทันที ไม่เลื่อนแบบแอนิเมชัน · ไม่ต้องลาก (2.5.7)</li>
+          <li><b>ที่เลื่อน 0 เห็นถึง "เซอร์โว":</b> เสียง · เซนเซอร์ · แสดงผล · ไฟ (หมวดอุปกรณ์ที่ใช้บ่อยสุด) อยู่ใต้รอยพับ · ไม่ยุบกลุ่ม (คงตัวคั่นตาม OQ60) → ให้ทดลองกับเด็ก ป.3 · ถ้าเข้าถึงยาก = ผู้ใช้ตัดสินเรื่องกลุ่มยุบได้ (OQ68 ง)</li>
+          <li><b>หมวดว่างใน MVP 5 หมวด</b> (ข้อความ · รายการ · ฟังก์ชัน · บัส · แสดงผล): กดได้ โฟกัสคีย์บอร์ดได้ ไม่ใช้ disabled · ตัวอักษรเต็ม contrast · ไอคอนขอบ<b>เส้นประ</b> (รูปทรงบอก ไม่ใช่ความจาง · ข้อเสนอ OQ58 (6) ปิดได้ด้วย tweak <code>empty-mark</code>) · aria-label ต่อท้าย "ยังไม่มีบล็อก"</li>
+          <li><b>หมวด "ตัวละคร":</b> ปุ่ม "ต่อบล็อกให้ · ตัวละคร" ที่หัวหน้า (โฟกัสได้ · <code>aria-pressed</code>) = ทำหน้าที่เดียวกับคลิก stage → หมวด + หัวกลุ่ม "อื่น ๆ" โผล่ท้ายแถบ เลือกให้และเลื่อนเข้าจอ · กลับ "บอร์ด Uno" → กลับหมวดก่อนหน้า · อยู่ท้ายสุด จึงไม่ดีดตำแหน่งหมวดอื่น (OQ66 Proposed)</li>
+          <li><b>ชื่อบนแถบ:</b> ไทยสั้น 1 คำ ไม่ใส่วงเล็บ (ที่ 16px คำยาวสุด ≈ 70px · "Function" ≈ 69px พอดีกรอบ 80) · ชื่อเต็ม เช่น "สื่อสาร (Serial)" อยู่หัวรายการบล็อกและ aria-label (ข้อเสนอ OQ62 · "บัส" ต้องให้ผู้ใช้ยืนยันคำเรียก)</li>
+        </ul>
+      </div>
+      <sc-for list="{{groupsCards}}" as="g" hint-placeholder-count="4">
+        <div style="margin-bottom:12px">
+          <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px"><span style="font-size:18px;font-weight:700">กลุ่ม {{g.label}}</span><span style="font-size:14px;color:#5A6377">{{g.note}}</span></div>
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">
+            <sc-for list="{{g.cards}}" as="c" hint-placeholder-count="5">
+              <div class="card" style="padding:10px 12px">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <span style="{{c.chip}}"><svg class="i" viewBox="0 0 24 24" style="width:18px;height:18px" aria-hidden="true"><path d="{{c.icon}}"/></svg></span>
+                  <span style="font-size:18px;font-weight:700;line-height:1.4">{{c.name}}</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;margin:4px 0 2px;font-size:14px;font-weight:600;line-height:1.6;color:#14243D"><svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px" aria-hidden="true"><path d="{{c.kindIcon}}"/></svg>{{c.kindText}}</div>
+                <div style="font-size:14px;line-height:1.6;color:#5A6377;margin-bottom:6px">พื้น {{c.fill}} · ขอบ {{c.bord}}<br>ตัวอักษร {{c.crText}}:1 · ขอบ {{c.crBord}}:1</div>
+                <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+                  <span class="sh" style="{{c.sO}}"><span class="bi" style="{{c.sI}};min-height:32px;padding:0 10px">คำสั่ง</span></span>
+                  <span class="sh" style="{{c.vO}}"><span class="bi" style="{{c.vI}};min-height:32px">ค่า</span></span>
+                  <span class="sh" style="{{c.cO}}"><span class="bi" style="{{c.cI}};min-height:32px">เงื่อนไข</span></span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- 2. หมวดว่าง / หมวดอุปกรณ์ที่ยังไม่มีอุปกรณ์ / หมวดเริ่มต้นที่วางแล้ว -->
+  <h2 class="h2" style="margin-top:36px">2 · รายการบล็อกของหมวดที่ "ว่าง" 3 แบบ (R18 กฎกลาง · R16 · OQ58 · OQ68)</h2>
+  <p class="sub">3 แบบต้องไม่ใช้ข้อความเดียวกัน: (ก) หมวดไม่มีบล็อกใน MVP (ข) หมวดอุปกรณ์ที่มีบล็อกแต่ยังไม่ได้วางอุปกรณ์ในวงจร (ค) หมวด "เริ่มต้น" ที่บล็อกวางไว้ให้แล้ว · ทั้งหมดกดได้ ไม่ใช่ error ไม่สัญญา "เร็ว ๆ นี้" มีทางไปต่อ (ปุ่ม ≥ 44) · ข้อความจัดในกว้าง 168 ไม่ล้นที่ 3 ภาษา (+40% ขึ้นบรรทัดใหม่)</p>
+  <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap">
+    <div>
+      <div class="fly">
+        <div style="display:flex;align-items:center;gap:10px;min-height:52px;padding:4px 10px;box-sizing:border-box"><span style="display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:32px;height:32px;box-sizing:border-box;border-radius:10px;background:#A9B8CC;border:2px dashed #4F6482"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18M7 8l-4 4 4 4M17 8l4 4-4 4"/></svg></span><span style="font-size:18px;font-weight:700;line-height:1.5">บัส (Bus)</span></div>
+        <div class="msg" role="note" style="border-top:2px solid #DCE3EC;min-height:236px">
+          <div style="display:flex;gap:8px;align-items:flex-start"><svg class="i" viewBox="0 0 24 24" style="margin-top:3px" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 16v-4M12 8h.01"/></svg><span style="font-weight:700">หมวดนี้ยังไม่มีบล็อก</span></div>
+          <div style="color:#5A6377">ลองดูหมวดที่มีบล็อกให้ใช้</div>
+          <button class="bt" style="width:100%;justify-content:flex-start"><span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;box-sizing:border-box;border-radius:9px;background:#FFAB3D;border:2px solid #A8610A"><svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px" aria-hidden="true"><path d="M17 2l4 4-4 4M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4M21 13v2a3 3 0 0 1-3 3H3"/></svg></span><span>ควบคุม</span></button>
+          <button class="bt" style="width:100%;justify-content:flex-start"><span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;box-sizing:border-box;border-radius:9px;background:#C9E04A;border:2px solid #6E7F0B"><svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px" aria-hidden="true"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2V17h6v-.3c0-.8.4-1.5 1-2A7 7 0 0 0 12 2z"/></svg></span><span>ไฟ</span></button>
+        </div>
+      </div>
+      <div class="cap" style="max-width:184px"><b style="color:#14243D">(ก) ว่างใน MVP</b><br>ข้อความ · รายการ · ฟังก์ชัน · บัส · แสดงผล</div>
+    </div>
+    <div>
+      <div class="fly">
+        <div style="display:flex;align-items:center;gap:10px;min-height:52px;padding:4px 10px;box-sizing:border-box"><span style="display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:32px;height:32px;box-sizing:border-box;border-radius:10px;background:#D58CF2;border:2px solid #8239A8"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg></span><span style="font-size:18px;font-weight:700;line-height:1.5">เสียง (Sound)</span></div>
+        <div style="padding:0 8px;border-top:2px solid #DCE3EC;min-height:236px;padding-top:8px">
+          <div style="margin-bottom:6px"><span class="sh" style="display:flex;background:#8239A8;border-radius:12px"><span class="bi" style="background:#D58CF2;border-radius:10px;flex-wrap:wrap;white-space:normal">เล่นเสียง <button class="dd" style="border:2px dashed #5A6377"><svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg><span class="dn">เลือกอุปกรณ์</span><svg class="i" viewBox="0 0 24 24" style="width:14px;height:14px" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button> ความถี่ <span class="sl">440</span></span></span></div>
+          <div class="msg" role="note" style="margin-top:4px;padding:10px;border-radius:12px;background:#EAF2FD;border:2px solid #C6D6EA">
+            <div style="display:flex;gap:8px;align-items:flex-start"><svg class="i" viewBox="0 0 24 24" style="margin-top:3px" aria-hidden="true"><path d="M9 2v6M15 2v6M6 8h12v4a6 6 0 0 1-12 0zM12 18v4"/></svg><span style="font-weight:700">ยังไม่มีบัซเซอร์ในวงจร</span></div>
+            <div style="color:#5A6377">วางบัซเซอร์ที่ตัวจำลอง แล้วกลับมาเลือกในบล็อก</div>
+            <button class="bt" style="width:100%"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h10v10H7zM9 3v4M15 3v4M9 17v4M15 17v4M3 9h4M3 15h4M17 9h4M17 15h4"/></svg><span>ไปที่ตัวจำลอง</span></button>
+          </div>
+        </div>
+      </div>
+      <div class="cap" style="max-width:184px"><b style="color:#14243D">(ข) ยังไม่มีอุปกรณ์</b><br>เซอร์โว · เสียง (ตอนวงจรไม่มี) · เซนเซอร์ · ไฟ · ช่องเลือกอุปกรณ์ขอบประ</div>
+    </div>
+    <div>
+      <div class="fly">
+        <div style="display:flex;align-items:center;gap:10px;min-height:52px;padding:4px 10px;box-sizing:border-box"><span style="display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:32px;height:32px;box-sizing:border-box;border-radius:10px;background:#FFD23F;border:2px solid #9C7A00"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg></span><span style="font-size:18px;font-weight:700;line-height:1.5">เริ่มต้น</span></div>
+        <div style="padding:0 8px;border-top:2px solid #DCE3EC;min-height:236px;padding-top:8px">
+          <div style="margin-bottom:6px" aria-disabled="true"><span class="sh" style="display:flex;background:#9C7A00;border-radius:22px 22px 12px 12px"><span class="bi" style="background:#FFD23F;border-radius:20px 20px 10px 10px;font-weight:700;flex-wrap:wrap;white-space:normal">เริ่มต้น <span style="display:inline-flex;align-items:center;gap:4px;min-height:28px;padding:0 8px;border-radius:14px;background:#fff;border:2px solid #14243D;font-size:16px;font-weight:700"><svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>วางแล้ว</span></span></span></div>
+          <div style="margin-bottom:6px" aria-disabled="true"><span class="sh" style="display:flex;background:#9C7A00;border-radius:22px 22px 12px 12px"><span class="bi" style="background:#FFD23F;border-radius:20px 20px 10px 10px;font-weight:700;flex-wrap:wrap;white-space:normal">วนซ้ำ <span style="display:inline-flex;align-items:center;gap:4px;min-height:28px;padding:0 8px;border-radius:14px;background:#fff;border:2px solid #14243D;font-size:16px;font-weight:700"><svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>วางแล้ว</span></span></span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start;padding:6px 2px;font-size:16px;line-height:1.6;color:#5A6377" role="note"><svg class="i" viewBox="0 0 24 24" style="margin-top:4px" aria-hidden="true"><path d="M5 11h14v10H5zM8 11V7a4 4 0 0 1 8 0v4"/></svg><span>มีบล็อก เริ่มต้น และ วนซ้ำ ในงานนี้แล้ว · ใช้ได้อย่างละ 1 บล็อก</span></div>
+        </div>
+      </div>
+      <div class="cap" style="max-width:184px"><b style="color:#14243D">(ค) วางแล้ว</b><br>ไม่จาง · ไม่ลากซ้ำ · มีข้อความ "วางแล้ว" (aria-disabled + เหตุผล · D-03)</div>
+    </div>
+    <div class="card" style="flex:1;min-width:360px">
+      <div style="font-size:18px;font-weight:700;margin-bottom:6px">ข้อกำหนด</div>
+      <ul class="rl">
+        <li>ห้ามใช้ <code>disabled</code> กับรายการหมวด · ห้ามจางตามสถานะว่าง · ตัวอักษร ≥ 4.5:1 ทุกสถานะ</li>
+        <li>(ก) ข้อความเดียวทุกหมวดว่าง "หมวดนี้ยังไม่มีบล็อก" + ปุ่มพาไป 2 หมวดที่ใช้บ่อย (ควบคุม · ไฟ) ไม่พึ่งชื่อหมวดเฉพาะ</li>
+        <li>(ข) บล็อกอุปกรณ์ยังเห็นครบ (ดูรูปทรงได้) ช่องเลือกอุปกรณ์เป็นขอบประ + กล่องบอกวิธีวาง + ปุ่ม "ไปที่ตัวจำลอง" (ทางเลือกที่ไม่ต้องลาก)</li>
+        <li>(ค) หมวด "เริ่มต้น" ตอนงานใหม่ (setup/วนซ้ำ วางไว้ให้ · OQ26 Proposed) ไม่ใช่หมวดว่างและไม่ใช่ error</li>
+        <li>ความกว้างข้อความในรายการ 168px: ข้อความทุกจุดขึ้นบรรทัดใหม่ได้ (ปุ่มกว้างเต็ม 168 × สูง ≥ 44)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 3. รูปทรง/สถานะ -->
+  <h2 class="h2" style="margin-top:36px">3 · รูปทรงและสถานะของบล็อก (R2)</h2>
+  <p class="sub">มน = ค่า · หกเหลี่ยม = เงื่อนไข (ช่องหกเหลี่ยมรับเฉพาะบล็อกหกเหลี่ยม) · "เริ่มต้น" และ "วนซ้ำ" (เปลี่ยนจาก "วนทำซ้ำ" · OQ39 Proposed) อย่างละ 1 บล็อก วางไว้ให้ในงานใหม่ ลบไม่ได้ · พื้นหลังพื้นที่ต่อบล็อกเป็นตารางจุด · สีสดระดับ mBlock + ตัวอักษรกรมท่า (OQ38 ผ่าน 4.5:1 ไม่ต้องขอข้อยกเว้น)</p>
+  <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px">
+    <div class="card">
+      <span class="sh" style="background:#6E7F0B;border-radius:12px"><span class="bi" style="background:#C9E04A;border-radius:10px">เปิด <button class="dd"><svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px" aria-hidden="true"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2V17h6v-.3c0-.8.4-1.5 1-2A7 7 0 0 0 12 2z"/></svg><span class="dn">LED แดง 1</span><svg class="i" viewBox="0 0 24 24" style="width:14px;height:14px" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></span></span>
+      <div class="cap">คำสั่ง · มุมมน เรียงต่อกันได้ · ช่องอุปกรณ์เป็นช่องกลม (ค่า)</div>
+    </div>
+    <div class="card">
+      <span class="sh" style="background:#17789A;border-radius:999px"><span class="bi" style="background:#5CCBEA;border-radius:999px;padding:4px 16px">อ่าน <button class="dd"><svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px" aria-hidden="true"><path d="M4 4h16v16H4zM12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/></svg><span class="dn">ปุ่มกด 1</span><svg class="i" viewBox="0 0 24 24" style="width:14px;height:14px" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></span></span>
+      <div class="cap">ค่า · มน ใส่ในช่องกลมได้</div>
+    </div>
+    <div class="card">
+      <span class="sh" style="background:#137A70;clip-path:polygon(16px 0,calc(100% - 16px) 0,100% 50%,calc(100% - 16px) 100%,16px 100%,0 50%)"><span class="bi" style="background:#62D4C8;padding:4px 24px;clip-path:polygon(14px 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,14px 100%,0 50%)"><span class="sl">ก</span> = <span class="sl">ข</span></span></span>
+      <div class="cap">เงื่อนไข · หกเหลี่ยม ใส่ใน "ถ้า" ได้</div>
+    </div>
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:8px;font-size:16px;font-weight:600;line-height:1.6">ถ้า <span style="display:inline-block;width:56px;height:30px;background:#EAF2FD;clip-path:polygon(12px 0,calc(100% - 12px) 0,100% 50%,calc(100% - 12px) 100%,12px 100%,0 50%)"></span> ทำ</div>
+      <div style="display:flex;gap:8px;align-items:flex-start;margin-top:8px;font-size:16px;line-height:1.6"><svg class="i" viewBox="0 0 24 24" style="margin-top:3px;color:#5A6377" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM5 5l14 14"/></svg><span>บล็อกค่า (มน) วางลงช่องหกเหลี่ยมไม่ได้ · ช่องสั่นครั้งเดียว + ข้อความ "ช่องนี้รับเฉพาะเงื่อนไข"</span></div>
+    </div>
+    <div class="card">
+      <span class="sh" style="width:224px;background:#9C7A00;border-radius:22px 22px 12px 12px"><span class="bi" style="background:#FFD23F;border-radius:20px 20px 10px 10px"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg><b>เริ่มต้น</b><span style="font-size:14px;color:#5A6377">ทำครั้งเดียว</span></span></span>
+      <span class="sh" style="width:224px;background:#9C7A00;border-radius:22px 22px 12px 12px;margin-top:6px"><span class="bi" style="background:#FFD23F;border-radius:20px 20px 10px 10px"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 2l4 4-4 4M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4M21 13v2a3 3 0 0 1-3 3H3"/></svg><b>วนซ้ำ</b><span style="font-size:14px;color:#5A6377">ทำไปเรื่อย ๆ</span></span></span>
+      <div class="cap">บล็อกเริ่ม 2 แบบ · วางไว้ให้ ลบไม่ได้ (OQ26) · ในรายการหมวดแสดงเป็น "วางแล้ว" (ไม่จาง)</div>
+    </div>
+    <div class="card">
+      <span style="display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:4px 12px;border:2px dashed #5A6377;border-radius:12px;background:#F4F6F8;color:#5A6377;font-size:16px;font-weight:500;white-space:nowrap"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM5 5l14 14"/></svg>ตัวละคร: พูด <span class="sl" style="color:#14243D">สวัสดี</span></span>
+      <div><span class="tg" style="margin-top:8px;background:#F4F6F8;border-color:#5A6377">ยังไม่ได้ต่อ · ไม่ทำงาน</span></div>
+      <div class="cap">ST-27 · คำสั่งที่ไม่ได้ต่อใต้ เริ่มต้น/วนซ้ำ · พื้นเรียบ ขอบประ ไอคอน + ข้อความ (ไม่ใช้ลายเฉียงบนตารางจุด · OQ40) · #5A6377 บน #F4F6F8 = 5.4:1</div>
+    </div>
+    <div class="card">
+      <span class="sh" style="background:#5A6377;clip-path:polygon(16px 0,calc(100% - 16px) 0,100% 50%,calc(100% - 16px) 100%,16px 100%,0 50%)"><span class="bi" style="background:#F4F6F8;color:#5A6377;padding:4px 24px;clip-path:polygon(14px 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,14px 100%,0 50%)"><svg class="i" viewBox="0 0 24 24" style="width:18px;height:18px" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM5 5l14 14"/></svg>ก = ข</span></span>
+      <div><span class="tg" style="margin-top:8px;background:#F4F6F8;border-color:#5A6377">ต้องวางในช่อง "ถ้า" ก่อน</span></div>
+      <div class="cap">เงื่อนไข (หกเหลี่ยม) ที่ไม่ได้ต่อในช่อง = disabled ทั้งพื้นเรียบ + ไอคอน + ข้อความเหตุผล · ถูกข้ามตอนจำลอง/ส่ง (R2 ข้อ 4)</div>
+    </div>
+    <div class="card">
+      <span class="sh" style="background:#137A70;clip-path:polygon(16px 0,calc(100% - 16px) 0,100% 50%,calc(100% - 16px) 100%,16px 100%,0 50%)"><span class="bi" style="background:#62D4C8;padding:4px 24px;clip-path:polygon(14px 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,14px 100%,0 50%)">ก = <span class="sl" style="min-width:44px;border:3px dashed #B07F00;background:#FFF4CC"></span></span></span>
+      <div><span class="tg" style="margin-top:8px"><svg class="i" viewBox="0 0 24 24" style="width:18px;height:18px;color:#B07F00" aria-hidden="true"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01"/></svg>ช่องนี้ยังว่าง</span></div>
+      <div class="cap">ช่องค่าว่าง (OQ26) · ไม่เริ่มจำลอง/ส่ง · ไฮไลต์ช่อง + ไอคอน + ข้อความ</div>
+    </div>
+    <div class="card">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <button class="bt"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>ไม่เช่นนั้น</button>
+        <button class="bt" aria-label="เอา ไม่เช่นนั้น ออก"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg>เอาออก</button>
+      </div>
+      <div class="cap">"ถ้า" มีปุ่มเพิ่ม/เอาออก แบบข้อความ + ไอคอน ขนาด 44 ขึ้นไป · เห็นปุ่มเพิ่มก่อนมี "ไม่เช่นนั้น" และปุ่มเอาออกหลังมี</div>
+    </div>
+    <div class="card">
+      <span class="sh" style="background:#6E7F0B;border-radius:12px"><span class="bi" style="background:#C9E04A;border-radius:10px">เปิด <button class="dd" style="border:2px dashed #B07F00;background:#FFF4CC"><svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px" aria-hidden="true"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2V17h6v-.3c0-.8.4-1.5 1-2A7 7 0 0 0 12 2z"/></svg><span class="dn">LED แดง 2</span><svg class="i" viewBox="0 0 24 24" style="width:14px;height:14px" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></span></span>
+      <div><span class="tg" style="margin-top:8px"><svg class="i" viewBox="0 0 24 24" style="width:18px;height:18px;color:#B07F00" aria-hidden="true"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01"/></svg>ไม่พบอุปกรณ์ · ถูกข้ามตอนจำลอง</span></div>
+      <div class="cap">บล็อก "กำพร้า" (อุปกรณ์ถูกลบ · OQ50): คงชื่อสุดท้าย + ไอคอน + ป้าย · ป้ายอยู่ตลอดจำลอง (ST-R17-D) · บล็อกค่าที่ฝังในบล็อกอื่น = 0/เท็จ</div>
+    </div>
+  </div>
+
+  <!-- 4. บล็อกอ้างอุปกรณ์ -->
+  <h2 class="h2" style="margin-top:36px">4 · บล็อกอ้างอุปกรณ์จาก dropdown ชื่อ (R16)</h2>
+  <p class="sub">ไม่มีบล็อกเลขขา · เลือกอุปกรณ์จากชื่อ (บล็อกอ้าง ID ของอุปกรณ์ เปลี่ยนชื่อแล้วไม่พัง) · ระบบหาขาจากสายที่ต่อจริงและแสดงเลขขาที่แผงโค้ด C++ · dropdown แสดงเฉพาะอุปกรณ์ชนิดที่บล็อกรับ + ไอคอนชนิด (ไม่ใช้ชื่ออย่างเดียว) + สถานะ "ต่อสายแล้ว / ยังไม่ต่อสาย" (ไอคอน + ข้อความ) · LED บนบอร์ด (ขา 13) อยู่ใน dropdown ตลอด · ถ้ามีอุปกรณ์ชนิดนั้นตัวเดียว เลือกให้เลยเมื่อวางบล็อก (ข้อเสนอ ไม่ใช่ข้อกำหนด)</p>
+  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px">
+    <div class="card">
+      <div style="font-size:18px;font-weight:700;margin-bottom:8px">dropdown เปิด (ชนิด LED)</div>
+      <div style="box-sizing:border-box;width:100%;max-width:340px;padding:6px;background:#fff;border:2px solid #DCE3EC;border-radius:16px;box-shadow:0 8px 20px rgba(20,36,61,.2);display:flex;flex-direction:column;gap:4px" role="listbox" aria-label="เลือก LED">
+        <div style="padding:2px 8px 4px;font-size:14px;font-weight:700;line-height:1.6;color:#5A6377">เลือก LED</div>
+        <sc-for list="{{ddItems}}" as="d" hint-placeholder-count="3">
+          <div role="option" aria-selected="{{d.sel}}" style="{{d.style}}">
+            <span style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;flex-shrink:0;box-sizing:border-box;border-radius:10px;background:#F4F7FB;border:2px solid #C6D6EA"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2V17h6v-.3c0-.8.4-1.5 1-2A7 7 0 0 0 12 2z"/></svg></span>
+            <span style="flex:1;min-width:0"><span style="display:block;font-weight:700">{{d.name}}</span><span style="display:flex;align-items:center;gap:6px"><svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px;color:{{d.stColor}}" aria-hidden="true"><path d="{{d.stIcon}}"/></svg>{{d.stText}}</span></span>
+            <sc-if value="{{d.sel}}" hint-placeholder-val="{{false}}"><svg class="i" viewBox="0 0 24 24" style="color:#1866C9" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg></sc-if>
+          </div>
+        </sc-for>
+      </div>
+      <div class="cap">เลือกแล้วมีเครื่องหมายถูก + ขอบหนา (ไม่ใช้สีอย่างเดียว) · "ยังไม่ต่อสาย" ใช้ไอคอนเตือน + ข้อความ · แถวสูง ≥ 56</div>
+    </div>
+    <div class="card">
+      <div style="font-size:18px;font-weight:700;margin-bottom:8px">บล็อก ↔ โค้ด C++ (เลขขามาจากสาย)</div>
+      <span class="sh" style="background:#6E7F0B;border-radius:12px"><span class="bi" style="background:#C9E04A;border-radius:10px">เปิด <button class="dd"><svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px" aria-hidden="true"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2V17h6v-.3c0-.8.4-1.5 1-2A7 7 0 0 0 12 2z"/></svg><span class="dn">LED แดง 1</span><svg class="i" viewBox="0 0 24 24" style="width:14px;height:14px" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></span></span>
+      <div style="margin-top:10px;padding:8px 10px;border-radius:12px;background:#fff;border:2px solid #DCE3EC">
+        <div class="ln"><span style="width:28px;flex-shrink:0;color:#5A6377;font-size:13px">3</span><span>pinMode(9, OUTPUT);</span><span class="nt">LED แดง 1 → ขา 9</span></div>
+        <div class="ln"><span style="width:28px;flex-shrink:0;color:#5A6377;font-size:13px">8</span><span>digitalWrite(9, HIGH);</span></div>
+      </div>
+      <div style="margin-top:8px;padding:8px 10px;border-radius:12px;background:#fff;border:2px solid #DCE3EC">
+        <div class="ln"><span style="width:28px;flex-shrink:0;color:#5A6377;font-size:13px">8</span><span>// เปิด LED แดง 2: ไม่พบอุปกรณ์ · ข้ามบล็อกนี้</span><span class="nt" style="background:#FFF4CC;color:#14243D">ไม่พบอุปกรณ์</span></div>
+      </div>
+      <div class="cap">ย้ายสายแล้วเลขขาเปลี่ยนเอง (ตอนจำลอง = แก้วงจร หยุดจำลอง · R10) · หาขาไม่ได้ = คอมเมนต์ ไม่ใส่เลขขา</div>
+    </div>
+    <div class="card">
+      <div style="font-size:18px;font-weight:700;margin-bottom:8px">ช่องเลือกอุปกรณ์ที่ว่าง</div>
+      <span class="sh" style="background:#6E7F0B;border-radius:12px"><span class="bi" style="background:#C9E04A;border-radius:10px">เปิด <button class="dd" style="border:2px dashed #5A6377;color:#5A6377"><svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px" aria-hidden="true"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2V17h6v-.3c0-.8.4-1.5 1-2A7 7 0 0 0 12 2z"/></svg><span class="dn">เลือกอุปกรณ์</span><svg class="i" viewBox="0 0 24 24" style="width:14px;height:14px" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></span></span>
+      <div><span class="tg" style="margin-top:8px"><svg class="i" viewBox="0 0 24 24" style="width:18px;height:18px;color:#B07F00" aria-hidden="true"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01"/></svg>ยังไม่ได้เลือกอุปกรณ์ · บล็อกนี้ไม่ทำงาน</span></div>
+      <div class="cap">นับเป็นข้อ (1) ของผลตรวจก่อนรัน (R17) · ไม่ใช่ error · ตัวอักษร #5A6377 บนขาว 6.0:1</div>
+    </div>
+    <div class="card">
+      <div style="font-size:18px;font-weight:700;margin-bottom:6px">กติกา (R16 · OQ50 · OQ56 Proposed)</div>
+      <ul class="rl">
+        <li>dropdown กรองตามชนิด: "เปิด" รับ LED / ไฟ RGB / LED บนบอร์ด · "อ่าน ปุ่มกด" รับปุ่มกด · "เล่นเสียง" รับบัซเซอร์ · "หมุน" รับเซอร์โว</li>
+        <li>ไม่มีอุปกรณ์ชนิดนั้น: ข้อความบอกวิธีวาง + ปุ่ม "ไปที่ตัวจำลอง" (ไม่ต้องลาก · OQ29)</li>
+        <li>ชื่ออุปกรณ์ยาวใน dropdown (3 ภาษา +40%) ตัดด้วย … ในช่องบล็อก · เต็มชื่อใน dropdown และ aria-label</li>
+        <li>เป้ากดของช่อง = 44×44 (ช่องสูง 32 + พื้นที่กดขยายรอบละ 6px) · ข้อยกเว้นเดิม "ช่องในบล็อกสูง 28" ยกเลิกสำหรับ dropdown อุปกรณ์</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div style="font-size:18px;font-weight:700;margin-bottom:6px">ก่อนลบอุปกรณ์ (ข้อเสนอ OQ50)</div>
+      <div style="font-size:16px;line-height:1.6">popover ลบอุปกรณ์บอกจำนวนบล็อกที่จะได้รับผล เช่น "ลบ LED แดง 1 · มีบล็อกใช้อยู่ 3 บล็อก" · ไม่ต้องมี confirm เพราะเลิกทำได้ (เลิกทำการลบ → บล็อกผูกกลับอัตโนมัติ เพราะอ้าง ID) · วางอุปกรณ์ใหม่ไม่ผูกให้เอง</div>
+      <div class="cap">popover ของอุปกรณ์อยู่ใน D2 (R15)</div>
+    </div>
+    <div class="card">
+      <div style="font-size:18px;font-weight:700;margin-bottom:6px">ชื่อหมวดและปุ่ม (3 ภาษา)</div>
+      <div style="font-size:16px;line-height:1.6">th: เปิด / ปิด / ตั้งความสว่าง / อ่าน / เล่นเสียง / หมุน · ปุ่มกด · ลูกบิด · บัซเซอร์ · เซอร์โว · ไฟ RGB<br>ชื่ออัตโนมัติเก็บ ชนิด + ลำดับ + ธงอัตโนมัติ แล้วแสดงตามภาษา (เช่น "LED แดง 1" / "Red LED 1") · ชื่อที่เด็กพิมพ์เองคงเดิม (OQ56)</div>
+    </div>
+  </div>
+
+  <!-- 5. ผลตรวจก่อนรัน -->
+  <h2 class="h2" style="margin-top:36px">5 · ผลตรวจก่อนรัน (R17 · OQ48 OQ49 OQ51 OQ53 OQ55)</h2>
+  <p class="sub">กด "เริ่มจำลอง" (หรือ "ส่งลงบอร์ด") แล้วพบปัญหา → ป๊อปอัปมาสคอตท่าเดียว (#6 หลอดไฟ "คิดออก" · ruler เสนอแทน #3 ที่ผูกกับ Quiz ตอบผิด) + จำนวนข้อ + ลิสต์ · เห็นพร้อมกัน 3 ข้อ แล้วเลื่อนในลิสต์ · กดรายการ = พาไปจุดที่ผิด · ไม่กะพริบ ไม่หายเอง · Esc = กลับไปแก้ · ตรวจใหม่ทุกครั้งที่กด · <b>จำลอง:</b> เข้าใจแล้วจำลองต่อได้ (บล็อกที่ใช้อุปกรณ์ไม่ครบถูกข้าม มีป้ายตลอด) · <b>ส่งลงบอร์ด:</b> ไม่มีทางข้าม (ปุ่มส่งที่ถูกปิดกั้นเป็นของ D5 · ป๊อปอัปนี้ใช้ซ้ำได้ด้วย <code>mode=send</code>)</p>
+  <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap">
+    <div>
+      <dc-import name="PreflightDialog" mode="run" n="4" hint-size="560px,540px"></dc-import>
+      <div class="cap" style="max-width:560px"><b style="color:#14243D">จำลอง · 4 ข้อ</b> (3 ข้อแรกเห็นพร้อมกัน · ข้อ 4 อยู่ใต้ลิสต์ มีข้อความ "ยังมีอีก 1 ข้อ · เลื่อนดูในรายการ")</div>
+    </div>
+    <div>
+      <dc-import name="PreflightDialog" mode="send" n="3" hint-size="560px,500px"></dc-import>
+      <div class="cap" style="max-width:560px"><b style="color:#14243D">ส่งลงบอร์ด · 3 ข้อ</b> (ไม่มีปุ่มข้าม · มีรหัสให้บอกครู · OQ55 ก)</div>
+    </div>
+    <div class="card" style="flex:1;min-width:300px">
+      <div style="font-size:18px;font-weight:700;margin-bottom:6px">ชิปและป้ายหลังปิดป๊อปอัป</div>
+      <button class="bt" style="min-height:48px;padding:0 14px;background:#FFF4CC;border-color:#B07F00;border-bottom-color:#B07F00;font-weight:700"><svg class="i" viewBox="0 0 24 24" style="color:#B07F00" aria-hidden="true"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01"/></svg><span>ปัญหา 3 ข้อ</span></button>
+      <div class="cap">ST-R17-C · ชิปที่หัวหน้า ข้างปุ่ม "เริ่มจำลอง" · กดเปิดลิสต์ซ้ำ · จำนวนลดเมื่อแก้ (ตรวจนิ่งซ้ำอัตโนมัติ · OQ55 Proposed)</div>
+      <ul class="rl" style="margin-top:10px">
+        <li>4 กรณี: (1) ยังไม่ได้วางอุปกรณ์/ช่องเลือกว่าง (2) ต่อสายไม่ครบ (3) บล็อกกับขาไม่ตรง (4) วงจรอันตราย · ต้นเหตุเดียว = 1 ข้อ · เรียงตามชนิด (1)→(4)</li>
+        <li>ทุกข้อ: ไอคอนชนิด + เลขข้อ + หัวข้อ + วิธีแก้ + รหัส E-CHK-xx (ชั่วคราว) · ไม่ใช้สีอย่างเดียว · ปุ่มแถว ≥ 76</li>
+        <li>กดรายการ: ปิดป๊อปอัป ไฮไลต์บล็อก (ข้อ (1) ทำแล้วใน Main · ไฮไลต์อุปกรณ์/ขาในตัวจำลองเป็นของ D2) · ชิปพากลับมาดูลิสต์</li>
+        <li>ตรวจผ่าน ≠ ปลอดภัยบนบอร์ดจริง: ข้อความห้ามสื่อว่าวงจรปลอดภัย</li>
+        <li><code>role=alertdialog</code> · โฟกัสเข้าป๊อปอัป · อ่านหัวข้อ + จำนวนข้อก่อนลิสต์ · เว้นแถบล่าง 76 (z-stop ไม่ถูกบัง)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 6. effect ลาก/วาง -->
+  <h2 class="h2" style="margin-top:36px">6 · effect ตอนลากและวางบล็อก (R2 ข้อ 3 · R14 · OQ40)</h2>
+  <p class="sub">ไม่กะพริบ (WCAG 2.3.1 · ไม่มีแสงแฟลช) · เคารพ prefers-reduced-motion · ผูกกับเสียง R14 (เปิดเป็นค่าเริ่มต้น · ปุ่มไอคอนเล็กปุ่มเดียวที่หัวหน้า · ไม่พึ่งเสียงอย่างเดียว ทุกอย่างมีภาพแทน) · พฤติกรรมลาก/ghost/ลบ/เลิกทำของ Main-1D คงไว้เป็นฐาน ผ่านการตรวจแบบอ่านโค้ด ยังไม่ได้ทดลองลากจริง (OQ40)</p>
+  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px">
+    <div class="card">
+      <div style="font-size:18px;font-weight:700;margin-bottom:8px">ระหว่างลาก</div>
+      <div style="display:flex;gap:10px">
+        <div style="width:150px;flex-shrink:0;box-sizing:border-box;padding:10px 8px;border:2px solid #DCE3EC;border-radius:12px;background:#fff">
+          <div style="font-size:14px;font-weight:700;color:#5A6377;margin-bottom:6px">รายการ (ต้นทาง)</div>
+          <span style="display:flex;align-items:center;min-height:44px;padding:4px 10px;border:2px dashed #5A6377;border-radius:12px;font-size:16px;font-weight:600;color:#14243D;box-sizing:border-box">ปิด …</span>
+        </div>
+        <div class="dots" style="position:relative;flex:1;height:176px;overflow:hidden">
+          <span class="sh" style="position:absolute;left:10px;top:12px;background:#6E7F0B;border-radius:12px"><span class="bi" style="background:#C9E04A;border-radius:10px;min-height:36px;padding:2px 10px">เปิด …</span></span>
+          <div style="position:absolute;left:10px;top:58px;width:110px;height:4px;border-radius:2px;background:#1866C9"></div>
+          <span class="sh" style="position:absolute;left:10px;top:66px;background:#3D4FC0;border-radius:12px"><span class="bi" style="background:#8FA6FF;border-radius:10px;min-height:36px;padding:2px 10px">Serial print</span></span>
+          <span class="sh" style="position:absolute;left:44px;top:100px;background:#6E7F0B;border-radius:12px;box-shadow:0 8px 20px rgba(20,36,61,.3);transform:scale(1.02)"><span class="bi" style="background:#C9E04A;border-radius:10px;min-height:36px;padding:2px 10px">ปิด …</span></span>
+        </div>
+      </div>
+      <div class="cap">ต้นทางเป็นกรอบเส้นประ (ไม่ใช้ความจางอย่างเดียว) · บล็อกที่ลากยกขึ้น (เงา shadow-float + ขยาย 1.02) · จุดต่อเป็นเส้นหนา 4px สีฟ้า (action-primary) บอกตำแหน่งที่จะวาง</div>
+    </div>
+    <div class="card">
+      <div style="font-size:18px;font-weight:700;margin-bottom:8px">วางแล้ว</div>
+      <div class="dots" style="position:relative;height:176px;overflow:hidden">
+        <span class="sh" style="position:absolute;left:14px;top:14px;background:#6E7F0B;border-radius:12px"><span class="bi" style="background:#C9E04A;border-radius:10px;min-height:36px;padding:2px 10px">เปิด …</span></span>
+        <span class="sh" style="position:absolute;left:14px;top:62px;background:#3D4FC0;border-radius:12px;outline:3px solid #1866C9;outline-offset:3px"><span class="bi" style="background:#8FA6FF;border-radius:10px;min-height:36px;padding:2px 10px">Serial print</span></span>
+        <span class="tg" style="position:absolute;left:150px;top:62px;background:#EAF2FD;border-color:#C6D6EA"><svg class="i" viewBox="0 0 24 24" style="width:18px;height:18px;color:#2E7D32" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>วางแล้ว</span>
+        <span class="sh" style="position:absolute;left:14px;top:114px;background:#6E7F0B;border-radius:12px"><span class="bi" style="background:#C9E04A;border-radius:10px;min-height:36px;padding:2px 10px">ปิด …</span></span>
+      </div>
+      <div class="cap">วงสีฟ้าค้าง 0.6 วินาทีแล้วจางหายครั้งเดียว (ไม่วน ไม่กะพริบ) · บล็อกเลื่อนเข้าที่ภายใน 0.2 วินาที · ป้าย "วางแล้ว" ให้ screen reader ประกาศแบบ polite</div>
+    </div>
+    <div class="card">
+      <div style="font-size:18px;font-weight:700;margin-bottom:6px">ค่าที่ใช้ (ตาม brand §5)</div>
+      <ul class="rl">
+        <li>เข้า/เลื่อนเข้าที่: <code>dur-move</code> 0.2s <code>ease-out</code> · ยกขึ้น: <code>dur-press</code> 0.1s</li>
+        <li>เงา: <code>shadow-float</code> · เส้นจุดต่อ 4px #1866C9 · วง 3px #1866C9 (ไม่ใช้ focus ring สีส้ม)</li>
+        <li><b>reduced-motion:</b> ไม่ขยาย ไม่เลื่อน ไม่จาง · เหลือเงา + เส้นจุดต่อ + วงนิ่งแล้วหายเมื่อลากครั้งถัดไป</li>
+        <li><b>เสียง (R14):</b> วาง/ต่อบล็อก = คลิกสั้น &lt; 0.3 วินาที ดังเบา · ปิดได้ด้วยปุ่มเสียงปุ่มเดียว (หัวหน้า · ไอคอน + aria-label บอกสถานะ) · ไม่ใช้เสียงเป็นข้อมูลเดียว</li>
+        <li>ไม่มีแอนิเมชันวนซ้ำใด ๆ ในพื้นที่ต่อบล็อก (ยกเว้น spinner โหลด)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 7. มาสคอต -->
+  <h2 class="h2" style="margin-top:36px">7 · มาสคอต 10 ท่า และ dropdown ของบล็อก "เปลี่ยนท่า" (R7 · DEC-30 · ใช้ท่า #6 ที่ป๊อปอัป R17)</h2>
+  <p class="sub">ใช้ 10 ท่านี้เท่านั้น ห้ามดัดแปลง · ข้อความกำกับท่าทุกที่ · ภาพความหมายมี alt · ตัดจากแผ่นเดียวด้วย CSS ชั่วคราว (งานตัดแยกไฟล์ DEL-09 ยังไม่ทำ) · การจับคู่ท่ากับสถานการณ์เป็นข้อเสนอจาก brand §8</p>
+  <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px">
+    <sc-for list="{{poses}}" as="p" hint-placeholder-count="10">
+      <div class="card" style="display:flex;gap:10px;align-items:flex-start">
+        <dc-import name="Mascot" pose="{{p.n}}" h="112" alt="{{p.alt}}" hint-size="76px,112px"></dc-import>
+        <div style="min-width:0;font-size:16px;line-height:1.6">
+          <div style="font-weight:700">{{p.name}}</div>
+          <div style="font-size:14px;color:#5A6377;line-height:1.6">stage: {{p.stage}}</div>
+          <div style="font-size:14px;color:#5A6377;line-height:1.6">ใช้ที่: {{p.use}}</div>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+  <!-- 8. ทางเลือกที่ไม่ต้องลาก -->
+  <h2 class="h2" style="margin-top:36px">8 · ทางเลือกที่ไม่ต้องลาก (WCAG 2.5.7 · OQ29)</h2>
+  <p class="sub">ทุกจุดที่ลากได้ ต้องทำได้ด้วยการแตะ/คลิกทีละขั้น และด้วยคีย์บอร์ด</p>
+  <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px">
+    <div class="card">
+      <div style="font-size:18px;font-weight:700;margin-bottom:6px">ต่อบล็อก</div>
+      <div style="font-size:16px;line-height:1.6">1. แตะบล็อกในรายการ (ไฮไลต์) <br>2. แตะจุดที่จะต่อ (ขอบประสีฟ้า) <br>หรือเมนูบนบล็อก "ย้ายไปไว้ใต้…"</div>
+      <div class="cap">Esc ยกเลิกการเลือก · เลิกทำ 60 ขั้น</div>
+    </div>
+    <div class="card">
+      <div style="font-size:18px;font-weight:700;margin-bottom:6px">เลือกหมวด / เลือกอุปกรณ์</div>
+      <div style="font-size:16px;line-height:1.6">แถบหมวด: แตะ หรือ ลูกศรขึ้น-ลง + Enter · ปุ่ม เลื่อนขึ้น/เลื่อนลง <br>ช่องอุปกรณ์ในบล็อก: แตะแล้วเลือกจากรายการ (ไม่ต้องจำเลขขา)<br>ไม่มีอุปกรณ์: ปุ่ม "ไปที่ตัวจำลอง"</div>
+      <div class="cap">ไม่ต้องลาก ไม่พึ่ง hover</div>
+    </div>
+    <div class="card">
+      <div style="font-size:18px;font-weight:700;margin-bottom:6px">ต่อสาย (ตัวช่วยต่อสาย · D2)</div>
+      <div style="font-size:16px;line-height:1.6">แตะขาแรก (ไฮไลต์) แล้วแตะขาที่สอง · หรือเลือกจากรายการ:</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+        <label style="display:flex;align-items:center;gap:8px;font-size:16px;font-weight:600">จาก <select style="min-height:44px;font-size:16px;border:2px solid #C6D6EA;border-radius:12px;padding:0 8px;background:#fff;color:#14243D"><option>Uno ขา 9</option><option>Uno ขา 2</option></select></label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:16px;font-weight:600">ไป <select style="min-height:44px;font-size:16px;border:2px solid #C6D6EA;border-radius:12px;padding:0 8px;background:#fff;color:#14243D"><option>breadboard แถว 5</option><option>breadboard แถว 9</option></select></label>
+        <button class="bt" style="align-self:flex-start">ต่อสาย</button>
+      </div>
+    </div>
+    <div class="card">
+      <div style="font-size:18px;font-weight:700;margin-bottom:6px">ลูกบิดและปุ่มกด (ตอนจำลอง)</div>
+      <div style="font-size:16px;line-height:1.6">โฟกัสอุปกรณ์ได้ · Space/Enter ค้าง = กดปุ่ม · ลูกศรหมุนลูกบิดทีละ 16 · Shift/PageUp ทีละ 128 · มีช่อง "ล็อกปุ่มค้างไว้" สำหรับผู้กดค้างลำบาก (ข้อเสนอ OQ15) · ค่าเป็นตัวเลขเสมอ</div>
+    </div>
+  </div>
+
+  <!-- 9. โค้ด -->
+  <h2 class="h2" style="margin-top:36px">9 · ตัวอย่างโค้ดที่ใส่ให้อัตโนมัติ (R3 · OQ25 ผู้ใช้ตอบแล้ว)</h2>
+  <p class="sub">ตัวแปรเป็นจำนวนเต็มชนิดเดียว · ชื่อไทยถูกแปลงเป็น var_1 พร้อมหมายเหตุชื่อเดิม · include/attach Servo ใส่ให้ · เลขขามาจากสายที่ต่ออุปกรณ์ (R16) · บล็อก Stage ไม่เงียบ แสดงเป็นหมายเหตุ · บล็อกที่ข้ามเพราะไม่พบอุปกรณ์เป็นคอมเมนต์ ไม่มีเลขขา</p>
+  <div class="card" style="width:760px">
+    <sc-for list="{{lines}}" as="l" hint-placeholder-count="10">
+      <div class="ln"><span style="width:28px;flex-shrink:0;color:#5A6377;font-size:13px">{{l.n}}</span><span style="{{l.style}}">{{l.t}}</span><sc-if value="{{l.hasNote}}" hint-placeholder-val="{{false}}"><span class="nt" style="{{l.noteStyle}}">{{l.note}}</span></sc-if></div>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":5000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const lum = (hex) => { const c = [1, 3, 5].map((i) => parseInt(hex.substr(i, 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4))); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; };
+    const cr = (a, b) => { const x = lum(a), y = lum(b); return (((Math.max(x, y)) + 0.05) / ((Math.min(x, y)) + 0.05)).toFixed(1); };
+    const HEX = (n) => 'polygon(' + n + 'px 0,calc(100% - ' + n + 'px) 0,100% 50%,calc(100% - ' + n + 'px) 100%,' + n + 'px 100%,0 50%)';
+    // 16 หมวด [ชื่อเต็ม, ไอคอน, พื้น, ขอบ, ชนิด] เรียงตามกลุ่ม (ค่าสี = ชั่วคราว DSG-13)
+    const K = {
+      basic: ['มีบล็อก', 'M5 12l5 5L20 7'],
+      device: ['มีบล็อก · เลือกอุปกรณ์จาก dropdown', 'M9 2v6M15 2v6M6 8h12v4a6 6 0 0 1-12 0zM12 18v4'],
+      empty: ['ว่างใน MVP · ไอคอนขอบเส้นประ', 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 16v-4M12 8h.01'],
+      stage: ['โผล่เมื่อเลือก stage เท่านั้น', 'M2 12s4-8 10-8 10 8 10 8-4 8-10 8-10-8-10-8zM12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z']
+    };
+    const G = [
+      ['พื้นฐาน', 'เริ่มต้น–ตัวแปร (5 หมวด)', [
+        ['เริ่มต้น', 'M5 21V4M5 4h11l-2 4 2 4H5', '#FFD23F', '#9C7A00', 'basic'],
+        ['ควบคุม', 'M17 2l4 4-4 4M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4M21 13v2a3 3 0 0 1-3 3H3', '#FFAB3D', '#A8610A', 'basic'],
+        ['ตรรกะ', 'M12 3l9 9-9 9-9-9z', '#62D4C8', '#137A70', 'basic'],
+        ['คณิต', 'M7 3v8M3 7h8M13 17h8M14.5 14.5l5 5M19.5 14.5l-5 5', '#6CCB5F', '#2F7A26', 'basic'],
+        ['ตัวแปร', 'M21 8l-9-5-9 5v8l9 5 9-5zM3 8l9 5 9-5M12 13v8', '#FF8F70', '#B03A1C', 'basic']]],
+      ['ข้อมูล', 'ข้อความ · สื่อสาร (Serial) · รายการ · ฟังก์ชัน (4 หมวด · มีบล็อกหมวดเดียว · Serial + สื่อสาร รวมกัน OQ59)', [
+        ['ข้อความ (Text)', 'M4 7V4h16v3M9 20h6M12 4v16', '#B79CFF', '#5F3FC2', 'empty'],
+        ['สื่อสาร (Serial)', 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z', '#8FA6FF', '#3D4FC0', 'basic'],
+        ['รายการ (List)', 'M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01', '#FF86A8', '#B02C57', 'empty'],
+        ['ฟังก์ชัน (Function)', 'M9 3H7a2 2 0 0 0-2 2v4a2 2 0 0 1-2 2 2 2 0 0 1 2 2v4a2 2 0 0 0 2 2h2M15 3h2a2 2 0 0 1 2 2v4a2 2 0 0 0 2 2 2 2 0 0 0-2 2v4a2 2 0 0 1-2 2h-2', '#F08AD3', '#9A2F85', 'empty']]],
+      ['อุปกรณ์', 'เซอร์โว · บัส · เสียง · เซนเซอร์ · แสดงผล · ไฟ (6 หมวด · ตรงกับอุปกรณ์ในตัวจำลอง R1)', [
+        ['เซอร์โว (Servo)', 'M21 12a9 9 0 1 1-3-6.7M21 3v6h-6', '#5BAEFF', '#1D63B8', 'device'],
+        ['บัส (Bus)', 'M3 12h18M7 8l-4 4 4 4M17 8l4 4-4 4', '#A9B8CC', '#4F6482', 'empty'],
+        ['เสียง (Sound)', 'M11 5L6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14', '#D58CF2', '#8239A8', 'device'],
+        ['เซนเซอร์ (Sensor)', 'M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01', '#5CCBEA', '#17789A', 'device'],
+        ['แสดงผล (Display)', 'M3 4h18v12H3zM8 21h8M12 16v5', '#7FE0A8', '#1F8050', 'empty'],
+        ['ไฟ (Light)', 'M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2V17h6v-.3c0-.8.4-1.5 1-2A7 7 0 0 0 12 2z', '#C9E04A', '#6E7F0B', 'device']]],
+      ['อื่น ๆ', 'ตัวละคร (1 หมวด · มีหัวกลุ่มแม้เหลือหมวดเดียว OQ65 · โผล่พร้อมหมวด)', [
+        ['ตัวละคร', 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01', '#FFBE94', '#A4521C', 'stage']]]
+    ];
+    const groupsCards = G.map((g) => ({
+      label: g[0], note: g[1],
+      cards: g[2].map((c) => ({
+        name: c[0], icon: c[1], fill: c[2], bord: c[3],
+        kindText: K[c[4]][0], kindIcon: K[c[4]][1],
+        crText: cr('#14243D', c[2]), crBord: cr(c[3], '#F4F7FB'),
+        chip: 'display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:36px;height:36px;box-sizing:border-box;border-radius:10px;color:#14243D;background:' + c[2] + ';border:2px ' + (c[4] === 'empty' ? 'dashed ' : 'solid ') + c[3],
+        sO: 'background:' + c[3] + ';border-radius:12px', sI: 'background:' + c[2] + ';border-radius:10px',
+        vO: 'background:' + c[3] + ';border-radius:999px', vI: 'background:' + c[2] + ';border-radius:999px;padding:4px 16px',
+        cO: 'background:' + c[3] + ';clip-path:' + HEX(16), cI: 'background:' + c[2] + ';clip-path:' + HEX(14) + ';padding:4px 24px'
+      }))
+    }));
+    // dropdown ตัวอย่าง (วงจรสมมติมี LED 3 ตัว เพื่อโชว์ทั้ง 3 สถานะ)
+    const OKI = 'M5 12l5 5L20 7', INFO = 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 16v-4M12 8h.01', WARN = 'M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01';
+    const rowBase = 'display:flex;align-items:center;gap:10px;box-sizing:border-box;width:100%;min-height:56px;padding:6px 10px;border-radius:12px;background:#fff;color:#14243D;font-size:16px;line-height:1.5;';
+    const ddItems = [
+      { name: 'LED แดง 1', stText: 'ต่อสายแล้ว', stIcon: OKI, stColor: '#2E7D32', sel: true, style: rowBase + 'border:3px solid #1866C9;background:#EAF2FD' },
+      { name: 'LED เขียว 1', stText: 'ยังไม่ต่อสาย', stIcon: WARN, stColor: '#B07F00', sel: false, style: rowBase + 'border:2px solid #DCE3EC' },
+      { name: 'LED บนบอร์ด (ขา 13)', stText: 'มีให้ใช้เสมอ · ไม่ต้องต่อสาย', stIcon: INFO, stColor: '#14243D', sel: false, style: rowBase + 'border:2px solid #DCE3EC' }
+    ];
+    const P = [
+      ['โบกมือ · สวัสดี', 'ท่าเริ่มต้น / สวัสดี', 'login · หน้าหลักครั้งแรก'],
+      ['ดีใจ (ชูกำปั้น)', 'ดีใจ', 'Quiz ตอบถูก'],
+      ['คิด (?)', 'สงสัย', 'Quiz ตอบผิด · ส่งไม่สำเร็จ (ST-34)'],
+      ['แว่นขยาย', 'ค้นหา', 'ไม่พบบอร์ด (ST-30)'],
+      ['กอดหัวใจ', 'รัก', 'ขอบคุณ · จบหน่วย'],
+      ['หลอดไฟ', 'คิดออก', 'ผลตรวจก่อนรัน (R17) · สาเหตุอุปกรณ์เสีย (ST-29)'],
+      ['วิ่ง', 'ขณะเคลื่อนที่', 'แปลงโค้ด/ส่งลงบอร์ด (ST-32)'],
+      ['ถือแท็บเล็ต', 'อ่าน', 'วงจรว่าง (ST-40) · หน้าว่าง'],
+      ['กระโดด + ดาว', 'เย่!', 'จบด่าน 3 ดาว'],
+      ['ยกนิ้วโป้ง', 'เยี่ยม', 'ส่งลงบอร์ดสำเร็จ (ST-33)']
+    ];
+    const poses = P.map((p, k) => ({ n: String(k + 1), name: (k + 1) + '. ' + p[0], stage: p[1], use: p[2], alt: 'มาสคอต School Bot ท่า ' + p[0] }));
+    const A = 'ใส่ให้อัตโนมัติ';
+    const src = [
+      [0, '#include <Servo.h>', A], [0, 'Servo servo_9;', A], [0, 'int var_1;', 'ชื่อเดิม: คะแนน'],
+      [0, 'void setup() {'], [1, 'servo_9.attach(10);', 'เซอร์โว 1 → ขา 10'], [1, 'Serial.begin(9600);', A], [1, 'pinMode(9, OUTPUT);', 'LED แดง 1 → ขา 9'], [0, '}'],
+      [0, 'void loop() {'], [1, 'var_1 = var_1 + 1;'], [1, 'servo_9.write(90);'], [1, 'digitalWrite(9, HIGH);'],
+      [1, '// เล่นเสียง บัซเซอร์ 2: ไม่พบอุปกรณ์ · ข้ามบล็อกนี้', 'ไม่พบอุปกรณ์', 2],
+      [1, '// ตัวละคร: พูด "สวัสดี" · ทำงานเฉพาะในจอ (ไม่ถูกส่งลงบอร์ด)', null, 1], [0, '}']
+    ];
+    const lines = src.map((r, k) => ({ n: String(k + 1), t: r[1], style: 'padding-left:' + (r[0] * 16) + 'px;' + (r[3] === 1 ? 'color:#5A6377;background:#F4F6F8;border-radius:4px;padding-right:8px' : ''), hasNote: !!r[2], note: r[2] || '', noteStyle: r[3] === 2 ? 'background:#FFF4CC;color:#14243D' : '' }));
+    return { groupsCards, ddItems, poses, lines };
+  }
+}
+</script>
+</body>
+</html>

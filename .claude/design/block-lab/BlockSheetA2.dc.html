@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>แผ่นตัวอย่างบล็อก A2</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'IBM Plex Sans Thai',system-ui,sans-serif;color:#14243D}
+</style>
+</helmet>
+<!-- แผ่นตัวอย่างของ component BlockA2 (รอบ 9 · คืนตัวอักษรเข้ม OQ135) · ใช้ตรวจหน้าตาบล็อกโดยไม่ต้องเปิดบอร์ด A2: (ก) 5 ชนิด × 4 สถานะ (ข) 16 หมวด ตัวอักษรเข้ม text-primary #14243D + ค่า contrast ที่คำนวณสด (ตัวอักษรบนพื้นหมวด และตัวอักษรบน dropdown) เกณฑ์ ≥ 4.5 : 1 · ไม่เป็นหน้าจอของแอป · รอบ 8 เคยมีตัวขาว + ปุ่มเงาตัวอักษร + ส่วนเทียบค่าอ้างอิงสี (ยกเลิกแล้ว) -->
+<div style="position:relative;width:1440px;height:2780px;background:#F4F7FB;overflow:hidden;color:#14243D">
+  <div style="position:absolute;left:40px;top:28px;font-size:28px;font-weight:700;line-height:1.3">BlockA2 · แผ่นตัวอย่างบล็อก</div>
+  <div style="position:absolute;left:40px;top:70px;width:1360px;font-size:16px;line-height:1.6;color:#5A6377">ตัวอักษรบนบล็อก = text-primary #14243D 700 16px · ช่องค่า/ช่องเงื่อนไข = พื้นขาว ตัวเข้ม · dropdown = พื้นเข้มกว่าสีบล็อกเล็กน้อย ตัว/ลูกศรเข้ม · ใช้ Tweaks ของแผ่นนี้ปรับความหนาขอบ</div>
+
+  <sc-for list="{{labels}}" as="l" hint-placeholder-count="0">
+    <div style="{{l.st}}">{{l.t}}</div>
+  </sc-for>
+
+  <sc-for list="{{cells}}" as="c" hint-placeholder-count="0">
+    <div style="position:absolute;left:{{c.x}}px;top:{{c.y}}px">
+      <dc-import name="BlockA2" kind="{{c.kind}}" cat="{{c.cat}}" text="{{c.text}}" chip="{{c.chip}}" icon="{{c.icon}}" state="{{c.state}}" w="{{c.w}}" h="{{c.h}}" items="{{c.items}}" bw="{{bw}}" hint-size="200px,44px"></dc-import>
+    </div>
+  </sc-for>
+  <sc-for list="{{rings}}" as="rg" hint-placeholder-count="0">
+    <div aria-hidden="true" style="{{rg.st}}"></div>
+  </sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"bw":{"editor":"float","default":1.5,"min":1,"max":3,"step":0.5,"section":"ขอบบล็อก"},"$preview":{"width":1440,"height":2780}}'>
+class Component extends DCLogic {
+  lum(hex) {
+    const c = [1, 3, 5].map((i) => parseInt(hex.substr(i, 2), 16) / 255).map((v) => (v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)));
+    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+  }
+  ratio(a, b) {
+    const la = this.lum(a), lb = this.lum(b);
+    return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+  }
+  // พื้น dropdown = สีบล็อก ซ้อน #14243D โปร่ง 12% (ตรงกับ BlockA2) · ผสมใน sRGB
+  blend(hex) {
+    const d = [20, 36, 61];
+    const c = [1, 3, 5].map((i, k) => Math.round(parseInt(hex.substr(i, 2), 16) * 0.88 + d[k] * 0.12));
+    return '#' + c.map((v) => ('0' + v.toString(16)).slice(-2)).join('');
+  }
+  renderVals() {
+    const P = this.props || {};
+    const labels = [], cells = [];
+    const H2 = 'font-size:20px;font-weight:700;line-height:1.5';
+    const T = (x, y, t, extra) => labels.push({ t: t, st: 'position:absolute;left:' + x + 'px;top:' + y + 'px;' + (extra || 'font-size:16px;font-weight:600;line-height:1.6') });
+    const C = (x, y, o) => cells.push(Object.assign({ x: x, y: y, kind: 'stack', cat: 2, text: '', chip: '', icon: 'flag', state: 'normal' }, o));
+    const DARK = '#14243D';
+
+    // (ก) 5 ชนิด × 4 สถานะ
+    T(40, 128, '(ก) ชนิดบล็อก × สถานะ', 'width:600px;' + H2);
+    const COLX = [220, 520, 820, 1120];
+    const STS = [['normal', 'ปกติ'], ['disabled', 'ยังไม่ได้ต่อ (disabled)'], ['ghost', 'ตำแหน่งแทรก (ghost)'], ['warn', 'เตือน (warn)']];
+    STS.forEach((s, i) => T(COLX[i], 168, s[1], 'width:280px;font-size:16px;font-weight:700;line-height:1.6;color:#5A6377'));
+    const ROWS = [
+      { y: 204, label: 'hat · เริ่มต้น', o: { kind: 'hat', cat: 1, text: 'เริ่มต้น', chip: 'ทำครั้งเดียว', icon: 'flag' } },
+      { y: 360, label: 'c-block · ทำซ้ำ', o: { kind: 'c', cat: 2, text: 'ทำซ้ำ [10] ครั้ง' } },
+      { y: 504, label: 'stack · คำสั่ง', o: { kind: 'stack', cat: 2, text: 'รอ [200] ms' } },
+      { y: 596, label: 'value · ค่า (มน)', o: { kind: 'value', cat: 4, text: 'สุ่ม [1] ถึง [10]' } },
+      { y: 664, label: 'boolean · เงื่อนไข', o: { kind: 'boolean', cat: 3, text: '() และ ()' } }
+    ];
+    ROWS.forEach((r) => {
+      T(40, r.y + 8, r.label, 'width:170px;font-size:16px;font-weight:600;line-height:1.6');
+      STS.forEach((s, i) => C(COLX[i], r.y, Object.assign({}, r.o, { state: s[0] })));
+    });
+
+    // (ข) 16 หมวด · ตัวอักษรเข้ม #14243D · contrast ตัวเข้มบนพื้นหมวด และบนพื้น dropdown (คำนวณสด)
+    T(40, 752, '(ข) 15 หมวด (14 + ตัวละคร) · ตัวอักษรเข้ม #14243D · contrast ที่คำนวณสด (เกณฑ์ ≥ 4.5 : 1)', 'width:1000px;' + H2);
+    // ข้อ 1.1 (2026-10-28): ลำดับ/สีตามหมวดใหม่ R18 (ตรงกับ BlockA2)
+    const CATS = [
+      ['เริ่มต้น', '#FFD23F', '#9C7A00'], ['ควบคุม', '#FFAB3D', '#A8610A'], ['ตรรกะ', '#62D4C8', '#137A70'], ['คณิต', '#6CCB5F', '#2F7A26'],
+      ['ข้อความ', '#B79CFF', '#5F3FC2'], ['ตัวแปร', '#FF8F70', '#B03A1C'], ['รายการ', '#FF86A8', '#B02C57'], ['ฟังก์ชัน', '#F08AD3', '#9A2F85'],
+      null,['Car Control', '#D58CF2', '#8239A8'], ['มอเตอร์', '#5BAEFF', '#1D63B8'], ['Sensor', '#5CCBEA', '#17789A'],
+      ['Display', '#7FE0A8', '#1F8050'], ['Serial', '#8FA6FF', '#3D4FC0'], ['Remote Control', '#D2A679', '#7A4E1F'], ['ตัวละคร', '#FFBE94', '#A4521C']
+    ];
+    // 2026-11-02: ถอด Arm Control (เลข 9 ว่าง) · CL = 14+1 หมวดที่เหลือ [ชื่อ, พื้น, ขอบ, เลขหมวดคงเดิม]
+    const CL = [];
+    CATS.forEach((c, i) => { if (c) CL.push([c[0], c[1], c[2], i + 1]); });
+    let minR = 99, minName = '', failN = 0;
+    const rows = CL.map((c, i) => {
+      const r1 = this.ratio(DARK, c[1]);
+      const r2 = this.ratio(DARK, this.blend(c[1]));
+      if (Math.min(r1, r2) < minR) { minR = Math.min(r1, r2); minName = c[0]; }
+      if (r1 < 4.5 || r2 < 4.5) failN++;
+      return [r1, r2];
+    });
+    T(40, 782, 'ต่ำสุด ' + minR.toFixed(2) + ' : 1 (หมวด ' + minName + ') · ' + (failN === 0 ? 'ผ่านครบ 15 หมวด' : 'ไม่ผ่าน ' + failN + ' หมวด'), 'width:1000px;font-size:16px;font-weight:700;line-height:1.6;color:' + (failN === 0 ? '#2E7D32' : '#D32F2F'));
+    CL.forEach((c, i) => {
+      const col = i < 8 ? 0 : 1, row = i % 8;
+      const x = 40 + col * 700, y = 820 + row * 60;
+      const r1 = rows[i][0], r2 = rows[i][1];
+      T(x, y + 8, c[3] + ' ' + c[0], 'width:120px;font-size:16px;font-weight:700;line-height:1.6');
+      C(x + 124, y, { kind: 'stack', cat: c[3], text: 'ตั้ง [10] {LED 1}' });
+      T(x + 360, y + 1, 'ตัวเข้มบนพื้นหมวด ' + r1.toFixed(2) + ' : 1 ' + (r1 >= 4.5 ? '· ผ่าน' : '· ไม่ผ่าน'), 'width:320px;font-size:14px;font-weight:600;line-height:21px;color:' + (r1 >= 4.5 ? '#2E7D32' : '#D32F2F'));
+      T(x + 360, y + 22, 'ตัวเข้มบน dropdown ' + r2.toFixed(2) + ' : 1 ' + (r2 >= 4.5 ? '· ผ่าน' : '· ไม่ผ่าน'), 'width:320px;font-size:14px;font-weight:600;line-height:21px;color:' + (r2 >= 4.5 ? '#2E7D32' : '#D32F2F'));
+    });
+
+    // (ค) R21 (6) · OQ213 · ไอคอนควบคุมทึบ เฟือง ⚙ + ? ต่อหมวด · contrast คำนวณสด (WCAG 1.4.11 ≥ 3:1 สำหรับสัญลักษณ์ที่ต้องเข้าใจ)
+    const rings = [];
+    T(40, 1330, '(ค) ไอคอนควบคุมทึบ · เฟือง + ? · 15 หมวด (R21 · OQ213 · brand §6)', 'width:1200px;' + H2);
+    T(40, 1366, 'เฟือง = ขาวทึบมีรูกลางบนวงกลมสีขอบเข้มของหมวด · ? = วงกลมขาวขอบ 2px สีขอบเข้ม + เครื่องหมาย ? สีขอบเข้ม · ปิดใช้ = วงกลม/ขอบ #5A6377 · วงโฟกัส = วง 2 ชั้น ขาว 2px + น้ำเงิน #1866C9 3px (ดูวงที่ซ้อนบนเฟือง) · เกณฑ์: สัญลักษณ์ ≥ 3 : 1 (1.4.11)', 'width:1360px;font-size:16px;line-height:1.6;color:#5A6377');
+    let minW = 99, minWn = '', minB = 99;
+    CL.forEach((c, i) => {
+      const y = 1430 + i * 72;
+      const wd = this.ratio('#FFFFFF', c[2]);
+      const df = this.ratio(c[2], c[1]);
+      const bl = this.ratio('#1866C9', c[1]);
+      const bw2 = this.ratio('#1866C9', '#FFFFFF');
+      if (wd < minW) { minW = wd; minWn = c[0]; }
+      if (bl < minB) minB = bl;
+      T(40, y + 8, c[3] + ' ' + c[0], 'width:126px;font-size:16px;font-weight:700;line-height:1.6');
+      cells.push({ x: 170, y: y, kind: 'stack', cat: c[3], state: 'normal', text: '', chip: '', icon: 'flag', w: 250, h: 44, items: [{ t: 'ctl', gear: true, live: false, x: 4, y: 0 }, { t: 'ctl', k: 'help', live: false, x: 44, y: 0 }, { t: 'x', text: 'ตั้ง ค่า', x: 96, y: 12, w: 60, h: 20 }] });
+      rings.push({ st: 'position:absolute;left:' + (170 + 12) + 'px;top:' + (y + 8) + 'px;width:28px;height:28px;border-radius:50%;box-shadow:0 0 0 2px #FFFFFF,0 0 0 5px #1866C9;pointer-events:none' });
+      const ok = (v) => (v >= 3 ? '#2E7D32' : '#D32F2F');
+      T(450, y - 2, 'ขาวบนวงกลมสีขอบเข้ม ' + wd.toFixed(2) + ' : 1 ' + (wd >= 3 ? '· ผ่าน' : '· ไม่ผ่าน') + ' · เครื่องหมาย ? สีเข้มบนวงกลมขาว ' + wd.toFixed(2) + ' : 1', 'width:900px;font-size:14px;font-weight:600;line-height:21px;color:' + ok(wd));
+      T(450, y + 19, 'วงกลมเข้มเทียบพื้นหมวด ' + df.toFixed(2) + ' : 1 (ไม่บังคับ · ความหมายอยู่ที่สัญลักษณ์ในวงกลม)', 'width:900px;font-size:14px;font-weight:500;line-height:21px;color:#5A6377');
+      T(450, y + 40, 'วงโฟกัสน้ำเงินบนพื้นหมวดอย่างเดียว ' + bl.toFixed(2) + ' : 1 ' + (bl >= 3 ? '(ผ่าน)' : '(ต่ำกว่า 3 : 1 → ใช้ 2 ชั้น)') + ' · น้ำเงินติดวงขาว ' + bw2.toFixed(2) + ' : 1 ผ่าน', 'width:900px;font-size:14px;font-weight:600;line-height:21px;color:' + (bl >= 3 ? '#2E7D32' : '#B07F00'));
+    });
+    T(40, 2594, 'ต่ำสุด ขาวบนวงกลม ' + minW.toFixed(2) + ' : 1 (หมวด ' + minWn + ') · น้ำเงินเดี่ยวต่ำสุด ' + minB.toFixed(2) + ' : 1 → ต้องใช้วง 2 ชั้น (น้ำเงินติดขาว 5.55 : 1)', 'width:1360px;font-size:16px;font-weight:700;line-height:1.6;color:#14243D');
+    T(40, 2640, 'สถานะ: ปิดใช้ (พื้น #F4F6F8 · วงกลม #5A6377 ขาวบนวงกลม ' + this.ratio('#FFFFFF', '#5A6377').toFixed(2) + ' : 1 · ขาวล้วนบนพื้นนี้ ' + this.ratio('#FFFFFF', '#F4F6F8').toFixed(2) + ' : 1 มองไม่เห็น) · เตือน (ขอบประเหลือง · วงกลมคงสีหมวด)', 'width:1360px;font-size:16px;line-height:1.6;color:#14243D');
+    cells.push({ x: 170, y: 2690, kind: 'stack', cat: 8, state: 'disabled', text: '', chip: '', icon: 'flag', w: 250, h: 44, items: [{ t: 'ctl', gear: true, live: false, x: 4, y: 0 }, { t: 'ctl', k: 'help', live: false, x: 44, y: 0 }, { t: 'x', text: 'ตั้ง ค่า', x: 96, y: 12, w: 60, h: 20 }] });
+    cells.push({ x: 520, y: 2690, kind: 'stack', cat: 8, state: 'warn', text: '', chip: '', icon: 'flag', w: 250, h: 44, items: [{ t: 'ctl', gear: true, live: false, x: 4, y: 0 }, { t: 'ctl', k: 'help', live: false, x: 44, y: 0 }, { t: 'x', text: 'ตั้ง ค่า', x: 96, y: 12, w: 60, h: 20 }] });
+    T(40, 2698, 'ปิดใช้ / เตือน', 'width:126px;font-size:16px;font-weight:700;line-height:1.6');
+
+    return { labels: labels, cells: cells, rings: rings, bw: String(Number(P.bw) > 0 ? Number(P.bw) : 1.5) };
+  }
+}
+</script>
+</body>
+</html>

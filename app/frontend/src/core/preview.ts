@@ -1,10 +1,47 @@
+import { previewDeviceList } from "./previewBoards";
+import { cancelPreviewBuilds, isPreviewBuild, previewBuild } from "./previewSend";
+import { closePreviewSerial, isPreviewSerial, previewSerial } from "./previewSerial";
 import type { Command, EngineResponse, ModeID } from "./types";
+
+async function runPreviewBuild(action: string, input: unknown): Promise<EngineResponse<unknown>> {
+  // Simulated compile/upload answers; the browser preview has no toolchain and no board.
+  return {
+    protocol: "1.0",
+    request_id: crypto.randomUUID(),
+    status: "success",
+    data: await previewBuild(action, input),
+  };
+}
+
+// The preview's stand-in for the host's cancel, which also ends the Serial session.
+export function cancelPreview() {
+  cancelPreviewBuilds(false);
+  closePreviewSerial();
+}
+
+export function stopPreviewUpload() {
+  cancelPreviewBuilds(true);
+}
 
 export function runPreview(
   mode: ModeID,
   action: string,
   input: unknown,
-): EngineResponse {
+): EngineResponse<unknown> | Promise<EngineResponse<unknown>> {
+  if (mode === "block-programming" && isPreviewBuild(action)) return runPreviewBuild(action, input);
+  if (mode === "block-programming" && isPreviewSerial(action)) {
+    // Simulated Serial monitor; the browser preview has no board.
+    return { protocol: "1.0", request_id: crypto.randomUUID(), status: "success", data: previewSerial(action, input) };
+  }
+  if (mode === "block-programming" && action === "device.list") {
+    // Simulated sample ports; the browser preview has no engine and no serial access.
+    return {
+      protocol: "1.0",
+      request_id: crypto.randomUUID(),
+      status: "success",
+      data: previewDeviceList(),
+    };
+  }
   const data = input as {
     source?: string;
     commands?: Command[];
@@ -13,11 +50,14 @@ export function runPreview(
   };
   if (!data || typeof data !== "object" || new TextEncoder().encode(JSON.stringify(data)).length > 32768)
     throw new Error("Invalid or oversized program");
-  if (!["coding-adventure", "block-programming"].includes(mode) || action !== "program.run")
+  if (mode === "coding-adventure" && action !== "program.run")
+    throw new Error("Unknown mode/action");
+  if (mode === "block-programming" && action !== "program.run")
     throw new Error("Unknown mode/action");
   if (mode === "coding-adventure" && (typeof data.source !== "string" || new TextEncoder().encode(data.source).length > 16384))
     throw new Error("Source exceeds 16384 bytes");
-  let commands = data.commands;
+
+  let commands: Command[] | undefined = data.commands;
   if (mode === "coding-adventure") {
     commands = [];
     for (const [index, line] of (data.source ?? "").split("\n").entries()) {
@@ -61,5 +101,24 @@ export function runPreview(
       data: { commands, steps, simulated: true },
     };
   }
-  throw new Error("Program commands required");
+  if (["coding-adventure", "block-programming"].includes(mode))
+    throw new Error("Program commands required");
+  if (mode !== "robot-control" || !["servo.set", "robot.stop"].includes(action))
+    throw new Error("Unknown mode/action");
+  if (
+    action === "servo.set" &&
+    (!Number.isInteger(data.servo) ||
+      data.servo! < 1 ||
+      data.servo! > 4 ||
+      !Number.isInteger(data.angle) ||
+      data.angle! < 0 ||
+      data.angle! > 180)
+  )
+    throw new Error("Servo safety limit exceeded");
+  return {
+    protocol: "1.0",
+    request_id: crypto.randomUUID(),
+    status: "success",
+    data: { simulated: true },
+  };
 }

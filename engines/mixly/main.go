@@ -47,7 +47,10 @@ func serve(input io.Reader, output io.Writer) error {
 }
 
 func main() {
-	if err := serve(os.Stdin, os.Stdout); err != nil {
+	// The host ends a serial session by closing stdin; the port is released before exiting.
+	err := serve(os.Stdin, os.Stdout)
+	boardSerial.close()
+	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}

@@ -3,7 +3,9 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -19,13 +21,16 @@ type ToolStatus struct {
 }
 
 type ToolchainStatus struct {
-	Engine string       `json:"engine"`
-	Tools  []ToolStatus `json:"tools"`
+	Engine  string        `json:"engine"`
+	Tools   []ToolStatus  `json:"tools"`
+	Arduino ArduinoStatus `json:"arduino"`
 }
 
+// toolPath finds the tools only the engine's toolchains folder may hold; arduino-cli is found
+// by findArduinoCLI.
 func toolPath(name string) (string, error) {
 	switch name {
-	case "arduino-cli", "python3", "mpremote", "esptool", "kflash":
+	case "python3", "mpremote", "esptool", "kflash":
 	default:
 		return "", fmt.Errorf("unknown tool")
 	}
@@ -45,8 +50,13 @@ func toolPath(name string) (string, error) {
 }
 
 func toolchainStatus() ToolchainStatus {
-	status := ToolchainStatus{Engine: "mixly", Tools: []ToolStatus{}}
-	for _, name := range []string{"arduino-cli", "python3", "mpremote", "esptool", "kflash"} {
+	arduino := arduinoStatus()
+	status := ToolchainStatus{
+		Engine:  "mixly",
+		Tools:   []ToolStatus{{Name: "arduino-cli", Available: arduino.Found}},
+		Arduino: arduino,
+	}
+	for _, name := range []string{"python3", "mpremote", "esptool", "kflash"} {
 		_, err := toolPath(name)
 		status.Tools = append(status.Tools, ToolStatus{Name: name, Available: err == nil})
 	}
@@ -72,6 +82,14 @@ func buildProgram(board Board, input ProgramInput, upload bool) (BuildResult, er
 	if upload && input.Port == "" {
 		return result, &ProtocolError{"INVALID_INPUT", "upload requires a selected port"}
 	}
+	if len(input.Port) > 256 {
+		return result, &ProtocolError{"INVALID_INPUT", "port name is too long"}
+	}
+	if upload {
+		if err := checkUploadIDs(input, board.Language == "arduino"); err != nil {
+			return result, err
+		}
+	}
 	compiler := "python3"
 	if board.Language == "arduino" {
 		compiler = "arduino-cli"
@@ -91,6 +109,10 @@ func buildProgram(board Board, input ProgramInput, upload bool) (BuildResult, er
 	if input.Transport != "native" {
 		return result, nil
 	}
+	if compiler == "arduino-cli" {
+		target, _ := arduinoTarget(board, input)
+		return buildArduino(result, target, input, upload)
+	}
 	tool, err := toolPath(compiler)
 	if err != nil {
 		return result, err
@@ -105,27 +127,12 @@ func buildProgram(board Board, input ProgramInput, upload bool) (BuildResult, er
 		return result, err
 	}
 	defer os.RemoveAll(directory)
-	name := "program.py"
-	if board.Language == "arduino" {
-		name = filepath.Base(directory) + ".ino"
-	}
-	source := filepath.Join(directory, name)
+	source := filepath.Join(directory, "program.py")
 	if err := os.WriteFile(source, []byte(input.Source), 0600); err != nil {
 		return result, err
 	}
 	arguments := []string{"-I", "-m", "py_compile", source}
-	if compiler == "arduino-cli" {
-		target, _ := arduinoTarget(board, input)
-		arguments = []string{"compile", "--fqbn", target, "--build-path", filepath.Join(directory, "build")}
-		config := filepath.Join(filepath.Dir(tool), "arduino-cli.yaml")
-		if _, err := os.Stat(config); err == nil {
-			arguments = append(arguments, "--config-file", config)
-		}
-		if upload {
-			arguments = append(arguments, "--upload", "--port", input.Port)
-		}
-		arguments = append(arguments, directory)
-	} else if compiler == "mpremote" {
+	if compiler == "mpremote" {
 		arguments = []string{"connect", input.Port, "fs", "cp", source, ":main.py"}
 	}
 	result.Output, err = runTool(tool, arguments, directory)
@@ -181,34 +188,78 @@ func arduinoTarget(board Board, input ProgramInput) (string, error) {
 	return target.Key, nil
 }
 
+// limitedOutput keeps the first limit bytes (zero: 16 KB) and drops the rest.
 type limitedOutput struct {
-	data []byte
+	data      []byte
+	limit     int
+	truncated bool
 }
 
 func (output *limitedOutput) Write(data []byte) (int, error) {
-	remaining := 16384 - len(output.data)
+	limit := output.limit
+	if limit == 0 {
+		limit = 16384
+	}
+	remaining := limit - len(output.data)
+	if remaining < len(data) {
+		output.truncated = true
+	}
 	if remaining > 0 {
 		output.data = append(output.data, data[:min(len(data), remaining)]...)
 	}
 	return len(data), nil
 }
 
-func runTool(tool string, arguments []string, directory string) (string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+// execTool runs one tool under a deadline; running past it is ENGINE_TIMEOUT. env adds to the
+// engine's own environment.
+func execTool(
+	tool string, arguments, env []string, directory string, timeout time.Duration, stdout, stderr io.Writer,
+) error {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 	command := exec.CommandContext(ctx, tool, arguments...)
 	configureTool(command)
+	if len(env) != 0 {
+		command.Env = append(os.Environ(), env...)
+	}
 	command.Dir = directory
 	command.WaitDelay = time.Second
-	output := &limitedOutput{}
-	command.Stdout = output
-	command.Stderr = output
-	// Both streams share the same bounded writer; os/exec serialises its writes.
+	command.Stdout = stdout
+	command.Stderr = stderr
 	if err := runToolProcess(command); err != nil {
 		if ctx.Err() != nil {
-			return "", &ProtocolError{"ENGINE_TIMEOUT", "tool exceeded its two-minute deadline"}
+			return &ProtocolError{"ENGINE_TIMEOUT", fmt.Sprintf("%s exceeded its %s deadline", filepath.Base(tool), timeout)}
 		}
-		return "", fmt.Errorf("%s failed: %w; %s", filepath.Base(tool), err, string(output.data))
+		return err
+	}
+	return nil
+}
+
+func toolFailure(tool string, err error, output *limitedOutput) error {
+	if problem := (*ProtocolError)(nil); errors.As(err, &problem) {
+		return err
+	}
+	return fmt.Errorf("%s failed: %w; %s", filepath.Base(tool), err, string(output.data))
+}
+
+func runTool(tool string, arguments []string, directory string) (string, error) {
+	output := &limitedOutput{}
+	// Both streams share the same bounded writer; os/exec serialises its writes.
+	if err := execTool(tool, arguments, nil, directory, 2*time.Minute, output, output); err != nil {
+		return "", toolFailure(tool, err, output)
 	}
 	return string(output.data), nil
+}
+
+// probeTool runs a tool for what it prints on stdout, kept apart from its diagnostics so it
+// stays parseable. A listing cut short would parse as a different answer, so it is an error.
+func probeTool(tool string, arguments, env []string, timeout time.Duration) ([]byte, error) {
+	stdout, stderr := &limitedOutput{limit: 1 << 20}, &limitedOutput{}
+	if err := execTool(tool, arguments, env, os.TempDir(), timeout, stdout, stderr); err != nil {
+		return nil, toolFailure(tool, err, stderr)
+	}
+	if stdout.truncated {
+		return nil, fmt.Errorf("%s printed more than 1 MB", filepath.Base(tool))
+	}
+	return stdout.data, nil
 }

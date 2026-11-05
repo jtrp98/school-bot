@@ -25,10 +25,12 @@ flowchart TB
             GuestStore["Guest Project & History Engine"]
             Updater["Background Updater & Atomic Applier"]
             EngineMgr["Engine Manager (JSON Lines Subprocess)"]
+            SessionMgr["Serial Session & Arm Ports Guard"]
         end
 
         subgraph Engines["Isolated Native Execution Engines"]
             ZideCpp["Zide C++ Engine (6-Axis Servo & USB Transport)"]
+            MixlyEngine["Mixly Engine (Blockly to Arduino C++ & avrdude)"]
             DemoEngine["Demo Python Engine (Bounded DSL)"]
         end
     end
@@ -66,6 +68,8 @@ flowchart TB
 
 ## 2. Desktop Client Architecture
 
+Standalone engine sources live in `engines/<engine-id>/`; each owns its language, dependencies, build scripts, tests, docs and platform outputs. Shared manifest metadata lives in `contracts/engine/`. The host's trusted registry routes Robot Control to Zide, Coding Adventure to the demo engine, and Block Lab's code generation, port list (which opens no port), compile, upload (Windows), and Serial monitor session to Mixly.
+
 ### 2.1 Separation of Concerns
 1. **Frontend UI Layer (`app/frontend/`)**:
    - Built on React 18 with TypeScript and Vite.
@@ -79,7 +83,9 @@ flowchart TB
 
 2. **Go Desktop Host (`app/`)**:
    - Thin Wails v3 adapter (`DesktopService`) exposing minimal API bindings to JavaScript.
-   - **Engine Manager (`app/internal/engine/`)**: Spawns isolated native processes on demand. Never allows arbitrary shell execution or untrusted path lookups. Enforces 64 KB input ceiling, 1 MB output limit, and a strict 5-second deadline per IPC invocation.
+   - **Engine Manager (`app/internal/engine/`)**: Spawns isolated native processes on demand. Never allows arbitrary shell execution or untrusted path lookups. Enforces 64 KB input ceiling, 1 MB output limit, and a strict 5-second deadline per IPC invocation (two minutes for Block Lab compile and upload).
+   - **Serial Monitor Session (`app/internal/engine/session.go`)**: Manages one long-lived engine process outside the normal request slot for serial communication. Closes before upload or after 15 seconds without a request.
+   - **Arm Ports Safety (`app/internal/engine/armports.go`)**: Prevents uploads to a port used by Robot Control.
    - **Local Storage (`app/internal/project/`)**: Atomic file writes (`.tmp` + sync + rename) into `%APPDATA%\SchoolBotPoC` (Windows) or `~/Library/Application Support/SchoolBotPoC` (macOS). Ensures no local learning progress is lost during network disruption.
    - **Updater Applier (`app/internal/updater/`)**: Background updater with publisher certificate pin verification, atomic binary swap, and rollback recovery.
 
@@ -90,6 +96,13 @@ flowchart TB
      - Real-time safety guards: motion bounding, 6-axis velocity/PWM profiling, emergency disconnect torque cutoff (`$DST!`), and dry-run simulation mode.
    - **Demo Engine (`app/cmd/demo-engine/`)**:
      - Lightweight Go-based DSL interpreter for classroom block and python adventure execution.
+
+   - **Mixly Engine (`engines/mixly/`)**:
+     - Arduino code generation using Mixly blocks via Goja JavaScript runtime.
+     - Integration with Arduino CLI and avrdude for compiling and uploading sketches to Arduino UNO on Windows.
+     - Long-lived serial communication session for real-time sensor/device interaction in Block Lab.
+
+This is **not a sandbox for arbitrary executable student code**. Child-tree cleanup, package verification, dynamic discovery, persistent sessions beyond the Serial monitor, event streaming and protocol capability negotiation are follow-ups.
 
 ---
 

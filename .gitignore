@@ -21,7 +21,6 @@ dist/
 **/node_modules/
 **/bin/
 **/obj/
-**/TestResults/
 app/frontend/dist/
 app/frontend/public/blockly-media/
 app/frontend/bindings/

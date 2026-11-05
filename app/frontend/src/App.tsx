@@ -54,13 +54,28 @@ export function useAppScreen(
   const [pending, setPending] = useState<{ view: View; screen?: string }>();
   const desktop = !!info && info.platform !== "browser-preview" && !preview;
   const close = useWindowClose(closeActions ?? {
-    requestStop: async () => {
-      await prepareWindowClose();
+    requestStop: async onWait => {
+      await prepareWindowClose(onWait);
+      // The host's cancel waits for a running upload. It may still run when the page that
+      // started it reloaded or crashed and took its own close guard and note along.
+      if (await client.uploadRunning()) onWait("blockLab.send.guard.closeWait");
       await client.cancel();
     },
     close: client.closeWindow,
   }, desktop || !!closeActions);
   const { closeRequested, setCloseRequested, closeBusy, closeWindow } = close;
+  const closeGuard = useRef<(() => void) | null>(null);
+  // A mode's close guard keeps the closeApp it was handed, so closeApp reads the latest
+  // closeWindow (and the state it closes over) through this ref.
+  const latestCloseWindow = useRef(closeWindow);
+  latestCloseWindow.current = closeWindow;
+  // Home holds no work. A mode's own guard asks about its work; otherwise the app's dialog does.
+  function requestClose() {
+    if (closeBusy) return;
+    if (view === "home") void closeWindow();
+    else if (closeGuard.current) closeGuard.current();
+    else setCloseRequested(true);
+  }
   const sample = useSampleData();
   const stars = sample ? SAMPLE_STARS : WEEK_STARS;
   const classLine = `${sample ? `${STUDENT_CLASS} · ` : ""}${translate("profile.stars", { count: stars })}`;
@@ -105,11 +120,7 @@ export function useAppScreen(
 
   useEffect(() => {
     if (!desktop) return;
-    return client.onCloseRequested(() => {
-      if (closeBusy) return;
-      if (view === "home") void closeWindow();
-      else setCloseRequested(true);
-    });
+    return client.onCloseRequested(requestClose);
   }, [desktop, closeBusy, view]);
 
   async function cloud(action: () => Promise<string>) {
@@ -142,16 +153,30 @@ export function useAppScreen(
     },
     [view, armScreen, apply],
   );
+  // The host has one engine slot, so a mode's running request is cancelled before the next
+  // view opens instead of holding the slot until its deadline.
+  const leaving = useRef(false);
+  const leaveMode = useCallback(async (next: View, screen?: string) => {
+    // A second click while the cancel is in flight would open the next view twice.
+    if (leaving.current) return;
+    leaving.current = true;
+    try {
+      await client.cancel().catch(error => console.warn("Unable to cancel before switching modes", error));
+      apply(next, screen);
+    } finally {
+      leaving.current = false;
+    }
+  }, [apply]);
   async function confirmSwitch() {
     if (!pending) return;
-    await client.cancel().catch(error => console.warn("Unable to cancel before switching modes", error));
-    apply(pending.view, pending.screen);
+    await leaveMode(pending.view, pending.screen);
     setPending(undefined);
   }
 
   const shell = useMemo<ShellApi>(
     () => ({
       go,
+      leaveMode: (next: View, screen?: string) => void leaveMode(next, screen),
       menuOpen,
       openMenu: () => {
         setProfile(false);
@@ -169,8 +194,12 @@ export function useAppScreen(
       lang,
       setLang,
       setArmScreen,
+      setCloseGuard: (guard: (() => void) | null) => {
+        closeGuard.current = guard;
+      },
+      closeApp: () => void latestCloseWindow.current(),
     }),
-    [go, menuOpen, profile, lang, setLang],
+    [go, leaveMode, menuOpen, profile, lang, setLang],
   );
 
   const langName = langs.find((l) => l.value === lang)?.label ?? lang;
@@ -179,7 +208,7 @@ export function useAppScreen(
       <Seg value={lang} options={langs} onChange={setLang} label={translate("language.label")} />
     </div>
   );
-  const full = view === "robot-control" && armScreen !== "works";
+  const full = (view === "robot-control" && armScreen !== "works") || view === "block-programming";
 
   return {
     view,
@@ -200,10 +229,7 @@ export function useAppScreen(
     pending,
     setPending,
     ...close,
-    entry,
-    entryAdapter,
-    licenseBar,
-    licenseBarHeight,
+    requestClose,
     desktop,
     classLine,
     cloud,
@@ -213,6 +239,10 @@ export function useAppScreen(
     langName,
     langSeg,
     full,
+    entry,
+    entryAdapter,
+    licenseBar,
+    licenseBarHeight,
   };
 }
 

@@ -13,11 +13,13 @@ if ($OutputDirectory) { $schoolBotBuildArguments.OutputDirectory = $schoolBotOut
 $schoolBotSuffix = if ($env:OS -eq 'Windows_NT') { '.exe' } else { '' }
 $schoolBotEngine = Join-Path $schoolBotOutput "demo-engine$schoolBotSuffix"
 $schoolBotZide = Join-Path $schoolBotOutput "engines/zide/zide-engine$schoolBotSuffix"
+$schoolBotMixly = Join-Path $schoolBotOutput "engines/mixly/mixly-engine$schoolBotSuffix"
 if ($IsMacOS) {
     $schoolBotArch = & $SchoolBotGo env GOHOSTARCH
     $schoolBotBundle = Join-Path $schoolBotOutput "darwin-$schoolBotArch/School Bot.app/Contents/MacOS"
     $schoolBotEngine = Join-Path $schoolBotBundle 'demo-engine'
     $schoolBotZide = Join-Path $schoolBotBundle 'engines/zide/zide-engine'
+    $schoolBotMixly = Join-Path $schoolBotBundle 'engines/mixly/mixly-engine'
 }
 $schoolBotVersion = (Get-Content -LiteralPath (Join-Path $SchoolBotRoot 'app/frontend/package.json') -Raw | ConvertFrom-Json).version
 Push-Location (Join-Path $SchoolBotRoot 'app/frontend')
@@ -32,8 +34,19 @@ if ($IsMacOS) {
     $schoolBotEngineOutput = Join-Path $schoolBotOutput 'engines/zide'
     & "$PSScriptRoot/engines/build.ps1" -Engine zide -Test -OutputDirectory $schoolBotEngineOutput
 }
+if ($IsMacOS) {
+    # Same as Zide: the bundled engine is signed, so its tests build into a throwaway directory.
+    $schoolBotMixlyTestOutput = Join-Path ([IO.Path]::GetTempPath()) "school-bot-mixly-$([guid]::NewGuid())"
+    try {
+        Invoke-SchoolBotCommand 'bash' @("$PSScriptRoot/engines/build.sh",'mixly',$schoolBotMixlyTestOutput,'--test')
+    } finally { Remove-Item -LiteralPath $schoolBotMixlyTestOutput -Recurse -Force -ErrorAction SilentlyContinue }
+} else {
+    & "$PSScriptRoot/engines/build.ps1" -Engine mixly -Test -OutputDirectory (Join-Path $schoolBotOutput 'engines/mixly')
+}
 $schoolBotPreviousZide = $env:ZIDE_ENGINE
+$schoolBotPreviousMixly = $env:MIXLY_ENGINE
 $env:ZIDE_ENGINE = $schoolBotZide
+$env:MIXLY_ENGINE = $schoolBotMixly
 try {
     Push-Location $SchoolBotRoot
     try {
@@ -42,6 +55,10 @@ try {
             'app/frontend/tests/frontend-adapter.test.mjs',
             'app/frontend/tests/frontend-workspace.test.mjs',
             'app/frontend/tests/phase4-simulator.test.mjs',
+            'app/frontend/tests/block-lab-blocks.test.mjs',
+            'app/frontend/tests/block-lab-boards.test.mjs',
+            'app/frontend/tests/block-lab-serial.test.mjs',
+            'app/frontend/tests/block-lab-upload-close.test.mjs',
             'engines/zide/tests/ipc.test.mjs'
         )
     } finally { Pop-Location }
@@ -51,7 +68,10 @@ try {
         Invoke-SchoolBotCommand $SchoolBotGo @('test','-ldflags',"-X schoolbot.local/app.appVersion=$schoolBotVersion",'./...')
         Invoke-SchoolBotCommand $SchoolBotGo @('vet','./...')
     } finally { Pop-Location }
-} finally { $env:ZIDE_ENGINE = $schoolBotPreviousZide }
+} finally {
+    $env:ZIDE_ENGINE = $schoolBotPreviousZide
+    $env:MIXLY_ENGINE = $schoolBotPreviousMixly
+}
 $schoolBotInput = @{
     protocol = '1.0'; request_id = 'smoke-1'; mode = 'coding-adventure'; action = 'program.run'
     data = @{ source = "hero.move_right(2)`nhero.jump()" }
@@ -59,14 +79,6 @@ $schoolBotInput = @{
 $schoolBotResult = $schoolBotInput | & $schoolBotEngine | ConvertFrom-Json
 if ($LASTEXITCODE -ne 0 -or $schoolBotResult.status -ne 'success' -or $schoolBotResult.request_id -ne 'smoke-1') {
     throw 'Native JSON Lines smoke test failed.'
-}
-$schoolBotBlockInput = @{
-    protocol = '1.0'; request_id = 'smoke-block'; mode = 'block-programming'; action = 'program.run'
-    data = @{ commands = @(@{ op = 'move_right'; value = 2 }) }
-} | ConvertTo-Json -Depth 8 -Compress
-$schoolBotResult = $schoolBotBlockInput | & $schoolBotEngine | ConvertFrom-Json
-if ($LASTEXITCODE -ne 0 -or $schoolBotResult.status -ne 'success' -or $schoolBotResult.request_id -ne 'smoke-block') {
-    throw 'Block engine smoke test failed.'
 }
 $schoolBotZideInput = @{
     protocol = '1.0'; request_id = 'smoke-zide'; mode = 'robot-control'; action = 'servo.set'

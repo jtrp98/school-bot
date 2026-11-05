@@ -58,10 +58,21 @@ or introduce an empty placeholder engine to register future work.
 - Dependencies stay with their engine until there is a demonstrated reason to share
   them. C++ is not required for future engines.
 - Frontends call the host and never choose executable paths. The host owns a trusted
-  routing table: robot-control → Zide, coding-adventure/block-programming → demo.
+  per-action routing table (`app/internal/engine/routes.go`): robot-control → Zide,
+  coding-adventure `program.run` → demo, block-programming `program.generate` /
+  `project.validate` → mixly with the board fixed to Arduino UNO, its `device.list`
+  (port names and USB IDs, no port opened) → mixly, and `program.compile` / `program.upload`
+  → mixly with transport fixed to native, Block Lab's own block types only (no C++ source, and
+  the engine refuses field values the blocks do not offer where they reach the C++) and a
+  two-minute deadline; upload is routed on Windows only, where cancel kills avrdude too, and the
+  host refuses it (`SAFETY_LIMIT`) to a serial port Robot Control drove until a Block Lab port
+  list no longer shows that port, because a clone UNO and the arm's controller can share one
+  USB bridge chip. Block Lab's Serial monitor (`serial.open`/`read`/`write`/`close`) → one
+  long-lived mixly process outside the request slot (`app/internal/engine/session.go`), with
+  the same port refusal; the host ends it before an upload and when the mode is left.
   Adding a source directory or manifest does not authorize executing a new engine.
 
-The existing `app/cmd/demo-engine` remains the PoC runtime for Adventure and Blockly.
+The existing `app/cmd/demo-engine` remains the PoC runtime for Adventure.
 Zide remains a separate C++ implementation used by native Robot Control. Desktop
 builds collect their runtime files into one app and installer. The root request/
 response schema paths are compatibility references to the common envelopes.
@@ -69,8 +80,8 @@ response schema paths are compatibility references to the common envelopes.
 Engines:
 
 - [Zide](zide/README.md), C++17, robot-control; routed and bundled by the desktop.
-- [Mixly](mixly/README.md), Go with original Mixly JavaScript generators; standalone
-  engine only, with its own build/tests. It is not yet routed or bundled by the desktop.
+- [Mixly](mixly/README.md), Go with original Mixly JavaScript generators; block-programming
+  code generation, port list, compile and (Windows only) upload, routed and bundled by the desktop.
 
 ```powershell
 ./scripts/engines/build.ps1 -Engine mixly -Test

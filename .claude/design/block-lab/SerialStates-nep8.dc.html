@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>SCR-26 แผงข้อความ สถานะ</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'IBM Plex Sans Thai',system-ui,sans-serif;color:#14243D}
+</style>
+</helmet>
+<div style="width:1440px;min-height:1060px;box-sizing:border-box;background:#F4F7FB;padding:32px 20px 40px 20px">
+  <h1 style="margin:0;font-size:28px;font-weight:700;line-height:1.4">SCR-26 · แผงข้อความจากบอร์ด · สถานะ</h1>
+  <p style="margin:4px 0 24px 0;font-size:16px;line-height:1.6;color:#5A6377;max-width:1100px">R8 — อยู่ใต้พื้นที่แท็บ เห็นทั้งแท็บตัวจำลองและ stage · ค่าเริ่มต้นขยาย 150px (ย่อได้เหลือ 52px) · แสดง 4 บรรทัดล่าสุด เลื่อนดูได้ · Serial print ขึ้นบรรทัดใหม่เสมอ · ไม่บันทึกกับงาน · เก็บเฉพาะบรรทัดล่าสุด (จำนวนบรรทัดให้ dev กำหนด · OQ10) · ไม่ประกาศ aria-live ทุกบรรทัด (ประกาศสรุปเป็นช่วง)</p>
+  <div style="display:grid;grid-template-columns:repeat(2,680px);gap:24px 40px;align-items:start">
+    <sc-for list="{{cells}}" as="c" hint-placeholder-count="8">
+      <div style="width:680px">
+        <div style="font-size:18px;font-weight:700;line-height:1.5">{{c.cap}}</div>
+        <div style="font-size:16px;line-height:1.6;color:#5A6377;min-height:52px;margin-bottom:8px">{{c.sub}}</div>
+        <div style="width:680px;box-shadow:0 0 0 2px #DCE3EC;background:#fff;overflow:hidden">
+          <dc-import name="SerialPane" state="{{c.state}}" open="{{c.open}}" paused="{{c.paused}}" hint-size="680px,150px"></dc-import>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1060}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      cells: [
+        { cap: 'ST-42 · ว่าง', sub: 'บอกว่าใช้บล็อก "Serial print" ในหมวด สื่อสาร แล้วข้อความจะขึ้นที่นี่', state: 'empty', open: 'open', paused: 'no' },
+        { cap: 'ST-43 · ข้อความจากตัวจำลอง', sub: 'ป้ายแหล่ง = ไอคอน + ข้อความ "จากตัวจำลอง" · ล้างเมื่อเริ่มจำลองใหม่เท่านั้น หยุดแล้วข้อความยังอยู่', state: 'sim', open: 'open', paused: 'no' },
+        { cap: 'ST-43 · ข้อความจากบอร์ด Uno (อ่านอัตโนมัติ · OQ2 แบบ A)', sub: 'ป้าย "จากบอร์ด Uno" · ล้างเมื่อส่งลงบอร์ดใหม่ · ไม่ปนกับข้อความจากตัวจำลอง (ล้างเมื่อสลับแหล่ง)', state: 'uno', open: 'open', paused: 'no' },
+        { cap: 'OQ2 แบบ B · ต้องกดเปิดอ่านข้อความจากบอร์ด', sub: 'เตือนว่าโปรแกรมบนบอร์ดอาจเริ่มใหม่ตอนเปิดพอร์ต · ต้องปิดอ่านก่อนส่งซ้ำ (ยังไม่ยืนยัน)', state: 'uno-manual', open: 'open', paused: 'no' },
+        { cap: 'ST-44 · อ่านข้อความจากบอร์ดไม่ได้', sub: 'สาเหตุ + วิธีแก้ + รหัส E-USB + ลองอีกครั้ง · ไม่โทษเด็ก', state: 'unreadable', open: 'open', paused: 'no' },
+        { cap: 'หยุดเลื่อนอัตโนมัติ (ข้อความมาถี่)', sub: 'อ่านย้อนหลังได้ ไม่ถูกดึงลง · ปุ่ม "ไปล่างสุด" บอกจำนวนข้อความใหม่ · จำกัดอัตราแสดงผลเมื่อโปรแกรมพิมพ์ถี่', state: 'sim', open: 'open', paused: 'yes' },
+        { cap: 'ย่อแผง · มีข้อความ', sub: 'ย่อเหลือหัวแผง 52px แสดงข้อความล่าสุด + จำนวนบรรทัด · ปุ่มขยายมี aria-expanded', state: 'sim', open: 'closed', paused: 'no' },
+        { cap: 'ย่อแผง · อ่านไม่ได้', sub: 'สถานะผิดปกติยังเห็นตอนย่อ (ไอคอน + ข้อความ + รหัส)', state: 'unreadable', open: 'closed', paused: 'no' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

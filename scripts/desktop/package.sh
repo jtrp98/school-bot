@@ -30,7 +30,7 @@ if [[ "$require_signed" == true ]]; then
 fi
 if [[ "$skip_build" == false ]]; then bash "$root/scripts/desktop/build.sh" "${build_flags[@]}"; fi
 bundle="$root/app/bin/darwin-universal/School Bot.app"
-for executable in school-bot demo-engine engines/zide/zide-engine; do
+for executable in school-bot demo-engine engines/zide/zide-engine engines/mixly/mixly-engine; do
   test -x "$bundle/Contents/MacOS/$executable"
   lipo -verify_arch x86_64 arm64 "$bundle/Contents/MacOS/$executable"
 done

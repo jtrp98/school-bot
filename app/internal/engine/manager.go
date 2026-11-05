@@ -28,59 +28,19 @@ const (
 // A trusted registry prevents the frontend from selecting executables.
 // Child processes provide crash isolation, not a security sandbox.
 type Manager struct {
-	slots     chan struct{}
-	mu        sync.Mutex
-	active    context.CancelFunc
-	stopping  bool
-	done      chan struct{}
-	timeout   time.Duration
-	resolve   func(engineSpec) (string, error)
-	command   func(context.Context, string) *exec.Cmd
+	slots    chan struct{}
+	mu       sync.Mutex
+	active   context.CancelFunc
+	stopping bool
+	done     chan struct{}
+	timeout  time.Duration
+	resolve  func(engineSpec) (string, error)
+	command  func(context.Context, string) *exec.Cmd
+	arm      armPorts
+	session  engineSession
+	building bool
+	uploading bool
 	simulator *hardwareSimulator
-}
-
-type engineSpec struct{ id, relativePath string }
-
-func engineForMode(mode string) (engineSpec, error) {
-	switch mode {
-	case "robot-control":
-		return engineSpec{"zide", filepath.Join("engines", "zide", "zide-engine")}, nil
-	case "coding-adventure", "block-programming":
-		return engineSpec{"demo", "demo-engine"}, nil
-	default:
-		return engineSpec{}, fmt.Errorf("unsupported engine mode %q", mode)
-	}
-}
-
-func ValidMode(mode string) bool {
-	_, err := engineForMode(mode)
-	return err == nil
-}
-
-// The webview is untrusted, so the host admits only the actions each mode's UI
-// really sends; an engine action missing here is unreachable even if it exists.
-var modeActions = map[string]map[string]struct{}{
-	"robot-control": actionSet(
-		"device.list", "board.info", "servo.set", "servo.read", "servo.torque", "robot.stop",
-		"group.execute", "group.download", "group.run",
-	),
-	"coding-adventure":  actionSet("program.run"),
-	"block-programming": actionSet("program.run"),
-}
-
-func actionSet(actions ...string) map[string]struct{} {
-	set := make(map[string]struct{}, len(actions))
-	for _, action := range actions {
-		set[action] = struct{}{}
-	}
-	return set
-}
-
-func checkAction(mode, action string) error {
-	if _, ok := modeActions[mode][action]; !ok {
-		return fmt.Errorf("action %q is not allowed for mode %q", action, mode)
-	}
-	return nil
 }
 
 func locateEngine(spec engineSpec) (string, error) {
@@ -117,12 +77,37 @@ func NewManager() *Manager {
 	return manager
 }
 
-func (m *Manager) Cancel() {
+// Cancel is what leaving a mode and closing the window ask for. It lets a robot.stop and a
+// program.upload finish instead, so a page that lost its own guard (Block Lab after a crash or a
+// WebView reload) cannot cut an upload off; their request deadlines bound the wait.
+func (m *Manager) Cancel() { m.cancel(false) }
+
+// StopUpload is the stop the child confirmed in Block Lab. It ends a running upload and nothing
+// else: a stop that arrives after its upload ended must not end the next request, such as a
+// robot motion that cancelling would not stop.
+func (m *Manager) StopUpload() { m.cancel(true) }
+
+// UploadRunning tells a closing window why it waits.
+func (m *Manager) UploadRunning() bool {
 	m.mu.Lock()
+	defer m.mu.Unlock()
+	return m.uploading
+}
+
+func (m *Manager) isBuilding() bool {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return m.building
+}
+
+func (m *Manager) cancel(stopUpload bool) {
+	m.mu.Lock()
+	if stopUpload && !m.uploading {
+		m.mu.Unlock()
+		return
+	}
 	done := m.done
-	// Navigation and shutdown can cancel concurrently with the stop sent by Robot Control.
-	// Keep that stop alive; its existing request deadline still bounds the wait.
-	if m.active != nil && !m.stopping {
+	if m.active != nil && !m.stopping && (stopUpload || !m.uploading) {
 		m.active()
 	}
 	m.mu.Unlock()
@@ -131,17 +116,36 @@ func (m *Manager) Cancel() {
 	if done != nil {
 		<-done
 	}
+	// Leaving a mode or closing the app also lets go of the board's Serial port. It comes after
+	// the slot is free, and end() gives up waiting on a stuck process, so a robot stop that
+	// waits for this cancel is not held back by the Serial monitor.
+	m.session.close()
 }
 
 // Execute returns a Go error only when the caller asked for a mode or action the host never allows.
 // Every failure after that point is a Response with an error code, so the frontend decides by code.
 func (m *Manager) Execute(mode, action string, data json.RawMessage) (Response, error) {
-	spec, err := engineForMode(mode)
+	r, err := routeFor(mode, action)
 	if err != nil {
 		return Response{}, err
 	}
-	if err := checkAction(mode, action); err != nil {
-		return Response{}, err
+	if !pageDataAccepted(data, r) {
+		return hostFailure("", CodeInvalidRequest, "request data has fields or blocks this mode does not send"), nil
+	}
+	data, ok := withFixedFields(data, r.fixed)
+	if !ok {
+		return hostFailure("", CodeInvalidRequest, "request data must be a JSON object without host-owned fields"), nil
+	}
+	opensPort := action == "program.upload" || action == "serial.open"
+	if mode == "block-programming" && opensPort && m.arm.holds(exactText(data, "port")) {
+		return hostFailure("", CodeSafetyLimit, "Robot Control drove the robot arm on this port; choose the UNO's port"), nil
+	}
+	if r.session {
+		return m.session.run(m, r.engine, mode, action, data), nil
+	}
+	timeout := m.timeout
+	if r.timeout > 0 {
+		timeout = r.timeout
 	}
 	m.mu.Lock()
 	select {
@@ -150,10 +154,12 @@ func (m *Manager) Execute(mode, action string, data json.RawMessage) (Response, 
 		m.mu.Unlock()
 		return hostFailure("", CodeEngineBusy, "engine is busy; stop or wait for the current request"), nil
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), m.timeout)
+	ctx, cancel := context.WithCancel(context.Background())
 	done := make(chan struct{})
 	m.active = cancel
 	m.stopping = action == "robot.stop"
+	m.building = action == "program.compile" || action == "program.upload"
+	m.uploading = action == "program.upload"
 	m.done = done
 	m.mu.Unlock()
 	defer func() {
@@ -161,6 +167,8 @@ func (m *Manager) Execute(mode, action string, data json.RawMessage) (Response, 
 		m.mu.Lock()
 		m.active = nil
 		m.stopping = false
+		m.building = false
+		m.uploading = false
 		m.done = nil
 		<-m.slots
 		close(done)
@@ -169,10 +177,23 @@ func (m *Manager) Execute(mode, action string, data json.RawMessage) (Response, 
 	if mode == "robot-control" && m.simulator != nil {
 		return m.simulator.execute(ctx, action, data), nil
 	}
-	return m.runEngine(ctx, spec, mode, action, data), nil
+	// avrdude needs the board's port, which an open Serial monitor holds. Closing it only once
+	// this upload has the slot keeps a busy refusal from ending the session for nothing.
+	if action == "program.upload" {
+		m.session.close()
+	}
+	// The deadline starts after the session has let go of the port, which can take seconds, so
+	// it does not eat into the engine's own compile and upload budget.
+	ctx, stopTimer := context.WithTimeout(ctx, timeout)
+	defer stopTimer()
+	res := m.runEngine(ctx, timeout, r.engine, mode, action, data)
+	m.arm.note(mode, action, data, res)
+	return res, nil
 }
 
-func (m *Manager) runEngine(ctx context.Context, spec engineSpec, mode, action string, data json.RawMessage) Response {
+func (m *Manager) runEngine(
+	ctx context.Context, timeout time.Duration, spec engineSpec, mode, action string, data json.RawMessage,
+) Response {
 	path, err := m.resolve(spec)
 	if err != nil {
 		return hostFailure("", CodeEngineFailed, err.Error())
@@ -204,7 +225,7 @@ func (m *Manager) runEngine(ctx context.Context, spec engineSpec, mode, action s
 		case errors.Is(ctx.Err(), context.Canceled):
 			return hostFailure(req.RequestID, CodeEngineCancelled, "engine request was cancelled")
 		case errors.Is(ctx.Err(), context.DeadlineExceeded):
-			return hostFailure(req.RequestID, CodeEngineTimeout, "engine did not finish within "+m.timeout.String())
+			return hostFailure(req.RequestID, CodeEngineTimeout, "engine did not finish within "+timeout.String())
 		}
 		return engineFailure(req.RequestID, fmt.Sprintf("engine failed: %v", err), &diagnostic)
 	}

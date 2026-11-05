@@ -44,6 +44,14 @@ func simulatorInteger(fields map[string]json.RawMessage, key string, low, high i
 	return value, nil
 }
 
+func actionSet(actions ...string) map[string]struct{} {
+	set := make(map[string]struct{}, len(actions))
+	for _, action := range actions {
+		set[action] = struct{}{}
+	}
+	return set
+}
+
 func simulatorKeys(fields map[string]json.RawMessage, allowed ...string) error {
 	keys := actionSet(append([]string{"transport", "device", "port", "baud", "read_ms"}, allowed...)...)
 	for key := range fields {

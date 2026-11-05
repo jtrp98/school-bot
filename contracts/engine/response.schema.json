@@ -28,7 +28,7 @@
   ],
   "$defs": {
     "errorCode": {
-      "description": "Consumers decide by code, never by message text. Engines send the first group, the desktop host the second; the third is sent by the demo engine only.",
+      "description": "Consumers decide by code, never by message text. Engines send the codes from PROTOCOL_INVALID to UPLOAD_FAILED; the desktop host sends the ENGINE_* codes, and the Mixly engine also sends ENGINE_BUSY and ENGINE_TIMEOUT for its own build lock and tool deadlines. PROGRAM_INVALID comes from the demo engine and the Mixly engine; COMMAND_UNKNOWN and STEP_LIMIT from the demo engine only.",
       "enum": [
         "PROTOCOL_INVALID",
         "INVALID_REQUEST",
@@ -38,6 +38,9 @@
         "TRANSPORT_ERROR",
         "DEVICE_TIMEOUT",
         "PROJECT_INVALID",
+        "TOOLCHAIN_MISSING",
+        "COMPILE_FAILED",
+        "UPLOAD_FAILED",
         "ENGINE_BUSY",
         "ENGINE_CANCELLED",
         "ENGINE_FAILED",

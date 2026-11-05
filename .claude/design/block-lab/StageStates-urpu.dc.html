@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>SCR-18 stage สถานะ</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'IBM Plex Sans Thai',system-ui,sans-serif;color:#14243D}
+</style>
+</helmet>
+<div style="width:1440px;min-height:1900px;box-sizing:border-box;background:#F4F7FB;padding:32px 20px 40px 20px">
+  <h1 style="margin:0;font-size:28px;font-weight:700;line-height:1.4">SCR-18 · stage มาสคอต (แท็บ) · สถานะ</h1>
+  <p style="margin:4px 0 24px 0;font-size:16px;line-height:1.6;color:#5A6377;max-width:1100px">R7 · R10 — ตัวละครเดียว (มาสคอต School Bot 10 ท่าเท่านั้น) แสดงสูง 144px (ไม่เกิน ~150) · ข้อความกำกับท่าทุกครั้ง · ไม่มีแอนิเมชันกะพริบ/วนซ้ำ · ท่าเปลี่ยนทันทีครั้งเดียว · ภาพตัดจากแผ่น 10 ท่าด้วย CSS ชั่วคราว (ยังไม่ได้ตัดแยกไฟล์ DEL-09)</p>
+  <div style="display:grid;grid-template-columns:repeat(2,680px);gap:28px 40px;align-items:start">
+    <sc-for list="{{cells}}" as="c" hint-placeholder-count="6">
+      <div style="width:680px">
+        <div style="font-size:18px;font-weight:700;line-height:1.5">{{c.cap}}</div>
+        <div style="font-size:16px;line-height:1.6;color:#5A6377;min-height:52px;margin-bottom:8px">{{c.sub}}</div>
+        <div style="width:680px;height:498px;box-shadow:0 0 0 2px #DCE3EC;border-radius:2px;overflow:hidden;background:#fff">
+          <dc-import name="StagePane" pose="{{c.pose}}" say="{{c.say}}" x="{{c.x}}" y="{{c.y}}" frozen="{{c.frozen}}" fast="{{c.fast}}" state="{{c.state}}" h="498" hint-size="680px,498px"></dc-import>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      cells: [
+        { cap: 'ST-28 · ยังไม่เริ่มจำลอง', sub: 'ท่าเริ่มต้น "โบกมือ · สวัสดี" + ข้อความบอกว่ายังไม่ได้เริ่ม · stage รีเซ็ตตำแหน่ง/ท่าทุกครั้งที่เริ่มจำลอง (ข้อสมมติ OQ14)', pose: '1', say: '', x: '0', y: '0', frozen: '', fast: 'no', state: 'idle' },
+        { cap: 'ST-28 · กำลังจำลอง · เปลี่ยนท่า "ดีใจ" + พูด', sub: 'กล่องคำพูดมีขอบชัด ตัดบรรทัดตามคำ (ไทยไม่เว้นวรรคใช้ overflow-wrap) · บล็อก "พูด" ไม่หน่วงเวลาโปรแกรม (OQ27)', pose: '2', say: 'กดปุ่มแล้ว ไฟติดแล้ว เก่งมากเลย', x: '-20', y: '0', frozen: '', fast: 'no', state: 'running' },
+        { cap: 'ท่า "วิ่ง" ขณะตัวละครเคลื่อนที่ (อัตโนมัติ)', sub: 'บล็อก "ขยับ" ใช้ท่าวิ่งเอง · ถ้ามีบล็อก "เปลี่ยนท่า" ให้บล็อกเปลี่ยนท่าชนะจนกว่าจะเคลื่อนที่ใหม่ (Proposed OQ14)', pose: '7', say: '', x: '60', y: '0', frozen: '', fast: 'no', state: 'running' },
+        { cap: 'ST-29 · หยุดอยู่เพราะ LED เสีย (เห็นจากแท็บ stage)', sub: 'ป้ายเตือนบน stage + แถบแจ้งเหนือแผงข้อความ + ป้ายสถานะที่แถบแท็บ — ผู้ใช้ไม่ต้องอยู่แท็บตัวจำลองก็รู้ (OQ28)', pose: '2', say: '', x: '-20', y: '0', frozen: 'หยุดอยู่ เพราะ LED เสีย', fast: 'no', state: 'running' },
+        { cap: 'OQ34 · โปรแกรมสลับท่าเร็วเกิน 3 ครั้ง/วินาที', sub: 'ค้างท่าล่าสุดแบบนิ่ง + ป้ายบอก · ไม่กะพริบทั้งพื้นหลัง stage (พื้นหลังคงที่เสมอ)', pose: '2', say: '', x: '0', y: '0', frozen: '', fast: 'yes', state: 'running' },
+        { cap: 'OQ14 · ข้อความพูดยาว (จำกัด ~40 ตัวอักษร ค่าชั่วคราว)', sub: 'ช่องพิมพ์ในบล็อก "พูด" จำกัดความยาวและแสดงตัวนับ · กล่องคำพูดสูงสุด 3 บรรทัด line-height 1.7 กันสระบน/ล่างถูกตัด', pose: '9', say: 'ต่อวงจรไฟ LED กับปุ่มกดสำเร็จแล้ว สนุกมาก', x: '0', y: '20', frozen: '', fast: 'no', state: 'running' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

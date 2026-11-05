@@ -14,5 +14,5 @@
   },
   "hardware_platforms": ["windows", "darwin", "linux"],
   "source": "sb-app-mixly/resources/app/src",
-  "integration": "standalone engine only; not routed or bundled by the desktop host"
+  "integration": "desktop host routes Block Lab (UNO) code generation, compile, upload, the port list and the Serial monitor session; bundled with the desktop app and its Arduino libraries"
 }

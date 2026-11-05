@@ -34,6 +34,17 @@ try {
     Get-ChildItem -LiteralPath "$mixlySource/licenses" -File | ForEach-Object {
         Copy-Item -LiteralPath $_.FullName -Destination "$OutputDirectory/licenses/$($_.Name)" -Force
     }
+    # arduino-cli compiles these Arduino libraries from source, so they ship as they are vendored.
+    # Replace the copy so a library removed from the source tree does not linger in the payload.
+    $mixlyLibraries = Join-Path $OutputDirectory 'libraries'
+    if (Test-Path -LiteralPath $mixlyLibraries) {
+        $mixlyLibrariesItem = Get-Item -LiteralPath $mixlyLibraries -Force
+        if ($mixlyLibrariesItem.Attributes -band [IO.FileAttributes]::ReparsePoint) {
+            throw "Engine output libraries folder is a link; remove it first: $mixlyLibraries"
+        }
+        Remove-Item -LiteralPath $mixlyLibraries -Recurse -Force
+    }
+    Copy-Item -LiteralPath "$mixlySource/libraries" -Destination $mixlyLibraries -Recurse
     $mixlyHash = (Get-FileHash -LiteralPath $mixlyExecutable -Algorithm SHA256).Hash.ToLowerInvariant()
     [IO.File]::WriteAllText("$mixlyExecutable.sha256", "$mixlyHash  mixly-engine$mixlySuffix`n")
     if ($Test) {

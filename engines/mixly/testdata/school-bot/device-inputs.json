@@ -1,0 +1,39 @@
+{
+  "blocks": [
+    {
+      "type": "base_setup",
+      "statements": {
+        "DO": {
+          "type": "serial_begin",
+          "fields": {"serial_select": "Serial"},
+          "values": {"CONTENT": {"type": "math_number", "fields": {"NUM": "9600"}}}
+        }
+      }
+    },
+    {
+      "type": "sb_loop",
+      "statements": {
+        "DO": {
+          "type": "serial_print",
+          "fields": {"serial_select": "Serial", "new_line": "println"},
+          "values": {"CONTENT": {"type": "sb_button", "fields": {"PIN": "2"}}},
+          "next": {
+            "type": "serial_print",
+            "fields": {"serial_select": "Serial", "new_line": "println"},
+            "values": {"CONTENT": {"type": "sb_ir_obstacle", "fields": {"PIN": "A1", "MODE": "ANALOG"}}},
+            "next": {
+              "type": "serial_print",
+              "fields": {"serial_select": "Serial", "new_line": "println"},
+              "values": {"CONTENT": {"type": "sb_pir", "fields": {"PIN": "4", "MODE": "DIGITAL"}}},
+              "next": {
+                "type": "serial_print",
+                "fields": {"serial_select": "Serial", "new_line": "println"},
+                "values": {"CONTENT": {"type": "sb_potentiometer", "fields": {"PIN": "A0"}}}
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

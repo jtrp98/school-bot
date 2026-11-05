@@ -1473,10 +1473,6 @@
       "unitCompleteLabel": "单元完成",
       "startUnit": "开始单元",
       "robotDisconnected": "机器人未连接",
-      "dragBlocksFromTheToolboxConnectThemIntoOne": "从工具箱拖出积木，连接成一个序列。",
-      "blockProjectSavedLocally": "积木作品已保存到本地。",
-      "noSavedBlockProjectYet": "暂无已保存的积木作品。",
-      "savedBlockProjectLoaded": "已打开保存的积木作品。",
       "writeASequenceThenBringItToLife": "编写指令序列，让角色动起来。",
       "savedProgramLoaded": "已打开保存的程序。",
       "noSavedProgramYet": "暂无已保存的程序。",
@@ -1775,28 +1771,9 @@
   },
   "blocks": {
     "messages": {
-      "engineCommandTrace": "引擎指令记录",
-      "buildYourSequence": "搭建指令序列",
-      "thinkItConnectItTryIt": "构思、连接、试一试。",
-      "localWorkspaceBlockly": "本地工作区 · BLOCKLY",
-      "runBlocks": "运行积木 ▷",
       "visualProgrammingWorkspace": "可视化编程工作区"
     },
-    "move": "移动",
-    "direction": {
-      "right": "右",
-      "left": "左"
-    },
-    "tiles": "格",
-    "jump": "跳跃",
-    "repeat": "重复",
-    "times": "次",
-    "run": {
-      "result": "引擎已接收积木，显示指令记录。"
-    },
-    "workspace": {
-      "scope": "支持移动、跳跃和有限次数重复。变量、函数、条件及设备积木尚待开发。"
-    }
+    "move": "移动"
   },
   "adventure": {
     "messages": {
@@ -1909,6 +1886,927 @@
         "saving": "保存失败，作品尚未存储，窗口仍保持打开。请重试或检查磁盘空间。",
         "stopping": "请求停止机器人失败。窗口仍保持打开，尚未确认机器人已实际停止。请重试关闭或取消。",
         "closing": "关闭失败，窗口仍保持打开。请重试关闭或取消。"
+      }
+    }
+  },
+  "blockLab": {
+    "board": {
+      "change": "更换",
+      "notConnected": "未连接开发板",
+      "notConnectedHint": "插上开发板的 USB 线，然后点“更换”选择开发板",
+      "usbOnly": "通过 USB 连接，无需联网",
+      "tapToClose": "点击任意处关闭",
+      "changeLabel": "更换 Uno 开发板",
+      "changeHere": "已在连接开发板页面，请从卡片中选择开发板",
+      "connectedChip": "{{boardName}} · {{port}}",
+      "connectedChipWithChip": "{{boardName}} · {{port}} · {{chipName}}",
+      "connectedTitle": "已连接 Uno 开发板",
+      "connectedBody": "已选好这块开发板。准备好后，按“上传到开发板”。",
+      "connectedMeta": "端口 {{port}} · 通过 USB 连接，无需网络",
+      "connectedMetaWithChip": "端口 {{port}} · {{chipName}} 芯片 · 通过 USB 连接，无需网络",
+      "lost": "线已断开",
+      "lostTitle": "开发板的线已断开",
+      "lostBody": {
+        "anySocket": "把 USB 线插回任意接口。开发板再次出现在列表中时，程序会重新选中它。",
+        "sameSocket": "把 USB 线插回原来的接口，然后在开发板的卡片上再按一次“用这块”。这类开发板没有序列号，所以程序需要你确认是同一块。"
+      },
+      "linkMeta": "{{boardName}} · 端口 {{port}}",
+      "connectedTitleSerial": "已选好开发板，可能是 Uno",
+      "unknown": "无法检查开发板",
+      "unknownTitle": "暂时无法检查开发板",
+      "unknownBody": "程序读不到端口列表，无法确认开发板是否还插着 · 按“更换”后重新查找",
+      "label": {
+        "connectedUno": "已连接 Uno 开发板：{{boardName}}，端口 {{port}}",
+        "connectedSerial": "已选好开发板，可能是 Uno：{{boardName}}，端口 {{port}}",
+        "lost": "开发板的线已断开：{{boardName}}，端口 {{port}}",
+        "unknown": "暂时无法检查开发板：{{boardName}}，端口 {{port}}"
+      },
+      "simulated": "模拟",
+      "reconnect": "重新连接",
+      "reconnectTip": "再次尝试连接同一块 Uno 开发板"
+    },
+    "connect": {
+      "title": "连接 Uno 开发板",
+      "back": "返回 Block Lab",
+      "say": {
+        "lost": {
+          "title": "开发板的线掉了，没关系",
+          "sub": "把 USB 线插回去，稍等一下，开发板会重新出现在列表中。"
+        },
+        "returned": {
+          "title": "原来的接口上又出现了开发板",
+          "sub": "在卡片上点“用这块”，再点下方的按钮，确认是原来那块开发板。"
+        },
+        "back": {
+          "title": "开发板回来了！",
+          "sub": "正在返回积木页面…"
+        },
+        "naming": {
+          "title": "找到了！",
+          "sub": "在下方栏里给开发板起个名字，比如“第 3 组的开发板”，下次就容易找到。"
+        },
+        "ok": {
+          "title": "找到了！",
+          "sub": "正在返回积木页面…"
+        },
+        "connected": {
+          "title": "开发板已连接",
+          "sub": "可以回去继续做，也可以从下方卡片选择其他开发板。"
+        },
+        "switching": {
+          "title": "开发板已连接",
+          "sub": "已选择另一块开发板，按下方的连接按钮即可切换。"
+        },
+        "scanFailed": {
+          "title": "暂时无法查找开发板，没关系",
+          "sub": "看看红色框里的说明，然后按“再试一次”。"
+        },
+        "scanning": {
+          "title": "正在查找开发板…",
+          "sub": "请稍等。"
+        },
+        "disconnected": {
+          "title": "已断开连接",
+          "sub": "随时可以从下方卡片选择开发板重新连接。"
+        },
+        "none": {
+          "title": "还没有找到开发板",
+          "sub": "插好线后按“重新查找”。"
+        },
+        "search": {
+          "title": "一起找找我们的开发板",
+          "sub": "按照蓝色框一步一步来。"
+        },
+        "one": {
+          "title": "找到 1 块开发板",
+          "sub": "这台电脑只接了一块开发板，直接按连接就行。"
+        },
+        "many": {
+          "title": "找到 {{boardCount}} 块开发板，哪块是我们的？",
+          "sub": "看看卡片上的开发板名字。如果还没起名，按“拔线来找”。"
+        },
+        "oneMaybe": {
+          "title": "找到 1 个可能是 Uno 开发板的设备",
+          "sub": "其他设备也会用这种芯片。如果是我们的开发板，按“用这块”，再按连接。"
+        }
+      },
+      "lost": {
+        "title": "{{boardName}} 的线掉了 · 等待开发板回来",
+        "titleReturned": "{{boardName}} 已插回原来的接口 · 请确认是原来那块"
+      },
+      "cableTips": {
+        "pushIn": "把线头在电脑和开发板两端都插到底，然后等 3 秒。",
+        "otherSocket": "试试电脑上的其他 USB 接口。",
+        "otherSocketRescan": "试试电脑上的其他 USB 接口，然后按“重新查找”。",
+        "newCard": "换到其他 USB 接口时，开发板可能显示为新卡片，请在那张卡片上按“用这块”。",
+        "light": "检查 USB 线：开发板上的灯应该亮着。如果不亮，换一根线试试。"
+      },
+      "tips": {
+        "show": "插好了但没出现？",
+        "hide": "隐藏解决方法"
+      },
+      "connected": {
+        "label": "已连接的开发板",
+        "title": "已连接：{{boardName}}（{{port}}）",
+        "since": "{{time}} 起已连接 · 通过 USB 连接，无需网络",
+        "disconnect": "断开连接",
+        "backToWork": "返回继续工作"
+      },
+      "returned": {
+        "title": "开发板回来了",
+        "body": "开发板又出现在列表中，仍是已选状态，可以继续工作。"
+      },
+      "disconnect": {
+        "label": "确认断开连接",
+        "title": "断开连接？",
+        "body": "断开后随时可以重新连接 · 程序里的作品都还在",
+        "confirm": "断开"
+      },
+      "disconnected": {
+        "title": "已断开 {{boardName}}",
+        "body": "如果要继续在这里使用，点下方的开发板卡片重新连接 · 程序里的作品都还在"
+      },
+      "scanFailed": {
+        "title": "无法在这台电脑上查找开发板",
+        "body": "按“再试一次”。如果还是不行，把这个代码告诉老师。",
+        "codeLabel": "把这个代码告诉老师",
+        "retry": "再试一次"
+      },
+      "list": {
+        "title": "在这台电脑上找到的开发板",
+        "searching": "正在查找…",
+        "autoUpdate": "插拔线时会自动更新",
+        "rescan": "重新查找"
+      },
+      "card": {
+        "unnamedUno": "Uno 开发板",
+        "unnamedChip": "使用 {{chipName}} 芯片的开发板",
+        "unnamedUsbSerial": "使用 USB 串口芯片的开发板",
+        "port": "端口 {{port}}",
+        "portUnnamed": "端口 {{port}} · 还没起名",
+        "portChip": "端口 {{port}} · {{chipName}} 芯片",
+        "portMaybeUno": "端口 {{port}} · 可能是 Uno 开发板 · 还没起名",
+        "pick": "用这块",
+        "picked": "已选择",
+        "inUse": "使用中",
+        "waitingBack": "等待插回",
+        "tag": {
+          "lost": "线已断开 · 等待插回",
+          "inUse": "正在使用",
+          "disconnected": "已断开 · 可以重新连接",
+          "ours": "我们的开发板",
+          "oursMoved": "回到 {{port}} · 我们的开发板",
+          "returned": "已插回"
+        },
+        "unnamedOther": "USB 设备",
+        "pickAria": {
+          "pick": "用这块：{{boardName}}，端口 {{port}}",
+          "picked": "已选择：{{boardName}}，端口 {{port}}",
+          "inUse": "使用中：{{boardName}}，端口 {{port}}",
+          "waitingBack": "等待插回：{{boardName}}，端口 {{port}}"
+        }
+      },
+      "search": {
+        "start": "不确定是哪块？拔线来找",
+        "unplug": {
+          "title": "把我们组开发板的 USB 线从电脑上拔下来",
+          "body": "只拔一根，程序会看哪张卡片消失了。"
+        },
+        "plugBack": {
+          "title": "消失的那张卡片就是我们的开发板，把线插回去吧。",
+          "body": "插哪个接口都可以，程序会看哪张卡片回来了。"
+        },
+        "slow": {
+          "title": "还没看到开发板回来",
+          "body": "线插好了吗？如果插好了还是没出现，看看下面的方法。"
+        },
+        "tooMany": {
+          "title": "有 {{cardCount}} 张卡片消失了，拔多了。",
+          "body": "先把所有线插回去，按“重新开始”，然后只拔我们组的那根。"
+        },
+        "found": {
+          "title": "找到了！已经选好我们组的开发板。",
+          "titleMoved": "找到了！开发板回到了 {{port}}（换接口也没关系）。",
+          "body": "按下方的连接按钮吧。"
+        }
+      },
+      "empty": {
+        "title": "这台电脑上还没有找到开发板",
+        "body": "按下面的步骤逐一检查，然后按“重新查找”。"
+      },
+      "others": {
+        "toggle": "不太可能是开发板的其他设备（{{deviceCount}}）· 通常不需要",
+        "usbName": "其他 USB 设备",
+        "serialName": "非 USB 端口",
+        "usbReason": "不是程序认识的 Uno 开发板，所以不能选择",
+        "serialReason": "不是通过 USB 连接的，所以不是 Uno 开发板"
+      },
+      "help": {
+        "title": "找不到我们的开发板？逐一试试这些",
+        "titleMore": "更多检查",
+        "tips": {
+          "cable": "把 USB 线在电脑和开发板两端都插紧",
+          "light": "检查 USB 线，看看开发板上的灯是否亮着",
+          "dataCable": "使用能传数据的线，有些充电线不能传数据。"
+        }
+      },
+      "hint": {
+        "waitLost": "等开发板回来，把 USB 线插回去吧。",
+        "inUse": "这块开发板已经连接了",
+        "busy": "请先等这一步完成",
+        "pickFirst": "先在开发板卡片上点“用这块”，再按连接",
+        "nameFirst": "先输入开发板的名字，或者按“先跳过”"
+      },
+      "naming": {
+        "title": "找到了！给这块开发板起个名字吧",
+        "body": "下次列表里会显示这个名字，马上就能找到我们组的开发板。",
+        "placeholder": "例如：第 3 组的开发板",
+        "label": "开发板名字",
+        "skip": "先跳过",
+        "save": "保存名字并开始使用"
+      },
+      "ok": {
+        "title": "已连接 {{boardName}}！",
+        "body": "{{seconds}} 秒后自动返回积木页面",
+        "start": "马上开始"
+      },
+      "footer": {
+        "waitingBack": "等待开发板回来…",
+        "pickFirst": "请先选择开发板",
+        "connect": "连接 {{boardName}}（{{port}}）",
+        "switch": "断开 {{oldName}}，改连 {{newName}}（{{port}}）",
+        "confirmBack": "重新连接原来的 {{boardName}}（{{port}}）"
+      },
+      "baud": {
+        "label": "波特率 · 自动与程序一致",
+        "selectLabel": "波特率与 Block Lab 的程序一致（不能更改）",
+        "tip": "积木生成的程序总是使用这个速度，所以自动设为一致，不能自己更改 · 如果不对请告诉老师",
+        "tipNone": "先选择开发板，波特率会自动显示",
+        "value": "{{baudRate}} bps",
+        "none": "请先选择开发板"
+      },
+      "preview": {
+        "toggle": "模拟设备（预览）",
+        "title": "预览中的模拟端口",
+        "note": "虚构数据，不读取真实端口 · 勾选即可插入或拔出",
+        "movePort": "换 USB 接口"
+      }
+    },
+    "job": {
+      "untitled": "未命名作品",
+      "label": "作品名称",
+      "placeholder": "给作品起名，例如：按键点灯",
+      "rename": "重命名作品 {{jobName}}",
+      "renameHint": "点击重命名作品"
+    },
+    "rail": {
+      "label": "积木分类",
+      "scrollUp": "向上滚动",
+      "scrollDown": "向下滚动",
+      "emptyCategory": "{{categoryName}} · 暂无积木",
+      "groups": {
+        "basics": "基础",
+        "data": "数据",
+        "schoolBot": "School Bot"
+      },
+      "scrollUpLabel": "滚动查看上方分类",
+      "scrollDownLabel": "滚动查看下方分类"
+    },
+    "categories": {
+      "start": "开始",
+      "control": "控制",
+      "logic": "逻辑",
+      "math": "数学",
+      "text": "文本",
+      "variable": "变量",
+      "list": "列表",
+      "function": "函数",
+      "car": "Car Control",
+      "motor": "电机",
+      "sensor": "Sensor",
+      "display": "Display",
+      "serial": "Serial",
+      "remote": "Remote Control"
+    },
+    "emptyCategory": {
+      "title": "此分类暂无积木",
+      "hint": "试试有积木的分类",
+      "goTo": "前往 {{categoryName}}"
+    },
+    "workspace": {
+      "label": "积木编辑区",
+      "controls": "编辑区工具",
+      "redo": "重做",
+      "zoomIn": "放大",
+      "zoomOut": "缩小",
+      "fit": "适应屏幕",
+      "fitTip": "适应屏幕（0）· 显示全部积木",
+      "undoTip": "撤销（{{shortcut}}）",
+      "undoUnavailable": "还没有可撤销的操作",
+      "redoTip": "重做（{{shortcut}}）",
+      "redoUnavailable": "还没有可重做的操作",
+      "zoomOutTip": "缩小（-）· 当前 {{percent}}%",
+      "zoomOutUnavailable": "已缩到最小 {{percent}}%",
+      "zoomInTip": "放大（+）· 当前 {{percent}}%",
+      "zoomInUnavailable": "已放到最大 {{percent}}%",
+      "zoomLevel": "缩放 {{percent}}%",
+      "dropped": "已放下",
+      "hint": {
+        "title": "把积木拖到“循环”下面",
+        "tap": "或点按列表中的积木，会自动接上"
+      },
+      "releaseToDelete": "松开即删除"
+    },
+    "function": {
+      "title": "函数",
+      "inputs": "输入",
+      "inputName": "输入：",
+      "allowStatements": "允许语句",
+      "callDisabledWarning": "无法运行函数“%1”，因为它的积木已被禁用。"
+    },
+    "comment": {
+      "open": "打开注释",
+      "close": "关闭注释",
+      "bubble": "注释：%1",
+      "label": "注释",
+      "collapse": "收起注释",
+      "expand": "展开注释"
+    },
+    "blockState": {
+      "disabled": "已禁用"
+    },
+    "blockSettings": {
+      "open": "设置此积木",
+      "close": "关闭积木设置",
+      "workspace": "积木设置区"
+    },
+    "blockMenu": {
+      "cleanUp": "整理积木",
+      "duplicate": "复制",
+      "deleteOne": "删除 1 个积木",
+      "deleteMany": "删除 %1 个积木",
+      "deleteAll": "删除全部 {{blockCount}} 个积木",
+      "reason": {
+        "nothingToUndo": "还没有可以撤销的操作",
+        "nothingToRedo": "还没有可以重做的操作",
+        "noBlocks": "还没有积木",
+        "onlyOne": "每种只能有 1 个"
+      },
+      "createCall": "创建调用积木“%1”",
+      "createValue": "创建值“%1”",
+      "deleteInput": "删除这个输入"
+    },
+    "fieldMenu": {
+      "pin": "选择引脚",
+      "value": "选择选项",
+      "variable": "选择变量",
+      "color": "选择颜色",
+      "colorNow": "当前颜色"
+    },
+    "toast": {
+      "addedToLoop": "已添加“{{blockText}}”到“循环”末尾",
+      "addedFree": "已添加“{{blockText}}”，放在空白处",
+      "deleted": "已删除 {{blockCount}} 个积木",
+      "onlyOne": "作品中已有“{{blockName}}” · 每种只能用一个"
+    },
+    "drawer": {
+      "label": "输出和代码",
+      "tabs": "选择显示内容",
+      "output": "Output",
+      "cpp": "Arduino C++ 代码",
+      "send": "上传到开发板",
+      "collapse": "收起底部抽屉",
+      "expand": "展开底部抽屉",
+      "readOnly": "只读",
+      "cppDesktopOnly": "C++ 代码需在桌面应用中查看",
+      "cppGenerating": "正在把积木转换为代码…",
+      "cppFailed": "积木无法转换为代码",
+      "outputUnread": "Output 有 {{lineCount}} 行新消息",
+      "peek": {
+        "latest": "最新：{{message}} · 共 {{lineCount}} 行",
+        "unreadable": "无法读取开发板 ({{errorCode}})",
+        "notReading": "还没有读取开发板"
+      }
+    },
+    "preflight": {
+      "title": "还不能上传到开发板，先修改一下吧",
+      "summary": "发现 {{count}} 处需要修改",
+      "sub": "全部改好后，再按一次“上传到开发板”",
+      "listLabel": "需要修改的地方：{{count}} 处",
+      "itemLabel": "第 {{number}} 处 {{title}} · 修改方法：{{fix}} · 按下查看积木",
+      "fixLine": "修改方法：{{fix}}",
+      "show": "查看",
+      "more": "还有 {{count}} 处 · 在列表中滚动查看",
+      "locked": "全部改好之前不能上传到开发板",
+      "lockedNote": "改好后再上传一次 · 如果还出现，请把每项末尾的代码告诉老师",
+      "back": "返回修改",
+      "emptySlot": {
+        "title": "“{{blockName}}”积木还有空格",
+        "fix": "把数值积木拖进所有空格"
+      },
+      "loose": {
+        "title": "“{{blockName}}”积木没有接到“开始”或“循环”下面",
+        "fix": "把它拖到“开始”或“循环”下面；不用的话就删掉"
+      },
+      "pinShared": {
+        "title": "引脚 {{pin}} 被用作多种用途：{{uses}}",
+        "fix": "每个设备用自己的引脚。请在其中一个积木里换一个引脚"
+      },
+      "timer2": {
+        "title": "蜂鸣器声音和红外遥控不能在同一个程序里使用",
+        "fix": "只选其中一个，删掉另一个的积木"
+      },
+      "engine": {
+        "title": "没能检查这个程序",
+        "fix": "把末尾的代码和下面的信息告诉老师"
+      },
+      "use": {
+        "input": "输入",
+        "output": "输出",
+        "tone": "蜂鸣器声音",
+        "servo": "舵机",
+        "neopixel": "RGB 灯",
+        "ultrasonic": "测距传感器",
+        "i2c": "I2C 屏幕或传感器"
+      }
+    },
+    "send": {
+      "progressLabel": "上传进度",
+      "steps": {
+        "compile": "第 1 步，共 2 步 · 转换代码",
+        "upload": "第 2 步，共 2 步 · 上传到开发板"
+      },
+      "errorCode": "错误代码：{{errorCode}}",
+      "retry": "再试一次",
+      "close": "关闭",
+      "toolOutput": "工具信息（供老师查看）",
+      "noBoard": {
+        "title": "未找到 Uno 开发板",
+        "body": "请一步一步试试",
+        "pick": "选择开发板",
+        "tips": {
+          "cable": "把 USB 线插到开发板和电脑上",
+          "wait": "稍等一下，然后按“再试一次”",
+          "pick": "按“选择开发板”，然后选择我们的 Uno 开发板"
+        }
+      },
+      "compiling": {
+        "title": "正在转换代码…",
+        "body": "请稍候，还没有上传到开发板",
+        "cancel": "取消"
+      },
+      "uploading": {
+        "title": "正在上传到开发板…",
+        "body": "上传时不要拔下 USB 线",
+        "cancel": "取消",
+        "confirmStop": "如果现在停止，需要重新上传到开发板，而且无法知道开发板上现在是什么程序",
+        "keep": "继续上传",
+        "stop": "停止上传"
+      },
+      "stopping": {
+        "title": "正在停止上传…",
+        "body": "请稍候，先不要拔下 USB 线"
+      },
+      "cancelled": {
+        "compile": {
+          "title": "已取消",
+          "body": "没有向开发板发送任何内容"
+        },
+        "upload": {
+          "title": "已停止上传",
+          "body": "无法知道开发板上现在是什么程序。按“再试一次”重新上传"
+        }
+      },
+      "sent": {
+        "title": "上传到开发板成功",
+        "body": "程序已上传到 Uno 开发板",
+        "done": "完成",
+        "previewNote": "预览：只是模拟结果，没有检查引脚，也没有向开发板发送任何内容"
+      },
+      "failed": {
+        "compile": {
+          "title": "代码转换失败",
+          "body": "开发板还没有收到程序。没关系，可以再试一次",
+          "tips": {
+            "check": "再检查一下积木，然后按“再试一次”",
+            "teacher": "如果还是不行，请老师打开下面的工具信息查看"
+          }
+        },
+        "upload": {
+          "title": "上传到开发板失败",
+          "body": "开发板里的程序可能不完整，需要再上传一次",
+          "tips": {
+            "cable": "检查 USB 线两端是否插紧",
+            "monitor": "关闭其他正在使用开发板端口的程序，例如 Arduino IDE 的串口监视器",
+            "again": "再按一次“上传到开发板”"
+          }
+        },
+        "timeout": {
+          "title": "用时太长了",
+          "body": "所以先停止了。开发板里的程序可能不完整，需要再上传一次",
+          "tips": {
+            "cable": "检查 USB 线两端是否插紧",
+            "again": "按“再试一次”"
+          }
+        },
+        "compileTimeout": {
+          "title": "代码转换时间太长",
+          "body": "开发板还没有收到程序。可以再试一次，下次会更快，因为电脑会保留已经转换好的部分",
+          "tips": {
+            "again": "按“再试一次”",
+            "teacher": "如果每次都太慢，请老师打开下面的工具信息查看"
+          }
+        },
+        "toolchain": {
+          "title": "这台电脑还不能上传到开发板",
+          "body": "需要先安装 Arduino 软件，请老师帮忙",
+          "tips": {
+            "install": "老师：安装 Arduino IDE 2",
+            "open": "打开 Arduino IDE 一次，等它把“Arduino AVR Boards”安装完成",
+            "again": "回来按“再试一次”"
+          }
+        },
+        "busy": {
+          "title": "还有别的任务在运行",
+          "body": "开发板还没有收到程序。稍等一下再试",
+          "tips": {
+            "again": "等 2–3 秒，然后按“再试一次”"
+          }
+        },
+        "engine": {
+          "title": "上传工具出了问题",
+          "body": "开发板可能还没有收到程序。没关系，可以再试一次",
+          "tips": {
+            "again": "按“再试一次”",
+            "teacher": "如果还是不行，请老师打开下面的工具信息查看"
+          }
+        },
+        "robotPort": {
+          "title": "这个端口属于机械臂",
+          "body": "机械臂控制正在使用这个端口，所以没有向开发板发送任何内容",
+          "tips": {
+            "pick": "按“选择开发板”，然后选对 Uno 开发板",
+            "replug": "如果确实是 Uno 开发板，请在打开开发板页面时拔下再插上，然后再按一次“用这块”"
+          }
+        }
+      },
+      "guard": {
+        "title": "正在上传到开发板",
+        "ok": "确定",
+        "body": {
+          "new": "请等上传完成后再新建作品 · 不要拔下 USB 线",
+          "leave": "请等上传完成后再离开 Block Lab · 不要拔下 USB 线",
+          "close": "请等上传完成后再关闭应用 · 不要拔下 USB 线",
+          "board": "请等上传完成后再更换开发板 · 不要拔下 USB 线"
+        },
+        "closeWait": "正在等待上传完成（最多 2 分钟），完成后应用会自动关闭 · 不要拔下 USB 线"
+      }
+    },
+    "terminal": {
+      "title": "来自开发板的消息",
+      "follow": "自动滚动",
+      "clear": "清空",
+      "nothingYet": "还没有可滚动或清空的消息",
+      "emptyTitle": "还没有消息",
+      "emptyHint": "使用“{{categoryName}}”类积木输出消息，开发板发来的内容会显示在这里",
+      "inputLabel": "输入要发送给开发板的消息，然后按 Enter",
+      "placeholderOff": "无法发送 · 尚未连接开发板",
+      "send": "发送",
+      "sendUnavailable": "无法发送：尚未连接开发板",
+      "explainTitle": "现在无法发送消息",
+      "explainBody": "尚未连接 Uno 开发板，消息无处可发 · 插上开发板的 USB 线，然后按“更换”选择开发板",
+      "explainClose": "知道了",
+      "followOff": "已暂停",
+      "clearLabel": "清空消息",
+      "logLabel": "来自开发板的消息和已发送的消息",
+      "trimmed": "已删除较早的消息 · 只保留最新 200 行",
+      "newLines": "有 {{lineCount}} 行新消息 · 跳到底部",
+      "badge": {
+        "uno": "来自 Uno 开发板",
+        "unreadable": "无法读取"
+      },
+      "reopen": "开始读取",
+      "prefix": {
+        "board": "来自开发板：",
+        "sent": "已发送：",
+        "error": "错误：",
+        "system": "系统："
+      },
+      "manual": {
+        "open": "读取开发板的消息",
+        "idle": "现在还没有读取",
+        "restart": "按下开始读取（开发板上的程序可能会重新开始）"
+      },
+      "unreadable": {
+        "title": "无法读取开发板的消息",
+        "body": "USB 线松了，或有其他程序正在使用端口 · 重新插好线，然后再试一次",
+        "retry": "再试一次"
+      },
+      "robotPort": {
+        "title": "这个端口属于机械臂",
+        "body": "机械臂控制正在使用这个端口 · 请选对 Uno 开发板，或在打开开发板页面时拔下再插上"
+      },
+      "log": {
+        "opened": "已开始读取 · 开发板上的程序可能已重新开始",
+        "dropped": "开发板发送太快，有部分消息没来得及读取而丢失",
+        "readFailed": "无法继续读取开发板，USB 线可能松了",
+        "robotPort": "无法读取：这个端口属于机械臂",
+        "sendFailed": "发送“{{message}}”失败，USB 线可能松了，请再发送一次",
+        "sendTooLong": "无法发送“{{message}}”，消息太长了，请分成较短的消息发送",
+        "sendFailedInApp": "发送“{{message}}”失败，程序出了问题，请再发送一次"
+      },
+      "placeholderReady": "输入消息，然后按 Enter 发送给开发板",
+      "placeholderNotReading": "无法发送 · 请先按“开始读取”",
+      "sendReady": "把消息发送给开发板",
+      "sendEmpty": "请先输入消息，再按发送",
+      "sendNotReading": "无法发送：还没有开始读取开发板的消息",
+      "explainBodyNotReading": "要先开始读取开发板的消息，发送的内容才能到达开发板 · 按“读取开发板的消息”，然后再发送一次",
+      "sentLive": "已发送",
+      "helpReady": "输入消息并按 Enter 发送到开发板的 Serial，按向上箭头可调出之前发送的消息",
+      "waitSend": "请等上传完成，之后会自动继续读取"
+    },
+    "blocks": {
+      "common": {
+        "do": "执行 %1"
+      },
+      "hat": {
+        "placed": "已放置",
+        "placed_tip": "每种只能用一个 · 已在作品中"
+      },
+      "base_setup": "开始",
+      "base_setup_note": "执行一次",
+      "sb_loop": "循环",
+      "sb_loop_note": "一直执行",
+      "controls_delay": "等待 %1 %2",
+      "controls_if": "如果 %1",
+      "controls_whileUntil": "重复 %1 %2",
+      "sb_forever": "一直重复",
+      "controls_for": "计数 %1 从 %2 到 %3 每次加 %4",
+      "sb_repeat": "重复 %1 次",
+      "controls_flow_statements": "%1",
+      "sb_wait_until": "等待直到 %1",
+      "controls_end_program": "停止程序",
+      "logic_compare": "%1 %2 %3",
+      "logic_operation": "%1 %2 %3",
+      "logic_negate": "非 %1",
+      "logic_boolean": "%1",
+      "math_number": "%1",
+      "math_arithmetic": "%1 %2 %3",
+      "sb_random": "随机 %1 到 %2",
+      "math_to_int": "%1 %2",
+      "base_map": "映射 %1 从 %2 – %3 到 %4 – %5",
+      "math_constrain": "约束 %1 在 %2 和 %3 之间",
+      "text": "%1",
+      "text_join": "连接 %1 和 %2",
+      "sb_text_letter": "%2 的第 %1 个字符",
+      "text_length": "%1 的长度",
+      "sb_text_contains": "%1 包含 %2",
+      "variables_declare": "创建变量 %1 类型 %2 初始值 %3",
+      "variables_get": "%1",
+      "variables_set": "将 %1 设为 %2",
+      "sb_variable_change": "将 %1 增加 %2",
+      "procedures_return": "返回 %1",
+      "serial_print": "串口 %1 %2",
+      "serial_readstr": "串口收到的文本",
+      "serial_available": "串口有新数据",
+      "sb_button": "引脚 %1 的按键被按下",
+      "sb_touch": "引脚 %1 的触摸传感器被触摸",
+      "sb_reed_switch": "引脚 %1 的干簧管检测到磁铁",
+      "sb_sound": "引脚 %1 的声音传感器检测到声音",
+      "sb_light": "引脚 %1 的光线传感器检测到光",
+      "sb_line_tracker": "引脚 %1 的循迹传感器检测到线",
+      "sb_potentiometer": "引脚 %1 的电位器",
+      "sb_soil_moisture": "引脚 %1 的土壤湿度",
+      "sb_water_level": "引脚 %1 的水位",
+      "sb_grayscale": "引脚 %1 的灰度",
+      "sb_ir_obstacle": "以%2读取引脚 %1 的避障传感器",
+      "sb_tilt": "以%2读取引脚 %1 的倾斜开关",
+      "sb_pir": "以%2读取引脚 %1 的人体感应",
+      "sb_mq7": "以%2读取引脚 %1 的一氧化碳传感器",
+      "sb_mq3": "以%2读取引脚 %1 的酒精传感器",
+      "sb_active_buzzer": "引脚 %1 的蜂鸣器 %2",
+      "sb_relay": "引脚 %1 的继电器 %2",
+      "sb_fan": "风扇 A %1 B %2 %3 速度 %4",
+      "sb_fan_stop": "停止风扇 A %1 B %2",
+      "sb_buzzer_tone": "引脚 %1 的蜂鸣器播放 %2 Hz",
+      "sb_buzzer_tone_for": "引脚 %1 的蜂鸣器播放 %2 Hz 持续 %3 毫秒",
+      "sb_buzzer_stop": "停止引脚 %1 的蜂鸣器",
+      "sb_rgb_setup": "设置引脚 %1 的 RGB 灯 %2 个 亮度 %3",
+      "sb_rgb_set": "引脚 %1 的第 %2 个 RGB 灯设为 %3",
+      "sb_rgb_color": "颜色 红 %1 绿 %2 蓝 %3",
+      "sb_rgb_named_color": "颜色 %1",
+      "sb_ultrasonic": "超声波距离 (厘米) Trig %1 Echo %2",
+      "sb_mpu6050": "MPU6050 %1",
+      "sb_dht11": "引脚 %1 的 DHT11 %2",
+      "sb_gesture_is": "检测到的手势是 %1",
+      "sb_gesture_light": "手势传感器光线 %1",
+      "sb_color_sensor": "颜色传感器 %1",
+      "sb_servo": "引脚 %1 的舵机转到 %2 度",
+      "sb_oled_print": "OLED 第 %1 行显示 %2",
+      "sb_oled_clear": "清空 OLED",
+      "sb_led": "引脚 %1 的 LED %2",
+      "sb_led_brightness": "引脚 %1 的 LED 亮度 %2",
+      "sb_ir_received": "引脚 %1 的红外遥控收到信号",
+      "sb_ir_button": "按下的按键是 %1",
+      "options": {
+        "delay": {
+          "delay": "毫秒",
+          "delaymicroseconds": "微秒"
+        },
+        "while": {
+          "while": "当",
+          "until": "直到"
+        },
+        "flow": {
+          "break": "跳出循环",
+          "continue": "进入下一次循环"
+        },
+        "logic": {
+          "and": "且",
+          "or": "或"
+        },
+        "boolean": {
+          "true": "真",
+          "false": "假"
+        },
+        "math": {
+          "mod": "取余"
+        },
+        "round": {
+          "round": "四舍五入",
+          "ceil": "向上取整",
+          "floor": "向下取整",
+          "abs": "绝对值",
+          "sqrt": "平方根"
+        },
+        "type": {
+          "int": "整数",
+          "float": "小数",
+          "string": "文本",
+          "boolean": "真/假"
+        },
+        "print": {
+          "print": "打印",
+          "println": "打印并换行"
+        },
+        "state": {
+          "high": "打开",
+          "low": "关闭"
+        },
+        "mode": {
+          "digital": "数字",
+          "analog": "模拟"
+        },
+        "fan": {
+          "forward": "正转",
+          "reverse": "反转"
+        },
+        "color": {
+          "red": "红色",
+          "green": "绿色",
+          "blue": "蓝色",
+          "yellow": "黄色",
+          "cyan": "青色",
+          "magenta": "品红",
+          "white": "白色",
+          "off": "熄灭"
+        },
+        "mpu": {
+          "accel_x": "X 轴加速度",
+          "accel_y": "Y 轴加速度",
+          "accel_z": "Z 轴加速度",
+          "gyro_x": "X 轴角速度",
+          "gyro_y": "Y 轴角速度",
+          "gyro_z": "Z 轴角速度"
+        },
+        "dht": {
+          "temperature": "温度 (°C)",
+          "humidity": "湿度 (%)"
+        },
+        "gesture": {
+          "dir_left": "向左",
+          "dir_right": "向右",
+          "dir_up": "向上",
+          "dir_down": "向下",
+          "dir_near": "靠近",
+          "dir_far": "远离"
+        },
+        "light": {
+          "red": "红色",
+          "green": "绿色",
+          "blue": "蓝色",
+          "ambient": "环境光",
+          "clear": "总光强"
+        }
+      },
+      "function_input": {
+        "tray_tip": "点按这个积木来添加输入 · 或拖到“输入”里",
+        "placed_tip": "长按这个积木可删除这个输入 · 或拖到新的位置"
+      }
+    },
+    "sensorGroups": {
+      "buttons": "按键与按压",
+      "motion": "碰撞、倾斜与震动",
+      "light": "光线与颜色",
+      "sound": "声音",
+      "distance": "距离与障碍",
+      "environment": "空气与环境",
+      "actuators": "执行器"
+    },
+    "startPlaced": {
+      "hint": "作品中已有“开始”和“循环” · 各只能用一个"
+    },
+    "defaults": {
+      "text": "你好"
+    },
+    "project": {
+      "unsaved": "尚未保存",
+      "saved": "已保存 {{time}}",
+      "savedEdited": "已保存 {{time}} · 有新的修改",
+      "opened": "已保存",
+      "openedEdited": "有未保存的修改",
+      "saveFailed": "保存失败，请再试一次",
+      "confirm": {
+        "title": "有尚未保存的修改",
+        "titleNamed": "作品“{{jobName}}”尚未保存",
+        "body": {
+          "new": "开始新作品前要先保存吗？",
+          "leave": "离开此页面前要先保存吗？",
+          "close": "关闭程序前要先保存吗？"
+        },
+        "keep": "继续编辑",
+        "discard": "不保存"
+      }
+    },
+    "menu": {
+      "label": "菜单",
+      "new": "新作品",
+      "save": "保存作品",
+      "saveCopy": "另存副本…",
+      "export": "导出为 .sbb 文件",
+      "checkConnection": "检查连接",
+      "about": "关于 School Bot Studio",
+      "notYet": "此版本暂不可用"
+    },
+    "list": {
+      "label": "积木列表",
+      "show": "显示积木列表",
+      "hide": "隐藏积木列表",
+      "hideHint": "隐藏积木列表 (Esc)",
+      "dropToDelete": "松开即可删除"
+    },
+    "deleteAll": {
+      "title": "删除全部 {{blockCount}} 个积木？",
+      "body": "如果删错了，按撤销就能找回来",
+      "keep": "不删除",
+      "confirm": "全部删除"
+    },
+    "colorPicker": {
+      "mixedName": "R{{red}} G{{green}} B{{blue}}",
+      "basicLabel": "8 种基本颜色",
+      "tabs": {
+        "label": "选择颜色的方式",
+        "basic": "基本颜色",
+        "basicLabel": "从基本颜色中选择",
+        "wheel": "色轮",
+        "wheelLabel": "在色轮上选择",
+        "numbers": "数值",
+        "numbersLabel": "输入 R G B 数值"
+      },
+      "wheel": {
+        "hueLabel": "色相",
+        "hue": "色相 {{hue}}° · {{hueName}}",
+        "hueText": "色相 {{hue}} 度，{{hueName}}",
+        "hint": "拖动圆环，或按 ← →",
+        "lightness": "亮度 {{lightness}}%",
+        "lightnessText": "亮度百分之 {{lightness}}",
+        "rgb": "R {{red}} · G {{green}} · B {{blue}}"
+      },
+      "hues": {
+        "red": "红",
+        "orange": "橙",
+        "yellow": "黄",
+        "lime": "黄绿",
+        "green": "绿",
+        "mint": "薄荷绿",
+        "cyan": "青",
+        "azure": "天蓝",
+        "blue": "蓝",
+        "purple": "紫",
+        "magenta": "品红",
+        "pink": "粉红"
+      },
+      "numbers": {
+        "red": "R（红）",
+        "green": "G（绿）",
+        "blue": "B（蓝）",
+        "redLabel": "红色值，0 到 255",
+        "greenLabel": "绿色值，0 到 255",
+        "blueLabel": "蓝色值，0 到 255",
+        "hint": "可输入 0–255 · 按 Enter 或离开输入框即可使用",
+        "notDigits": "只能输入数字 · 使用 {{number}}",
+        "empty": "输入框为空，已使用 0",
+        "tooHigh": "只能输入 0–255 · 已调整为 255"
       }
     }
   }

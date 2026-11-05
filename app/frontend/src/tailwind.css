@@ -115,10 +115,13 @@
     @apply [color:var(--ink)];
     @apply [background:var(--bg)]
 }
+/* The app fills a fixed window, so there is no page to bounce: a touchpad scroll that runs past
+   the end of a list would otherwise drag the whole app away from the window buttons. */
 :root {
     @apply [font-size:14px];
     @apply [line-height:1.6];
-    @apply [font-synthesis:none]
+    @apply [font-synthesis:none];
+    @apply [overscroll-behavior:none]
 }
 * {
     @apply box-border

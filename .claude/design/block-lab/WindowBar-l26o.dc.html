@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>แถบหน้าต่าง Block Lab</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'IBM Plex Sans Thai',system-ui,sans-serif}
+button{font-family:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid #B85E00;outline-offset:-3px}
+.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.sp{animation:bl-spin .8s linear infinite}
+@keyframes bl-spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.sp{animation:none}}
+.wb{display:inline-flex;align-items:center;justify-content:center;width:48px;height:60px;border:0;background:transparent;color:#14243D;padding:0}
+.mc{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:0;background:transparent;padding:0}
+.hb{display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border:0;background:transparent;padding:0;color:#14243D}
+.hv{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:40px;height:40px;border-radius:12px;border:2px solid #C6D6EA;border-bottom-width:4px;background:#fff}
+</style>
+</helmet>
+<!-- แถบหน้าต่าง 60 (เดิม 44 · แก้ 2026-10-22 ตาม R11 app-shell · Win+Mac · ปุ่มกด ≥44 คงไว้ ปุ่ม Windows 48×60 เต็มความสูง) · pattern ตามภาพอ้างอิง: ซ้าย (ปุ่มหน้าต่าง Mac) + บ้าน + เมนู + สถานะคลาวด์ · กลาง โลโก้ · ขวา ชิปอุปกรณ์ + ชื่องาน/สถานะบันทึก + (Windows) ปุ่มหน้าต่าง
+     สำเนาจำลองจาก app-shell WindowBarV1 (ชั่วคราว) · ชั้นต่ำกว่า z-stop (CR-10 ทาง ก) · prop lab = block|arm สลับโลโก้ (Arm Lab ใช้ pattern เดียวกัน) -->
+<div style="position:relative;width:1440px;height:60px;box-sizing:border-box;background:#fff;color:#14243D;overflow:hidden">
+  <div style="position:absolute;left:0;right:0;bottom:0;height:2px;background:#DCE3EC"></div>
+
+  <div style="position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;width:100%;height:60px">
+
+    <!-- ซ้าย -->
+    <div style="display:flex;align-items:center;gap:8px;min-width:0;padding-left:{{leftPad}}">
+      <sc-if value="{{isMac}}" hint-placeholder-val="{{false}}">
+        <div style="display:flex;align-items:center;margin-right:4px">
+          <button class="mc" aria-label="ปิดโปรแกรม"><span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#FF5F57"><svg class="i" viewBox="0 0 24 24" style="width:14px;height:14px;color:#14243D" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></span></button>
+          <button class="mc" aria-label="ย่อหน้าต่าง"><span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#FEBC2E"><svg class="i" viewBox="0 0 24 24" style="width:14px;height:14px;color:#14243D" aria-hidden="true"><path d="M5 12h14"></path></svg></span></button>
+          <button class="mc" aria-label="ซ่อนลง menu bar"><span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#28C840"><svg class="i" viewBox="0 0 24 24" style="width:14px;height:14px;color:#14243D" aria-hidden="true"><path d="M12 21V9M6 15l6-6 6 6M5 3h14"></path></svg></span></button>
+        </div>
+      </sc-if>
+
+      <button class="hb" aria-label="หน้าหลัก"><span class="hv"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8M5 10v10h14V10M10 20v-6h4v6"></path></svg></span></button>
+      <button class="hb" aria-label="เมนูงาน" aria-haspopup="menu" aria-expanded="{{menuOpen}}"><span class="hv" style="{{menuStyle}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></span></button>
+
+      <!-- สถานะบันทึกคลาวด์ (R3 · ที่เดียวทั้งแอป · กดดูรายละเอียด) -->
+      <button style="display:inline-flex;align-items:center;height:48px;padding:0;border:0;background:transparent;color:#14243D;margin-left:4px;min-width:0" aria-label="{{saveText}} กดเพื่อดูรายละเอียด"><span style="display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 12px;border-radius:999px;font-size:16px;font-weight:600;white-space:nowrap;{{saveStyle}}"><svg class="{{saveIconClass}}" viewBox="0 0 24 24" aria-hidden="true"><path d="{{saveIcon}}"></path></svg><span>{{saveText}}</span></span></button>
+    </div>
+
+    <!-- กลาง: โลโก้ (ไม่ใช่ปุ่ม) -->
+    <div role="img" aria-label="{{logoAlt}}" style="display:flex;align-items:center;gap:10px;height:60px;white-space:nowrap;user-select:none">
+      <span style="display:inline-flex;align-items:center;gap:6px">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#F08A1C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="12" rx="5"></rect><path d="M12 8V4M9 14h.01M15 14h.01"></path></svg>
+        <span style="font-size:20px;font-weight:600;line-height:28px;letter-spacing:-0.2px"><span style="color:#F08A1C">School</span> <span style="color:#3FA3DC">Bot</span></span>
+      </span>
+      <span style="width:2px;height:24px;border-radius:1px;background:#C6D6EA"></span>
+      <span style="display:inline-flex;align-items:center;gap:6px">
+        <sc-if value="{{isBlock}}" hint-placeholder-val="{{true}}">
+          <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><rect x="3" y="2.5" width="13" height="6" rx="2" fill="#2F7BEA"></rect><rect x="8" y="9.5" width="13" height="5.5" rx="2" fill="#5BC0EB"></rect><rect x="3" y="16.5" width="13" height="5.5" rx="2" fill="#FFB703"></rect></svg>
+        </sc-if>
+        <sc-if value="{{isArm}}" hint-placeholder-val="{{false}}">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#2F7BEA" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21h8M8 21v-5l6-6M14 10l4-6M16 4l4 2"></path><circle cx="8" cy="14" r="1.6" fill="#FFB703" stroke="#FFB703"></circle></svg>
+        </sc-if>
+        <span style="font-size:20px;font-weight:700;line-height:28px;letter-spacing:-0.2px"><span style="color:#2F7BEA">{{logoA}}</span><span style="color:#E8A100">Lab</span></span>
+      </span>
+    </div>
+
+    <!-- ขวา -->
+    <div style="display:flex;align-items:center;justify-content:flex-end;gap:12px;min-width:0;padding-right:{{rightPad}}">
+      <!-- ชิปอุปกรณ์ Uno (R4 · เฉพาะใน lab · กดแล้วไป SCR-19) · พื้นที่กดสูง 44 -->
+      <button style="display:inline-flex;align-items:center;height:48px;padding:0;border:0;background:transparent;color:#14243D;min-width:0" aria-label="{{chipAria}}"><span style="display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 12px;border-radius:999px;font-size:16px;font-weight:600;white-space:nowrap;{{chipStyle}}"><svg class="{{chipIconClass}}" viewBox="0 0 24 24" aria-hidden="true"><path d="{{chipIcon}}"></path></svg><span>{{chipText}}</span></span></button>
+
+      <!-- ชื่องาน + สถานะบันทึกในเครื่อง (ตัวหนังสือเขียวใต้ชื่อ · EDIT-09) · กดเพื่อเปลี่ยนชื่อ · พื้นที่กดสูง 44 -->
+      <button style="display:inline-flex;flex-direction:column;align-items:flex-end;justify-content:center;height:56px;max-width:240px;min-width:0;padding:0 4px;border:0;background:transparent;color:#14243D" aria-label="เปลี่ยนชื่องาน {{jobName}} · {{workText}}">
+        <span style="display:inline-flex;align-items:center;gap:6px;max-width:100%;font-size:16px;font-weight:700;line-height:24px"><svg class="i" viewBox="0 0 24 24" style="width:14px;height:14px;color:#5A6377" aria-hidden="true"><path d="M4 20l4-1 11-11a2.8 2.8 0 0 0-4-4L4 15zM13.5 6.5l4 4"></path></svg><span title="{{jobName}}" style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{jobName}}</span></span>
+        <span style="display:inline-flex;align-items:center;gap:5px;max-width:100%;font-size:14px;font-weight:600;line-height:22px;color:#2E7D32"><svg class="i" viewBox="0 0 24 24" style="width:14px;height:14px" aria-hidden="true"><path d="{{workIcon}}"></path></svg><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{workText}}</span></span>
+      </button>
+
+      <sc-if value="{{isWin}}" hint-placeholder-val="{{true}}">
+        <div style="display:flex;align-items:center;margin-left:-4px">
+          <button class="wb" aria-label="ย่อหน้าต่าง"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"></path></svg></button>
+          <button class="wb" aria-label="ซ่อนลง tray"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M6 9l6 6 6-6M5 21h14"></path></svg></button>
+          <button class="wb" aria-label="ปิดโปรแกรม"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"os":{"editor":"enum","default":"win","options":["win","mac"]},"lab":{"editor":"enum","default":"block","options":["block","arm"]},"chip":{"editor":"enum","default":"connected","options":["disconnected","connecting","connected","lost"]},"save":{"editor":"enum","default":"saved","options":["saved","saving","offline","failed"]},"work":{"editor":"enum","default":"unsaved","options":["saved","dirty","unsaved"]},"menu":{"editor":"enum","default":"closed","options":["closed","open"]},"job":{"editor":"text","default":"กดปุ่มแล้วไฟติด"},"time":{"editor":"text","default":"10:20"},"port":{"editor":"text","default":"COM3"},"$preview":{"width":1440,"height":60}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const os = this.props.os || 'win';
+    const lab = this.props.lab || 'block';
+    const chip = this.props.chip || 'connected';
+    const save = this.props.save || 'saved';
+    const work = this.props.work || 'unsaved';
+    const port = this.props.port || 'COM3';
+    const time = this.props.time || '10:20';
+    const job = this.props.job || 'กดปุ่มแล้วไฟติด';
+    const menuOpen = this.props.menu === 'open';
+    const SPIN = 'M12 2v4M12 18v4M4.9 4.9l2.9 2.9M16.2 16.2l2.9 2.9M2 12h4M18 12h4M4.9 19.1l2.9-2.9M16.2 7.8l2.9-2.9';
+    const ALERT = 'M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01';
+    const CLOUD = 'M18 18a4 4 0 0 0 0-8 6 6 0 0 0-11.5-1A5 5 0 0 0 7 18zM9 13l2 2 4-4';
+    const SV = {
+      saved: ['บันทึกขึ้นคลาวด์แล้ว', CLOUD, 'i', 'color:#2E7D32;background:#fff;border:2px solid #DCE3EC'],
+      saving: ['กำลังบันทึกขึ้นคลาวด์', SPIN, 'i sp', 'color:#14243D;background:#EAF2FD;border:2px solid #C6D6EA'],
+      offline: ['ไม่มีเน็ต · เก็บงานในเครื่องไว้ก่อน', 'M3 3l18 18M18 18a4 4 0 0 0-2-7.5 6 6 0 0 0-9-3.7M5 15a4 4 0 0 0 2 3h6', 'i', 'color:#14243D;background:#F4F6F8;border:2px solid #DCE3EC'],
+      failed: ['บันทึกขึ้นคลาวด์ไม่สำเร็จ', ALERT, 'i', 'color:#14243D;background:#FFF4CC;border:2px solid #B07F00']
+    };
+    const CH = {
+      disconnected: ['Uno · ยังไม่เชื่อม', 'M9 2v6M15 2v6M6 8h12v4a6 6 0 0 1-12 0zM12 18v4', 'i', 'background:#F4F6F8;border:2px solid #DCE3EC', 'ชิปอุปกรณ์ Uno ยังไม่เชื่อม กดเพื่อดูวิธีเชื่อม'],
+      connecting: ['Uno · กำลังเชื่อม…', SPIN, 'i sp', 'background:#EAF2FD;border:2px solid #C6D6EA', 'ชิปอุปกรณ์ Uno กำลังเชื่อม'],
+      connected: ['Uno · ' + port + ' · เชื่อมแล้ว', 'M5 12l5 5L20 7', 'i', 'background:#fff;border:2px solid #2E7D32', 'ชิปอุปกรณ์ Uno เชื่อมแล้วที่ ' + port],
+      lost: ['Uno · หลุด', ALERT, 'i', 'background:#FFF4CC;border:2px solid #B07F00', 'ชิปอุปกรณ์ Uno หลุด กดเพื่อดูวิธีแก้']
+    };
+    const WK = {
+      saved: ['บันทึกแล้ว ' + time, 'M5 12l5 5L20 7'],
+      dirty: ['บันทึกแล้ว ' + time + ' · มีแก้ไขใหม่', 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 12h.01'],
+      unsaved: ['ยังไม่ได้บันทึกงานในเครื่อง', 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 16v-4M12 8h.01']
+    };
+    const s = SV[save] || SV.saved;
+    const c = CH[chip] || CH.connected;
+    const w = WK[work] || WK.unsaved;
+    return {
+      isMac: os === 'mac', isWin: os !== 'mac',
+      leftPad: os === 'mac' ? '8px' : '12px',
+      rightPad: os === 'mac' ? '12px' : '0px',
+      isBlock: lab !== 'arm', isArm: lab === 'arm',
+      logoA: lab === 'arm' ? 'Arm' : 'Block',
+      logoAlt: lab === 'arm' ? 'School Bot Studio · Arm Lab' : 'School Bot Studio · Block Lab',
+      menuOpen: menuOpen,
+      menuStyle: menuOpen ? 'border-color:#1866C9;background:#EAF2FD' : '',
+      jobName: job, workText: w[0], workIcon: w[1],
+      saveText: s[0], saveIcon: s[1], saveIconClass: s[2], saveStyle: s[3],
+      chipText: c[0], chipIcon: c[1], chipIconClass: c[2], chipStyle: c[3], chipAria: c[4]
+    };
+  }
+}
+</script>
+</body>
+</html>
