@@ -58,7 +58,11 @@ $requiredPayload = @(
     'engines/zide/THIRD-PARTY-NOTICES.md',
     'engines/zide/HIDAPI-LICENSE.txt',
     'engines/zide/JSON-LICENSE.txt',
-    'engines/zide/zide-engine.exe.sha256'
+    'engines/zide/zide-engine.exe.sha256',
+    'engines/mixly/mixly-engine.exe',
+    'engines/mixly/engine.json',
+    'engines/mixly/THIRD-PARTY-NOTICES.md',
+    'engines/mixly/mixly-engine.exe.sha256'
 )
 foreach ($rel in $requiredPayload) {
     $full = Join-Path $payloadDir $rel
@@ -122,6 +126,7 @@ if ($bootstrapperSig.status -ne 'Valid' -or $bootstrapperSig.signer_subject -not
 
 $demoHash = (Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $payloadDir 'demo-engine.exe')).Hash.ToLowerInvariant()
 $zideHash = (Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $payloadDir 'engines/zide/zide-engine.exe')).Hash.ToLowerInvariant()
+$mixlyHash = (Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $payloadDir 'engines/mixly/mixly-engine.exe')).Hash.ToLowerInvariant()
 $desktopHash = (Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $payloadDir 'school-bot.exe')).Hash.ToLowerInvariant()
 $msiHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $msiPath).Hash.ToLowerInvariant()
 $setupHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $setupPath).Hash.ToLowerInvariant()
@@ -144,7 +149,8 @@ $manifest = [ordered]@{
     }
     engine_hashes  = @(
         [ordered]@{ id = 'demo'; executable = 'demo-engine.exe'; sha256 = $demoHash },
-        [ordered]@{ id = 'zide'; executable = 'engines/zide/zide-engine.exe'; sha256 = $zideHash }
+        [ordered]@{ id = 'zide'; executable = 'engines/zide/zide-engine.exe'; sha256 = $zideHash },
+        [ordered]@{ id = 'mixly'; executable = 'engines/mixly/mixly-engine.exe'; sha256 = $mixlyHash }
     )
     webview2_bootstrapper = [ordered]@{
         file       = 'MicrosoftEdgeWebview2Setup.exe'

@@ -1,5 +1,5 @@
 param(
-    [string]$PayloadDirectory = "dist/payload-0.1.5-rc",
+    [string]$PayloadDirectory,
     [string]$ReportPath = "reports/phase6/msi-lifecycle-and-rollback-report.json"
 )
 $ErrorActionPreference = 'Stop'
@@ -9,10 +9,12 @@ if ($env:OS -ne 'Windows_NT') {
     throw 'test-msi-rollback-recovery.ps1 requires Windows (msiexec.exe).'
 }
 
-$resolvedPayload = if ([IO.Path]::IsPathRooted($PayloadDirectory)) {
+$resolvedPayload = if ($PayloadDirectory -and [IO.Path]::IsPathRooted($PayloadDirectory)) {
     $PayloadDirectory
-} else {
+} elseif ($PayloadDirectory) {
     Join-Path $SchoolBotRoot $PayloadDirectory
+} else {
+    Join-Path $SchoolBotRoot 'app/bin'
 }
 if (-not (Test-Path -LiteralPath $resolvedPayload)) {
     $resolvedPayload = Join-Path $SchoolBotRoot 'app/bin'
@@ -121,13 +123,23 @@ function Get-MsiProductInfo([string]$ProductCode, [string]$Attribute) {
     }
 }
 
-$msiPrev = Join-Path $smokeRoot 'school-bot-0.1.4-smoke.msi'
-$msiCurr = Join-Path $smokeRoot "school-bot-$currentVersion-smoke.msi"
-$msiFault = Join-Path $smokeRoot 'school-bot-0.1.6-fault-smoke.msi'
+$parsedVer = [version]$currentVersion
+$prevVersion = if ($parsedVer.Major -gt 0 -and $parsedVer.Minor -eq 0 -and $parsedVer.Build -eq 0) {
+    "$($parsedVer.Major - 1).9.9"
+} elseif ($parsedVer.Build -gt 0) {
+    "$($parsedVer.Major).$($parsedVer.Minor).$($parsedVer.Build - 1)"
+} else {
+    "$($parsedVer.Major).$([Math]::Max(0, $parsedVer.Minor - 1)).9"
+}
+$faultVersion = "$($parsedVer.Major).$($parsedVer.Minor).$($parsedVer.Build + 1)"
 
-Build-SmokeMsi -Version '0.1.4' -OutPath $msiPrev
+$msiPrev = Join-Path $smokeRoot "school-bot-$prevVersion-smoke.msi"
+$msiCurr = Join-Path $smokeRoot "school-bot-$currentVersion-smoke.msi"
+$msiFault = Join-Path $smokeRoot "school-bot-$faultVersion-fault-smoke.msi"
+
+Build-SmokeMsi -Version $prevVersion -OutPath $msiPrev
 Build-SmokeMsi -Version $currentVersion -OutPath $msiCurr
-Build-SmokeMsi -Version '0.1.6' -OutPath $msiFault
+Build-SmokeMsi -Version $faultVersion -OutPath $msiFault
 
 $codePrev = Get-MsiProductCode -MsiPath $msiPrev
 $codeCurr = Get-MsiProductCode -MsiPath $msiCurr
@@ -185,23 +197,23 @@ foreach ($rel in $payloadFiles) {
 $steps = @()
 
 try {
-    # 1. Clean install of 0.1.4
-    $resInstallPrev = Invoke-MsiExec -Arguments @('/i', "`"$msiPrev`"", "INSTALLFOLDER=`"$testInstallDir`"") -LogName '01-install-0.1.4.log'
+    # 1. Clean install of baseline
+    $resInstallPrev = Invoke-MsiExec -Arguments @('/i', "`"$msiPrev`"", "INSTALLFOLDER=`"$testInstallDir`"") -LogName "01-install-$prevVersion.log"
     $prevState = Get-MsiProductState -ProductCode $codePrev
     $prevVer = Get-MsiProductInfo -ProductCode $codePrev -Attribute 'VersionString'
-    if ($prevState -ne 5 -or $prevVer -ne '0.1.4') {
-        throw "Expected 0.1.4 installed (state=5), got state=$prevState version=$prevVer"
+    if ($prevState -ne 5 -or $prevVer -ne $prevVersion) {
+        throw "Expected $prevVersion installed (state=5), got state=$prevState version=$prevVer"
     }
     $steps += [ordered]@{
-        step        = 'install-baseline-0.1.4'
+        step        = "install-baseline-$prevVersion"
         requirement = 'AC-031-01'
         exit_code   = $resInstallPrev.exit_code
         version     = $prevVer
         status      = 'PASS'
     }
 
-    # 2. In-place MajorUpgrade 0.1.4 -> 0.1.5
-    $resInstallCurr = Invoke-MsiExec -Arguments @('/i', "`"$msiCurr`"", "INSTALLFOLDER=`"$testInstallDir`"") -LogName '02-install-upgrade-0.1.5.log'
+    # 2. In-place MajorUpgrade baseline -> current
+    $resInstallCurr = Invoke-MsiExec -Arguments @('/i', "`"$msiCurr`"", "INSTALLFOLDER=`"$testInstallDir`"") -LogName "02-install-upgrade-$currentVersion.log"
     $currState = Get-MsiProductState -ProductCode $codeCurr
     $currVer = Get-MsiProductInfo -ProductCode $codeCurr -Attribute 'VersionString'
     $prevStateAfterUpgrade = Get-MsiProductState -ProductCode $codePrev
@@ -212,26 +224,26 @@ try {
         $installedPath = Join-Path $testInstallDir $rel
         $actualHash = (Get-FileHash -LiteralPath $installedPath -Algorithm SHA256).Hash.ToLowerInvariant()
         if ($actualHash -ne $expectedHashes[$rel]) {
-            throw "Payload hash mismatch after 0.1.5 install for ${rel}: expected $($expectedHashes[$rel]), got $actualHash"
+            throw "Payload hash mismatch after $currentVersion install for ${rel}: expected $($expectedHashes[$rel]), got $actualHash"
         }
     }
     $steps += [ordered]@{
-        step        = 'upgrade-0.1.4-to-0.1.5'
+        step        = "upgrade-$prevVersion-to-$currentVersion"
         requirement = 'AC-031-04'
         exit_code   = $resInstallCurr.exit_code
         version     = $currVer
         status      = 'PASS'
     }
 
-    # 3. Downgrade attempt 0.1.5 -> 0.1.4 blocked
-    $resDowngrade = Invoke-MsiExec -Arguments @('/i', "`"$msiPrev`"", "INSTALLFOLDER=`"$testInstallDir`"") -LogName '03-downgrade-blocked-0.1.4.log' -AllowedExitCodes @(1603, 1638)
+    # 3. Downgrade attempt current -> baseline blocked
+    $resDowngrade = Invoke-MsiExec -Arguments @('/i', "`"$msiPrev`"", "INSTALLFOLDER=`"$testInstallDir`"") -LogName "03-downgrade-blocked-$prevVersion.log" -AllowedExitCodes @(1603, 1638)
     $stateAfterDowngrade = Get-MsiProductState -ProductCode $codeCurr
     $verAfterDowngrade = Get-MsiProductInfo -ProductCode $codeCurr -Attribute 'VersionString'
     if ($stateAfterDowngrade -ne 5 -or $verAfterDowngrade -ne $currentVersion) {
         throw "Downgrade was not cleanly blocked; state=$stateAfterDowngrade ver=$verAfterDowngrade"
     }
     $steps += [ordered]@{
-        step        = 'downgrade-blocked-0.1.5-to-0.1.4'
+        step        = "downgrade-blocked-$currentVersion-to-$prevVersion"
         requirement = 'AC-031-04'
         exit_code   = $resDowngrade.exit_code
         active_ver  = $verAfterDowngrade
@@ -241,7 +253,7 @@ try {
     # 4. Delete both engines and run MSI Repair (/fa)
     Remove-Item -LiteralPath (Join-Path $testInstallDir 'demo-engine.exe') -Force
     Remove-Item -LiteralPath (Join-Path $testInstallDir 'engines/zide/zide-engine.exe') -Force
-    $resRepair = Invoke-MsiExec -Arguments @('/fa', $codeCurr) -LogName '04-repair-0.1.5.log'
+    $resRepair = Invoke-MsiExec -Arguments @('/fa', $codeCurr) -LogName "04-repair-$currentVersion.log"
     foreach ($rel in @('demo-engine.exe', 'engines/zide/zide-engine.exe')) {
         $repairedPath = Join-Path $testInstallDir $rel
         $repairedHash = (Get-FileHash -LiteralPath $repairedPath -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -256,10 +268,10 @@ try {
         status      = 'PASS'
     }
 
-    # 5. AC-030-07: Mid-update failure injection during MajorUpgrade 0.1.5 -> 0.1.6 (SCHOOLBOT_INJECT_FAIL=1)
+    # 5. AC-030-07: Mid-update failure injection during MajorUpgrade current -> fault (SCHOOLBOT_INJECT_FAIL=1)
     $resFaultUpgrade = Invoke-MsiExec `
         -Arguments @('/i', "`"$msiFault`"", "INSTALLFOLDER=`"$testInstallDir`"", 'SCHOOLBOT_INJECT_FAIL=1') `
-        -LogName '05-mid-update-fail-rollback-0.1.6.log' `
+        -LogName "05-mid-update-fail-rollback-$faultVersion.log" `
         -AllowedExitCodes @(1603)
 
     $faultLogText = Get-Content -LiteralPath $resFaultUpgrade.log_path -Raw
@@ -268,10 +280,10 @@ try {
     $currVerAfterRollback = Get-MsiProductInfo -ProductCode $codeCurr -Attribute 'VersionString'
     $faultStateAfterRollback = Get-MsiProductState -ProductCode $codeFault
     if (-not $customActionTriggered) {
-        throw "InjectMidUpdateFailure custom action was not observed in 05-mid-update-fail-rollback-0.1.6.log"
+        throw "InjectMidUpdateFailure custom action was not observed in 05-mid-update-fail-rollback-$faultVersion.log"
     }
     if ($currStateAfterRollback -ne 5 -or $currVerAfterRollback -ne $currentVersion -or $faultStateAfterRollback -ne -1) {
-        throw "MSI transactional rollback failed to restore 0.1.5: currState=$currStateAfterRollback currVer=$currVerAfterRollback faultState=$faultStateAfterRollback"
+        throw "MSI transactional rollback failed to restore $currentVersion: currState=$currStateAfterRollback currVer=$currVerAfterRollback faultState=$faultStateAfterRollback"
     }
     foreach ($rel in $payloadFiles) {
         $rolledBackPath = Join-Path $testInstallDir $rel
@@ -310,7 +322,7 @@ try {
     }
 
     $steps += [ordered]@{
-        step                    = 'mid-update-failure-rollback-0.1.5-to-0.1.6'
+        step                    = "mid-update-failure-rollback-$currentVersion-to-$faultVersion"
         requirement             = 'AC-030-07'
         exit_code               = $resFaultUpgrade.exit_code
         custom_action_triggered = $customActionTriggered
