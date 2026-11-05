@@ -1,4 +1,51 @@
 {
+  "learning": {
+    "title": "Lessons",
+    "online": "Connected",
+    "offline": "Offline — saved lessons remain available",
+    "back": "Choose mode",
+    "curriculum": "Curriculum",
+    "choose": "Choose",
+    "sync": "Sync ({{count}} pending)",
+    "noCourses": "No lessons available. Connect and sign in to download your curriculum.",
+    "activities": "Learning activities",
+    "program": "Program",
+    "move_right": "Move right",
+    "move_left": "Move left",
+    "jump": "Jump",
+    "clear": "Clear",
+    "savedProjects": "Load saved projects",
+    "project": "Arm project",
+    "submit": "Submit for assessment",
+    "queue": "Save for sync",
+    "examOnline": "Connect to start or resume an exam.",
+    "chooseActivity": "Choose a learning activity.",
+    "results": "Assessment results",
+    "error": "Could not complete the request. Your pending work is retained. Check your connection and account, then retry.",
+    "state": {
+      "queued": "Waiting for assessment",
+      "grading": "Assessing",
+      "awaiting_teacher": "Waiting for teacher",
+      "evaluated": "Assessed",
+      "error": "Assessment unavailable"
+    },
+    "outcome": {
+      "passed": "Passed",
+      "not_yet": "Needs more practice"
+    },
+    "startExam": "Start exam",
+    "saveAnswers": "Save answers",
+    "submitExam": "Submit exam",
+    "timeLeft": "Time remaining: {{seconds}} seconds",
+    "examResult": "Score: {{earned}} / {{max}}",
+    "resultsHidden": "Results will be available when the assessment closes.",
+    "run": "Course",
+    "teacher": "Teacher review",
+    "feedback": "Feedback",
+    "passed": "Passed",
+    "notYet": "Needs more practice",
+    "review": "Save assessment"
+  },
   "installer": {
     "windowTitle": "School Bot Setup",
     "welcomeTitle": "Big ideas.\nStart here.",
@@ -1819,6 +1866,8 @@
       "useOffline": "Continue with the device entitlement"
     },
     "feedback": {
+      "verification_required": "Verify this device through the school account system before signing in.",
+      "password_reset_required": "Reset your password through the school account system before signing in.",
       "invalid_credentials": "Incorrect username or password. Try again.",
       "network": "Unable to connect. Check your internet connection, or continue as Guest while the License remains valid.",
       "unavailable": "Sign-in is not configured yet. Contact your administrator, or continue as Guest while the License remains valid.",

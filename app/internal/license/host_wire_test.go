@@ -32,6 +32,9 @@ func TestHostWireAndSecureGenerationSelfCheck(t *testing.T) {
 	online, denied := true, false
 	checkedAt := clock.wall.Unix()
 	client := &http.Client{Transport: transportFunc(func(request *http.Request) (*http.Response, error) {
+		if !strings.HasPrefix(request.URL.Path, "/api/service-school-bot/") {
+			t.Fatal("license request bypassed Gateway")
+		}
 		if !online {
 			return nil, io.ErrClosedPipe
 		}
@@ -55,7 +58,7 @@ func TestHostWireAndSecureGenerationSelfCheck(t *testing.T) {
 				X string
 				Y string
 			}
-			if request.URL.Path == "/v2/licenses/activate" {
+			if request.URL.Path == "/api/service-school-bot/licenses/activate" {
 				if err := json.Unmarshal(body["device_jwk"], &jwk); err != nil {
 					t.Fatal(err)
 				}
@@ -90,7 +93,7 @@ func TestHostWireAndSecureGenerationSelfCheck(t *testing.T) {
 				Path     string `json:"path"`
 				Key      string `json:"idempotency_key"`
 			}
-			if json.Unmarshal(payload, &claims) != nil || claims.BodyHash != hex.EncodeToString(hash[:]) || claims.Path != request.URL.Path || claims.Key != request.Header.Get("Idempotency-Key") {
+			if json.Unmarshal(payload, &claims) != nil || claims.BodyHash != hex.EncodeToString(hash[:]) || claims.Path != "/v2"+strings.TrimPrefix(request.URL.Path, "/api/service-school-bot") || claims.Key != request.Header.Get("Idempotency-Key") {
 				t.Fatal("proof is not bound to request")
 			}
 			credentials, err := license.OpenCredentials(context.Background(), storage)

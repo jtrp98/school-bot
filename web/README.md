@@ -39,12 +39,19 @@ SchoolProfile ใช้ School context, Logs ใช้ Logs context และ Gr
 implementation จำลองเดิมอยู่ใน `Repositories/Storage/Memory/` เพื่อรองรับ development และ tests
 services/principal resolvers ที่ใช้ repository เป็น scoped; replay/nonce caches เดิมแชร์ต่อ host แยกจาก DbContext
 
+PostgreSQL ลงทะเบียน `SchoolAssessmentAuthority` สำหรับ assignment/room/term/explicit enrollment และ
+`PostgresGradeDestination` สำหรับช่องเกรดเดิม พร้อม worker resolver ที่ตรวจครูผู้ยืนยันใหม่ทุกครั้ง
+ตั้ง `SchoolBot__LegacyAuthority__TimeZoneId` ให้ตรง timestamp ของ School DB; history ที่ซ้ำ ย้าย หรือสถานะกำกวมยังถูกปฏิเสธ
+โค้ดเขียนคะแนน/คำนวณ/receipt เพิ่มแล้วแต่ยังไม่รันตามคำสั่ง code-only และยังต้องมี `GradeExportWriteAuthorization`
+จาก composition ที่ทบทวนหลักฐานจริงก่อน confirm/apply; ไม่มี config boolean สำหรับข้ามการรับรองสูตรหรือ coexistence
+
 การเขียน SchoolBot ใช้ transaction รวม mutation/audit/idempotency; ผลที่เตรียมไม่สำเร็จ rollback ทั้งหน่วย
 schema ปัจจุบันมีเฉพาะ primary keys จึงใช้ PostgreSQL advisory transaction lock ร่วมสำหรับ mutations
 เพื่อกัน race ข้าม instance การเพิ่ม unique constraints และแบ่ง lock รองรับ throughput สูงเป็นงานต่อไป
 ETag ใช้เวลาความละเอียด microsecond ให้ตรง PostgreSQL และอ่านข้อมูลใหม่ทุกหน่วย transaction
 Curriculum/QuestionBank replay ต้องตั้ง `SCHOOL_BOT_REPLAY_KEY` เป็น base64 ของกุญแจ 32 bytes ที่คงเดิมข้าม restart
-replay/nonce caches ของ Project/License และ release metadata เดิมยังเป็นข้อมูลระดับ process
+Project create ที่มี idempotency key ใช้ durable commit/replay และ release metadata ใช้ repository-backed service แล้ว
+Project update/copy และ replay/nonce caches ของ License เดิมยังมีส่วนที่เป็นข้อมูลระดับ process
 `TestLicenseTokenSigner` ยังคงเป็น signer ของ PoC ตามสัญญาเดิม
 
 Curriculum import ยังปฏิเสธการเขียนจริง เพราะ scaffold ของฐานปัจจุบันไม่มี `SchoolBotLesson.ImportSource`
@@ -54,7 +61,7 @@ SchoolProfile ไม่อนุมานสิทธิ์ admin จากป�
 ## Transport และตัวตน
 
 Client → HTTP Gateway → gRPC SchoolBot; browser ผ่าน same-origin BFF
-HTTP ของธุรกิจอยู่ที่ Gateway ใต้ `/api/school-bot/service/` โดยไม่มี v1/v2
+HTTP ของธุรกิจอยู่ที่ Gateway ใต้ `/api/service-school-bot/` โดยไม่มี v1/v2
 SchoolBot มี typed RPC 5 services: `ProjectService`, `LicenseService`, `CurriculumService`,
 `AssessmentService` และ `ReleaseService`; proto ต้นฉบับอยู่ใน
 `src/ServiceSchoolBot.Infrastructure/Protos/ServiceSchoolBot/` และ Gateway ต้องใช้สำเนาที่ hash ตรงทุกไบต์
@@ -80,11 +87,12 @@ SchoolBot ไม่มี login/logout, opaque session token หรือ web-se
 Gateway มี `AddSchoolBotModule` และ gRPC repositories แต่ยังไม่ต่อเข้า Program ตาม gate H5/G-AUTH
 `DenyAllGatewayPeerVerifier` ปฏิเสธ peer ทุกตัวโดยปริยาย และ `ProductionSchoolBotTransportValidator`
 ไม่เปิด production trust เมื่อยังไม่มี transport จริง Tests เปลี่ยน verifier/transport เฉพาะ host ของการทดสอบ
-Desktop ใน `app/` ยังใช้ base URL/path HTTP เดิม ต้องย้ายไป Gateway พร้อม JWT และ entitlement ก่อนใช้งานร่วมกัน
+Desktop ใน `app/` ใช้เส้นทาง Gateway พร้อม native JWT และ entitlement แล้ว; การเปิดใช้จริงยังต้องผ่าน transport/authority gates
+หน้า Admin เนื้อหาใน sb-web-helper ใช้ login เดิมแล้วส่ง JWT assertion อายุ 60 วินาทีจากเซิร์ฟเวอร์ ดู [Phase 5](../docs/phase5-implementation-2026-11-04.md)
 
 ## License ผ่าน gRPC บน stub
 
-ส่วนนี้อธิบายโหมด Memory ที่เลือกอย่างชัดเจนใน Development; release metadata ยังใช้ memory store
+ส่วนนี้อธิบายโหมด Memory ที่เลือกอย่างชัดเจนใน Development; release metadata ใช้ repository/backing store ตามโหมดที่เลือก
 License และ binding ใช้ authoritative snapshot จาก backing store ทุกครั้งที่อ่านหรือเขียน
 Memory แชร์ lock ของ store object; file store แชร์ lock ตาม absolute directory ภายใน process เดียว
 การตรวจ current binding, epoch, identity, expiry และ ETag อยู่ใต้ lock เดียวกับการ publish
@@ -129,7 +137,7 @@ Atomicity นี้ครอบคลุมหลาย adapters ใน process 
 
 ## Course Plan importer บน stub
 
-`POST /api/school-bot/service/admin/curricula/{id}/import` ที่ Gateway รับแถว normalize เข้า draft revision ที่มีอยู่
+`POST /api/service-school-bot/admin/curricula/{id}/import` ที่ Gateway รับแถว normalize เข้า draft revision ที่มีอยู่
 ใช้ `staff_admin` + `content_author` และ `Idempotency-Key` โดยไม่ใช้ `If-Match`
 แต่ละแถวมี `source_row_key`, `source_position`, `source_approved` (true/false/null) และ `lesson`
 นำเข้าใหม่ได้ `created`; identity/hash เดิมได้ `unchanged`; ชนเนื้อหาเดิมได้ `409 STATE_CONFLICT` ทั้ง batch
@@ -140,12 +148,12 @@ File adapter เปิดใหม่ใน process เดิม replay ได�
 
 ## คลังข้อสอบและการอ่าน assessment บน stub
 
-Gateway `/api/school-bot/service/admin/question-banks` รองรับ create/list/detail/PUT draft/publish แบบ four-eyes
+Gateway `/api/service-school-bot/admin/question-banks` รองรับ create/list/detail/PUT draft/publish แบบ four-eyes
 create/PUT ต้องมี `content_author`; publish ต้องมี `content_approver` และ `approval_ref` ไม่เกิน 1,000 ตัวอักษร
 PUT/publish ใช้ `If-Match`; mutations ใช้ helper idempotency เดียวกับหลักสูตร
 bank/audit/ledger commit ใน `curricula_snapshot.json` พร้อมกัน โดยคง format เดิม; collection ใหม่ที่ว่างละ key ออก
-`GET /api/school-bot/service/course-runs/{id}/activities/{activity_id}` อ่าน policy/window ที่กำหนดไว้จริง
-`GET /api/school-bot/service/attempts` และ `attempts/{id}` อ่านประวัติ/เฉลยจาก snapshot เดิมของ Attempt
+`GET /api/service-school-bot/course-runs/{id}/activities/{activity_id}` อ่าน policy/window ที่กำหนดไว้จริง
+`GET /api/service-school-bot/attempts` และ `attempts/{id}` อ่านประวัติ/เฉลยจาก snapshot เดิมของ Attempt
 เรียงข้อ/ตัวเลือกตาม snapshot และซ่อนคะแนน/เฉลยตาม reveal policy
 การ publish bank revision ใหม่ไม่เปลี่ยน Activity, CourseRun หรือ Attempt และไม่มี worker เปลี่ยนผลระหว่างอ่าน
 
@@ -157,7 +165,7 @@ Tests ใช้ authority fake และตรวจ memory/file หลาย ad
 
 ## CourseRun และ progress บน stub
 
-`GET /api/school-bot/service/progress?course_run_id=…` อ่านหลักสูตรฉบับที่ CourseRun เลือก แล้วคืน Level,
+`GET /api/service-school-bot/progress?course_run_id=…` อ่านหลักสูตรฉบับที่ CourseRun เลือก แล้วคืน Level,
 Activity และ Mission ตามลำดับเดิม ไม่ใช้ระดับชั้นของห้องแทน Level ของหลักสูตร
 รองรับ `curriculum_id` และ `mode=block|arm|code`; เมื่อระบุทั้ง run/curriculum ต้องตรงกัน
 Progress รับเฉพาะ desktop student ที่ profile/License binding ยังใช้ได้ และตรวจ roster/ห้อง/ปี/เทอมผ่าน authority จริง

@@ -1,4 +1,51 @@
 {
+  "learning": {
+    "title": "课程",
+    "online": "已连接",
+    "offline": "离线 — 可继续查看已保存的课程",
+    "back": "选择模式",
+    "curriculum": "教学课程",
+    "choose": "选择",
+    "sync": "同步（{{count}} 项待处理）",
+    "noCourses": "暂无课程。请联网并登录以下载课程。",
+    "activities": "学习活动",
+    "program": "程序",
+    "move_right": "向右移动",
+    "move_left": "向左移动",
+    "jump": "跳跃",
+    "clear": "清空",
+    "savedProjects": "加载已保存的项目",
+    "project": "机械臂项目",
+    "submit": "提交评估",
+    "queue": "保存并等待同步",
+    "examOnline": "请联网开始或继续考试。",
+    "chooseActivity": "请选择学习活动。",
+    "results": "评估结果",
+    "error": "请求未完成。待提交的作业已保留。请检查网络和账户后重试。",
+    "state": {
+      "queued": "等待评估",
+      "grading": "评估中",
+      "awaiting_teacher": "等待教师评估",
+      "evaluated": "已评估",
+      "error": "评估暂不可用"
+    },
+    "outcome": {
+      "passed": "通过",
+      "not_yet": "需要更多练习"
+    },
+    "startExam": "开始考试",
+    "saveAnswers": "保存答案",
+    "submitExam": "提交考试",
+    "timeLeft": "剩余 {{seconds}} 秒",
+    "examResult": "得分：{{earned}} / {{max}}",
+    "resultsHidden": "评估结束后可查看结果。",
+    "run": "课程班次",
+    "teacher": "教师评估",
+    "feedback": "反馈",
+    "passed": "通过",
+    "notYet": "需要更多练习",
+    "review": "保存评估"
+  },
   "installer": {
     "windowTitle": "安装 School Bot",
     "welcomeTitle": "全新创意，\n从这里开始。",
@@ -1819,6 +1866,8 @@
       "useOffline": "使用本机权限继续"
     },
     "feedback": {
+      "verification_required": "请先通过学校账户系统验证此设备，再登录。",
+      "password_reset_required": "请先通过学校账户系统重置密码，再登录。",
       "invalid_credentials": "用户名或密码不正确，请重试。",
       "network": "无法连接系统。请检查网络，或在 License 有效期间以访客身份继续。",
       "unavailable": "登录服务尚未配置。请联系管理员，或在 License 有效期间以访客身份继续。",

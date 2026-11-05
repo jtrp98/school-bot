@@ -4,6 +4,8 @@ namespace ServiceSchoolBot.Domain;
 // so a misspelled literal would silently become a generic 400.
 public static class ErrorCodes
 {
+    public const string AttemptExpired = "ATTEMPT_EXPIRED";
+    public const string GraderUnavailable = "GRADER_UNAVAILABLE";
     public const string NotFound = "NOT_FOUND";
     public const string DeviceLimit = "DEVICE_LIMIT";
     public const string ReleaseExists = "RELEASE_EXISTS";

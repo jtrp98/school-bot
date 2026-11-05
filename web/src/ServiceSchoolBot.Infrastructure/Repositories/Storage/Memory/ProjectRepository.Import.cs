@@ -91,6 +91,7 @@ public sealed partial class ProjectRepository
 
             try
             {
+                // shortcut: the Development file adapter commits projects before its replay ledger; prove process-crash atomicity with PostgreSQL.
                 await state.backingStore.CommitProjectAsync(candidateProjects, candidateRevisions, ct);
             }
             catch

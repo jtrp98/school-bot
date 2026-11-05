@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using ServiceSchoolBot.Application.Common.Model.Assessment;
 using ServiceSchoolBot.Application.Databases.Repository.Interfaces;
 using ServiceSchoolBot.Application.Services.Implementations.Assessment;
@@ -46,15 +47,24 @@ public static class ApplicationServiceExtensions
 
     public static IServiceCollection AddAssessmentServices(this IServiceCollection services)
     {
-        services.AddSingleton<IAssessmentAuthority, UnconfiguredAssessmentAuthority>();
+        services.TryAddSingleton<IAssessmentAuthority, UnconfiguredAssessmentAuthority>();
         services.AddScoped<QuestionBankService>();
         services.AddScoped<AssessmentReadService>();
+        services.AddScoped<LearningSubmissionService>();
+        services.AddScoped<TeacherRunService>();
+        services.AddScoped<AttemptFinalizer>();
+        services.AddScoped<LevelPromotionService>();
+        services.AddScoped<ScoreExportService>();
+        services.AddScoped<CriteriaApprovalService>();
+        services.TryAddSingleton<IGradeDestination, UnconfiguredGradeDestination>();
+        services.TryAddSingleton<IExportPrincipalResolver, UnconfiguredExportPrincipalResolver>();
         return services;
     }
 
     public static IServiceCollection AddManagementServices(this IServiceCollection services)
     {
         services.AddSingleton<ManagementService>();
+        services.AddScoped<ReleaseService>();
         return services;
     }
 }

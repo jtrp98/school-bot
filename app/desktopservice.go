@@ -126,7 +126,7 @@ func (s *DesktopService) CheckUpdates() (string, error) {
 		"channel":  {"stable"},
 		"platform": {runtime.GOOS + "-" + runtime.GOARCH},
 	}
-	return s.api("GET", "/v1/updates/check?"+query.Encode(), nil)
+	return s.api("GET", "/api/service-school-bot/updates/check?"+query.Encode(), nil)
 }
 
 func (s *DesktopService) ActivateLicense(key string) (string, error) {
@@ -155,9 +155,12 @@ func (s *DesktopService) LoginSession(username, password string) (string, error)
 	if err != nil || projection.Status != license.StatusValid {
 		return "unavailable", nil
 	}
-	resp, err := s.api("POST", "/v2/auth/sessions", map[string]string{
-		"username": username,
-		"password": password,
+	schoolID, deviceID, err := s.entitlement.LoginContext(context.Background())
+	if err != nil {
+		return "unavailable", nil
+	}
+	resp, err := s.api("POST", "/api/auth/login", map[string]any{
+		"user": username, "password": password, "schoolId": schoolID, "imei": deviceID,
 	})
 	if err != nil {
 		msg := err.Error()
@@ -169,37 +172,22 @@ func (s *DesktopService) LoginSession(username, password string) (string, error)
 		}
 		return "unavailable", nil
 	}
-	var parsed struct {
-		Token     string `json:"token"`
-		SessionID string `json:"session_id"`
-		ExpiresAt string `json:"expires_at"`
-	}
-	_ = json.Unmarshal([]byte(resp), &parsed)
-	token := parsed.Token
-	if token == "" {
-		token = parsed.SessionID
+	session, status := parseGatewayLogin(resp, username, schoolID, time.Now().UTC())
+	if session == nil {
+		return status, nil
 	}
 	s.mu.Lock()
-	s.session = &DesktopSession{
-		Username:  username,
-		Token:     token,
-		ExpiresAt: parsed.ExpiresAt,
-	}
+	s.session = session
 	s.mu.Unlock()
 	return "success", nil
 }
 
 func (s *DesktopService) LogoutSession() error {
 	s.mu.Lock()
-	current := s.session
 	s.session = nil
 	s.mu.Unlock()
-	if current != nil && current.Token != "" {
-		_, _ = s.api("POST", "/v2/auth/logout", map[string]string{"token": current.Token})
-	}
 	return nil
 }
-
 func (s *DesktopService) CurrentSession() *DesktopSession {
 	s.mu.Lock()
 	defer s.mu.Unlock()

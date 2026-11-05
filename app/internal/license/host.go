@@ -229,6 +229,20 @@ type cloudResponse struct {
 }
 
 func (h *Host) post(ctx context.Context, path string, body interface{}, requestKey string) (cloudResponse, error) {
+	// Signed proof intents retain their /v2 canonical path; HTTP transport goes through the Gateway.
+	var wirePath string
+	switch path {
+	case "/api/service-school-bot/device-challenges", "/device-challenges":
+		wirePath = "/api/service-school-bot/device-challenges"
+	case "/api/service-school-bot/licenses/activate", "/licenses/activate":
+		wirePath = "/api/service-school-bot/licenses/activate"
+	case "/api/service-school-bot/licenses/validate", "/licenses/validate":
+		wirePath = "/api/service-school-bot/licenses/validate"
+	case "/v2/device-challenges", "/v2/licenses/activate", "/v2/licenses/validate":
+		wirePath = "/api/service-school-bot" + strings.TrimPrefix(path, "/v2")
+	default:
+		return cloudResponse{}, errors.New("unsupported license route")
+	}
 	endpoint, parseErr := url.Parse(h.baseURL)
 	if parseErr != nil || endpoint.Host == "" || endpoint.User != nil || endpoint.RawQuery != "" || endpoint.Fragment != "" {
 		return cloudResponse{}, errors.New("invalid API endpoint")
@@ -246,7 +260,7 @@ func (h *Host) post(ctx context.Context, path string, body interface{}, requestK
 	}
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
-	request, err := http.NewRequestWithContext(ctx, "POST", h.baseURL+path, bytes.NewReader(payload))
+	request, err := http.NewRequestWithContext(ctx, "POST", h.baseURL+wirePath, bytes.NewReader(payload))
 	if err != nil {
 		return cloudResponse{}, err
 	}

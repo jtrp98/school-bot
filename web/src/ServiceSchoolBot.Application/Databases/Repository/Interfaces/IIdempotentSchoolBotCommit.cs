@@ -17,6 +17,7 @@ public sealed record IdempotentCommitResult<T>(MutationResult<T> Result, bool Re
 
 public interface IIdempotentSchoolBotCommit
 {
+    bool IsInAtomicCommit => false;
     Task<IdempotentCommitResult<T>> CommitWithIdempotencyAsync<T>(
         IdempotencyCommand command,
         Func<ISchoolBotRepositoryScope, int?, DateTimeOffset, CancellationToken, Task> recheckAccess,

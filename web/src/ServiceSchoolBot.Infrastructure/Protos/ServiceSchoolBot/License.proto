@@ -4,7 +4,7 @@ option csharp_namespace = "SchoolBot.Infrastructure.Protos";
 
 package ServiceSchoolBot;
 
-// Gateway /api/school-bot/service: device-challenges, licenses/* and admin/licenses.
+// Gateway /api/service-school-bot: device-challenges, licenses/* and admin/licenses.
 // Device calls carry the request body verbatim because activation proofs and replay fingerprints are
 // computed over the exact text the device sent. Times are ISO 8601 round-trip text so a client-supplied
 // offset (expires_at) is returned unchanged.

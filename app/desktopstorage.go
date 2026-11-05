@@ -320,7 +320,7 @@ func (s *DesktopService) ImportGuestProjectV2(localProjectID string, schoolID in
 		OwnerID:   ownerID,
 	}
 	resp, _, err := store.ImportProjectToCloud(context.Background(), localProjectID, dest, func(_ context.Context, _ project.ImportDestination, req project.CloudImportRequest) (*project.CloudImportResponse, error) {
-		raw, err := s.api("POST", "/v2/projects/import", req)
+		raw, err := s.api("POST", "/api/service-school-bot/projects/import", req)
 		if err != nil {
 			return nil, err
 		}

@@ -13,6 +13,15 @@ public sealed record AssessmentPrincipalContext(
 
 public interface IAssessmentAuthority
 {
+    async Task<IReadOnlyList<int>> GetLearnerIdsAsync(AssessmentPrincipalContext principal,
+        SchoolBotCourseRunRecord run, CancellationToken ct = default) =>
+        (await GetClassroomContextAsync(principal, run, ct)).LearnerIds;
+    Task<ClassroomLearningContext> GetClassroomContextAsync(AssessmentPrincipalContext principal,
+        SchoolBotCourseRunRecord run, CancellationToken ct = default) =>
+        Task.FromException<ClassroomLearningContext>(new ServiceSchoolBot.Domain.DomainRuleException(
+            ServiceSchoolBot.Domain.ErrorCodes.AuthNotConfigured, "Authoritative classroom roster and next term are not configured."));
+    Task<bool> CanReviewLearnerAsync(AssessmentPrincipalContext principal, SchoolBotCourseRunRecord run,
+        int learnerId, CancellationToken ct = default) => Task.FromResult(false);
     Task<bool> CanReadRunAsync(AssessmentPrincipalContext principal, SchoolBotCourseRunRecord run,
         CancellationToken ct = default);
 }
@@ -20,7 +29,8 @@ public interface IAssessmentAuthority
 public sealed class UnconfiguredAssessmentAuthority : IAssessmentAuthority
 {
     public Task<bool> CanReadRunAsync(AssessmentPrincipalContext principal, SchoolBotCourseRunRecord run,
-        CancellationToken ct = default) => Task.FromResult(false);
+        CancellationToken ct = default) => Task.FromException<bool>(new ServiceSchoolBot.Domain.DomainRuleException(
+            ServiceSchoolBot.Domain.ErrorCodes.AuthNotConfigured, "Authoritative teacher, learner, and term resolution is not configured."));
 }
 
 public sealed record CreateQuestionBankRequest(

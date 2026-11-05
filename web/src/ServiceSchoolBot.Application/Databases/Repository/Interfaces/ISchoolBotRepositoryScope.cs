@@ -2,6 +2,7 @@ using ServiceSchoolBot.Domain.Curriculum;
 namespace ServiceSchoolBot.Application.Databases.Repository.Interfaces;
 
 public interface ISchoolBotRepositoryScope :
+    IScoreExportRepository,
     IAssessmentRepository,
     ILicenseRepository,
     IProjectRepository,

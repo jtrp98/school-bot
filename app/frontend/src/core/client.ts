@@ -27,6 +27,11 @@ const previewProjectBackend = new InMemoryProjectLibraryBackend();
 let previewSessionScope = "guest";
 
 export const client = {
+  learningScope: (): Promise<string> => preview ? Promise.resolve(`preview:${previewSessionScope}`) : native("LearningScope"),
+  learningRequest: async <T>(request: import("../learning/types").LearningRequest): Promise<{ data: T; etag: string }> => {
+    if (preview) throw new Error("LEARNING_PREVIEW_UNAVAILABLE");
+    return JSON.parse(await native<string>("LearningRequest", JSON.stringify(request))) as { data: T; etag: string };
+  },
   onCloseRequested: (listener: () => void): (() => void) => {
     let active = true;
     let unsubscribe: (() => void) | undefined;
@@ -147,7 +152,7 @@ export const client = {
       return "success";
     }
     const res = await native<string>("LoginSession", username, password);
-    if (res === "success" || res === "invalid_credentials" || res === "network" || res === "unavailable") {
+    if (res === "success" || res === "invalid_credentials" || res === "network" || res === "unavailable" || res === "verification_required" || res === "password_reset_required") {
       return res;
     }
     return "unavailable";

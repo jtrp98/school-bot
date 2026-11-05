@@ -6,7 +6,7 @@ Handbook เป็นแนวทางกลาง ต้องเทียบ�
 
 ## Contract และ transport
 
-- Client → HTTP Gateway → typed gRPC SchoolBot; business HTTP อยู่ใต้ `/api/school-bot/service/` ไม่เพิ่มเวอร์ชันหรือ route สำรองเอง และไม่เปิด business REST ที่ School Bot
+- Client → HTTP Gateway → typed gRPC SchoolBot; business HTTP อยู่ใต้ `/api/service-school-bot/` ไม่เพิ่มเวอร์ชันหรือ route สำรองเอง และไม่เปิด business REST ที่ School Bot
 - รักษา binding ที่ตั้งค่าไว้: ค่าเริ่มต้น local คือ gRPC h2c `127.0.0.1:8080` และ health `127.0.0.1:8081` ไม่เปลี่ยน network exposure ระหว่าง refactor
 - RPC service ต้องบาง: ตรวจ transport/identity, map request, เรียก Application, map response ใช้ `SchoolBotGrpcRunner`/metadata/error mapping เดิม Business rules ไม่อยู่ใน generated types หรือ gRPC handlers
 - ส่ง `ServerCallContext.CancellationToken` ต่อถึง service/repository/DB และรักษา deadline ห้ามกลืน cancellation หรือทำ retry ของ mutation โดยไม่มี idempotency contract รองรับ

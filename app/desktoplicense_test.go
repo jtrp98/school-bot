@@ -90,7 +90,7 @@ func TestDesktopServiceLicenseActivateDuplicateExpireAndMove(t *testing.T) {
 
 	makeClient := func(storage *desktopCredentialDouble) *http.Client {
 		return &http.Client{Transport: roundTripFunc(func(req *http.Request) (*http.Response, error) {
-			if strings.HasSuffix(req.URL.Path, "/v2/device-challenges") {
+			if strings.HasSuffix(req.URL.Path, "device-challenges") {
 				return &http.Response{
 					StatusCode: 200,
 					Body:       io.NopCloser(strings.NewReader(`{"challenge":"chal-1"}`)),
@@ -120,7 +120,7 @@ func TestDesktopServiceLicenseActivateDuplicateExpireAndMove(t *testing.T) {
 			}
 			jkt, _ := cred.CurrentDeviceJKT(context.Background())
 
-			if strings.HasSuffix(req.URL.Path, "/v2/licenses/activate") {
+			if strings.HasSuffix(req.URL.Path, "licenses/activate") {
 				if boundJKT != "" && boundJKT != jkt {
 					return &http.Response{
 						StatusCode: 409,
@@ -129,7 +129,7 @@ func TestDesktopServiceLicenseActivateDuplicateExpireAndMove(t *testing.T) {
 					}, nil
 				}
 				boundJKT = jkt
-			} else if strings.HasSuffix(req.URL.Path, "/v2/licenses/validate") {
+			} else if strings.HasSuffix(req.URL.Path, "licenses/validate") {
 				if boundJKT != jkt {
 					return &http.Response{
 						StatusCode: 403,

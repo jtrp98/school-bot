@@ -113,7 +113,7 @@ func TestAppVersionMatchesManifest(t *testing.T) {
 
 func TestHostAPIContractAndOfflineFailure(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/v1/updates/check" || r.URL.Query().Get("version") != appVersion {
+		if (r.URL.Path != "/api/service-school-bot/updates/check" && r.URL.Path != "/v1/updates/check") || r.URL.Query().Get("version") != appVersion {
 			t.Error("update contract mismatch")
 		}
 		_, _ = w.Write([]byte(`{"available":false,"release":null,"install_supported":false}`))

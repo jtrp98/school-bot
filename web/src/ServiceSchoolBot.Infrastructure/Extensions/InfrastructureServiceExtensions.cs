@@ -6,6 +6,7 @@ using ServiceSchoolBot.Infrastructure.Configuration;
 using ServiceSchoolBot.Infrastructure.Repositories.Storage;
 using ServiceSchoolBot.Infrastructure.Persistence;
 using Memory = ServiceSchoolBot.Infrastructure.Repositories.Storage.Memory;
+using ServiceSchoolBot.Application.Common.Model.Assessment;
 
 namespace ServiceSchoolBot.Infrastructure.Extensions;
 
@@ -29,6 +30,9 @@ public static class InfrastructureServiceExtensions
         services.AddScoped<ISchoolProfileRepository, SchoolProfileRepository>();
         services.AddScoped<ILogsRepository, LogsRepository>();
         services.AddScoped<IGradeRepository, GradeRepository>();
+        services.AddScoped<IAssessmentAuthority, SchoolAssessmentAuthority>();
+        services.AddScoped<IGradeDestination, PostgresGradeDestination>();
+        services.AddScoped<IReleaseRepository, ReleaseRepository>();
         return services;
     }
 
@@ -51,6 +55,7 @@ public static class InfrastructureServiceExtensions
         services.AddSingleton<ISchoolProfileRepository, Memory.SchoolProfileRepository>();
         services.AddSingleton<ILogsRepository, Memory.LogsRepository>();
         services.AddSingleton<IGradeRepository, Memory.GradeRepository>();
+        services.AddSingleton<IReleaseRepository, Memory.ReleaseRepository>();
         return services;
     }
 

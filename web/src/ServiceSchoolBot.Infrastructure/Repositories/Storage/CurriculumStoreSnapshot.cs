@@ -46,7 +46,24 @@ public sealed record CurriculumStoreSnapshot(
     [property: JsonPropertyName("sessions"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     IReadOnlyList<SchoolBotSessionRecord>? Sessions = null,
     [property: JsonPropertyName("staff_roles"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    IReadOnlyList<SchoolBotStaffRoleRecord>? StaffRoles = null)
+    IReadOnlyList<SchoolBotStaffRoleRecord>? StaffRoles = null,
+    [property: JsonPropertyName("submissions"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    IReadOnlyList<SchoolBotSubmissionRecord>? Submissions = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] IReadOnlyList<GradeSlotRecord>? GradeSlots = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] IReadOnlyList<ScoreMappingRecord>? ScoreMappings = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] IReadOnlyList<ScorePreviewRecord>? ScorePreviews = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] IReadOnlyList<ScoreExportRecord>? ScoreExports = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] IReadOnlyList<ScoreOutboxRecord>? ScoreOutbox = null,
+    [property: JsonPropertyName("assessments"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    IReadOnlyList<SchoolBotAssessmentRecord>? Assessments = null,
+    [property: JsonPropertyName("grading_jobs"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    IReadOnlyList<SchoolBotGradingJobRecord>? GradingJobs = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] IReadOnlyList<SchoolBotRetakeGrantRecord>? RetakeGrants = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] IReadOnlyList<SchoolBotScoringPolicyRecord>? ScoringPolicies = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] IReadOnlyList<SchoolBotLevelRecord>? Levels = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] IReadOnlyList<SchoolBotLevelPromotionPolicyRecord>? PromotionPolicies = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] IReadOnlyList<SchoolBotLevelProposalRecord>? LevelProposals = null,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] IReadOnlyList<ServiceSchoolBot.Domain.Releases.DesktopRelease>? Releases = null)
 {
     public static CurriculumStoreSnapshot Empty => new(1, [], [], [], [], [], [], []);
 }

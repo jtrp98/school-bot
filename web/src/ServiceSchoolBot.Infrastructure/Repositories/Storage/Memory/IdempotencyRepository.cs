@@ -8,7 +8,7 @@ public sealed class IdempotencyRepository(SchoolBotUnitOfWork unitOfWork) : IIde
 {
     private readonly SchoolBotRepositoryState state = unitOfWork.State;
 
-    public Task<IdempotentCommitResult<T>> CommitWithIdempotencyAsync<T>(
+    public async Task<IdempotentCommitResult<T>> CommitWithIdempotencyAsync<T>(
         IdempotencyCommand command,
         Func<ISchoolBotRepositoryScope, int?, DateTimeOffset, CancellationToken, Task> recheckAccess,
         Func<ISchoolBotRepositoryScope, DateTimeOffset, CancellationToken, Task<MutationResult<T>>> mutate,
@@ -25,14 +25,19 @@ public sealed class IdempotencyRepository(SchoolBotUnitOfWork unitOfWork) : IIde
             command.RequestHash.Any(c => c is not (>= '0' and <= '9') and not (>= 'a' and <= 'f')))
             throw new DomainRuleException(ErrorCodes.InvalidInput, "Invalid idempotency command.");
 
-        return state.CurriculumStore.MutateCurriculumUnitAsync(async (snapshot, token) =>
+        // shortcut: fake authorization snapshots precede the file lock; production requires the PostgreSQL transaction.
+        var licenses = await state.backingStore.LoadLicenseUnitAsync(ct);
+        var projects = await state.backingStore.LoadProjectsAsync(ct);
+        var revisions = await state.backingStore.LoadProjectRevisionsAsync(ct);
+        return await state.CurriculumStore.MutateCurriculumUnitAsync(async (snapshot, token) =>
         {
             var ledger = snapshot.Idempotency ?? [];
             var stored = ledger.SingleOrDefault(entry => entry.SchoolId == command.SchoolId &&
                 string.Equals(entry.Principal, command.Principal, StringComparison.Ordinal) &&
                 string.Equals(entry.Operation, command.Operation, StringComparison.Ordinal) &&
                 entry.RequestKey == command.RequestKey);
-            var transaction = await unitOfWork.CreateTransactionAsync(snapshot, token);
+            var transaction = await unitOfWork.CreateTransactionAsync(snapshot, token, licenses);
+            await transaction.Store.CommitProjectAsync(projects, revisions, token);
             await recheckAccess(transaction.Adapter, stored?.ResourceId, state.clock.GetUtcNow(), token);
             if (stored is not null)
             {

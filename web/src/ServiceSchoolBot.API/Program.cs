@@ -34,6 +34,7 @@ builder.Services.AddManagementStore();
 builder.Services.AddManagementServices();
 builder.Services.AddPrincipalResolvers();
 builder.Services.AddSchoolBotGrpc();
+builder.Services.AddHostedService<LearningWorker>();
 
 var app = builder.Build();
 app.MapSchoolBotGrpc();

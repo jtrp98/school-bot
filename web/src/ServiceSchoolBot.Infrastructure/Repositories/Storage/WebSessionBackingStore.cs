@@ -22,12 +22,3 @@ public sealed partial class MemorySchoolBotBackingStore : IWebSessionBackingStor
         finally { curriculumLock.Release(); }
     }
 }
-
-public sealed partial class FileSchoolBotBackingStore : IWebSessionBackingStore
-{
-    public Task<T> MutateWebSessionUnitAsync<T>(
-        Func<CurriculumStoreSnapshot, IReadOnlyList<SchoolBotLicenseRecord>, CurriculumStoreMutation<T>> mutate,
-        CancellationToken ct) =>
-        MutateCurriculumUnitAsync(async (snapshot, token) =>
-            mutate(snapshot, (await ReadLicenseUnitUnderLockAsync(token)).Licenses), ct);
-}

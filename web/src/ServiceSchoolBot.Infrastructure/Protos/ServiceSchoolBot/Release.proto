@@ -4,7 +4,7 @@ option csharp_namespace = "SchoolBot.Infrastructure.Protos";
 
 package ServiceSchoolBot;
 
-// Gateway /api/school-bot/service: updates/check (desktop, no sign-in) and admin/releases (central staff).
+// Gateway /api/service-school-bot: updates/check (desktop, no sign-in) and admin/releases (central staff).
 service ReleaseService {
   rpc CheckUpdate (CheckUpdateRequest) returns (CheckUpdateResponse);
   rpc ListReleases (ListReleasesRequest) returns (ListReleasesResponse);

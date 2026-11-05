@@ -4,7 +4,7 @@ option csharp_namespace = "SchoolBot.Infrastructure.Protos";
 
 package ServiceSchoolBot;
 
-// Gateway /api/school-bot/service: curricula and admin/curricula. Keys are UUID text; times are
+// Gateway /api/service-school-bot: curricula and admin/curricula. Keys are UUID text; times are
 // ISO 8601 round-trip text so client-supplied offsets come back unchanged.
 service CurriculumService {
   rpc ListPublishedCurricula (ListPublishedCurriculaRequest) returns (CurriculumListResponse);

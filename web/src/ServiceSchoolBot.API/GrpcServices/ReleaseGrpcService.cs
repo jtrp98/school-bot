@@ -8,40 +8,40 @@ using Rpc = SchoolBot.Infrastructure.Protos;
 namespace ServiceSchoolBot.API.GrpcServices;
 
 // Desktop update checks need no sign-in; managing releases is for central staff (TAdmin) only.
-public sealed class ReleaseGrpcService(SchoolBotGrpcRunner runner, ManagementService service)
+public sealed class ReleaseGrpcService(SchoolBotGrpcRunner runner, ReleaseService service)
     : Rpc.ReleaseService.ReleaseServiceBase
 {
     public override Task<Rpc.CheckUpdateResponse> CheckUpdate(Rpc.CheckUpdateRequest request, ServerCallContext context) =>
-        runner.RunAsync(context, _ =>
+        runner.RunAsync(context, async call =>
         {
-            var release = service.CheckUpdate(request.Version, request.Channel, request.Platform);
+            var release = await service.CheckAsync(request.Version, request.Channel, request.Platform, call.CancellationToken);
             var response = new Rpc.CheckUpdateResponse();
             if (release is not null) response.Release = ToProto(release);
-            return Task.FromResult(response);
+            return response;
         });
 
     public override Task<Rpc.ListReleasesResponse> ListReleases(Rpc.ListReleasesRequest request, ServerCallContext context) =>
-        runner.RunAsync(context, call =>
+        runner.RunAsync(context, async call =>
         {
             RequireStaff(call);
             var response = new Rpc.ListReleasesResponse();
-            response.Items.AddRange(service.ListReleases().Select(ToProto));
-            return Task.FromResult(response);
+            response.Items.AddRange((await service.ListAsync(call.CancellationToken)).Select(ToProto));
+            return response;
         });
 
     public override Task<Rpc.ReleaseItem> CreateRelease(Rpc.CreateReleaseRequest request, ServerCallContext context) =>
-        runner.RunAsync(context, call =>
+        runner.RunAsync(context, async call =>
         {
             RequireStaff(call);
-            return Task.FromResult(ToProto(service.CreateRelease(new CreateReleaseRequest(request.Version,
-                request.Channel, request.Platform, request.Url, request.Sha256, request.Signature))));
+            return ToProto(await service.CreateAsync(request.Version,
+                request.Channel, request.Platform, request.Url, request.Sha256, request.Signature, call.CancellationToken));
         });
 
     public override Task<Rpc.ReleaseItem> PublishRelease(Rpc.PublishReleaseRequest request, ServerCallContext context) =>
-        runner.RunAsync(context, call =>
+        runner.RunAsync(context, async call =>
         {
             RequireStaff(call);
-            return Task.FromResult(ToProto(service.PublishRelease(request.Id)));
+            return ToProto(await service.PublishAsync(request.Id, call.CancellationToken));
         });
 
     private static void RequireStaff(SchoolBotRpcCall call)
@@ -63,3 +63,4 @@ public sealed class ReleaseGrpcService(SchoolBotGrpcRunner runner, ManagementSer
         Published = release.Published
     };
 }
+

@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using ServiceSchoolBot.API.GrpcServices;
 
 namespace ServiceSchoolBot.API.Extensions;
@@ -13,6 +14,7 @@ public static class ApiServiceExtensions
         services.AddScoped<ICurriculumAuthResolver>(provider => provider.GetRequiredService<GatewayPrincipalResolver>());
         services.AddScoped<ILicenseAdminAuthResolver>(provider => provider.GetRequiredService<GatewayPrincipalResolver>());
         services.AddScoped<IAssessmentAuthResolver, GatewayAssessmentAuthResolver>();
+        services.Replace(ServiceDescriptor.Scoped<ServiceSchoolBot.Application.Common.Model.Assessment.IExportPrincipalResolver, GatewayExportPrincipalResolver>());
         return services;
     }
 }

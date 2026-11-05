@@ -26,9 +26,10 @@ public sealed record GatewayIdentity(
         string? Value(string key) => headers.GetValue(key) is { Length: > 0 } value ? value : null;
 
         if (!int.TryParse(Value("x-school-id"), NumberStyles.None, CultureInfo.InvariantCulture, out var schoolId) ||
-            schoolId <= 0 ||
+            schoolId < 0 ||
             !int.TryParse(Value("x-user-id"), NumberStyles.None, CultureInfo.InvariantCulture, out var userId))
             return null;
+        if (schoolId == 0 && (userId != 0 || Value("x-admin-id") is null)) return null;
 
         var userType = Value("x-user-type");
         if (userType is not (null or Student or Employee)) return null;

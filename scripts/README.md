@@ -5,6 +5,8 @@
 | งาน | คำสั่ง |
 |---|---|
 | เปิด API | `./scripts/api/run.ps1` หรือ `bash scripts/api/run.sh` |
+| เตรียมไฟล์กุญแจ login sb-helper สำหรับเครื่องพัฒนา | `./scripts/api/with-helper-auth.ps1 -Target Configure` — source เพิ่มในรอบ code-only ยังไม่รัน |
+| เปิด Helper/Gateway พร้อม key-file environment | `./scripts/api/with-helper-auth.ps1 -Target Helper` หรือ `-Target Gateway`; ไม่เปลี่ยน config/secret ของระบบที่ deploy |
 | สร้าง EF models จากฐานข้อมูล | `./scripts/api/scaffold-databases.ps1 -Database Master` — อ่าน metadata แบบ read-only; ตั้งค่าตาม [คู่มือ API](../web/README.md#ef-core-database-first-scaffold) |
 | Build Desktop | `./scripts/desktop/build.ps1` หรือ `bash scripts/desktop/build.sh` |
 | เปิด Desktop | `./scripts/desktop/run.ps1 -SkipBuild` หรือ `bash scripts/desktop/run.sh --skip-build` |

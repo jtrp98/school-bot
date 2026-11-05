@@ -111,14 +111,26 @@ public sealed class QuestionBankSelfChecks(ITestOutputHelper output)
             }
             else Assert.Null(detail.Feedback);
             Assert.Equal(OpaqueConcurrencyToken.ToETag(baseline.Attempts![0].UpdateDate), detailResponse.Etag);
-            var pending = await fixture.ReopenedReader().GetAttemptAsync(QuestionBankFixture.Principal("student"), 2);
-            Assert.Equal("started", pending.State);
-            Assert.Null(pending.Earned);
-            Assert.Null(pending.Feedback);
-            var list = AssessmentRpc.ToModel(
-                await client.ListAttemptsAsync(new() { CourseRunId = 1 }, QuestionBankFixture.As("student")));
-            Assert.Equal(new[] { 2, 1 }, list.Items.Select(item => item.Id));
-            Assert.Equal(afterClose ? "2" : null, list.Items[1].Earned);
+            if (afterClose)
+            {
+                var unavailable = await Assert.ThrowsAsync<ServiceSchoolBot.Domain.DomainRuleException>(() =>
+                    fixture.ReopenedReader().GetAttemptAsync(QuestionBankFixture.Principal("student"), 2));
+                Assert.Equal(ServiceSchoolBot.Domain.ErrorCodes.GraderUnavailable, unavailable.Code);
+                var failed = await GrpcTest.Fails(client.ListAttemptsAsync(new() { CourseRunId = 1 },
+                    QuestionBankFixture.As("student")));
+                Assert.Equal(ServiceSchoolBot.Domain.ErrorCodes.GraderUnavailable, failed.Error.Code);
+            }
+            else
+            {
+                var pending = await fixture.ReopenedReader().GetAttemptAsync(QuestionBankFixture.Principal("student"), 2);
+                Assert.Equal("started", pending.State);
+                Assert.Null(pending.Earned);
+                Assert.Null(pending.Feedback);
+                var list = AssessmentRpc.ToModel(
+                    await client.ListAttemptsAsync(new() { CourseRunId = 1 }, QuestionBankFixture.As("student")));
+                Assert.Equal(new[] { 2, 1 }, list.Items.Select(item => item.Id));
+                Assert.Null(list.Items[1].Earned);
+            }
         }
         var final = await fixture.Snapshot();
         AssertCounts(final, 2, 5, 3);

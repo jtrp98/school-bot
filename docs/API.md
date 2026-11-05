@@ -1,6 +1,6 @@
 # SchoolBot API · Gateway → gRPC
 
-Client ใช้ HTTP ที่ **Gateway** ใต้ `/api/school-bot/service/` โดยไม่มี version segment
+Client ใช้ HTTP ที่ **Gateway** ใต้ `/api/service-school-bot/` โดยไม่มี version segment
 Gateway แปลงเป็น typed gRPC ไป SchoolBot; browser เรียกผ่าน same-origin BFF
 URL ในคู่มือนี้เป็นสัญญาของ module ไม่ใช่ endpoint HTTP ตรงที่ SchoolBot
 
@@ -35,6 +35,12 @@ Login ใช้ `POST /api/auth/login` ของ Gateway จากระบบ l
 Temporary token (`AccessLevel=0`) ใช้ module นี้ไม่ได้
 SchoolBot ไม่มี login, logout, web-session exchange หรือ admin bearer key ของตัวเอง
 
+หน้า Admin เนื้อหาของ sb-web-helper ใช้เซสชันเดิมผ่าน BFF แล้วส่ง JWT ES256 อายุ 60 วินาทีใน
+`X-SchoolBot-Staff-Assertion` ระหว่างเซิร์ฟเวอร์ Gateway ตรวจ `iss=sb-web-helper`,
+`aud=school-bot-admin`, `scope=schoolbot:content` และ resolve TAdmin.Id2 จากเซสชันเป็น TAdmin.Id
+scheme นี้ใช้เฉพาะ content Admin actions ที่ประกาศ policy ไว้ ไม่ใช้กับเส้นทางนักเรียน/ครูหรือ license admin
+ดูค่าตั้ง signing/public key และข้อจำกัดใน [รายงาน Phase 5](phase5-implementation-2026-11-04.md)
+
 Gateway ใช้ claims `PostalCode` เป็นโรงเรียนและ `Sid` เป็นผู้ใช้ แล้ว lookup `TUsers.cType` จากคู่นี้
 ค่า `"0"` เป็น student; ค่าอื่นเป็น employee ไม่รับ tenant จาก body/query/header ของ client มาแทน JWT
 การสร้าง license ของ staff ส่วนกลางมี `school_id` เพื่อระบุโรงเรียนเป้าหมาย ซึ่งไม่ใช่การ override tenant ของผู้ใช้
@@ -57,7 +63,7 @@ Device challenge, activate/validate และ update check เป็น **anonym
 
 ## Routes ของ Gateway
 
-ทุก path ในตารางต่อท้าย prefix **`/api/school-bot/service`**
+ทุก path ในตารางต่อท้าย prefix **`/api/service-school-bot`**
 
 | Method | Path | ขอบเขต |
 |---|---|---|
@@ -73,9 +79,11 @@ Device challenge, activate/validate และ update check เป็น **anonym
 | GET | `/curricula` | Published list: `level_id`, `recommended_grade`, `subject_key`, `mode`, `limit`, `cursor` |
 | GET | `/curricula/{id}` | Published detail |
 | GET / POST | `/admin/curricula` | Admin list/create; list รองรับ `level_id`, `lifecycle`, `limit`, `cursor` |
+| GET | `/admin/levels` | ระดับหลักสูตรจริงสำหรับ content Admin |
 | GET / PUT | `/admin/curricula/{id}` | Admin detail/update metadata ของ draft |
 | PUT | `/admin/curricula/{id}/content` | เปลี่ยนเนื้อหา draft |
 | POST | `/admin/curricula/{id}/publish` | Publish โดย approver คนละคนพร้อม `approval_ref` |
+| POST | `/admin/curricula/{id}/approve-criteria` | อนุมัติเกณฑ์ด้วยตัวตน approver + four-eyes, `approval_ref`, ETag และ idempotency key |
 | POST | `/admin/curricula/{id}/import` | Import normalized rows เข้า draft |
 | GET / POST | `/admin/question-banks` | List/create bank revision |
 | GET / PUT | `/admin/question-banks/{id}` | Detail/update draft |
@@ -84,6 +92,31 @@ Device challenge, activate/validate และ update check เป็น **anonym
 | GET | `/attempts` | ประวัติ: ต้องมี `course_run_id`; รองรับ `activity_id`, `state`, `limit`, `cursor` |
 | GET | `/attempts/{id}` | Attempt snapshot ตาม reveal policy |
 | GET | `/progress` | `course_run_id`, `curriculum_id`, `mode=block\|arm\|code` |
+| GET | `/learning/curricula/{id}` | Published lesson/mission/criteria/activity catalog พร้อม ID สำหรับเรียน/ส่งงาน |
+| GET | `/learning/curricula/{id}/course-runs` | รอบเรียนที่ตัวตนนี้เข้าถึงได้ |
+| GET | `/course-runs/{id}` | รอบเรียนและ ETag |
+| GET / POST | `/submissions` | รายการงาน/ส่ง project revision; ไม่รับคะแนนจาก client |
+| GET | `/submissions/{id}` | สถานะ/ผล และหลักฐานงานตามสิทธิ์ |
+| POST | `/submissions/{id}/assessments` | ครูตรวจ rubric หรือเพิ่ม correction พร้อม reason |
+| POST | `/course-runs/{id}/activities/{activityId}/attempts` | เริ่ม attempt พร้อม snapshot/สุ่มคำถามและตัวเลือก |
+| PUT | `/attempts/{id}/answers` | บันทึกคำตอบก่อน server deadline |
+| POST | `/attempts/{id}/submit` | ส่ง/ตรวจข้อสอบ; เมื่อหมดเวลาใช้คำตอบที่บันทึกไว้แล้ว |
+| PUT | `/course-runs/{id}/activities/{activityId}/policy` | ครูกำหนดเวลา/หน้าต่างสอบ |
+| POST | `/course-runs/{id}/activities/{activityId}/retakes` | สิทธิ์สอบซ่อมรายคนพร้อมเหตุผล |
+| PUT | `/course-runs/{id}/scoring-policy` | น้ำหนักกิจกรรมรวม 10,000 bps ก่อน activate |
+| POST | `/course-runs/{id}/activate` | Freeze scoring snapshot และเปิดรอบเรียน |
+| GET | `/course-runs/{id}/learners/{learnerId}/total` | คะแนนรวมตาม frozen policy |
+| POST | `/course-runs/{id}/level-proposals` | สรุปทั้งห้องจาก roster/term authority |
+| GET | `/level-proposals/{id}` | อ่านข้อเสนอและ snapshot |
+| POST | `/level-proposals/{id}/confirm` หรือ `/decline` | ตัดสินด้วย ETag และ snapshot hash |
+| GET / PUT | `/course-runs/{id}/grade-mapping` | ช่องเกรดเดิม/ตั้ง mapping ตามสิทธิ์ admin โรงเรียน |
+| DELETE | `/course-runs/{id}/grade-mapping/{mappingId}` | ยุติ mapping ที่ยังไม่มี export ยืนยัน |
+| POST | `/course-runs/{id}/score-previews` | สร้าง preview อายุ 15 นาที |
+| GET | `/score-previews/{id}` | อ่าน preview พร้อม snapshot hash/ETag |
+| POST | `/score-previews/{id}/confirm` | ยืนยัน source snapshot แล้วสร้าง export/outbox |
+| GET | `/score-exports/{id}` | สถานะ export/receipt/conflict |
+| POST | `/score-exports/{id}/process` | ดำเนินการต่อผ่าน verified destination และสิทธิ์เดิม |
+| POST | `/score-exports/{id}/resolutions` | เลือก keep/replace รายคนเพื่อสร้าง preview ใหม่; ไม่เขียนเกรดจนยืนยัน snapshot ใหม่ |
 | GET / POST | `/admin/releases` | Staff ส่วนกลาง list/create release metadata |
 | POST | `/admin/releases/{id}/publish` | Publish release metadata |
 | GET | `/updates/check?version=0.1.0&channel=stable&platform=windows-amd64` | Anonymous: published release ที่ใหม่กว่า |
@@ -123,7 +156,7 @@ Typed JSON endpoint ที่ Content-Type ไม่ใช่ JSON อาจไ�
 
 ## License และ device proof
 
-สร้างผ่าน `POST /api/school-bot/service/admin/licenses` ด้วย JWT ของ TAdmin:
+สร้างผ่าน `POST /api/service-school-bot/admin/licenses` ด้วย JWT ของ TAdmin:
 
 ```json
 {
@@ -161,6 +194,28 @@ Update check คืน `{ "available": false, "release": null, "install_supporte
 ถ้ามี จะคืน published release ล่าสุดที่ channel/platform ตรงและใหม่กว่า version ที่ส่งมา
 Metadata ไม่ใช่การอนุมัติดาวน์โหลด/ติดตั้ง และยังไม่มี install/recovery/rollback flow
 
+## Attempt mutations ผ่าน gRPC
+
+`AssessmentService` รองรับ `StartAttempt`, `SaveAttemptAnswers` และ `SubmitAttempt` เพิ่มจาก read RPC เดิม
+ยังไม่มี HTTP Gateway routes หรือ Desktop client สำหรับ RPC ใหม่เหล่านี้
+
+- ทุก mutation ต้องมี idempotency key เป็น UUID ที่ไม่ว่าง; การบันทึกและส่งตรวจต้องมี `if_match`
+- เริ่มสอบต้องเป็นนักเรียน Desktop ในห้องที่ได้รับสิทธิ์ มี License และ CourseRun ที่ active
+  พร้อม `CurrentPolicyId`; snapshot ตรึงคำถาม เฉลย ลำดับตัวเลือก policy/window และ evaluator `choice-v1`
+- `deadline_at` ใช้ค่าที่เร็วที่สุดระหว่างเวลาจำกัดกับเวลาปิด รับคำตอบเฉพาะก่อน deadline
+  PostgreSQL อ่าน `clock_timestamp()` ภายใน transaction หลังได้ advisory lock; fake ใช้ TimeProvider
+- เมื่อถึง deadline จะ commit `expired` และตรวจจากคำตอบที่บันทึกไว้ แล้วคืน `409 ATTEMPT_EXPIRED`
+  โดย `submitted_at` คง null; คำตอบที่แนบมากับคำขอช้าไม่ถูกนำมาคิดคะแนน
+- GET/list/progress และการเริ่มสอบครั้งถัดไปกู้ผลที่หมดเวลาผ่าน evaluator เดียวกัน
+  evaluator ที่ไม่รู้จักคืน `503 GRADER_UNAVAILABLE` และ rollback โดยไม่แทนคะแนนด้วยศูนย์
+- การส่งซ้ำใช้ ledger เดิม; terminal state ไม่ถูกตรวจหรือสร้าง audit ซ้ำ และคืนเฉลยตาม reveal policy
+
+ยังต้องเพิ่ม bounded background sweep, การอนุญาตสอบซ่อม, Teacher API, Offline submission sync และ
+การเชื่อมคะแนนไป PGGrade ก่อนตรวจรับ Phase 5 ทั้งระบบ การทดสอบ memory/file ไม่ยืนยัน
+PostgreSQL concurrency หรือการเชื่อม Gateway จริง
+License snapshot ของ memory/file ถูกอ่านก่อน curriculum lock เพื่อหลีกเลี่ยงการล็อกซ้อน
+จึงไม่รับรอง race ระหว่างเพิกถอน License กับ mutation; PostgreSQL ตรวจข้อมูลซ้ำใน transaction เดิม
+
 ## Errors และ trust boundary
 
 Business/binding error ที่ผ่าน pipeline ใช้รูปแบบ:
@@ -196,12 +251,21 @@ client/channel ไม่พร้อมคืน 503, peer/trailer ไม่น�
 
 ## ข้อจำกัดก่อนใช้งานร่วมกับ desktop
 
-Desktop ใน `app/` ยังเรียก `/v1/updates/check`, `/v2/device-challenges`, `/v2/licenses/*` ตรงไป SchoolBot
-ต้องย้าย base URL/path ให้ชี้ Gateway และส่ง JWT/`X-Device-Entitlement` ใน operation ที่ต้องใช้ตัวตน
-การฝัง `SCHOOL_BOT_BUILD_API_URL` อย่างเดียวไม่แก้ paths หรือ auth flow เดิม
+Desktop ใน `app/` ได้รับการปรับปรุงเส้นทาง REST ให้ชี้ตรงไปยัง Gateway ใต้ `/api/service-school-bot/...` เรียบร้อยแล้ว (เช่น `/api/service-school-bot/device-challenges`, `/api/service-school-bot/licenses/activate`, `/api/service-school-bot/licenses/validate`, `/api/service-school-bot/updates/check`, `/api/service-school-bot/projects/import`) โดยยังคง canonical path ภายใน signed device proof เป็น `/v2/licenses/activate` และ `/v2/licenses/validate` ตามสัญญาการเข้ารหัสของ domain model
+การเรียกที่ต้องใช้ตัวตนยังต้องส่ง Gateway JWT และ `X-Device-Entitlement`
 ไม่มี SchoolBot HTTP fallback และไม่ควรเปิด production trust ด้วย test stub เพื่อให้ desktop เก่าทำงาน
 
-Business repositories ปัจจุบันใช้ memory/file stub ไม่ใช่ EF production database; memory หายเมื่อ restart
-หลักประกัน file snapshot/lock ครอบคลุม process เดียวหลาย adapters ไม่รับรองหลาย process หรือ PostgreSQL
+Business repositories มี PostgreSQL implementation ผ่าน scoped unit of work; ค่าเริ่มต้นไม่ fallback ไป memory
+ผลทดสอบ Phase 5 ในเครื่องใช้ memory/file และ test doubles จึงยังไม่ใช่หลักฐานฐานข้อมูล production
+หลักประกัน file snapshot/lock ครอบคลุม process เดียวหลาย adapters ไม่รับรองหลาย process
 Session records/storage ยังอยู่เพื่อคง snapshot format แต่ไม่มี endpoint/session authentication เดิม
 การเปิด production ต้องผ่าน H5/G-AUTH รวม trusted transport, authority, persistence และ signing ที่ใช้งานจริง
+PostgreSQL ใช้ `SchoolAssessmentAuthority`, `PostgresGradeDestination` และ worker principal resolver แล้ว
+ต้องตั้ง time zone ของ timestamp โรงเรียนอย่างชัดเจน; strict authority ไม่อนุมานสมาชิกจากประวัติซ้ำ/การย้ายที่ยังไม่ resolve
+Memory ใช้ unconfigured defaults ส่วน confirm/apply ต้องมี reviewed `GradeExportWriteAuthorization` ตามเงื่อนไขเดิม
+โค้ดต่อเพิ่มเติมรอบนี้ยังไม่ได้ build/test/เชื่อมฐานจริงตามคำสั่งผู้ใช้ ดู [รายละเอียดและข้อจำกัด](phase5-implementation-2026-11-04.md)
+
+Resolution body คือ `{ "decisions": [{ "learner_id": 123, "action": "keep" }] }` โดย `action` เป็น `keep` หรือ `replace`
+และต้องครบหนึ่งรายการต่อผู้เรียนที่ยังค้างใน batch ที่ชน ใช้ Idempotency-Key เดิมเมื่อ retry
+รายการ applied เดิมไม่ส่งซ้ำ; ยืนยัน preview ใหม่ด้วย hash/ETag แล้วจึง supersede outbox เดิมใน transaction เดียว
+กรณี `unknown` หรือ processing ที่ยังไม่ reconcile จะไม่ยอม supersede การอ่าน receipt ใช้ operation lock ก่อนตรวจผล
