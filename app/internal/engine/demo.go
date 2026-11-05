@@ -21,18 +21,14 @@ func HandleDemo(req Request) Response {
 		return fail("PROTOCOL_INVALID", "Expected protocol 1.0 and request_id")
 	}
 	switch req.Mode + "/" + req.Action {
-	case "coding-adventure/program.run", "block-programming/program.run":
+	case "coding-adventure/program.run":
 		var program Program
 		if err := json.Unmarshal(req.Data, &program); err != nil {
 			return fail("INVALID_INPUT", "Invalid program")
 		}
-		commands := program.Commands
-		if req.Mode == "coding-adventure" {
-			var err error
-			commands, err = ParseSource(program.Source)
-			if err != nil {
-				return fail("PROGRAM_INVALID", err.Error())
-			}
+		commands, err := ParseSource(program.Source)
+		if err != nil {
+			return fail("PROGRAM_INVALID", err.Error())
 		}
 		if len(commands) == 0 || len(commands) > 64 {
 			return fail("STEP_LIMIT", "Use between 1 and 64 commands")

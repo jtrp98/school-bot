@@ -1,0 +1,153 @@
+{
+  "schema": 1,
+  "board": "arduino_avr",
+  "platform": "Arduino/Genuino Uno",
+  "categories": [
+    {
+      "id": "start",
+      "blocks": [
+        {"type": "base_setup"},
+        {"type": "sb_loop"}
+      ]
+    },
+    {
+      "id": "control",
+      "blocks": [
+        {"type": "controls_delay"},
+        {"type": "controls_if"},
+        {"type": "controls_whileUntil"},
+        {"type": "sb_forever"},
+        {"type": "controls_for"},
+        {"type": "sb_repeat"},
+        {"type": "controls_flow_statements"},
+        {"type": "sb_wait_until"},
+        {"type": "controls_end_program"}
+      ]
+    },
+    {
+      "id": "logic",
+      "blocks": [
+        {"type": "logic_compare"},
+        {"type": "logic_operation"},
+        {"type": "logic_negate"},
+        {"type": "logic_boolean"}
+      ]
+    },
+    {
+      "id": "math",
+      "blocks": [
+        {"type": "math_number"},
+        {"type": "math_arithmetic"},
+        {"type": "sb_random"},
+        {"type": "math_to_int"},
+        {"type": "base_map"},
+        {"type": "math_constrain"}
+      ]
+    },
+    {
+      "id": "text",
+      "blocks": [
+        {"type": "text"},
+        {"type": "text_join"},
+        {"type": "sb_text_letter"},
+        {"type": "text_length"},
+        {"type": "sb_text_contains"}
+      ]
+    },
+    {
+      "id": "variable",
+      "blocks": [
+        {"type": "variables_declare"},
+        {"type": "variables_get"},
+        {"type": "variables_set"},
+        {"type": "sb_variable_change"}
+      ]
+    },
+    {"id": "list", "userCreated": true, "blocks": []},
+    {
+      "id": "function",
+      "userCreated": true,
+      "blocks": [
+        {"type": "procedures_defnoreturn"},
+        {"type": "procedures_defreturn"},
+        {"type": "procedures_callnoreturn"},
+        {"type": "procedures_callreturn"},
+        {"type": "procedures_return"}
+      ]
+    },
+    {"id": "arm", "blocks": []},
+    {"id": "car", "blocks": []},
+    {
+      "id": "motor",
+      "blocks": [
+        {"type": "sb_servo", "device": "9g Servo Motor"}
+      ]
+    },
+    {
+      "id": "sensor",
+      "blocks": [
+        {"type": "sb_button", "group": "buttons", "device": "Button Module"},
+        {"type": "sb_touch", "group": "buttons", "device": "Touch Sensor"},
+        {"type": "sb_potentiometer", "group": "buttons", "device": "Rotary Potentiometer"},
+        {"type": "sb_reed_switch", "group": "motion", "device": "Magnetic Reed Switch"},
+        {"type": "sb_collision", "group": "motion", "device": "Collision Switch", "status": "deferred"},
+        {"type": "sb_tilt", "group": "motion", "device": "Tilt Switch"},
+        {"type": "sb_vibration", "group": "motion", "device": "Vibration Sensor", "status": "deferred"},
+        {"type": "sb_mpu6050", "group": "motion", "device": "MPU6050 Accelerometer & Gyroscope"},
+        {"type": "sb_gesture_is", "group": "motion", "device": "Gesture Sensor"},
+        {"type": "sb_gesture_light", "group": "motion", "device": "Gesture Sensor"},
+        {"type": "sb_rgb_setup", "group": "light", "device": "3-Channel RGB LED Module"},
+        {"type": "sb_rgb_set", "group": "light", "device": "3-Channel RGB LED Module"},
+        {"type": "sb_rgb_color", "group": "light", "device": "3-Channel RGB LED Module"},
+        {"type": "sb_rgb_named_color", "group": "light", "device": "3-Channel RGB LED Module"},
+        {"type": "sb_flame", "group": "light", "device": "Flame Sensor", "status": "deferred"},
+        {"type": "sb_light", "group": "light", "device": "Light Sensor"},
+        {"type": "sb_line_tracker", "group": "light", "device": "Dual-Channel Line Tracking Sensor"},
+        {"type": "sb_grayscale", "group": "light", "device": "Grayscale Sensor Module"},
+        {"type": "sb_color_sensor", "group": "light", "device": "Color Sensor"},
+        {"type": "sb_active_buzzer", "group": "sound", "device": "Active Buzzer"},
+        {"type": "sb_sound", "group": "sound", "device": "Sound Sensor"},
+        {"type": "sb_buzzer_tone", "group": "sound", "device": "Passive Buzzer"},
+        {"type": "sb_buzzer_tone_for", "group": "sound", "device": "Passive Buzzer"},
+        {"type": "sb_buzzer_stop", "group": "sound", "device": "Passive Buzzer"},
+        {"type": "sb_ir_obstacle", "group": "distance", "device": "IR Obstacle Avoidance Sensor"},
+        {"type": "sb_pir", "group": "distance", "device": "PIR Motion Sensor"},
+        {"type": "sb_ultrasonic", "group": "distance", "device": "Ultrasonic Distance Sensor"},
+        {"type": "sb_thermistor", "group": "environment", "device": "Thermistor Temperature Sensor", "status": "deferred"},
+        {"type": "sb_soil_moisture", "group": "environment", "device": "Soil Moisture Sensor"},
+        {"type": "sb_water_level", "group": "environment", "device": "Water Level Sensor"},
+        {"type": "sb_mq7", "group": "environment", "device": "MQ-7 Carbon Monoxide Sensor"},
+        {"type": "sb_mq3", "group": "environment", "device": "MQ-3 Alcohol Sensor"},
+        {"type": "sb_dht11", "group": "environment", "device": "DHT11 Temperature & Humidity Sensor"},
+        {"type": "sb_relay", "group": "actuators", "device": "Relay Module"},
+        {"type": "sb_fan", "group": "actuators", "device": "Fan Module"},
+        {"type": "sb_fan_stop", "group": "actuators", "device": "Fan Module"}
+      ]
+    },
+    {
+      "id": "display",
+      "blocks": [
+        {"type": "sb_oled_print", "device": "OLED Display Module"},
+        {"type": "sb_oled_clear", "device": "OLED Display Module"},
+        {"type": "sb_led"},
+        {"type": "sb_led_brightness"}
+      ]
+    },
+    {
+      "id": "serial",
+      "blocks": [
+        {"type": "serial_print"},
+        {"type": "serial_readstr"},
+        {"type": "serial_available"}
+      ]
+    },
+    {
+      "id": "remote",
+      "blocks": [
+        {"type": "sb_ir_received", "device": "Infrared Remote Control"},
+        {"type": "sb_ir_button", "device": "Infrared Remote Control"}
+      ]
+    },
+    {"id": "character", "blocks": []}
+  ]
+}

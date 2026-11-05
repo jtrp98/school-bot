@@ -1,0 +1,316 @@
+/* Block Lab uses the cool School Bright CI palette while the other modes keep the warm one,
+   so the mode root overrides the shared tokens from tailwind.css. Tokens built from *-rgb are
+   redeclared in full because a custom property inherits its computed value from :root, not
+   the var() expression. */
+[data-theme="block-lab"] {
+  --ink-rgb: 20, 36, 61;
+  --ink: rgb(var(--ink-rgb));
+  --muted: #5a6377;
+  --blue-rgb: 24, 102, 201;
+  --blue: rgb(var(--blue-rgb));
+  --blue-ink-rgb: 15, 76, 153;
+  --blue-ink: rgb(var(--blue-ink-rgb));
+  --blue-press-rgb: 15, 76, 153;
+  --blue-press: rgb(var(--blue-press-rgb));
+  --blue-tint: #eaf2fd;
+  --blue-line: #c6d6ea;
+  --bg-rgb: 244, 247, 251;
+  --bg: rgb(var(--bg-rgb));
+  --sunken: #f4f6f8;
+  --off: #f4f6f8;
+  --line: #dce3ec;
+  --line-strong: #c6d6ea;
+  --ok: #2e7d32;
+  --ok-ink: #2e7d32;
+  --err: #d32f2f;
+  --warn: #b07f00;
+  --warn-tint: #fff4cc;
+  --r-control: 12px;
+  --shadow-card: 0 1px 2px rgba(20, 36, 61, 0.06), 0 4px 14px rgba(20, 36, 61, 0.06);
+  --shadow-pop: 0 16px 40px rgba(20, 36, 61, 0.3);
+  --focus: 0 0 0 2px #ffffff, 0 0 0 5px var(--blue);
+  font-size: 16px;
+  color: var(--ink);
+}
+
+@keyframes block-lab-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The long-press ring fills from the moment it shows (120 ms) until the menu opens (500 ms).
+   The dash length is the circle's circumference (r 32). */
+@keyframes block-lab-press-ring {
+  from {
+    stroke-dashoffset: 201.06;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* The running step of the send card: a block that slides across without claiming an amount. */
+@keyframes block-lab-step-slide {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(250%);
+  }
+}
+
+/* Blockly prepends its renderer CSS to <head>, so these rules, with the same selectors, win by
+   coming later. Kept outside Tailwind layers because layered rules lose to Blockly's. */
+.school-bot-renderer.school-bot-block-lab-theme.injectionDiv {
+  --blockly-active-node-color: var(--blue);
+}
+/* While a block is dragged, the workspace lets Blockly's drag surface out of its box, so the
+   block floats over the window bar and the drawer (useDropToDelete). The workspace keeps the
+   panel's right corners itself, so nothing square shows while the panel stops clipping. */
+.school-bot-renderer.school-bot-block-lab-theme.injectionDiv.sbLifted {
+  overflow: visible;
+}
+.school-bot-renderer.school-bot-block-lab-theme.injectionDiv > .blocklySvg {
+  border-radius: 0 16px 16px 0;
+}
+.school-bot-renderer.school-bot-block-lab-theme .blocklyText {
+  fill: var(--ink);
+}
+.school-bot-renderer.school-bot-block-lab-theme .blocklyDropdownText {
+  fill: var(--ink) !important;
+}
+.school-bot-renderer.school-bot-block-lab-theme .blocklyNonEditableField > text,
+.school-bot-renderer.school-bot-block-lab-theme .blocklyEditableField > text,
+.school-bot-renderer.school-bot-block-lab-theme .blocklyEditableField > g > text {
+  fill: var(--ink);
+  font-weight: 600;
+}
+.school-bot-renderer.school-bot-block-lab-theme .blocklyHtmlInput {
+  color: var(--ink);
+  font-weight: 600;
+}
+.school-bot-renderer.school-bot-block-lab-theme .blocklyPath {
+  stroke-width: 1.5px;
+}
+.school-bot-renderer.school-bot-block-lab-theme .blocklyOutlinePath,
+.school-bot-renderer.school-bot-block-lab-theme .blocklyDisabledPattern > .blocklyOutlinePath {
+  fill: var(--surface);
+}
+.school-bot-renderer.school-bot-block-lab-theme .blocklyDisabled > .blocklyPath {
+  fill: var(--sunken);
+  fill-opacity: 1;
+  stroke: var(--muted);
+  stroke-opacity: 1;
+  stroke-width: 2px;
+  stroke-dasharray: 6 4;
+}
+.school-bot-renderer.school-bot-block-lab-theme .blocklyDisabled .blocklyText {
+  fill: var(--muted);
+}
+.school-bot-renderer.school-bot-block-lab-theme .sb-warn > .blocklyPath {
+  stroke: var(--warn);
+  stroke-width: 2.5px;
+  stroke-dasharray: 6 3;
+}
+.school-bot-renderer.school-bot-block-lab-theme .blocklyInsertionMarker > .blocklyPath {
+  stroke: var(--line-strong);
+  stroke-width: 1px;
+}
+/* The block list floats over the workspace (A2). Its right edge, corners and shadow belong to
+   the React panel above it (BlockListPanel), so the header and the list share one frame. */
+.school-bot-renderer.school-bot-block-lab-theme .blocklyFlyoutBackground {
+  stroke: none;
+}
+/* No scrollbar in the list (A2): wheel, touchpad and drag scroll it, the fades show more. */
+.school-bot-renderer.school-bot-block-lab-theme .blocklyFlyoutScrollbar {
+  display: none;
+}
+/* No scrollbars on the workspace either: it scrolls by dragging the background, the wheel or
+   the touchpad, and Blockly's arrow keys follow the focused block. */
+.school-bot-renderer.school-bot-block-lab-theme .blocklyMainWorkspaceScrollbar {
+  display: none;
+}
+/* Sub-group headings in the list: 16px bold secondary text, as in the design. */
+.school-bot-renderer.school-bot-block-lab-theme .sbListHeading .blocklyFlyoutLabelText {
+  fill: var(--muted);
+  font-size: 16px;
+  font-weight: 700;
+}
+.school-bot-renderer.school-bot-block-lab-theme .sbListDivider {
+  fill: var(--line);
+  pointer-events: none;
+}
+/* The hat's note ("do once"): a 60% white pill; in the list it is the "✓ placed" badge. */
+.school-bot-renderer.school-bot-block-lab-theme .sbPillRect {
+  fill: #ffffff;
+  fill-opacity: 0.6;
+  stroke: none;
+}
+.school-bot-renderer.school-bot-block-lab-theme .sbPillPlaced > .sbPillRect {
+  fill-opacity: 1;
+  stroke: var(--ink);
+  stroke-width: 2px;
+}
+.school-bot-renderer.school-bot-block-lab-theme .sbPillText {
+  font-weight: 600;
+}
+.school-bot-renderer.school-bot-block-lab-theme .sbPillTick {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2.4px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.school-bot-renderer.school-bot-block-lab-theme .sbPlaced,
+.school-bot-renderer.school-bot-block-lab-theme .sbPlaced * {
+  cursor: not-allowed;
+}
+/* Drag and drop (A2 effect spec): the lifted block floats on a shadow, and a block just let go
+   keeps a 3px blue ring for 0.6s that then fades once. Reduced motion drops the fade. */
+.school-bot-renderer.school-bot-block-lab-theme .blocklyDragging {
+  filter: drop-shadow(0 8px 20px rgba(20, 36, 61, 0.2));
+}
+/* Where letting go deletes it, a dragged block fades; useDropToDelete adds the red frame and tag.
+   A block just taken from the list stays as it is until it has been over the workspace. */
+.school-bot-renderer.school-bot-block-lab-theme .blocklyDragging.blocklyDraggingDelete {
+  opacity: 0.45;
+}
+.school-bot-renderer.school-bot-block-lab-theme.sbQuietDelete .blocklyDragging.blocklyDraggingDelete {
+  opacity: 1;
+}
+@keyframes block-lab-drop-ring {
+  0%,
+  66% {
+    stroke: var(--blue);
+    stroke-width: 3px;
+  }
+}
+.school-bot-renderer.school-bot-block-lab-theme .sbDropped > .blocklyPath {
+  animation: block-lab-drop-ring 0.9s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .school-bot-renderer.school-bot-block-lab-theme .sbDropped > .blocklyPath {
+    animation: block-lab-drop-ring 0.6s step-end;
+  }
+}
+.school-bot-renderer.school-bot-block-lab-theme .blocklyHighlightedConnectionPathVisible {
+  stroke: var(--blue);
+  stroke-width: 4px;
+}
+/* The named-colour field's swatch: a 2px ink edge keeps white and black visible on any block. */
+.school-bot-renderer.school-bot-block-lab-theme .sbColorSwatch {
+  fill-opacity: 1;
+  stroke: var(--ink);
+  stroke-width: 2px;
+}
+/* The settings box of a block (Blockly's mutator) as the design's gear box: a solid frame in the
+   block's colour without Blockly's emboss, rounded 16, floating on the shadow, white inside with
+   a grey tray. The gear itself is drawn in ink without its own tile. */
+.school-bot-renderer.school-bot-block-lab-theme .blocklyMiniWorkspaceBubble {
+  filter: drop-shadow(0 8px 20px rgba(20, 36, 61, 0.2));
+}
+.school-bot-renderer.school-bot-block-lab-theme .blocklyMiniWorkspaceBubble > .blocklyEmboss {
+  filter: none;
+}
+.school-bot-renderer.school-bot-block-lab-theme .blocklyMiniWorkspaceBubble > .blocklyEmboss > rect {
+  rx: 16px;
+  ry: 16px;
+}
+/* The theme's white list background is set inline, so the tray's grey has to override it. */
+.school-bot-renderer.school-bot-block-lab-theme .blocklyMiniWorkspaceBubble .blocklyFlyoutBackground {
+  fill: #e8ecf1 !important;
+  fill-opacity: 1 !important;
+}
+.school-bot-renderer.school-bot-block-lab-theme .blocklyMutatorIcon .blocklyIconShape {
+  fill: transparent;
+}
+.school-bot-renderer.school-bot-block-lab-theme .blocklyMutatorIcon .blocklyIconSymbol {
+  fill: var(--ink);
+}
+/* The right-click menu in the ☰ menu's box. Its container sits under the Block Lab root
+   (useBlockWorkspace sets Blockly's parent container), so the theme tokens apply. */
+.school-bot-renderer.school-bot-block-lab-theme .blocklyContextMenu {
+  box-sizing: border-box;
+  min-width: 280px;
+  max-width: 320px;
+  padding: 8px;
+  /* An inset line instead of a border: Blockly sizes the menu box without borders. */
+  border: 0;
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line), 0 8px 20px rgba(20, 36, 61, 0.2);
+  font: 600 16px/1.5 var(--f-body);
+  color: var(--ink);
+}
+.school-bot-renderer.school-bot-block-lab-theme .blocklyContextMenu .blocklyMenuItem {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.school-bot-renderer.school-bot-block-lab-theme .blocklyContextMenu .blocklyMenuItemHighlight {
+  background: var(--blue-tint);
+}
+.school-bot-renderer.school-bot-block-lab-theme .blocklyContextMenu .blocklyMenuItemDisabled {
+  color: var(--muted);
+  cursor: default;
+}
+.school-bot-renderer.school-bot-block-lab-theme .blocklyContextMenu .blocklyMenuItemContent {
+  flex: 1;
+}
+.school-bot-renderer.school-bot-block-lab-theme .blocklyContextMenu .blocklyMenuSeparator {
+  height: 1px;
+  margin: 4px 0;
+  background: var(--line);
+}
+.blocklyContextMenu .sbMenuEntry {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.blocklyContextMenu .sbMenuIcon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.blocklyContextMenu .sbMenuLabel {
+  flex: 1;
+}
+.blocklyContextMenu .sbMenuDanger {
+  color: var(--err);
+}
+/* A disabled entry says why on a second line, so the reason is not told by colour alone. */
+.blocklyContextMenu .sbMenuReason {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--muted);
+}
+.blocklyContextMenu .sbMenuKeys {
+  margin-left: auto;
+  padding: 0 6px;
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  border-radius: 8px;
+  background: var(--sunken);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.7;
+  color: var(--muted);
+}

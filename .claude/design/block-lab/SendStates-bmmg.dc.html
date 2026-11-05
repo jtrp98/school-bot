@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>SCR-19 ส่งลงบอร์ด สถานะ</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'IBM Plex Sans Thai',system-ui,sans-serif;color:#14243D}
+.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.fc{display:inline-flex;align-items:center;min-height:36px;padding:0 14px;border-radius:999px;background:#fff;border:2px solid #C6D6EA;font-size:16px;font-weight:600;line-height:1.6}
+</style>
+</helmet>
+<div style="width:1440px;min-height:2364px;box-sizing:border-box;background:#F4F7FB;padding:32px 0 40px 0">
+  <div style="padding:0 20px">
+    <h1 style="margin:0;font-size:28px;font-weight:700;line-height:1.4">SCR-19 · เชื่อม Uno + ส่งลงบอร์ด + หยุดทั้งหมด · สถานะ</h1>
+    <p style="margin:4px 0 16px 0;font-size:16px;line-height:1.6;color:#5A6377;max-width:1150px">R9 · R10 — การ์ดสถานะเปิดขึ้นด้านบนของแถบล่าง (ห้ามบังปุ่ม "หยุดทั้งหมด" ซ้ายล่าง · z-stop) · มีเฉพาะ dialog เตือนต่อสายจริงที่เป็นหน้าต่างกลางจอ และเว้นแถบล่าง 76px · ปุ่ม "ส่งลงบอร์ด" สีส้ม (กดแล้วฮาร์ดแวร์ทำงาน) · ถ้อยคำไม่สื่อว่า "บอร์ดหยุดแล้ว" จนกว่า dev ยืนยัน (OQ3)</p>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:28px">
+      <span class="fc">กด "ส่งลงบอร์ด"</span>
+      <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+      <span class="fc">ถ้ายังไม่เชื่อม: ST-30</span>
+      <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+      <span class="fc">ST-46 เตือนต่อสาย (ข้ามได้ถ้าติ๊ก และวงจรไม่เปลี่ยน)</span>
+      <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+      <span class="fc">ST-32 แปลงโค้ด แล้วส่ง</span>
+      <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+      <span class="fc">ST-33 (+ ST-45) หรือ ST-34</span>
+    </div>
+    <div style="font-size:18px;font-weight:700;line-height:1.5">ST-39 · ชิปอุปกรณ์ Uno บนแถบหน้าต่างสูง 60 (4 สถานะ · กดชิปแล้วไป SCR-19 · แสดงเฉพาะใน lab)</div>
+    <div style="font-size:16px;line-height:1.6;color:#5A6377;margin-bottom:8px">ไอคอน + ข้อความทุกสถานะ · แถบหน้าต่างเป็นสำเนาชั่วคราว ชั้นต่ำกว่า z-stop (CR-10)</div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:32px">
+    <dc-import name="WindowBar" os="win" chip="disconnected" save="saved" port="COM3" hint-size="1440px,60px"></dc-import>
+    <dc-import name="WindowBar" os="win" chip="connecting" save="saved" port="COM3" hint-size="1440px,60px"></dc-import>
+    <dc-import name="WindowBar" os="win" chip="connected" save="saved" port="COM3" hint-size="1440px,60px"></dc-import>
+    <dc-import name="WindowBar" os="mac" chip="lost" save="saved" port="COM3" hint-size="1440px,60px"></dc-import>
+  </div>
+  <div style="padding:0 16px;display:flex;flex-wrap:wrap;gap:28px 20px;align-items:flex-start">
+    <sc-for list="{{cells}}" as="c" hint-placeholder-count="13">
+      <div style="{{c.wrap}}">
+        <div style="font-size:18px;font-weight:700;line-height:1.5">{{c.cap}}</div>
+        <div style="font-size:16px;line-height:1.6;color:#5A6377;min-height:52px;margin-bottom:8px">{{c.sub}}</div>
+        <dc-import name="Cards" kind="{{c.kind}}" stage="{{c.stage}}" why="{{c.why}}" hint-size="420px,260px"></dc-import>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2364}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const w = (n) => 'width:' + n + 'px;flex-shrink:0';
+    return {
+      cells: [
+        { wrap: w(520), cap: 'ST-46 · เตือนต่อสายจริง (dialog)', sub: 'ทุกครั้งก่อนส่ง + ติ๊ก "ไม่ต้องเตือนอีกในงานนี้" · เตือนใหม่เมื่อเพิ่ม/ลบ/เปลี่ยนค่าอุปกรณ์หรือสาย (ไม่นับย้ายตำแหน่ง) · "ดูวงจร" ปิด dialog แล้วสลับไปแท็บตัวจำลอง', kind: 'warn', stage: 'no', why: 'usb' },
+        { wrap: w(420), cap: 'ST-30 · ไม่พบบอร์ด', sub: 'ตรวจการเชื่อมก่อนเตือนต่อสาย (ไม่ให้ยืนยันฟรี) · ปุ่มส่งกดได้เสมอ ไม่ปิดใช้เงียบ ๆ (OQ30)', kind: 'nodevice', stage: 'no', why: 'usb' },
+        { wrap: w(420), cap: 'ST-32 · กำลังแปลงโค้ด', sub: 'ไม่มีปุ่มยกเลิก (ยกเลิกกลางทางไม่ปลอดภัย) · ปุ่มส่งลงบอร์ดเป็น aria-disabled บอกว่ากำลังทำงาน', kind: 'compile', stage: 'no', why: 'usb' },
+        { wrap: w(420), cap: 'ST-32 · กำลังส่งลงบอร์ด', sub: 'เตือนห้ามถอดสาย USB · "หยุดทั้งหมด" ยังกดได้ หยุดตัวจำลอง+stage และบอกว่าการส่งทำต่อจนเสร็จ', kind: 'send', stage: 'no', why: 'usb' },
+        { wrap: w(420), cap: 'ST-33 · ส่งสำเร็จ', sub: 'มาสคอตท่ายกนิ้ว + ข้อความกำกับ · ไม่ใช้ถ้อยคำว่าบอร์ดหยุด/ทำงานถูกต้อง แค่ส่งแล้ว', kind: 'success', stage: 'no', why: 'usb' },
+        { wrap: w(420), cap: 'ST-33 + ST-45 · ส่งสำเร็จ แต่มีบล็อก Stage', sub: 'ข้อความสั้น "บล็อกตัวละครทำงานเฉพาะในจอ" ต่อท้าย · พื้นฟ้าอ่อน ไม่ใช่ error (DEC-23)', kind: 'success', stage: 'yes', why: 'usb' },
+        { wrap: w(420), cap: 'ST-34 · ส่งไม่สำเร็จ (USB หลุด)', sub: 'ภาษาเด็ก ไม่โทษ เป็นเช็กลิสต์ + รหัสผิดพลาด E-USB · ลองอีกครั้ง', kind: 'fail', stage: 'no', why: 'usb' },
+        { wrap: w(420), cap: 'ST-34 · แปลงโค้ดไม่ผ่าน (ชี้บล็อกที่ผิด)', sub: 'ปุ่ม "ไปที่บล็อก" เลื่อนพื้นที่ต่อบล็อกไปหาช่องว่างและไฮไลต์ (OQ26) · รหัส E-BUILD (ชื่อชั่วคราว)', kind: 'fail', stage: 'no', why: 'compile' },
+        { wrap: w(480), cap: 'OQ32 · งานใหม่ (Ctrl+N) ระหว่างจำลอง', sub: 'หยุดจำลองก่อน แล้วใช้ leave guard เดิมถ้าบันทึก/sync ไม่สำเร็จ (my-work R6)', kind: 'guardRun', stage: 'no', why: 'usb' },
+        { wrap: w(480), cap: 'OQ32 · งานใหม่ / ปิดแอป ระหว่างส่งลงบอร์ด', sub: 'กันไว้พร้อมข้อความ (ต้องเพิ่มกรณีใน app-shell R5 ผ่าน session หลัก)', kind: 'guardSend', stage: 'no', why: 'usb' },
+        { wrap: w(420), cap: 'ST-47 · หยุดทั้งหมด (ค่าตั้งต้น)', sub: 'บอกเฉพาะสิ่งที่หยุดแน่นอน: ตัวจำลองและตัวละคร · ผลกับบอร์ดยังไม่ยืนยัน (OQ3 · DEV-Q16)', kind: 'stop0', stage: 'no', why: 'usb' },
+        { wrap: w(420), cap: 'ST-47 · แบบ A (OQ3): บอร์ดหยุดทันที', sub: 'ใช้เมื่อ dev ยืนยันว่าสั่งหยุดบอร์ดได้ทันที', kind: 'stopA', stage: 'no', why: 'usb' },
+        { wrap: w(420), cap: 'ST-47 · แบบ B (OQ3): ต้องส่งโปรแกรมว่าง', sub: 'มีความคืบหน้า + บอกว่าโปรแกรมเดิมบนบอร์ดจะหาย · ผู้ใช้เลือกแบบเมื่อ dev ตอบ', kind: 'stopB', stage: 'no', why: 'usb' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

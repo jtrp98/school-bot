@@ -1,0 +1,950 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>ตัวแก้โค้ด Arduino C++ A2</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'IBM Plex Sans Thai',system-ui,sans-serif}
+button{font-family:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid #1866C9;outline-offset:2px}
+/* รอบ 14 (R3 · OQ144 · ชุดที่ 6 ข้อ B): ตัวแก้โค้ด Arduino C++ ของโหมดโค้ด · คลาส/id ทุกตัวขึ้นต้น cm- (helmet ทุกชิ้นส่วนรวมเป็น CSS เดียวกันทั้งหน้า · ห้ามใช้ชื่อกลางอย่าง .tip .cb .rb .i) */
+.cm-i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.cm-mono{font-family:Consolas,ui-monospace,SFMono-Regular,Menlo,monospace}
+.cm-ta{display:block;margin:0;border:0;outline:none;resize:none;overflow:hidden;background:transparent;color:transparent;-webkit-text-fill-color:transparent;caret-color:#14243D;font-size:16px;line-height:24px;white-space:pre;tab-size:2;user-select:text;-webkit-user-select:text}
+.cm-ta:focus{outline:none}
+/* OQ191 (R20 ข้อ 4 · brand §11.19): สี syntax = ชั้นซ้อน .cm-ov วางทับ textarea (ตัวอักษรของ textarea โปร่งใส เหลือเคอร์เซอร์/พื้นที่เลือก) · ฟอนต์/ขนาด/padding เหมือน textarea ทุกค่า · ตัวหนา 700 = สัญญาณที่สอง (WCAG 1.4.1) · ไม่ใช้ตัวเอียง (กันความกว้างต่างจาก textarea ตอนมีอักษรไทย) · พื้นที่เลือก = action-primary-subtle #EAF2FD (ทุกสีผ่าน 4.5:1 บนพื้นนี้ ดู D1) */
+.cm-ta::selection{background:#EAF2FD;color:transparent;-webkit-text-fill-color:transparent}
+.cm-ov{margin:0;border:0;overflow:hidden;pointer-events:none;user-select:none;-webkit-user-select:none;white-space:pre;tab-size:2;font-size:16px;line-height:24px;font-weight:400;font-style:normal;color:#14243D;background:transparent}
+/* R20 ข้อ 4 รอบ 2 (OQ204–OQ208 · brand §11.19 · AS2/AS7): กลุ่มสีตาม Arduino · ค่า hex ปรับเข้มจาก Arduino ให้ ≥ 4.5:1 บนขาว/#F4F7FB/#EAF2FD (ตารางใน D1) · ตัวหนา 700 = ทุกคำที่ลงสี keyword/ชนิด/ค่าคงที่/ฟังก์ชัน/คลาส (OQ208 Proposed ของ ruler · รอผู้ใช้ยืนยัน) */
+.cm-f{color:#5A7000;font-weight:700}
+.cm-t{color:#00747A;font-weight:700}
+.cm-o{color:#B04500;font-weight:700}
+.cm-u{color:#B04500}
+.cm-g{color:#5A6377;font-weight:700}
+.cm-n{color:#6B5F3F}
+.cm-s{color:#005C5F}
+.cm-c{color:#5A6377}
+/* โหมดสีบังคับ (Windows High Contrast): ซ่อนชั้นซ้อน ให้ textarea แสดงตัวอักษรตามระบบ */
+@media (forced-colors:active){.cm-ta{color:CanvasText;-webkit-text-fill-color:CanvasText}.cm-ov{display:none}}
+.cm-gm{position:absolute;left:4px;top:0;width:24px;height:24px;padding:0;border:0;border-radius:6px;background:transparent;display:flex;align-items:center;justify-content:center}
+.cm-gm:hover{background:#FFFFFF}
+.cm-tip{display:none;position:absolute;left:calc(100% + 12px);top:50%;transform:translateY(-50%);z-index:40;width:max-content;max-width:420px;box-sizing:border-box;padding:4px 12px;border-radius:8px;background:#14243D;color:#FFFFFF;font-family:'IBM Plex Sans Thai',system-ui,sans-serif;font-size:14px;font-weight:500;line-height:1.6;text-align:left;white-space:normal;pointer-events:none}
+.cm-gm:hover .cm-tip,.cm-gm:focus-visible .cm-tip{display:block}
+.cm-pi{display:flex;align-items:flex-start;gap:12px;box-sizing:border-box;width:100%;min-height:52px;margin:0 0 4px 0;padding:6px 12px;border:0;border-radius:12px;background:transparent;color:#14243D;text-align:left;font-size:16px;line-height:1.6}
+.cm-pi:hover{background:#EAF2FD}
+.cm-sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+/* ข้อ 2.2 (R3 · OQ161 · brand §11.18): autocomplete แบบ app.arduino.cc · รายการใต้เคอร์เซอร์ หน้าตาเมนู §11.9 · แถวที่เลือก = พื้น #EAF2FD + กรอบใน 2px #1866C9 (ไม่พึ่งสีอย่างเดียว) */
+.cm-ai{display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:12px;box-sizing:border-box;height:44px;flex-shrink:0;padding:0 12px;border-radius:12px;background:transparent;color:#14243D;cursor:pointer;text-align:left}
+.cm-al{font-size:14px;font-style:italic;font-weight:400;line-height:1.6;color:#5A6377;white-space:nowrap;flex-shrink:0}
+.cm-ai:hover{background:#EAF2FD}
+.cm-ai.on{background:#EAF2FD;box-shadow:inset 0 0 0 2px #1866C9}
+.cm-chip{display:inline-flex;align-items:center;height:24px;padding:0 8px;border-radius:999px;background:#EAF2FD;border:2px solid #C6D6EA;font-size:14px;font-weight:600;line-height:1.5;white-space:nowrap}
+</style>
+</helmet>
+<!-- ตัวแก้โค้ด Arduino C++ (โหมดโค้ด · R3 · OQ144) · ใช้ใน BlocksPaneA2 แทนแถบหมวด + รายการบล็อก + พื้นที่ต่อบล็อก เมื่อ mode=code · แก้ได้ · เลขบรรทัด monospace 16px (DSG-15 Proposed · ยังไม่ approve) · โค้ดเริ่มต้นแปลงจากบล็อกตอนสลับเข้าโหมดโค้ดเท่านั้น (ไม่ sync กลับ) · เช็ก syntax realtime ด้วยกฎจำลองโค้ด JS ล้วน (ไม่ใช่ compiler จริง): ลืม ; · วงเล็บ/ปีกกาไม่ครบ · ฟังก์ชันที่ไม่รู้จัก · คำสั่งพิมพ์ไม่จบ · ขาที่ไม่มีใน Uno · แสดงที่เลขบรรทัด (ไอคอน + tooltip ข้อความ) และรายการปัญหา (ข้อความภาษา ป.3–4 บอกที่ผิดและวิธีแก้) · ปัญหาบนบรรทัดที่กำลังพิมพ์ (เคอร์เซอร์อยู่ท้ายบรรทัด) แสดงเป็นคำใบ้ "กำลังพิมพ์" ยังไม่นับ -->
+<div onPointerDownCapture="{{mPtr}}" onKeyDownCapture="{{mKey}}" style="position:relative;width:{{rootW}}px;height:{{rootH}}px;background:#fff;color:#14243D;overflow:hidden;user-select:text;-webkit-user-select:text">
+
+  <!-- หัว 56 · ซ้าย: ชื่อ + หมายเหตุที่มาของโค้ด · ขวา: ตำแหน่งเคอร์เซอร์ · เว้นขวา (hdrPadR) ให้ที่จับแผงขวาของ Main-A2 (มุมขวาบน) -->
+  <div style="position:absolute;left:0;top:0;width:100%;height:56px;box-sizing:border-box;display:flex;align-items:center;gap:12px;padding:0 {{hdrPadR}}px 0 16px;border-bottom:1px solid #DCE3EC;background:#fff">
+    <svg class="cm-i" style="width:24px;height:24px" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"></path></svg>
+    <h2 style="margin:0;font-size:18px;font-weight:700;line-height:1.6;white-space:nowrap">โค้ด Arduino C++</h2>
+    <span style="flex:1 1 auto;min-width:0;font-size:14px;line-height:1.7;color:#5A6377;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{noteText}}</span>
+    <span style="flex-shrink:0;font-size:14px;line-height:1.7;color:#5A6377;white-space:nowrap">{{caretText}}</span>
+  </div>
+
+  <!-- พื้นที่แก้โค้ด: ตัวเลื่อนเดียวคลุมทั้งเลขบรรทัด (sticky ซ้าย) + ช่องพิมพ์ · textarea สูงเท่าจำนวนบรรทัด ไม่เลื่อนเอง · แถบสีบรรทัดปัญหาอยู่ใต้ textarea (โปร่งใส) -->
+  <div ref="{{scRef}}" style="{{scStyle}}">
+    <div style="display:flex;width:max-content;min-width:100%;min-height:100%">
+      <div style="{{gutStyle}}">
+        <sc-for list="{{gRows}}" as="g" hint-placeholder-count="0">
+          <div class="cm-mono" style="position:absolute;left:0;top:{{g.top}}px;width:100%;height:24px;box-sizing:border-box;display:flex;align-items:center;justify-content:flex-end;padding-right:12px;font-size:16px;line-height:24px">
+            <span aria-hidden="true" style="{{g.numStyle}}">{{g.n}}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="{{txtWrapStyle}}">
+        <sc-if value="{{hasCur}}" hint-placeholder-val="{{false}}"><div aria-hidden="true" style="position:absolute;left:0;right:0;top:{{curTop}}px;height:24px;background:#F4F7FB"></div></sc-if>
+        <textarea class="cm-ta cm-mono" ref="{{taRef}}" value="{{text}}" onChange="{{onText}}" onKeyDown="{{onKey}}" onKeyUp="{{onCaret}}" onClick="{{onCaret}}" onSelect="{{onCaret}}" onFocus="{{onFocus}}" onBlur="{{onBlur}}" wrap="off" spellCheck="false" autoComplete="off" maxLength="12000" role="combobox" aria-haspopup="listbox" aria-multiline="true" aria-label="ช่องแก้โค้ด Arduino C++ แก้ได้" aria-describedby="cm-help" aria-autocomplete="list" aria-controls="cm-ac" aria-expanded="{{acOpen}}" aria-activedescendant="{{acActive}}" style="{{taStyle}}"></textarea>
+        <!-- ชั้นสี syntax (OQ191): ทับ textarea · ไม่รับเมาส์ · ซ่อนจาก screen reader · เนื้อหาเขียนผ่าน ref (innerHTML จากตัวแยกคำ tokHtml) -->
+        <pre class="cm-ov cm-mono" ref="{{ovRef}}" aria-hidden="true" style="{{ovStyle}}"></pre>
+        <!-- autocomplete ตาม Arduino (R20 ข้อ 4 รอบ 2 · OQ204–OQ206 · brand §11.18): โฟกัสอยู่ที่ช่องโค้ดตลอด · ↑↓ เลือก · Enter/Tab ใส่รายการที่เลือก (ค่าเริ่มต้น = รายการแรก) · Esc ปิด · ไม่มีคำใบ้/คำอธิบาย · ป้ายกลุ่มท้ายแถวเป็นคำ · รายการสูงจำกัด 6 แถว เลื่อนในกล่อง · semantics: textarea = combobox · กล่อง = listbox · แถว = option -->
+        <sc-if value="{{acOpen}}" hint-placeholder-val="{{false}}">
+          <div style="{{acStyle}}" onMouseDown="{{acMd}}">
+            <div id="cm-ac" ref="{{acRef}}" role="listbox" aria-label="{{acLabel}}" style="{{acListStyle}}">
+              <sc-for list="{{acItems}}" as="a" hint-placeholder-count="0">
+                <div id="{{a.id}}" role="option" class="{{a.cls}}" aria-selected="{{a.sel}}" onPointerDown="{{a.pick}}">
+                  <span class="cm-mono" style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:16px;line-height:1.6;color:{{a.col}}"><span style="font-weight:700">{{a.m}}</span><span style="font-weight:400">{{a.rest}}</span></span>
+                  <span class="cm-al">{{a.kind}}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+  <!-- วงโฟกัส (ชั้นทับ ไม่รับเมาส์ · ข้อ 1.11 · §11.17 ขอบ 2px #1866C9 + วง #D0EBFD 3px · วาดด้านในเพราะตัวเลื่อน overflow) -->
+  <div aria-hidden="true" style="{{ringStyle}}"></div>
+  <span id="cm-help" class="cm-sr">ช่องแก้โค้ด พิมพ์ได้เลย มีรายการคำแนะนำขึ้นมาตอนพิมพ์ กด Enter หรือ Tab เพื่อใส่คำแรกในรายการ กดลูกศรขึ้นลงเพื่อเลือกคำอื่น กด Esc เพื่อปิดรายการ ถ้าไม่มีรายการ กด Tab เพื่อย้ายโฟกัสออกจากช่องโค้ด</span>
+  <span class="cm-sr" role="status" aria-live="polite">{{liveMsg}}</span>
+  <!-- ข้อ 2.2 (R3 · OQ161 · 2026-10-28): ตัดแผงปัญหาใต้โค้ด + แถบสถานะ + เครื่องหมายที่เลขบรรทัด + ชิปปัญหา (เช็ก syntax realtime) ออกทั้งหมด · ตัวเช็กเดิม (analyze) ใช้เฉพาะตอนสั่ง เริ่มจำลอง/ส่งลงบอร์ด (แปลงโค้ด) แล้วแจ้งผลใน Output -->
+  <!-- ตัวหนังสือ (เหนือเลขบรรทัด) แจ้ง screen reader ว่ามีคำแนะนำ -->
+  <span class="cm-sr" aria-live="polite">{{acSr}}</span>
+
+  <!-- ตัวบอกวินิจฉัย (Tweak debug · ปิดเป็นค่าเริ่มต้น · ไม่รับเมาส์ · เขียนข้อความตรงเข้า DOM ผ่าน ref) -->
+  <sc-if value="{{dbgOn}}" hint-placeholder-val="{{false}}">
+    <div ref="{{dbgRef}}" aria-hidden="true" style="position:absolute;right:8px;top:64px;z-index:100;pointer-events:none;box-sizing:border-box;max-width:560px;padding:6px 10px;border-radius:8px;background:rgba(20,36,61,.94);color:#FFFFFF;font:12px/1.45 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap"></div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"w":{"editor":"int","default":1392,"min":480,"max":1440,"section":"ตัวแก้โค้ด"},"h":{"editor":"int","default":516,"min":300,"max":812,"section":"ตัวแก้โค้ด"},"narrow":{"editor":"enum","default":"no","options":["no","yes"],"section":"ตัวแก้โค้ด"},"demo":{"editor":"enum","default":"off","options":["off","errors"],"section":"ตัวอย่างโค้ดที่มีปัญหา (ดูการเช็ก syntax)"},"debug":{"editor":"enum","default":"off","options":["off","on"],"section":"วินิจฉัย (ปิดเป็นค่าเริ่มต้น)"},"seed":{"editor":null},"saved":{"editor":null},"focusTick":{"editor":null},"gotoLine":{"editor":null},"onRegister":{"editor":null},"onState":{"editor":null},"onEdit":{"editor":null},"onSave":{"editor":null},"$preview":{"width":1392,"height":516}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this._demo = this.gp('demo') === 'errors' ? 'errors' : 'off';
+    this._seedText = this.pickSeed();
+    const sv = this.gp('saved');
+    const start = (typeof sv === 'string' && sv !== '') ? sv : this._seedText;
+    this.state = { text: start, caret: { line: 1, col: 1, atEnd: true }, focused: false, live: '' };
+    this._ft = Number(this.gp('focusTick')) || 0;
+    this._gl = String(this.gp('gotoLine') || '');
+    this._dbg = { inp: 0, key: 0, up: 0, clk: 0, sel: 0, foc: 0, blr: 0, pub: 0, last: '-' };
+    this.taRef = (el) => { this._ta = el; };
+    this.scRef = (el) => { this._sc = el; };
+    this.acRef = (el) => { this._acEl = el || null; };
+    this.dbgRef = (el) => { this._dbgEl = el; this.paintDbg(); };
+    this.ovRef = (el) => { this._ov = el || null; this._ovT = null; if (el) this.paintOv(); };
+  }
+  componentDidMount() {
+    this.publish(); this.paintDbg(); this.paintOv();
+    // ข้อ 2.2: ลงทะเบียนฟังก์ชัน "แปลงโค้ด" ให้พ่อเรียกตอนสั่ง เริ่มจำลอง/ส่งลงบอร์ด (พ่อดึงผลเอง ไม่ต้องส่งผลขึ้นพ่อทุกครั้งที่พิมพ์) · คืนรายการปัญหาระดับ error [{line, title, hint}]
+    this.emit('onRegister', () => this.compile());
+  }
+  compile() {
+    try {
+      const t = (this.state || {}).text || '';
+      return this.analyze(t).filter((p) => p.level === 'error').slice(0, 20).map((p) => ({ line: p.line, title: p.title, hint: p.hint }));
+    } catch (e) { return []; }
+  }
+  componentDidUpdate(pp) {
+    this.paintOv();
+    const ta = this._ta;
+    if (this._selNext != null && ta) {
+      const p = this._selNext;
+      this._selNext = null;
+      try { if (Array.isArray(p)) ta.setSelectionRange(p[0], p[1]); else ta.setSelectionRange(p, p); } catch (e) {}
+      this.syncCaret(ta);
+    }
+    this.acScroll();
+    // Tweak demo เปลี่ยน = เริ่มใหม่จากโค้ดตัวอย่างนั้น (ไม่เกี่ยวกับโค้ดที่เก็บไว้ตอน mount)
+    const dm = this.gp('demo') === 'errors' ? 'errors' : 'off';
+    if (dm !== this._demo) {
+      this._demo = dm;
+      this._seedText = this.pickSeed();
+      this.setState({ text: this._seedText });
+      return;
+    }
+    // ข้อ 2.2: กดที่บรรทัดใน Output / ปุ่ม "ไปที่บรรทัด" ใน Main-A2 → prop gotoLine = "บรรทัด:ตัวนับ" → ไปที่บรรทัดนั้น
+    const gl = String(this.gp('gotoLine') || '');
+    if (gl !== this._gl) { this._gl = gl; const q = gl.split(':'); const ln = parseInt(q[0], 10); if (ln > 0) this.jump(ln); }
+    this.publish();
+    this.paintDbg();
+  }
+  componentWillUnmount() {
+    // เก็บโค้ดที่แก้ไว้ที่ BlocksPaneA2 (ไม่ sync กลับเป็นบล็อก) · เก็บเฉพาะเมื่อแก้แล้ว (dirty)
+    try {
+      const f = this.gp('onSave');
+      const t = (this.state || {}).text;
+      const d = !!(this._cur && this._cur.dirty);
+      if (typeof f === 'function') setTimeout(() => { try { f(t, d); } catch (e) {} }, 0);
+    } catch (e) {}
+  }
+  gp(name) {
+    const P = this.props || {};
+    const kebab = name.replace(/[A-Z]/g, (m) => '-' + m.toLowerCase());
+    if (P[name] !== undefined) return P[name];
+    if (P[name.toLowerCase()] !== undefined) return P[name.toLowerCase()];
+    if (P[kebab] !== undefined) return P[kebab];
+    return undefined;
+  }
+  emit(name, a, b) {
+    const f = this.gp(name);
+    if (typeof f === 'function') { try { f(a, b); } catch (e) {} }
+  }
+
+  /* ---------- โค้ดตัวอย่าง ---------- */
+  sampleCode() {
+    return ['void setup() {', '  pinMode(13, OUTPUT);', '  pinMode(2, INPUT_PULLUP);', '}', '', 'void loop() {', '  if (digitalRead(2) == LOW) {', '    digitalWrite(13, HIGH);', '  } else {', '    digitalWrite(13, LOW);', '  }', '  delay(100);', '}'].join('\n');
+  }
+  // โค้ดตัวอย่างที่มีปัญหาหลายแบบ (Tweak demo = errors) ไว้ดูการเช็ก syntax โดยไม่ต้องพิมพ์เอง
+  demoCode() {
+    return ['int led = 13', '', 'void setup() {', '  pinMode(led, OUTPUT);', '  pinMode(25, OUTPUT);', '  Serial.begin(9600)', '}', '', 'void loop() {', '  digitalWrite(led, HIGHT);', '  digitalwrite(led, LOW);', '  delay(', '  if (led = 13) {', '    analogWrite(4, 128);', '  }', ''].join('\n');
+  }
+  pickSeed() {
+    if (this.gp('demo') === 'errors') return this.demoCode();
+    const s = this.gp('seed');
+    return (typeof s === 'string' && s.trim() !== '') ? s : this.sampleCode();
+  }
+
+  /* ---------- ตัวบอกวินิจฉัย (Tweak debug · ปิดเป็นค่าเริ่มต้น) ---------- */
+  dbg(k, extra) {
+    try {
+      const D = this._dbg;
+      if (k === 'input') D.inp += 1; else if (k === 'keydown') D.key += 1; else if (k === 'keyup') D.up += 1; else if (k === 'click') D.clk += 1; else if (k === 'select') D.sel += 1; else if (k === 'focus') D.foc += 1; else if (k === 'blur') D.blr += 1; else if (k === 'pub') D.pub += 1;
+      D.last = k + (extra ? ' ' + extra : '');
+      this.paintDbg();
+    } catch (e) {}
+  }
+  paintDbg() {
+    try {
+      const el = this._dbgEl;
+      if (!el) return;
+      const D = this._dbg, S = this.state || {}, ta = this._ta;
+      el.textContent =
+        'วินิจฉัย CodeEditorA2 (Tweak debug)\n' +
+        'input ' + D.inp + ' · keydown ' + D.key + ' · keyup ' + D.up + ' · click ' + D.clk + ' · select ' + D.sel + ' · focus ' + D.foc + ' · blur ' + D.blr + '\n' +
+        'ล่าสุด: ' + D.last + '\n' +
+        'textarea: ' + (ta ? 'มี · selectionStart=' + ta.selectionStart + ' · ยาว ' + ta.value.length + ' · readOnly=' + ta.readOnly : 'ไม่พบ') + '\n' +
+        'state: text ' + (S.text ? S.text.length : 0) + ' ตัวอักษร · caret ' + (S.caret ? S.caret.line + ':' + S.caret.col : '-') + ' · focused=' + S.focused + '\n' +
+        'ปัญหา(นับ) ' + (this._cur ? this._cur.errs : '-') + ' · dirty=' + (this._cur ? this._cur.dirty : '-') + ' · ส่งสถานะขึ้นพ่อ ' + D.pub + ' ครั้ง';
+    } catch (e) {}
+  }
+
+  /* ---------- ข้อความ · เคอร์เซอร์ ---------- */
+  setText(nv) {
+    const t = String(nv).replace(/\r\n?/g, '\n');
+    this.setState({ text: t });
+    this.emit('onEdit');
+  }
+  syncCaret(ta) {
+    try {
+      if (!ta) return;
+      const v = String(ta.value);
+      const s = ta.selectionStart || 0;
+      const before = v.slice(0, s);
+      const line = before.split('\n').length;
+      const ls = before.lastIndexOf('\n') + 1;
+      const col = s - ls + 1;
+      const le = v.indexOf('\n', s);
+      const rest = v.slice(s, le < 0 ? v.length : le);
+      const atEnd = rest.trim() === '';
+      const sel = (ta.selectionEnd || 0) > s;
+      const c = this.state.caret;
+      if (!c || c.line !== line || c.col !== col || c.atEnd !== atEnd || c.pos !== s || !!c.sel !== sel) this.setState({ caret: { line: line, col: col, atEnd: atEnd, pos: s, sel: sel } });
+    } catch (e) {}
+  }
+  // ไปที่บรรทัด (วางเคอร์เซอร์ท้ายบรรทัด ไม่เลือกข้อความ กันพิมพ์ทับทั้งบรรทัด) แล้วเลื่อนให้เห็น
+  jump(line) {
+    try {
+      const ta = this._ta, sc = this._sc;
+      if (!ta) return;
+      const arr = String(ta.value).split('\n');
+      let pos = 0;
+      for (let i = 0; i < line - 1 && i < arr.length; i++) pos += arr[i].length + 1;
+      const end = pos + (arr[line - 1] ? arr[line - 1].length : 0);
+      ta.focus();
+      ta.setSelectionRange(end, end);
+      if (sc) sc.scrollTop = Math.max(0, (line - 1) * 24 - 72);
+      this.syncCaret(ta);
+      this.setState({ live: 'ไปที่บรรทัด ' + line });
+    } catch (e) {}
+  }
+  /* ---------- autocomplete แบบ app.arduino.cc (ข้อ 2.2 · R3 · OQ161) ---------- */
+  charW() {
+    if (this._cw) return this._cw;
+    let w = 9.6;
+    try {
+      const cx = document.createElement('canvas').getContext('2d');
+      cx.font = '16px Consolas, ui-monospace, SFMono-Regular, Menlo, monospace';
+      w = cx.measureText('M').width || w;
+    } catch (e) {}
+    this._cw = w;
+    return w;
+  }
+  // ป้ายกลุ่มท้ายแถว (OQ205): คำไทย/3 ภาษา · ค่าชั่วคราว (EN/中文 ร่างโดย designer ต้องมีเจ้าของข้อความ) · เลือกภาษาด้วย prop lang (th|en|zh) ค่าเริ่มต้น th
+  acKindName(g) {
+    const L = { th: { cmd: 'คำสั่ง', cls: 'คลาส', typ: 'ชนิดข้อมูล', con: 'ค่าคงที่' }, en: { cmd: 'Command', cls: 'Class', typ: 'Type', con: 'Constant' }, zh: { cmd: '命令', cls: '类', typ: '数据类型', con: '常量' } };
+    const lg = String(this.gp('lang') || 'th');
+    return (L[lg] || L.th)[g];
+  }
+  // รายการคำของ autocomplete = ชุดเดียวกับตัวลงสี (ฐาน KB) จัด 4 กลุ่มตาม Arduino: คำสั่ง (hints) · คลาส (builtIn) · ชนิดข้อมูล (type) · ค่าคงที่ (literal) · ไม่มี keyword C/C++ · ไม่มีตัวแปรของผู้ใช้ · ไม่มีคำใบ้ (AS3 AS4 · OQ204)
+  acBase() {
+    if (this._acB) return this._acB;
+    const KB = this.KB();
+    const out = [];
+    const seen = {};
+    const add = (n, g) => { if (!seen[n]) { seen[n] = true; out.push({ n: n, g: g }); } };
+    Object.keys(KB.FN).forEach((n) => add(n, 'cmd'));
+    Object.keys(KB.FNX).forEach((n) => add(n, 'cmd'));
+    Object.keys(KB.SERIAL).forEach((n) => add(n, 'cmd'));
+    Object.keys(KB.SERVO).forEach((n) => add(n, 'cmd'));
+    Object.keys(KB.NOUNO).forEach((n) => add(n, 'cmd'));
+    ['Serial', 'Servo'].forEach((n) => add(n, 'cls'));
+    ['boolean', 'byte', 'word', 'String'].forEach((n) => add(n, 'typ'));
+    Object.keys(KB.CONST).forEach((n) => add(n, 'con'));
+    out.sort((a, b) => { const x = a.n.toLowerCase(), y = b.n.toLowerCase(); return x < y ? -1 : (x > y ? 1 : (a.n < b.n ? -1 : 1)); });
+    this._acB = out;
+    return out;
+  }
+  acCompute(text, rawLines, caret, focused) {
+    if (!focused) return null;
+    const S = this.state || {};
+    const es = S.acEsc;
+    if (es && es.pos === caret.pos && es.len === text.length) return null;
+    const line = rawLines[caret.line - 1] || '';
+    const before = line.slice(0, Math.max(0, caret.col - 1));
+    // ขึ้นหลังพิมพ์ตัวอักษรตัวแรก · ขึ้นในคอมเมนต์/ข้อความด้วย (AS4 · OQ204) · ไม่ขึ้นหลังจุด (AS4: Serial.p ไม่มี) · ไม่ขึ้นกลางตัวเลข (0x1F)
+    const m2 = /([A-Za-z_]\w*)$/.exec(before);
+    if (!m2) return null;
+    const prefix = m2[1];
+    const pre = before.slice(0, before.length - prefix.length);
+    if (/\.\s*$/.test(pre) || /[0-9]$/.test(pre)) return null;
+    // ขึ้นหลังชนิดข้อมูลด้วย (เช่น int s → scanNetworks …) ตาม Arduino จริง (ทดสอบ 2026-10-30 · OQ206) · ตัดกติกา "ไม่แนะนำหลังชนิด" ของ v330–v332 ออก
+    // จับส่วนหน้าของคำ แยกตัวพิมพ์เล็ก-ใหญ่ (Dig ไม่ขึ้น) · เรียงตามตัวอักษร · ไม่จำกัดจำนวน (เลื่อนในกล่อง)
+    const items = this.acBase().filter((it) => it.n !== prefix && it.n.indexOf(prefix) === 0);
+    if (!items.length) return null;
+    const key = items.map((it) => it.n).join('|');
+    const sel = (S.acKey === key) ? Math.min(Math.max(0, S.acSel || 0), items.length - 1) : 0;
+    return { items: items, sel: sel, key: key, prefix: prefix, col0: before.length - prefix.length };
+  }
+  // เลื่อนกล่องรายการให้แถวที่เลือกอยู่ในมุมมอง (แถวสูง 44 + ช่อง 2)
+  acScroll() {
+    try {
+      const el = this._acEl, A = this._ac;
+      if (!el || !A) return;
+      const top = A.sel * 46, bot = top + 44, st = el.scrollTop, h = el.clientHeight;
+      if (top < st) el.scrollTop = top; else if (bot > st + h) el.scrollTop = bot - h;
+    } catch (e) {}
+  }
+  // Enter/Tab = ใส่คำที่เลือก (ค่าเริ่มต้น = รายการแรก) · ใส่เฉพาะชื่อ ไม่ใส่ () (AS4)
+  acAccept(i) {
+    try {
+      const A = this._ac, ta = this._ta;
+      if (!A || !ta) return;
+      const it = A.items[i];
+      if (!it) return;
+      const v = String(ta.value), s = ta.selectionStart;
+      const start = s - A.prefix.length;
+      this._selNext = start + it.n.length;
+      this.setState({ acEsc: null, live: 'ใส่ ' + it.n + ' แล้ว' });
+      this.setText(v.slice(0, start) + it.n + v.slice(s));
+      ta.focus();
+    } catch (e) { this._selNext = null; }
+  }
+  // เครื่องหมายคู่ (OQ203 · OQ206 · AS5 AS7): ( { [ " ' เติมคู่ เคอร์เซอร์อยู่กลาง · ครอบข้อความที่เลือก · พิมพ์ตัวปิดซ้ำตอนตัวถัดไปเป็นตัวเดียวกัน = ข้าม · ' หลังตัวอักษร/ตัวเลข (don't) ไม่เติมคู่ · Backspace ไม่ดัก = ลบแค่ตัวเปิด เหลือตัวปิด (ตรง Arduino) · คืน true เมื่อจัดการแล้ว
+  pairKey(e, ta) {
+    const k = e.key;
+    const OPEN = { '(': ')', '{': '}', '[': ']', '"': '"', "'": "'" };
+    const v = String(ta.value), s = ta.selectionStart, en = ta.selectionEnd;
+    if (s === en && (k === ')' || k === ']' || k === '}' || k === '"' || k === "'") && v.charAt(s) === k) {
+      e.preventDefault();
+      try { ta.setSelectionRange(s + 1, s + 1); } catch (er) {}
+      this.syncCaret(ta);
+      return true;
+    }
+    if (!OPEN[k]) return false;
+    if (k === "'" && s > 0) {
+      let word = /[A-Za-z0-9_]/.test(v.charAt(s - 1));
+      try { word = /[\p{L}\p{M}\p{N}_]/u.test(v.charAt(s - 1)); } catch (er) {}
+      if (word) return false;
+    }
+    e.preventDefault();
+    this._selNext = s === en ? s + 1 : [s + 1, en + 1];
+    this.setText(v.slice(0, s) + k + v.slice(s, en) + OPEN[k] + v.slice(en));
+    return true;
+  }
+  // ส่ง (dirty, จำนวนปัญหาที่นับ) ขึ้นพ่อ เฉพาะเมื่อเปลี่ยน
+  publish() {
+    const c = this._cur;
+    if (!c) return;
+    if (this._rep && this._rep.d === c.dirty && this._rep.n === c.errs) return;
+    this._rep = { d: c.dirty, n: c.errs };
+    this.dbg('pub', c.errs + ' ข้อ dirty=' + c.dirty);
+    const f = this.gp('onState');
+    if (typeof f === 'function') setTimeout(() => { try { f(c.dirty, c.errs); } catch (e) {} }, 0);
+  }
+
+  /* ---------- ฐานความรู้ Arduino (รายการฟังก์ชันพื้นฐานที่ระบบรู้จัก) ---------- */
+  KB() {
+    if (this._kb) return this._kb;
+    const mk = (a) => { const o = {}; a.split(/\s+/).forEach((x) => { if (x) o[x] = true; }); return o; };
+    const sets = (a) => { const o = {}; a.forEach((x) => { o[x] = true; }); return o; };
+    const FN = mk('pinMode digitalWrite digitalRead analogRead analogWrite analogReference delay delayMicroseconds millis micros tone noTone pulseIn pulseInLong shiftOut shiftIn random randomSeed map constrain min max abs sq sqrt pow sin cos tan bitRead bitWrite bitSet bitClear bit lowByte highByte attachInterrupt detachInterrupt digitalPinToInterrupt interrupts noInterrupts setup loop');
+    const TYPES = mk('void int long short float double char byte bool boolean String word size_t uint8_t uint16_t uint32_t int8_t int16_t int32_t unsigned signed const static volatile Servo');
+    const KW = mk('if else for while do switch case default break continue return sizeof goto');
+    const SERIAL = mk('begin end print println write read available flush readString readStringUntil parseInt parseFloat peek setTimeout find findUntil readBytes readBytesUntil availableForWrite');
+    const SERVO = mk('attach detach write writeMicroseconds read attached');
+    const SIG = {
+      pinMode: { min: 2, max: 2, d: 'ขา กับ โหมด', ex: 'pinMode(13, OUTPUT);', pin: 'dig', val: { list: ['INPUT', 'OUTPUT', 'INPUT_PULLUP'] } },
+      digitalWrite: { min: 2, max: 2, d: 'ขา กับ ค่า', ex: 'digitalWrite(13, HIGH);', pin: 'dig', val: { list: ['HIGH', 'LOW'] } },
+      digitalRead: { min: 1, max: 1, d: 'ขา', ex: 'digitalRead(2)', pin: 'dig' },
+      analogRead: { min: 1, max: 1, d: 'ขา', ex: 'analogRead(A0)', pin: 'ana' },
+      analogWrite: { min: 2, max: 2, d: 'ขา กับ ค่า 0–255', ex: 'analogWrite(9, 128);', pin: 'pwm' },
+      delay: { min: 1, max: 1, d: 'เวลา (มิลลิวินาที)', ex: 'delay(1000);' },
+      tone: { min: 2, max: 3, d: 'ขา กับ ความถี่', ex: 'tone(8, 440);' },
+      noTone: { min: 1, max: 1, d: 'ขา', ex: 'noTone(8);' },
+      map: { min: 5, max: 5, d: 'ค่า และช่วงเดิม/ช่วงใหม่', ex: 'map(x, 0, 1023, 0, 255)' },
+      constrain: { min: 3, max: 3, d: 'ค่า ต่ำสุด สูงสุด', ex: 'constrain(x, 0, 255)' },
+      random: { min: 1, max: 2, d: 'ค่าสูงสุด (หรือต่ำสุด กับ สูงสุด)', ex: 'random(1, 10)' },
+      'Serial.begin': { min: 1, max: 2, d: 'ความเร็ว', ex: 'Serial.begin(9600);' },
+      'Serial.println': { min: 0, max: 2, d: 'ข้อความ', ex: 'Serial.println("สวัสดี");' },
+      'Serial.print': { min: 1, max: 2, d: 'ข้อความ', ex: 'Serial.print("สวัสดี");' }
+    };
+    Object.keys(SIG).forEach((k) => { if (SIG[k].val) SIG[k].val.set = sets(SIG[k].val.list); });
+    // OQ191: ฐานคำ "รู้จัก" สำหรับลงสี + autocomplete = Arduino core API ที่ถูกต้อง (ไม่จำกัดที่ตัวจำลองรองรับ) · FNX/KWX/CONST เพิ่มจากชุดเดิม · ตัวแปลงโค้ด (analyze) ไม่ฟ้อง FNX ว่าไม่รู้จัก
+    const FNX = mk('isAlpha isAlphaNumeric isAscii isControl isDigit isGraph isHexadecimalDigit isLowerCase isPrintable isPunct isSpace isUpperCase isWhitespace yield asin acos atan atan2 exp log log10 floor ceil round fabs fmod trunc strlen strcmp strcpy strcat memcpy memset atoi atof itoa dtostrf');
+    const KWX = mk('struct class enum typedef public private protected inline extern auto nullptr new delete this');
+    const CONST = mk('HIGH LOW INPUT OUTPUT INPUT_PULLUP LED_BUILTIN true false NULL PI A0 A1 A2 A3 A4 A5 DEC HEX OCT BIN LSBFIRST MSBFIRST CHANGE RISING FALLING');
+    // OQ207 (ข): คำที่ Arduino รู้จัก (ลงสี/แนะนำ) แต่บอร์ด Uno ไม่มี · ตอนแปลงโค้ดแจ้งใน Output ภาษาเด็ก · ค่าชั่วคราว: มีเฉพาะคำที่ knowledge AS4/ruler ระบุว่าไม่ใช่ของ Uno · dev ต้องทำให้ครบ (DEV-Q)
+    const NOUNO = mk('analogReadResolution analogWriteResolution scanNetworks beginSMS attachGPRS answerCall');
+    this._kb = { FN: FN, FNX: FNX, KWX: KWX, CONST: CONST, NOUNO: NOUNO, TYPES: TYPES, KW: KW, SERIAL: SERIAL, SERVO: SERVO, SIG: SIG, PWM: sets(['3', '5', '6', '9', '10', '11']) };
+    return this._kb;
+  }
+  ed(a, b) {
+    const m = a.length, n = b.length;
+    if (!m) return n;
+    if (!n) return m;
+    let prev = [];
+    for (let j = 0; j <= n; j++) prev.push(j);
+    for (let i = 1; i <= m; i++) {
+      const cur = [i];
+      for (let j = 1; j <= n; j++) cur.push(Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a.charAt(i - 1) === b.charAt(j - 1) ? 0 : 1)));
+      prev = cur;
+    }
+    return prev[n];
+  }
+  suggest(name, list, fallback) {
+    const low = String(name).toLowerCase();
+    let best = '', bd = 99;
+    for (let i = 0; i < list.length; i++) {
+      const c = list[i];
+      if (c.toLowerCase() === low) return 'หมายถึง ' + c + ' ใช่ไหม · ตัวเล็กตัวใหญ่ต้องตรงกัน';
+      const dd = this.ed(low, c.toLowerCase());
+      if (dd < bd) { bd = dd; best = c; }
+    }
+    if (best && bd <= (String(name).length <= 4 ? 1 : 2)) return 'หมายถึง ' + best + ' ใช่ไหม';
+    return fallback || 'ลองเช็กตัวสะกด · คำสั่งที่ใช้บ่อย: pinMode digitalWrite digitalRead analogRead delay';
+  }
+  // ข้อความในวงเล็บที่เปิดที่ตำแหน่ง open (บรรทัดเดียวกัน) · ไม่พบวงเล็บปิด = null
+  inner(s, open) {
+    let d = 0;
+    for (let j = open + 1; j < s.length; j++) {
+      const c = s.charAt(j);
+      if (c === '(') d += 1;
+      else if (c === ')') { if (d === 0) return s.slice(open + 1, j); d -= 1; }
+    }
+    return null;
+  }
+  // แยกอาร์กิวเมนต์ (ระดับบนสุด) ของการเรียกที่เปิดที่ open · ไม่พบวงเล็บปิดบนบรรทัดนี้ = null
+  args(s, open) {
+    let d = 0, cur = '';
+    const out = [];
+    for (let j = open + 1; j < s.length; j++) {
+      const c = s.charAt(j);
+      if (c === '(' || c === '[' || c === '{') d += 1;
+      else if (c === ')' || c === ']' || c === '}') {
+        if (d === 0) {
+          if (c !== ')') return null;
+          out.push(cur.trim());
+          return (out.length === 1 && out[0] === '') ? [] : out;
+        }
+        d -= 1;
+      }
+      if (c === ',' && d === 0) { out.push(cur.trim()); cur = ''; continue; }
+      cur += c;
+    }
+    return null;
+  }
+  pinValue(a, consts) {
+    const t = String(a).trim();
+    if (/^\d+$/.test(t)) return { k: 'n', n: parseInt(t, 10), s: t };
+    const m = /^A(\d+)$/.exec(t);
+    if (m) return { k: 'a', n: parseInt(m[1], 10), s: t };
+    if (consts[t] !== undefined) return { k: 'n', n: consts[t], s: t + ' (ค่า ' + consts[t] + ')' };
+    return null;
+  }
+  // ขาที่ไม่มีบนบอร์ด Uno (ดิจิทัล 0–13 · แอนะล็อก A0–A5 = ขา 14–19 · PWM 3 5 6 9 10 11)
+  pinBad(kind, pv) {
+    const KB = this.KB();
+    const noPin = (why) => ({ level: 'error', title: 'บอร์ด Uno ไม่มีขา ' + pv.s, hint: why });
+    if (pv.k === 'a') {
+      if (pv.n > 5) return noPin('Uno มีขา A0–A5 เท่านั้น (ไม่มี A6 A7)');
+      if (kind === 'pwm') return { level: 'warn', title: 'ขา ' + pv.s + ' ใช้ analogWrite ไม่ได้', hint: 'เลือกขา 3 5 6 9 10 หรือ 11 (ขาที่มีเครื่องหมาย ~)' };
+      return null;
+    }
+    if (kind === 'ana') {
+      if (pv.n > 19 || (pv.n > 5 && pv.n < 14)) return { level: 'error', title: 'analogRead ใช้ขา ' + pv.s + ' ไม่ได้', hint: 'ใช้ขา A0–A5 เช่น analogRead(A0)' };
+      return null;
+    }
+    if (pv.n > 19) return noPin('ใช้ขา 0–13 หรือ A0–A5');
+    if (kind === 'pwm' && !KB.PWM[String(pv.n)]) return { level: 'warn', title: 'ขา ' + pv.s + ' ใช้ analogWrite ไม่ได้', hint: 'เลือกขา 3 5 6 9 10 หรือ 11 (ขาที่มีเครื่องหมาย ~)' };
+    return null;
+  }
+  unclosedProblem(op, clean, add) {
+    const line = op.line;
+    if (op.c === '{') { add(line, 'error', 'ปีกกา { ที่บรรทัด ' + line + ' ยังไม่ปิด', 'เพิ่ม } ให้ครบ ทุก { ต้องมี } คู่กัน', 'brace', false); return; }
+    if (op.c === '[') { add(line, 'error', 'วงเล็บ [ ที่บรรทัด ' + line + ' ยังไม่ปิด', 'ใส่ ] ปิดท้าย', 'bracket', false); return; }
+    const s = clean[line - 1] || '';
+    const m = /([A-Za-z_]\w*(?:\s*\.\s*[A-Za-z_]\w*)?)\s*$/.exec(s.slice(0, op.col));
+    const name = m ? m[1].replace(/\s+/g, '') : '';
+    const sg = name ? this.KB().SIG[name] : null;
+    if (sg) add(line, 'error', 'คำสั่ง ' + name + ' ยังพิมพ์ไม่จบ', 'ใส่ ' + sg.d + ' แล้วปิด ) และ ; เช่น  ' + sg.ex, 'paren', true);
+    else add(line, 'error', 'วงเล็บ ( ที่บรรทัด ' + line + ' ยังไม่ปิด', 'ใส่ ) ปิดท้ายคำสั่ง แล้วตามด้วย ;', 'paren', true);
+  }
+
+  /* ---------- ตัวเช็ก syntax จำลอง (กฎจากโค้ด JS ล้วน ไม่ใช่ compiler จริง) ----------
+     คืนรายการปัญหา [{line, level: 'error'|'warn', title, hint, key, typeKind, seq}] เรียงตามบรรทัด
+     typeKind = เป็นปัญหาประเภท "พิมพ์ยังไม่จบ" (ลืม ; · วงเล็บไม่ปิด · ใส่ค่าไม่ครบ) → ถ้าเคอร์เซอร์อยู่ท้ายบรรทัดนั้นจะแสดงเป็นคำใบ้ ยังไม่นับ */
+  analyze(text) {
+    if (this._ckKey === text && this._ckVal) return this._ckVal;
+    const KB = this.KB();
+    const src = String(text).replace(/\r\n?/g, '\n');
+    const raw = src.split('\n');
+    const probs = [];
+    let seq = 0;
+    const add = (line, level, title, hint, key, typeKind) => { probs.push({ line: line, level: level, title: title, hint: hint, key: key, typeKind: !!typeKind, seq: seq++ }); };
+    const clip = (s) => (s.length > 44 ? s.slice(0, 42) + '…' : s);
+
+    // 1) ตัดความเห็น/เนื้อข้อความออก (คงตำแหน่งตัวอักษรไว้)
+    const clean = [];
+    let inBlock = false, blockLine = 0;
+    for (let i = 0; i < raw.length; i++) {
+      const s = raw[i];
+      let out = '';
+      let j = 0;
+      while (j < s.length) {
+        const c = s.charAt(j), d = s.charAt(j + 1);
+        if (inBlock) {
+          const e = s.indexOf('*/', j);
+          if (e < 0) { out += ' '.repeat(s.length - j); j = s.length; }
+          else { out += ' '.repeat(e + 2 - j); j = e + 2; inBlock = false; }
+          continue;
+        }
+        if (c === '/' && d === '/') { out += ' '.repeat(s.length - j); j = s.length; continue; }
+        if (c === '/' && d === '*') { inBlock = true; blockLine = i + 1; out += '  '; j += 2; continue; }
+        if (c === '"' || c === "'") {
+          let k = j + 1, closed = false;
+          while (k < s.length) {
+            const ch = s.charAt(k);
+            if (ch === '\\') { k += 2; continue; }
+            if (ch === c) { closed = true; break; }
+            k += 1;
+          }
+          if (!closed) {
+            add(i + 1, 'error', 'ข้อความยังไม่ปิดด้วย ' + c, 'ใส่ ' + c + ' ปิดท้ายข้อความ', 'quote', true);
+            out += c + ' '.repeat(Math.max(0, s.length - j - 1));
+            j = s.length;
+            continue;
+          }
+          out += c + ' '.repeat(k - j - 1) + c;
+          j = k + 1;
+          continue;
+        }
+        out += c;
+        j += 1;
+      }
+      clean.push(out);
+    }
+    if (inBlock) add(blockLine, 'error', 'ความเห็น /* ยังไม่ปิด', 'ใส่ */ เพื่อปิดความเห็น', 'comment', false);
+
+    // 2) วงเล็บ/ปีกกาให้ครบคู่ + ความลึกของปีกกาที่ต้นแต่ละบรรทัด
+    const CLOSE = { ')': '(', ']': '[', '}': '{' };
+    const stack = [];
+    const depthAt = [];
+    let bd = 0;
+    for (let i = 0; i < clean.length; i++) {
+      depthAt.push(bd);
+      const s = clean[i];
+      for (let j = 0; j < s.length; j++) {
+        const c = s.charAt(j);
+        if (c === '(' || c === '[' || c === '{') { stack.push({ c: c, line: i + 1, col: j }); if (c === '{') bd += 1; }
+        else if (c === ')' || c === ']' || c === '}') {
+          if (c === '}') bd = Math.max(0, bd - 1);
+          let k = stack.length - 1;
+          while (k >= 0 && stack[k].c !== CLOSE[c]) k -= 1;
+          if (k < 0) {
+            add(i + 1, 'error', 'มี ' + c + ' เกินมา', c === '}' ? 'ลบ } นี้ออก หรือเช็กว่าเปิด { ครบไหม' : 'ลบ ' + c + ' นี้ออก หรือเช็กว่าเปิดคู่ครบไหม', 'extra', false);
+          } else {
+            for (let m = stack.length - 1; m > k; m--) this.unclosedProblem(stack[m], clean, add);
+            stack.length = k;
+          }
+        }
+      }
+    }
+    for (let m = 0; m < stack.length; m++) this.unclosedProblem(stack[m], clean, add);
+
+    // 3) ข้อมูลที่ประกาศไว้: ตัวแปร · ขาคงที่ · ฟังก์ชันของผู้ใช้ · ตัว Servo
+    const TYPE_RE = '(?:const\\s+|static\\s+|unsigned\\s+|signed\\s+|volatile\\s+)*(?:void|int|long|short|float|double|char|byte|bool|boolean|String|word|size_t|uint8_t|uint16_t|uint32_t|int8_t|int16_t|int32_t|Servo)';
+    const decl = {}, userFn = {}, servoVars = {}, consts = {};
+    const declRe = new RegExp('\\b' + TYPE_RE + '\\s+\\*?\\s*([A-Za-z_]\\w*)', 'g');
+    const fnRe = new RegExp('\\b' + TYPE_RE + '\\s+\\*?\\s*([A-Za-z_]\\w*)\\s*\\(', 'g');
+    const servoRe = /\bServo\s+([A-Za-z_]\w*)/g;
+    const constRe = /\b(?:const\s+)?(?:int|byte|long|short|uint8_t)\s+([A-Za-z_]\w*)\s*=\s*(\d+)\s*[;,]/g;
+    clean.forEach((s) => {
+      let m;
+      declRe.lastIndex = 0; while ((m = declRe.exec(s)) !== null) decl[m[1]] = true;
+      fnRe.lastIndex = 0; while ((m = fnRe.exec(s)) !== null) userFn[m[1]] = true;
+      servoRe.lastIndex = 0; while ((m = servoRe.exec(s)) !== null) servoVars[m[1]] = true;
+      constRe.lastIndex = 0; while ((m = constRe.exec(s)) !== null) consts[m[1]] = parseInt(m[2], 10);
+      const dm = /^\s*#\s*define\s+([A-Za-z_]\w*)\s+(\d+)/.exec(s);
+      if (dm) { decl[dm[1]] = true; consts[dm[1]] = parseInt(dm[2], 10); }
+    });
+    const joined = clean.join('\n');
+    if (!/\bvoid\s+setup\s*\(\s*(?:void)?\s*\)/.test(joined)) add(1, 'error', 'ยังไม่มี void setup()', 'Arduino ต้องมี setup กับ loop เสมอ เพิ่มบรรทัด  void setup() { }', 'nosetup', false);
+    if (!/\bvoid\s+loop\s*\(\s*(?:void)?\s*\)/.test(joined)) add(1, 'error', 'ยังไม่มี void loop()', 'Arduino ต้องมี setup กับ loop เสมอ เพิ่มบรรทัด  void loop() { }', 'noloop', false);
+
+    const nextCode = (i) => { for (let k = i + 1; k < clean.length; k++) { const t = clean[k].trim(); if (t) return t; } return ''; };
+    const prevCode = (i) => { for (let k = i - 1; k >= 0; k--) { const t = clean[k].trim(); if (t) return t; } return ''; };
+    const defBefore = /(?:^|[\s;{}()])(?:void|int|long|short|float|double|char|byte|bool|boolean|String|word|size_t|uint8_t|uint16_t|uint32_t|Servo|const|static|unsigned)\s*\*?\s*$/;
+
+    // 4) กฎรายบรรทัด
+    for (let i = 0; i < clean.length; i++) {
+      const L = i + 1;
+      const line = clean[i];
+      const t = line.trim();
+      if (!t || t.charAt(0) === '#') continue;
+      const prev = prevCode(i);
+      const cont = !!prev && /(,|\(|&&|\|\||=|\?|\\)$/.test(prev);
+      const startsCont = /^[),.]|^&&|^\|\|/.test(t);
+      const isHeader = /^(?:\}\s*)?(?:else\s+if|if|for|while|switch)\s*\(.*\)\s*$/.test(t) || /^(?:\}\s*)?else\s*$/.test(t) || /^do\s*$/.test(t);
+      const isFnHeader = new RegExp('^' + TYPE_RE + '\\s+\\*?\\s*[A-Za-z_]\\w*\\s*\\(.*\\)\\s*$').test(t);
+      const endsOk = /[;{},:]$/.test(t) || /^[}{]+$/.test(t) || /\}$/.test(t);
+      const endsOpen = /(\(|&&|\|\||=|\?|\\)$/.test(t) && !/(==|!=|<=|>=)$/.test(t) ? true : false;
+
+      // (ก) ลืม ; / พิมพ์ไม่จบ
+      if (!cont && !startsCont) {
+        if (isFnHeader && !endsOk) {
+          if (!/^\{/.test(nextCode(i))) add(L, 'error', 'ต้องมี { ต่อจาก ' + clip(t), 'ใส่ { เพื่อเริ่มฟังก์ชัน เช่น  void setup() {  (ถ้าแค่ประกาศ ให้ใส่ ; ท้ายบรรทัด)', 'openbrace', true);
+        } else if (!endsOk && !isHeader && !endsOpen) {
+          if (/^[A-Za-z_]\w*(?:\s*\.\s*[A-Za-z_]\w*)?$/.test(t) && !/^(?:break|continue|return)$/.test(t) && !KB.KW[t]) {
+            const sg0 = KB.SIG[t.replace(/\s+/g, '')];
+            add(L, 'error', 'คำสั่ง ' + t + ' ยังพิมพ์ไม่จบ', sg0 ? 'ต้องตามด้วย ( ) และ ; เช่น  ' + sg0.ex : 'ตามด้วย ( ) หรือใส่ ; ให้ครบ', 'incomplete', true);
+          } else {
+            add(L, 'error', 'ลืมใส่ ; ท้ายบรรทัด', 'ใส่ ; ท้ายคำสั่ง เป็น  ' + clip(raw[i].trim()) + ';', 'semi', true);
+          }
+        } else if (endsOpen && /(=|&&|\|\||\?)$/.test(t)) {
+          add(L, 'error', 'คำสั่งพิมพ์ยังไม่จบ', 'พิมพ์ต่อให้จบ แล้วใส่ ; ท้ายบรรทัด', 'incomplete', true);
+        }
+      }
+
+      // (ข) คำสั่งที่อยู่นอก { } ของ setup/loop
+      if (depthAt[i] === 0 && !/^[}{]/.test(t) && !isFnHeader) {
+        const mt = /^([A-Za-z_]\w*)(?:\s*\.\s*[A-Za-z_]\w*)?\s*\(/.exec(t);
+        if (mt && !KB.TYPES[mt[1]] && !KB.KW[mt[1]]) add(L, 'error', 'คำสั่งนี้อยู่นอก { } ของ setup หรือ loop', 'ย้ายเข้าไปใน { } ของ void setup() หรือ void loop()', 'outside', false);
+      }
+
+      // (ค) การเรียกคำสั่ง: ไม่รู้จัก · จำนวนค่า · ขา · ค่าคงที่
+      const callRe = /\b([A-Za-z_]\w*)(?:\s*\.\s*([A-Za-z_]\w*))?\s*\(/g;
+      let cm;
+      while ((cm = callRe.exec(line)) !== null) {
+        const obj = cm[1], meth = cm[2] || '';
+        const full = meth ? obj + '.' + meth : obj;
+        const openIdx = callRe.lastIndex - 1;
+        const before = line.slice(0, cm.index);
+        if (!meth && KB.KW[obj]) continue;
+        if (!meth && defBefore.test(before)) continue;
+        if (meth) {
+          if (obj === 'Serial') {
+            if (!KB.SERIAL[meth]) add(L, 'error', 'ไม่รู้จักคำสั่ง Serial.' + meth, this.suggest(meth, Object.keys(KB.SERIAL), 'ลองเช็กตัวสะกด · ที่ใช้บ่อย: Serial.begin Serial.println Serial.print'), 'unk', false);
+          } else if (obj.toLowerCase() === 'serial') {
+            add(L, 'error', 'ต้องเขียน Serial ตัว S ตัวใหญ่', 'แก้ ' + obj + ' เป็น Serial', 'case', false);
+          } else if (servoVars[obj]) {
+            if (!KB.SERVO[meth]) add(L, 'error', 'ไม่รู้จักคำสั่ง ' + full, this.suggest(meth, Object.keys(KB.SERVO), 'ที่ใช้บ่อย: attach write'), 'unk', false);
+          }
+        } else if (KB.NOUNO[obj]) {
+          // OQ207 (ข): ข้อความภาษาเด็ก ไม่ใช่ error คอมไพเลอร์ดิบ
+          const rs = (obj === 'analogReadResolution' || obj === 'analogWriteResolution');
+          add(L, 'error', 'บอร์ด Uno ไม่มีคำสั่ง “' + obj + '” จึงส่งลงบอร์ดไม่ได้', rs ? 'Uno อ่านค่าได้ 0–1023 และส่งค่าได้ 0–255 อยู่แล้ว ไม่ต้องตั้งความละเอียด · ลบบรรทัดนี้ได้เลย' : 'คำสั่งนี้ใช้กับบอร์ดหรือโมดูลรุ่นอื่น ไม่ใช่ Uno · ลบบรรทัดนี้ หรือใช้คำสั่งที่ Uno มี เช่น digitalWrite analogWrite', 'nouno', false);
+        } else if (!KB.FN[obj] && !KB.FNX[obj] && !userFn[obj] && !KB.TYPES[obj]) {
+          add(L, 'error', 'ไม่รู้จักคำสั่ง “' + obj + '”', this.suggest(obj, Object.keys(KB.FN)), 'unk', false);
+        }
+        const sg = KB.SIG[full];
+        if (!sg) continue;
+        const a = this.args(line, openIdx);
+        if (!a) continue;
+        if (a.length < sg.min || a.length > sg.max) {
+          const few = a.length < sg.min;
+          const want = sg.min === sg.max ? sg.min + ' ค่า' : sg.min + '–' + sg.max + ' ค่า';
+          add(L, 'error', full + ' ต้องมี ' + want + (few ? ' แต่ใส่มาแค่ ' + a.length : ' แต่ใส่เกินมา (' + a.length + ' ค่า)'), (few ? 'ใส่ ' + sg.d + ' ให้ครบ' : 'ลบค่าที่เกินออก') + ' เช่น  ' + sg.ex, 'args', few);
+          continue;
+        }
+        let emptyFound = false;
+        a.forEach((x, k) => { if (x === '') { emptyFound = true; add(L, 'error', 'ช่องที่ ' + (k + 1) + ' ของ ' + full + ' ยังว่าง', 'ใส่ค่าให้ครบ เช่น  ' + sg.ex, 'empty', true); } });
+        if (emptyFound) continue;
+        if (sg.pin) {
+          const pv = this.pinValue(a[0], consts);
+          if (pv) { const bad = this.pinBad(sg.pin, pv); if (bad) add(L, bad.level, bad.title, bad.hint, 'pin', false); }
+        }
+        if (sg.val && a[1] !== undefined) {
+          const v = a[1];
+          if (/^[A-Za-z_]\w*$/.test(v) && !sg.val.set[v] && !decl[v]) add(L, 'error', 'ไม่รู้จักคำว่า “' + v + '”', this.suggest(v, sg.val.list, 'ใช้ได้: ' + sg.val.list.join(' หรือ ')), 'const', false);
+        }
+        if (full === 'analogWrite' && a[1] !== undefined && /^\d+$/.test(a[1]) && parseInt(a[1], 10) > 255) add(L, 'warn', 'analogWrite ใช้ค่าได้ 0–255', 'ค่า ' + a[1] + ' เกิน 255 · ลดให้ไม่เกิน 255', 'range', false);
+      }
+
+      // (ง) ใน if / while ใช้ = แทน ==
+      const ifm = /\b(?:if|while)\s*\(/.exec(line);
+      if (ifm) {
+        const inn = this.inner(line, ifm.index + ifm[0].length - 1);
+        if (inn !== null && /(^|[^=!<>+\-*\/%&|^])=(?!=)/.test(inn)) add(L, 'warn', 'ในเงื่อนไข ใช้ == ไม่ใช่ =', '= คือกำหนดค่า  == คือเทียบค่า เช่น  if (x == 1)', 'eq', false);
+      }
+    }
+
+    probs.sort((p, q) => (p.line - q.line) || (p.seq - q.seq));
+    const res = probs.slice(0, 60);
+    this._ckKey = text;
+    this._ckVal = res;
+    return res;
+  }
+
+  /* ---------- สี syntax (R20 ข้อ 4 · OQ191 · brand §11.19) ---------- */
+  // แยกคำแบบ lexical (ไม่ใช่ parser · ไม่ใช่ compiler): คืน HTML ของชั้นซ้อน · รู้จัก = ฐานคำ KB (Arduino core) · ชื่อที่ผู้ใช้ตั้ง/เครื่องหมาย = ไม่ห่อ span (ดำปกติ) · ตัวพิมพ์เล็ก/ใหญ่ต้องตรง (Delay ไม่ใช่คำที่รู้จัก = ปกติ ไม่หนา)
+  // อักษรไทยและตัวอื่นที่ไม่ใช่คำ/ตัวเลขถูกรวมเป็นก้อนเดียวกับข้อความธรรมดา (ไม่ถูกตัดกลางกลุ่มสระซ้อน) · ความเห็น/ข้อความทั้งก้อนอยู่ใน span เดียว
+  tokHtml(text) {
+    const KB = this.KB();
+    const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const n = text.length;
+    const reId = /[A-Za-z_]\w*/y;
+    const reNum = /(?:0[xX][0-9a-fA-F]+|0[bB][01]+|(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?[uUlLfF]*)/y;
+    const reDir = /#[A-Za-z_]\w*/y;
+    let out = '', plain = '', i = 0;
+    const flush = () => { if (plain) { out += esc(plain); plain = ''; } };
+    const put = (cls, s) => { flush(); out += '<span class="' + cls + '">' + esc(s) + '</span>'; };
+    const lineStart = (k) => { let j = k - 1; while (j >= 0 && (text.charAt(j) === ' ' || text.charAt(j) === '\t')) j--; return j < 0 || text.charAt(j) === '\n'; };
+    while (i < n) {
+      const c = text.charAt(i), d = text.charAt(i + 1);
+      if (c === '/' && d === '/') { let e = text.indexOf('\n', i); if (e < 0) e = n; put('cm-c', text.slice(i, e)); i = e; continue; }
+      if (c === '/' && d === '*') { let e = text.indexOf('*/', i + 2); e = e < 0 ? n : e + 2; put('cm-c', text.slice(i, e)); i = e; continue; }
+      if (c === '"' || c === "'") {
+        let j = i + 1;
+        while (j < n) {
+          const ch = text.charAt(j);
+          if (ch === '\n') break;
+          if (ch === '\\' && text.charAt(j + 1) !== '\n') { j += 2; continue; }
+          if (ch === c) { j++; break; }
+          j++;
+        }
+        if (j > n) j = n;
+        put('cm-s', text.slice(i, j)); i = j; continue;
+      }
+      if (c === '#' && lineStart(i)) {
+        reDir.lastIndex = i; const m = reDir.exec(text);
+        if (m) {
+          put('cm-f', m[0]); i += m[0].length;
+          // #include: ส่วนที่เหลือของบรรทัด (<Servo.h>) ยังไม่ได้ตรวจสีใน Arduino (knowledge "ที่ยังไม่ได้ตรวจ") → ดำปกติ ไม่ลงสีคำข้างใน
+          if (m[0] === '#include') { let e = text.indexOf('\n', i); if (e < 0) e = n; plain += text.slice(i, e); i = e; }
+          continue;
+        }
+      }
+      const prev = i > 0 ? text.charAt(i - 1) : '';
+      if (/[0-9]/.test(c) || (c === '.' && /[0-9]/.test(d))) {
+        if (!/[A-Za-z_0-9]/.test(prev)) { reNum.lastIndex = i; const m = reNum.exec(text); if (m && m[0]) { put('cm-n', m[0]); i += m[0].length; continue; } }
+      }
+      if (/[A-Za-z_]/.test(c)) {
+        reId.lastIndex = i;
+        const m = reId.exec(text);
+        const name = m[0];
+        let cls = '';
+        let k = i - 1;
+        while (k >= 0 && (text.charAt(k) === ' ' || text.charAt(k) === '\t')) k--;
+        const afterDot = k >= 0 && text.charAt(k) === '.';
+        let q = i + name.length;
+        while (q < n && (text.charAt(q) === ' ' || text.charAt(q) === '\t')) q++;
+        const isCall = q < n && text.charAt(q) === '(';
+        // กลุ่มสีตาม Arduino (AS2 AS7 · OQ204): มะกอก = keyword ควบคุม + ฟังก์ชัน/เมธอด · teal = ชนิด + ค่าคงที่ · เทา = true false · ส้ม = คลาส (หนา) และการเรียกที่ไม่อยู่ในรายการ (ปกติ) · ตัวพิมพ์เล็ก/ใหญ่ต้องตรง
+        if (name === 'Serial' || name === 'Servo') cls = 'cm-o';
+        else if (KB.KW[name] || KB.KWX[name]) cls = 'cm-f';
+        else if (KB.TYPES[name]) cls = 'cm-t';
+        else if (name === 'true' || name === 'false') cls = 'cm-g';
+        else if (KB.CONST[name]) cls = 'cm-t';
+        else if (KB.FN[name] || KB.FNX[name] || KB.NOUNO[name]) cls = 'cm-f';
+        else if (afterDot && (KB.SERIAL[name] || KB.SERVO[name])) cls = 'cm-f';
+        else if (isCall) cls = 'cm-u';
+        if (cls) put(cls, name); else plain += name;
+        i += name.length;
+        continue;
+      }
+      plain += c; i++;
+    }
+    flush();
+    return out;
+  }
+  paintOv() {
+    try {
+      const el = this._ov;
+      if (!el) return;
+      const t = String((this.state || {}).text || '');
+      if (this._ovT === t) return;
+      this._ovT = t;
+      el.innerHTML = this.tokHtml(t);
+    } catch (e) {}
+  }
+  // สีชื่อในรายการแนะนำ (ใช้โทเคนเดียวกับชั้นสี · ผ่าน 4.5:1 บนพื้นขาวและแถวที่เลือก #EAF2FD)
+  acCol(it) {
+    if (it.g === 'cmd') return '#5A7000';
+    if (it.g === 'cls') return '#B04500';
+    if (it.n === 'true' || it.n === 'false') return '#5A6377';
+    return '#00747A';
+  }
+
+  /* ---------- วาด ---------- */
+  // ข้อ 1.11 (แก้รอบ 2 2026-10-28): ค่าเริ่มต้น = ไม่มีวง (ถือว่าเมาส์) · มีวงเฉพาะเมื่อมี keydown นำทาง (Tab/Enter/Space/ลูกศร) ก่อน focus ภายใน 1 วินาทีและหลัง pointerdown ล่าสุด · ธงใน instance (this._md) ฟังที่ window ของเอกสารตัวเอง (capture) · pointerdown ล้างธงและวงทุกครั้ง
+  mdInit() {
+    if (this._md) return this._md;
+    const md = this._md = { k: 0, p: 0 };
+    try {
+      window.addEventListener('keydown', (e) => { if (this.navK(e)) md.k = Date.now(); this.typK(e); }, true);
+      window.addEventListener('input', (e) => this.typK(e), true);
+      window.addEventListener('pointerdown', () => { md.p = Date.now(); md.k = 0; if ((this.state || {}).kbF) this.setState({ kbF: false }); }, true);
+    } catch (e) {}
+    return md;
+  }
+  // แก้รอบ 3: key ที่กดในช่องพิมพ์ (ยกเว้น Tab) ไม่นับเป็นการนำทาง · เริ่มพิมพ์ (ตัวอักษร/Backspace/Delete/input) = ล้างวงตัวแก้โค้ดทันที
+  edT(t) { return !!(t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)); }
+  navK(e) { return !!(e && { Tab: 1, Enter: 1, ' ': 1, ArrowUp: 1, ArrowDown: 1, ArrowLeft: 1, ArrowRight: 1, Home: 1, End: 1 }[e.key]) && (!this.edT(e.target) || e.key === 'Tab'); }
+  typK(e) { if (!e || !this.edT(e.target)) return; if (e.type === 'input' || (e.key && (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Delete'))) { this.mdInit().k = 0; if ((this.state || {}).kbF) this.setState({ kbF: false }); } }
+  kbIn() { const md = this.mdInit(); return md.k > md.p && Date.now() - md.k < 1000; }
+  renderVals() {
+    this.mdInit();
+    const S = this.state || {};
+    const W = Math.max(480, Number(this.gp('w')) || 1392);
+    const H = Math.max(300, Number(this.gp('h')) || 516);
+    const narrow = this.gp('narrow') === 'yes' || W < 1000;
+    const text = String(S.text || '');
+    const rawLines = text.split('\n');
+    const n = rawLines.length;
+    const LH = 24, HDR = 56;
+    const caret = S.caret || { line: 1, col: 1, atEnd: true };
+    const focused = !!S.focused;
+
+    // ข้อ 2.2: ไม่เช็ก syntax realtime แล้ว (ไม่มีเครื่องหมาย/แผงปัญหา) · dirty = แก้จากโค้ดตั้งต้นแล้วหรือยัง (ใช้กับ dialog กลับโหมดบล็อก)
+    const dirty = text !== this._seedText;
+    this._cur = { dirty: dirty, errs: 0 };
+
+    const gRows = rawLines.map((_, i) => {
+      const L = i + 1, cur = caret.line === L;
+      return { top: i * LH, n: String(L), numStyle: 'color:' + (cur ? '#14243D' : '#5A6377') + ';font-weight:' + (cur ? 700 : 400) };
+    });
+
+    // ===== autocomplete แบบ app.arduino.cc (R3 · OQ161 · brand §11.18) =====
+    const ac = this.acCompute(text, rawLines, caret, focused);
+    this._ac = ac;
+    const acSel = ac ? ac.sel : 0;
+    const cw = this.charW();
+    const scEl = this._sc;
+    let acStyle = '', acListStyle = '', acItems = [];
+    const colLeft = (col) => 12 + (col - 1) * cw;
+    if (ac) {
+      // ตำแหน่งกล่อง (R20 ข้อ 4 รอบ 4 · ผู้ใช้สั่ง 2026-10-30 · OQ209): อยู่ใต้บรรทัดเคอร์เซอร์ทุกกรณี ห่าง 2px · ไม่ย้ายขึ้นบน · ไม่ทับบรรทัด
+      // พิกัด: กล่องอยู่ใน txtWrap ซึ่งเริ่มที่ y=0 ของเนื้อหาตัวเลื่อน (_sc) และ textarea ไม่มี padding บน → บรรทัด L อยู่ที่ (L-1)*LH ถึง L*LH = พิกัดเดียวกับ scrollTop/clientHeight ของ _sc
+      // จำนวนแถวที่เห็นลดตามที่ว่างใต้บรรทัด (สูงสุด 6 ต่ำสุด 2) ส่วนเกินเลื่อนในกล่อง · ใต้ไม่พอแม้ 2 แถว = คง 2 แถว ล้นมุมมองได้ (ไม่เลื่อนตัวแก้โค้ดเอง กันเคอร์เซอร์/ตำแหน่งกระโดดระหว่างพิมพ์)
+      const n6 = Math.min(6, ac.items.length), nMin = Math.min(2, n6);
+      const ROW = 46, PADB = 16; // แถว 44 + ช่อง 2 · กล่อง = padding 8×2 + เส้น 1×2 − ช่องท้าย 2
+      const lineBot = caret.line * LH;
+      let vis = n6;
+      if (scEl) {
+        const vBot = scEl.scrollTop + scEl.clientHeight;
+        const rb = Math.floor((vBot - (lineBot + 2) - 4 - PADB) / ROW);
+        vis = Math.max(nMin, Math.min(n6, rb));
+      }
+      const listH = vis * 44 + (vis - 1) * 2;
+      let left = colLeft(ac.col0 + 1);
+      const top = lineBot + 2;
+      if (scEl) {
+        const maxLeft = scEl.scrollLeft + scEl.clientWidth - 72 - 412;
+        left = Math.max(0, Math.min(left, maxLeft));
+      }
+      acStyle = 'position:absolute;left:' + Math.round(left) + 'px;top:' + Math.round(top) + 'px;z-index:8;width:400px;max-width:calc(100% - 16px);box-sizing:border-box;padding:8px;border-radius:16px;background:#FFFFFF;border:1px solid #DCE3EC;box-shadow:0 8px 20px rgba(20,36,61,.2);font-family:\'IBM Plex Sans Thai\',system-ui,sans-serif';
+      acListStyle = 'display:flex;flex-direction:column;gap:2px;max-height:' + listH + 'px;overflow-y:auto;overflow-x:hidden';
+      const pl = ac.prefix.length;
+      acItems = ac.items.map((it, i) => ({ id: 'cm-ac-' + i, col: this.acCol(it), m: it.n.slice(0, pl), rest: it.n.slice(pl), kind: this.acKindName(it.g), sel: i === acSel, cls: i === acSel ? 'cm-ai on' : 'cm-ai', pick: (e) => { if (e && e.preventDefault) e.preventDefault(); this.acAccept(i); } }));
+    }
+
+    // ขนาด: หัว 56 · ตัวแก้โค้ด = ที่เหลือทั้งหมด (ไม่มีแผงปัญหาใต้โค้ดแล้ว)
+    const edH = Math.max(120, H - HDR);
+    const textH = Math.max(edH, (n + 1) * LH + 16);
+    let maxLen = 0;
+    rawLines.forEach((l) => { if (l.length > maxLen) maxLen = l.length; });
+    const minTextW = Math.max(200, maxLen * 10 + 48);
+
+    return {
+      hasCur: focused && !caret.sel, curTop: (caret.line - 1) * LH,
+      ovRef: this.ovRef, ovStyle: 'position:absolute;left:0;top:0;z-index:1;width:100%;height:' + textH + 'px;box-sizing:border-box;padding:0 16px 0 12px',
+      acOpen: !!ac, acActive: ac ? 'cm-ac-' + acSel : '', acItems, acStyle, acListStyle, acRef: this.acRef,
+      acLabel: 'คำแนะนำคำสั่ง',
+      acMd: (e) => { if (e && e.preventDefault) e.preventDefault(); },
+      acSr: ac ? 'มีคำแนะนำ ' + ac.items.length + ' รายการ · ตอนนี้ ' + ac.items[acSel].n + ' · ' + this.acKindName(ac.items[acSel].g) : '',
+      mPtr: () => { const md = this.mdInit(); md.p = Date.now(); md.k = 0; if ((this.state || {}).kbF) this.setState({ kbF: false }); },
+      mKey: (e) => { if (this.navK(e)) this.mdInit().k = Date.now(); this.typK(e); },
+      rootW: String(W), rootH: String(H),
+      hdrPadR: narrow ? 16 : 196,
+      noteText: dirty ? 'โค้ดนี้แก้เองแล้ว · ไม่กลับไปเป็นบล็อก' : 'แปลงจากบล็อกแล้ว · แก้ที่นี่ไม่ทำให้บล็อกเปลี่ยน',
+      caretText: 'บรรทัด ' + caret.line + ' · คอลัมน์ ' + caret.col,
+      scRef: this.scRef, taRef: this.taRef,
+      scStyle: 'position:absolute;left:0;top:' + HDR + 'px;width:100%;height:' + edH + 'px;overflow:auto;background:#fff',
+      ringStyle: 'position:absolute;left:0;top:' + HDR + 'px;width:100%;height:' + edH + 'px;box-sizing:border-box;pointer-events:none;z-index:6;' + (focused && S.kbF ? 'border:2px solid #1866C9;box-shadow:inset 0 0 0 3px #D0EBFD' : 'border:0 solid transparent'),
+      gutStyle: 'position:sticky;left:0;z-index:2;flex-shrink:0;width:72px;height:' + textH + 'px;box-sizing:border-box;background:#F4F7FB;border-right:1px solid #DCE3EC',
+      txtWrapStyle: 'position:relative;flex:1 0 auto;min-width:' + minTextW + 'px;height:' + textH + 'px',
+      taStyle: 'position:absolute;left:0;top:0;width:100%;height:' + textH + 'px;box-sizing:border-box;padding:0 16px 0 12px',
+      gRows: gRows, text: text,
+      liveMsg: S.live || '',
+      dbgOn: String(this.gp('debug')) === 'on', dbgRef: this.dbgRef,
+      onText: (e) => {
+        this.dbg('input');
+        const ta = e && e.target;
+        if (!ta) return;
+        this.setText(ta.value);
+        this.syncCaret(ta);
+      },
+      // Enter = ขึ้นบรรทัดใหม่และเยื้องตามบรรทัดบน (+2 ช่องถ้าบรรทัดบนลงท้ายด้วย {) · ไม่ทำตอนพิมพ์ด้วย IME · Tab ปล่อยให้ย้ายโฟกัสตามปกติ (ไม่กับดักคีย์บอร์ด)
+      onKey: (e) => {
+        try {
+          this.dbg('keydown', e && e.key);
+          // autocomplete เปิดอยู่: ↑↓ เลือก · Enter/Tab ใส่คำที่เลือก · Esc ปิดรายการ (แล้ว Tab ถัดไปย้ายโฟกัสออกได้ · WCAG 2.1.2) · ไม่ทำตอนพิมพ์ด้วย IME
+          const A = this._ac;
+          if (A && e && !(e.nativeEvent && e.nativeEvent.isComposing) && !e.ctrlKey && !e.metaKey && !e.altKey) {
+            const k0 = e.key;
+            if (k0 === 'ArrowDown' || k0 === 'ArrowUp') {
+              if (e.preventDefault) e.preventDefault();
+              const n0 = A.items.length;
+              const nx = k0 === 'ArrowDown' ? (A.sel + 1) % n0 : (A.sel + n0 - 1) % n0;
+              this.setState({ acSel: nx, acKey: A.key });
+              return;
+            }
+            if ((k0 === 'Enter' && !e.shiftKey) || (k0 === 'Tab' && !e.shiftKey)) { if (e.preventDefault) e.preventDefault(); this.acAccept(A.sel); return; }
+            if (k0 === 'Escape') { if (e.preventDefault) e.preventDefault(); if (e.stopPropagation) e.stopPropagation(); this.setState({ acEsc: { pos: (this.state.caret || {}).pos, len: String(this.state.text || '').length }, live: 'ปิดรายการคำแนะนำแล้ว' }); return; }
+          }
+          if (!e || e.ctrlKey || e.metaKey || e.altKey) return;
+          // IME (ไทย/จีน/ญี่ปุ่น/เสียง): ไม่เติมคู่ ไม่จัดบรรทัดระหว่างประกอบคำ
+          if ((e.nativeEvent && e.nativeEvent.isComposing) || e.key === 'Process') return;
+          if (typeof e.key === 'string' && e.key.length === 1 && this.pairKey(e, e.target)) return;
+          if (e.key !== 'Enter' || e.shiftKey) return;
+          const ta = e.target;
+          const v = String(ta.value), s = ta.selectionStart, en = ta.selectionEnd;
+          const ls = s > 0 ? v.lastIndexOf('\n', s - 1) + 1 : 0;
+          const cur = v.slice(ls, s);
+          const ind = (cur.match(/^ */) || [''])[0];
+          const extra = /\{\s*$/.test(cur) ? '  ' : '';
+          // Enter ระหว่าง {} ที่ติดกัน = แตก 3 บรรทัด เยื้องบรรทัดกลาง ตัวปิดอยู่บรรทัดล่าง (OQ203 · AS5)
+          const split = s === en && v.charAt(s - 1) === '{' && v.charAt(s) === '}';
+          const ins = split ? '\n' + ind + '  ' + '\n' + ind : '\n' + ind + extra;
+          this._selNext = split ? s + 1 + ind.length + 2 : s + ins.length;
+          e.preventDefault();
+          this.setText(v.slice(0, s) + ins + v.slice(en));
+        } catch (er) { this._selNext = null; }
+      },
+      onCaret: (e) => { this.dbg(e && e.type === 'keyup' ? 'keyup' : (e && e.type === 'click' ? 'click' : 'select')); this.syncCaret(e && e.target); },
+      onFocus: (e) => { this.dbg('focus'); this.setState({ focused: true, kbF: this.kbIn() }); this.syncCaret(e && e.target); },
+      onBlur: () => { this.dbg('blur'); this.setState({ focused: false }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

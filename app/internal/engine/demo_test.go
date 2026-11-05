@@ -11,8 +11,8 @@ func TestDemoBoundaries(t *testing.T) {
 		{"reject arbitrary Python", "coding-adventure", "program.run", `{"source":"import os"}`, "PROGRAM_INVALID"},
 		{"robot mode belongs to Zide", "robot-control", "servo.set", `{"servo":1,"angle":90}`, "ACTION_UNKNOWN"},
 		{"robot stop belongs to Zide", "robot-control", "robot.stop", `{}`, "ACTION_UNKNOWN"},
-		{"unknown block opcode", "block-programming", "program.run", `{"commands":[{"op":"exec"}]}`, "COMMAND_UNKNOWN"},
-		{"bounded movement", "block-programming", "program.run", `{"commands":[{"op":"move_right","value":9999}]}`, "STEP_LIMIT"},
+		{"Block Lab belongs to Mixly", "block-programming", "program.run", `{"source":"hero.jump()"}`, "ACTION_UNKNOWN"},
+		{"bounded movement", "coding-adventure", "program.run", `{"source":"hero.move_right(99)"}`, "STEP_LIMIT"},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {

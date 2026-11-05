@@ -48,6 +48,44 @@
                 <RegistryValue Root="HKCU" Key="Software\SchoolBot\Installer" Name="ZideHash" Type="integer" Value="1" KeyPath="yes" />
               </Component>
             </Directory>
+            <!-- Block Lab code generation, compile, upload and Serial monitor session; serial.exchange has no host route. -->
+            <Directory Id="MixlyFolder" Name="mixly">
+              <Component Id="MixlyExecutable" Guid="0C5E8E2B-5B7A-4C1E-9A0B-2F1D6E3A4B01" Bitness="always64">
+                <File Id="MixlyExe" Source="$(var.PayloadDir)\engines\mixly\mixly-engine.exe" />
+                <RemoveFolder Id="RemoveMixlyFolder" On="uninstall" />
+                <RegistryValue Root="HKCU" Key="Software\SchoolBot\Installer" Name="MixlyExecutable" Type="integer" Value="1" KeyPath="yes" />
+              </Component>
+              <Component Id="MixlyManifest" Guid="0C5E8E2B-5B7A-4C1E-9A0B-2F1D6E3A4B02" Bitness="always64">
+                <File Id="MixlyManifestFile" Source="$(var.PayloadDir)\engines\mixly\engine.json" />
+                <RegistryValue Root="HKCU" Key="Software\SchoolBot\Installer" Name="MixlyManifest" Type="integer" Value="1" KeyPath="yes" />
+              </Component>
+              <Component Id="MixlyNotices" Guid="0C5E8E2B-5B7A-4C1E-9A0B-2F1D6E3A4B03" Bitness="always64">
+                <File Id="MixlyNoticesFile" Source="$(var.PayloadDir)\engines\mixly\THIRD-PARTY-NOTICES.md" />
+                <RegistryValue Root="HKCU" Key="Software\SchoolBot\Installer" Name="MixlyNotices" Type="integer" Value="1" KeyPath="yes" />
+              </Component>
+              <Component Id="MixlyHash" Guid="0C5E8E2B-5B7A-4C1E-9A0B-2F1D6E3A4B04" Bitness="always64">
+                <File Id="MixlyHashFile" Source="$(var.PayloadDir)\engines\mixly\mixly-engine.exe.sha256" />
+                <RegistryValue Root="HKCU" Key="Software\SchoolBot\Installer" Name="MixlyHash" Type="integer" Value="1" KeyPath="yes" />
+              </Component>
+              <Directory Id="MixlyLibrariesFolder" Name="libraries" />
+              <Directory Id="MixlyLicensesFolder" Name="licenses">
+                <Component Id="MixlyLicenses" Guid="0C5E8E2B-5B7A-4C1E-9A0B-2F1D6E3A4B05" Bitness="always64">
+                  <File Id="MixlyBlocklyLicense" Source="$(var.PayloadDir)\engines\mixly\licenses\BLOCKLY-LICENSE.txt" />
+                  <File Id="MixlyGoLicense" Source="$(var.PayloadDir)\engines\mixly\licenses\GO-LICENSE.txt" />
+                  <File Id="MixlyGojaLicense" Source="$(var.PayloadDir)\engines\mixly\licenses\GOJA-LICENSE.txt" />
+                  <File Id="MixlyGoselectLicense" Source="$(var.PayloadDir)\engines\mixly\licenses\GOSELECT-LICENSE.txt" />
+                  <File Id="MixlyMixlyLicense" Source="$(var.PayloadDir)\engines\mixly\licenses\MIXLY-LICENSE.txt" />
+                  <File Id="MixlyPprofLicense" Source="$(var.PayloadDir)\engines\mixly\licenses\PPROF-LICENSE.txt" />
+                  <File Id="MixlyRegexp2License" Source="$(var.PayloadDir)\engines\mixly\licenses\REGEXP2-LICENSE.txt" />
+                  <File Id="MixlySerialLicense" Source="$(var.PayloadDir)\engines\mixly\licenses\SERIAL-LICENSE.txt" />
+                  <File Id="MixlySourcemapLicense" Source="$(var.PayloadDir)\engines\mixly\licenses\SOURCEMAP-LICENSE.txt" />
+                  <File Id="MixlyXSysLicense" Source="$(var.PayloadDir)\engines\mixly\licenses\X-SYS-LICENSE.txt" />
+                  <File Id="MixlyXTextLicense" Source="$(var.PayloadDir)\engines\mixly\licenses\X-TEXT-LICENSE.txt" />
+                  <RemoveFolder Id="RemoveMixlyLicensesFolder" On="uninstall" />
+                  <RegistryValue Root="HKCU" Key="Software\SchoolBot\Installer" Name="MixlyLicenses" Type="integer" Value="1" KeyPath="yes" />
+                </Component>
+              </Directory>
+            </Directory>
           </Directory>
           <Component Id="DesktopExecutable" Guid="3F1DBC57-D0DA-4A26-9634-18AB874190A1" Bitness="always64">
             <File Id="DesktopExe" Source="$(var.PayloadDir)\school-bot.exe" />
@@ -72,6 +110,12 @@
         </Directory>
       </Directory>
     </StandardDirectory>
+    <!-- arduino-cli compiles the bundled Arduino libraries from source, so every file ships.
+         Files gives each one its own component; uninstall removes them and the folders the
+         installer created for them. -->
+    <ComponentGroup Id="MixlyLibraries" Directory="MixlyLibrariesFolder">
+      <Files Include="$(var.PayloadDir)\engines\mixly\libraries\**" />
+    </ComponentGroup>
     <StandardDirectory Id="ProgramMenuFolder">
       <Directory Id="SchoolBotMenu" Name="School Bot">
         <Component Id="MenuShortcut" Guid="*" Bitness="always64">
@@ -98,6 +142,12 @@
       <ComponentRef Id="ZideHidLicense" />
       <ComponentRef Id="ZideJsonLicense" />
       <ComponentRef Id="ZideHash" />
+      <ComponentRef Id="MixlyExecutable" />
+      <ComponentRef Id="MixlyManifest" />
+      <ComponentRef Id="MixlyNotices" />
+      <ComponentRef Id="MixlyHash" />
+      <ComponentRef Id="MixlyLicenses" />
+      <ComponentGroupRef Id="MixlyLibraries" />
       <ComponentRef Id="ThirdPartyNotices" />
       <ComponentRef Id="WebViewBootstrapper" />
       <ComponentRef Id="MenuShortcut" />

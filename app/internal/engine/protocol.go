@@ -11,6 +11,7 @@ const (
 	CodeEngineCancelled = "ENGINE_CANCELLED"
 	CodeEngineFailed    = "ENGINE_FAILED"
 	CodeEngineTimeout   = "ENGINE_TIMEOUT"
+	CodeSafetyLimit     = "SAFETY_LIMIT"
 )
 
 // knownErrorCodes must stay equal to the enum in the response schema; a test compares them.
@@ -19,10 +20,13 @@ var knownErrorCodes = map[string]bool{
 	CodeInvalidRequest:  true,
 	"INVALID_INPUT":     true,
 	"ACTION_UNKNOWN":    true,
-	"SAFETY_LIMIT":      true,
+	CodeSafetyLimit:     true,
 	"TRANSPORT_ERROR":   true,
 	"DEVICE_TIMEOUT":    true,
 	"PROJECT_INVALID":   true,
+	"TOOLCHAIN_MISSING": true,
+	"COMPILE_FAILED":    true,
+	"UPLOAD_FAILED":     true,
 	CodeEngineBusy:      true,
 	CodeEngineCancelled: true,
 	CodeEngineFailed:    true,
@@ -59,6 +63,5 @@ type Command struct {
 }
 
 type Program struct {
-	Source   string    `json:"source,omitempty"`
-	Commands []Command `json:"commands,omitempty"`
+	Source string `json:"source,omitempty"`
 }

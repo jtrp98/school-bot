@@ -55,6 +55,7 @@ if [[ "$universal" == true ]]; then
     thin_dir="$root/app/bin/$target/thin/$thin_arch"
     mkdir -p "$thin_dir"
     ENGINE_ARCH="$thin_arch" bash "$root/scripts/build-engine.sh" zide "$thin_dir/engines/zide"
+    ENGINE_ARCH="$thin_arch" bash "$root/scripts/build-engine.sh" mixly "$thin_dir/engines/mixly"
     GOARCH="$thin_arch" \
       CGO_CFLAGS="${CGO_CFLAGS:-} -arch $clang_arch" \
       CGO_LDFLAGS="${CGO_LDFLAGS:-} -arch $clang_arch" \
@@ -79,8 +80,17 @@ if [[ "$universal" == true ]]; then
     "$root/app/bin/$target/thin/arm64/engines/zide/zide-engine" \
     -output "$zide_bundle/zide-engine"
   lipo -verify_arch x86_64 arm64 "$zide_bundle/zide-engine"
+  mixly_bundle="$bundle/Contents/MacOS/engines/mixly"
+  mkdir -p "$mixly_bundle"
+  cp -R "$root/app/bin/$target/thin/amd64/engines/mixly/." "$mixly_bundle/"
+  lipo -create \
+    "$root/app/bin/$target/thin/amd64/engines/mixly/mixly-engine" \
+    "$root/app/bin/$target/thin/arm64/engines/mixly/mixly-engine" \
+    -output "$mixly_bundle/mixly-engine"
+  lipo -verify_arch x86_64 arm64 "$mixly_bundle/mixly-engine"
 else
   ENGINE_ARCH="$arch" bash "$root/scripts/build-engine.sh" zide "$bundle/Contents/MacOS/engines/zide"
+  ENGINE_ARCH="$arch" bash "$root/scripts/build-engine.sh" mixly "$bundle/Contents/MacOS/engines/mixly"
   "$go_command" build -trimpath -buildvcs=false -ldflags '-s -w' \
     -o "$bundle/Contents/MacOS/demo-engine" ./cmd/demo-engine
   "$go_command" build -trimpath -buildvcs=false -tags production "${link_flags[@]}" \
@@ -90,9 +100,11 @@ cp "$root/THIRD-PARTY-NOTICES.md" "$bundle/Contents/Resources/THIRD-PARTY-NOTICE
 chmod 755 \
   "$bundle/Contents/MacOS/demo-engine" \
   "$bundle/Contents/MacOS/school-bot" \
-  "$bundle/Contents/MacOS/engines/zide/zide-engine"
+  "$bundle/Contents/MacOS/engines/zide/zide-engine" \
+  "$bundle/Contents/MacOS/engines/mixly/mixly-engine"
 plutil -lint "$bundle/Contents/Info.plist"
 codesign --force --sign - "$bundle/Contents/MacOS/engines/zide/zide-engine"
+codesign --force --sign - "$bundle/Contents/MacOS/engines/mixly/mixly-engine"
 codesign --force --sign - "$bundle/Contents/MacOS/demo-engine"
 codesign --force --sign - "$bundle/Contents/MacOS/school-bot"
 codesign --force --sign - "$bundle"

@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>แผงบล็อกและพื้นที่ต่อ</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'IBM Plex Sans Thai',system-ui,sans-serif}
+button{font-family:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid #B85E00;outline-offset:2px}
+.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.fb{display:block;width:100%;padding:0;border:0;background:transparent;text-align:left;font:inherit;color:inherit;margin-bottom:6px;border-radius:12px}
+.sh{box-sizing:border-box;display:flex;padding:2px}
+.bi{box-sizing:border-box;display:flex;align-items:center;flex-wrap:wrap;gap:2px 8px;width:100%;min-height:40px;padding:4px 12px;font-size:16px;font-weight:500;line-height:1.5;color:#14243D}
+.sl{display:inline-flex;align-items:center;min-height:28px;padding:0 10px;background:#fff;border:2px solid #C6D6EA;border-radius:999px;font-weight:600;line-height:1.4}
+.hx{display:inline-block;width:40px;height:26px;background:#fff;clip-path:polygon(10px 0,calc(100% - 10px) 0,100% 50%,calc(100% - 10px) 100%,10px 100%,0 50%)}
+.cb{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 12px;border-radius:12px;border:2px solid #C6D6EA;border-bottom-width:4px;background:#fff;color:#14243D;font-size:16px;font-weight:600;line-height:1.6}
+.ln{display:flex;align-items:center;height:20px;font-family:Consolas,ui-monospace,monospace;font-size:14px;line-height:20px;white-space:pre}
+.nt{display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 8px;margin-left:12px;border-radius:10px;background:#EAF2FD;color:#0F4C99;font-family:'IBM Plex Sans Thai',system-ui,sans-serif;font-size:14px;font-weight:600;line-height:20px}
+.dd{position:relative;display:inline-flex;align-items:center;gap:6px;box-sizing:border-box;max-width:100%;min-height:32px;padding:0 8px;border-radius:999px;border:2px solid #C6D6EA;background:#fff;color:#14243D;font-size:16px;font-weight:600;line-height:1.7;text-align:left}
+.dd::after{content:"";position:absolute;left:-6px;right:-6px;top:-6px;bottom:-6px}
+.dn{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gt{display:inline-flex;align-items:center;gap:4px;min-height:28px;padding:0 8px;border-radius:14px;background:#fff;border:2px solid #14243D;font-size:16px;font-weight:700;line-height:1.5}
+.fs{overflow-y:auto;overflow-x:hidden;scrollbar-width:auto;scrollbar-color:#5A6377 #EEF1F5}
+.fs::-webkit-scrollbar{width:12px}
+.fs::-webkit-scrollbar-track{background:#EEF1F5}
+.fs::-webkit-scrollbar-thumb{background:#5A6377;border-radius:6px;border:3px solid #EEF1F5}
+.pi{display:flex;align-items:center;gap:10px;box-sizing:border-box;width:100%;min-height:56px;padding:6px 10px;border-radius:12px;background:#fff;color:#14243D;text-align:left;font-size:16px;line-height:1.5}
+</style>
+</helmet>
+<!-- SCR-16 ซ้าย (760×704): แถบหมวด 16 หมวด (CatRail 112) + รายการบล็อก 184 + พื้นที่ต่อบล็อก 464 (ตารางจุด) + ลิ้นชักดูโค้ด C++ · ไม่มีแถบภารกิจ -->
+<div style="position:relative;width:760px;height:704px;background:#F4F7FB;overflow:hidden;color:#14243D">
+
+  <!-- แถบหมวด (R18): 16 หมวด · 4 กลุ่ม · เลื่อนในแถบ -->
+  <div style="position:absolute;left:0;top:0;width:112px;height:704px">
+    <dc-import name="CatRail" uid="bp" cat="{{cat}}" stage="{{stageFlag}}" pos="auto" h="704" empty-mark="yes" on-cat="{{pickCat}}" hint-size="112px,704px"></dc-import>
+  </div>
+
+  <!-- รายการบล็อกของหมวดที่เลือก -->
+  <div style="{{flyStyle}}">
+    <div style="display:flex;align-items:center;gap:10px;min-height:52px;padding:4px 10px;box-sizing:border-box">
+      <span style="{{flyChipStyle}}"><svg class="i" viewBox="0 0 24 24" style="width:20px;height:20px" aria-hidden="true"><path d="{{flyIcon}}"></path></svg></span>
+      <span style="min-width:0;font-size:18px;font-weight:700;line-height:1.5">{{flyName}}</span>
+    </div>
+    <div class="fs" style="{{flyBodyStyle}}">
+      <div style="padding:0 8px">
+        <sc-for list="{{fly}}" as="b" hint-placeholder-count="4">
+          <button class="fb" aria-disabled="{{b.off}}" aria-label="{{b.label}}">
+            <span class="sh" style="{{b.outer}}"><span class="bi" style="{{b.inner}}">
+              <sc-for list="{{b.parts}}" as="p">
+                <sc-if value="{{p.isT}}" hint-placeholder-val="{{true}}"><span>{{p.v}}</span></sc-if>
+                <sc-if value="{{p.isS}}" hint-placeholder-val="{{false}}"><span class="sl">{{p.v}}</span></sc-if>
+                <sc-if value="{{p.isC}}" hint-placeholder-val="{{false}}"><span class="hx"></span></sc-if>
+                <sc-if value="{{p.isD}}" hint-placeholder-val="{{false}}"><span class="dd" style="{{p.ds}}"><svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px" aria-hidden="true"><path d="{{p.ic}}"></path></svg><span class="dn">{{p.v}}</span><svg class="i" viewBox="0 0 24 24" style="width:14px;height:14px" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></span></sc-if>
+                <sc-if value="{{p.isG}}" hint-placeholder-val="{{false}}"><span class="gt"><svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg>{{p.v}}</span></sc-if>
+              </sc-for>
+            </span></span>
+          </button>
+        </sc-for>
+
+        <!-- หมวดว่างใน MVP (กฎกลาง R18): กดได้ ตัวอักษรเต็ม contrast ไม่ใช่ error ไม่สัญญา "เร็ว ๆ นี้" ชี้ทางไปต่อ -->
+        <sc-if value="{{isEmptyCat}}" hint-placeholder-val="{{false}}">
+          <div style="display:flex;flex-direction:column;gap:10px;padding:8px 2px;font-size:16px;line-height:1.6" role="note">
+            <div style="display:flex;gap:8px;align-items:flex-start"><svg class="i" viewBox="0 0 24 24" style="margin-top:3px" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 16v-4M12 8h.01"></path></svg><span style="font-weight:700">หมวดนี้ยังไม่มีบล็อก</span></div>
+            <div style="color:#5A6377">ลองดูหมวดที่มีบล็อกให้ใช้</div>
+            <button class="cb" onClick="{{goControl}}" style="width:100%;justify-content:flex-start"><span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;box-sizing:border-box;border-radius:9px;background:#FFAB3D;border:2px solid #A8610A"><svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px" aria-hidden="true"><path d="M17 2l4 4-4 4M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4M21 13v2a3 3 0 0 1-3 3H3"></path></svg></span><span>ควบคุม</span></button>
+            <button class="cb" onClick="{{goLight}}" style="width:100%;justify-content:flex-start"><span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;box-sizing:border-box;border-radius:9px;background:#C9E04A;border:2px solid #6E7F0B"><svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px" aria-hidden="true"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2V17h6v-.3c0-.8.4-1.5 1-2A7 7 0 0 0 12 2z"></path></svg></span><span>ไฟ</span></button>
+          </div>
+        </sc-if>
+
+        <!-- หมวดอุปกรณ์ที่ยังไม่มีอุปกรณ์ในวงจร (R16) · ต่างจากหมวดว่าง ใช้คนละข้อความ -->
+        <sc-if value="{{hasNoDev}}" hint-placeholder-val="{{false}}">
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;padding:10px;border-radius:12px;background:#EAF2FD;border:2px solid #C6D6EA;font-size:16px;line-height:1.6" role="note">
+            <div style="display:flex;gap:8px;align-items:flex-start"><svg class="i" viewBox="0 0 24 24" style="margin-top:3px" aria-hidden="true"><path d="M9 2v6M15 2v6M6 8h12v4a6 6 0 0 1-12 0zM12 18v4"></path></svg><span style="font-weight:700">ยังไม่มี{{noDevName}}ในวงจร</span></div>
+            <div style="color:#5A6377">วาง{{noDevName}}ที่ตัวจำลอง แล้วกลับมาเลือกในบล็อก</div>
+            <button class="cb" onClick="{{goSim}}" style="width:100%"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h10v10H7zM9 3v4M15 3v4M9 17v4M15 17v4M3 9h4M3 15h4M17 9h4M17 15h4"></path></svg><span>ไปที่ตัวจำลอง</span></button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{hasInfo}}" hint-placeholder-val="{{false}}">
+          <div style="display:flex;gap:8px;align-items:flex-start;padding:6px 2px;font-size:16px;line-height:1.6;color:#5A6377" role="note"><svg class="i" viewBox="0 0 24 24" style="margin-top:4px" aria-hidden="true"><path d="{{infoIcon}}"></path></svg><span>{{infoText}}</span></div>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+
+  <!-- พื้นที่ต่อบล็อก · พื้นหลังตารางจุด (R2) -->
+  <div style="{{wsStyle}}">
+    <!-- ST-10 ว่าง -->
+    <sc-if value="{{isEmpty}}" hint-placeholder-val="{{false}}">
+      <div style="position:absolute;left:16px;top:12px;width:208px">
+        <span class="sh" style="{{hat1O}};width:208px"><span class="bi" style="{{hat1I}};flex-wrap:nowrap"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"></path></svg><b>เริ่มต้น</b><span style="font-size:14px;color:#5A6377;white-space:nowrap">ทำครั้งเดียว</span></span></span>
+        <div style="height:8px"></div>
+        <span class="sh" style="{{hat2O}};width:208px"><span class="bi" style="{{hat2I}};flex-wrap:nowrap"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 2l4 4-4 4M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4M21 13v2a3 3 0 0 1-3 3H3"></path></svg><b>วนซ้ำ</b><span style="font-size:14px;color:#5A6377;white-space:nowrap">ทำไปเรื่อย ๆ</span></span></span>
+      </div>
+      <div style="position:absolute;left:16px;top:124px;width:340px;box-sizing:border-box;padding:10px 14px;border-radius:12px;border:3px dashed #1866C9;background:#EAF2FD;line-height:1.6">
+        <div style="display:flex;align-items:center;gap:8px;font-size:18px;font-weight:700"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"></path></svg>ลากบล็อกเข้าใต้ "วนซ้ำ"</div>
+        <div style="font-size:16px;color:#5A6377">หรือแตะบล็อกในรายการ แล้วแตะตรงนี้</div>
+      </div>
+    </sc-if>
+
+    <!-- โปรแกรมตัวอย่าง: กดปุ่ม → ไฟติด · บล็อกอุปกรณ์เลือกจาก dropdown ชื่อ (R16) -->
+    <sc-if value="{{hasProgram}}" hint-placeholder-val="{{true}}">
+      <div style="position:absolute;left:16px;top:12px;width:432px">
+        <span class="sh" style="{{hat1O}};width:208px"><span class="bi" style="{{hat1I}};flex-wrap:nowrap"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"></path></svg><b>เริ่มต้น</b><span style="font-size:14px;color:#5A6377;white-space:nowrap">ทำครั้งเดียว</span></span></span>
+        <div style="height:8px"></div>
+        <span class="sh" style="{{hat2O}};width:208px"><span class="bi" style="{{hat2I}};flex-wrap:nowrap"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 2l4 4-4 4M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4M21 13v2a3 3 0 0 1-3 3H3"></path></svg><b>วนซ้ำ</b><span style="font-size:14px;color:#5A6377;white-space:nowrap">ทำไปเรื่อย ๆ</span></span></span>
+
+        <div style="box-sizing:border-box;width:424px;padding:2px;{{ifO}};border-radius:4px 12px 12px 12px">
+          <div style="{{ifI}};border-radius:2px 10px 10px 10px;overflow:hidden">
+            <div class="bi" style="min-height:48px;flex-wrap:nowrap;gap:8px">ถ้า
+              <span class="sh" style="{{condO}}"><span class="bi" style="{{condI}};flex-wrap:nowrap;gap:6px">
+                <span class="sh" style="{{valO}}"><span class="bi" style="{{valI}};flex-wrap:nowrap;gap:6px;width:auto">อ่าน
+                  <button class="dd" onClick="{{toggleBtn}}" aria-haspopup="listbox" aria-expanded="{{ddBtnOn}}" aria-label="เลือกปุ่มกด ตอนนี้ ปุ่มกด 1"><svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px" aria-hidden="true"><path d="M4 4h16v16H4zM12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"></path></svg><span class="dn">ปุ่มกด 1</span><svg class="i" viewBox="0 0 24 24" style="width:14px;height:14px" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
+                </span></span>
+                =
+                <sc-if value="{{notGap}}" hint-placeholder-val="{{true}}"><span class="sl">สูง</span></sc-if>
+                <sc-if value="{{isGap}}" hint-placeholder-val="{{false}}"><span class="sl" style="min-width:44px;min-height:28px;border:3px dashed #B07F00;background:#FFF4CC"></span></sc-if>
+              </span></span>
+              ทำ
+            </div>
+            <div style="margin:0 10px 0 26px;padding:4px;background:rgba(255,255,255,.6);border-radius:8px">
+              <span class="sh" style="{{openO}};width:fit-content;border-radius:12px"><span class="bi" style="{{openI}};flex-wrap:nowrap;width:auto;border-radius:10px">เปิด
+                <button class="dd" onClick="{{toggleLed}}" aria-haspopup="listbox" aria-expanded="{{ddLedOn}}" aria-label="{{ledAria}}" style="{{ledDdStyle}}"><svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px" aria-hidden="true"><path d="{{ledIcon}}"></path></svg><span class="dn">{{ledName}}</span><svg class="i" viewBox="0 0 24 24" style="width:14px;height:14px" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
+              </span></span>
+              <sc-if value="{{hasTag}}" hint-placeholder-val="{{false}}">
+                <div style="display:flex"><div style="display:inline-flex;align-items:center;gap:6px;min-height:32px;margin:4px 0;padding:0 10px;border-radius:16px;background:#FFF4CC;border:2px solid #B07F00;font-size:16px;font-weight:600;line-height:1.5" role="note"><svg class="i" viewBox="0 0 24 24" style="width:18px;height:18px;color:#B07F00" aria-hidden="true"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01"></path></svg><span>{{tagText}}</span></div></div>
+              </sc-if>
+              <span class="sh" style="{{serO}};width:fit-content;border-radius:12px"><span class="bi" style="{{serI}};flex-wrap:nowrap;width:auto;border-radius:10px">Serial print <span class="sl">กดแล้ว</span></span></span>
+            </div>
+            <div style="display:flex;align-items:center;min-height:48px;padding:0 10px"><button class="cb" style="min-height:44px;padding:0 12px;border-bottom-width:2px" aria-label="เพิ่ม ไม่เช่นนั้น"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg><span>ไม่เช่นนั้น</span></button></div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ST-27 บล็อกยังไม่ได้ต่อ (อ่านได้ · ขอบประ + ไอคอน + ข้อความเหตุผล · ไม่ใช้ลายเฉียงบนตารางจุด) -->
+    <sc-if value="{{hasLoose}}" hint-placeholder-val="{{false}}">
+      <span style="position:absolute;left:252px;top:12px;box-sizing:border-box;display:flex;align-items:center;gap:8px;min-height:44px;padding:4px 12px;border:2px dashed #5A6377;border-radius:12px;background:#F4F6F8;color:#5A6377;font-size:16px;font-weight:500;white-space:nowrap"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM5 5l14 14"></path></svg>ตัวละคร: พูด <span class="sl" style="color:#14243D">สวัสดี</span></span>
+      <span style="position:absolute;left:252px;top:62px;display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 10px;border-radius:16px;background:#F4F6F8;border:2px solid #5A6377;color:#14243D;font-size:16px;font-weight:600;white-space:nowrap" role="note"><svg class="i" viewBox="0 0 24 24" style="width:18px;height:18px" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 16v-4M12 8h.01"></path></svg>ยังไม่ได้ต่อ · ไม่ทำงาน</span>
+    </sc-if>
+
+    <!-- ช่องว่าง (OQ26): ไฮไลต์ + ข้อความ -->
+    <sc-if value="{{isGap}}" hint-placeholder-val="{{false}}">
+      <span style="position:absolute;left:236px;top:164px;display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;border-radius:17px;background:#FFF4CC;border:2px solid #B07F00;color:#14243D;font-size:16px;font-weight:700;white-space:nowrap" role="note"><svg class="i" viewBox="0 0 24 24" style="width:18px;height:18px;color:#B07F00" aria-hidden="true"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01"></path></svg>ช่องนี้ยังว่าง</span>
+    </sc-if>
+
+    <!-- เลิกทำ / ซูม (ปุ่มมองเห็นตลอด) -->
+    <div style="position:absolute;right:12px;bottom:8px;display:flex;align-items:center;gap:4px">
+      <button class="cb" style="padding:0 12px"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7M3 3v6h6"></path></svg><span>เลิกทำ</span></button>
+      <button class="cb" style="width:44px;padding:0" aria-label="ทำซ้ำ"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7M21 3v6h-6"></path></svg></button>
+      <button class="cb" style="width:44px;padding:0" aria-label="ซูมออก"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"></path></svg></button>
+      <button class="cb" style="width:44px;padding:0" aria-label="ซูมเข้า"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button>
+      <button class="cb" style="width:44px;padding:0" aria-label="พอดีจอ"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg></button>
+    </div>
+  </div>
+
+  <!-- ดูโค้ด Arduino C++ (อ่านอย่างเดียว) -->
+  <div style="{{codeStyle}}">
+    <button onClick="{{onToggleCode}}" aria-expanded="{{isCodeOpen}}" style="display:flex;align-items:center;gap:10px;width:100%;height:46px;padding:0 12px;border:0;background:#fff;color:#14243D;font-size:18px;font-weight:700;text-align:left">
+      <svg class="i" viewBox="0 0 24 24" style="width:24px;height:24px" aria-hidden="true"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"></path></svg>
+      <span>ดูโค้ด Arduino C++</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:14px;background:#F4F6F8;border:2px solid #DCE3EC;font-size:14px;font-weight:600;color:#5A6377"><svg class="i" viewBox="0 0 24 24" style="width:14px;height:14px" aria-hidden="true"><path d="M5 11h14v10H5zM8 11V7a4 4 0 0 1 8 0v4"></path></svg>อ่านอย่างเดียว</span>
+      <span style="flex:1"></span>
+      <svg class="i" viewBox="0 0 24 24" style="width:24px;height:24px" aria-hidden="true"><path d="{{codeChevron}}"></path></svg>
+    </button>
+    <sc-if value="{{isCodeOpen}}" hint-placeholder-val="{{true}}">
+      <div style="height:220px;overflow:hidden;padding:2px 12px 0 12px;box-sizing:border-box;background:#fff;border-top:2px solid #DCE3EC">
+        <sc-for list="{{lines}}" as="l" hint-placeholder-count="11">
+          <div class="ln"><span style="width:28px;flex-shrink:0;color:#5A6377;font-size:13px">{{l.n}}</span><span style="{{l.style}}">{{l.t}}</span><sc-if value="{{l.hasNote}}" hint-placeholder-val="{{false}}"><span class="nt" style="{{l.noteStyle}}">{{l.note}}</span></sc-if></div>
+        </sc-for>
+      </div>
+    </sc-if>
+  </div>
+
+  <!-- dropdown เลือกอุปกรณ์ (R16) · เปิดจากช่องในบล็อก · แสดงเฉพาะอุปกรณ์ชนิดที่บล็อกรับ + สถานะต่อสาย (ไอคอน + ข้อความ) -->
+  <sc-if value="{{ddOn}}" hint-placeholder-val="{{false}}">
+    <div style="{{popStyle}}" role="listbox" aria-label="{{popLabel}}">
+      <div style="padding:2px 8px 4px;font-size:14px;font-weight:700;line-height:1.6;color:#5A6377">{{popLabel}}</div>
+      <sc-for list="{{popItems}}" as="d" hint-placeholder-count="2">
+        <button class="pi" role="option" aria-selected="{{d.sel}}" onClick="{{d.pick}}" style="{{d.style}}">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;flex-shrink:0;box-sizing:border-box;border-radius:10px;background:#F4F7FB;border:2px solid #C6D6EA"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{d.icon}}"></path></svg></span>
+          <span style="flex:1;min-width:0"><span style="display:block;font-weight:700">{{d.name}}</span><span style="display:flex;align-items:center;gap:6px;color:#14243D"><svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px;color:{{d.stColor}}" aria-hidden="true"><path d="{{d.stIcon}}"></path></svg>{{d.stText}}</span></span>
+          <sc-if value="{{d.sel}}" hint-placeholder-val="{{false}}"><svg class="i" viewBox="0 0 24 24" style="color:#1866C9" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg></sc-if>
+        </button>
+      </sc-for>
+      <button class="cb" onClick="{{goSim}}" style="margin:6px 4px 2px;border-bottom-width:2px"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg><span>วางเพิ่มที่ตัวจำลอง</span></button>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"program":{"editor":"enum","default":"sample","options":["empty","sample","loose","gap","orphan","unset"]},"code":{"editor":"enum","default":"open","options":["open","closed"]},"cat":{"editor":"int","default":2,"min":1,"max":16},"target":{"editor":"enum","default":"board","options":["board","stage"]},"dd":{"editor":"enum","default":"closed","options":["closed","led","btn"]},"skip":{"editor":"enum","default":"no","options":["no","yes"]},"hl":{"editor":"enum","default":"no","options":["no","yes"]},"onToggleCode":{"editor":null},"onCat":{"editor":null},"onGoSim":{"editor":null},"$preview":{"width":760,"height":704}}'>
+class Component extends DCLogic {
+  gp(name) {
+    const P = this.props || {};
+    const kebab = name.replace(/[A-Z]/g, (m) => '-' + m.toLowerCase());
+    if (P[name] !== undefined) return P[name];
+    if (P[name.toLowerCase()] !== undefined) return P[name.toLowerCase()];
+    if (P[kebab] !== undefined) return P[kebab];
+    return undefined;
+  }
+  renderVals() {
+    const S = this.state || {};
+    const program = this.gp('program') || 'sample';
+    const codeOpen = (this.gp('code') || 'open') === 'open';
+    const target = this.gp('target') === 'stage' ? 'stage' : 'board';
+    const onCatProp = this.gp('onCat');
+    const controlled = typeof onCatProp === 'function';
+    const catP = Math.min(16, Math.max(1, Number(this.gp('cat')) || 2));
+    const cat = controlled ? catP : (S.cat !== undefined ? S.cat : catP);
+    const pickCat = (n) => { if (controlled) onCatProp(n); else this.setState({ cat: n }); };
+    const goSim = this.gp('onGoSim') || (() => {});
+    const skip = this.gp('skip') === 'yes';
+    const hl = this.gp('hl') === 'yes';
+    const dd = S.dd !== undefined ? S.dd : (this.gp('dd') === 'led' ? 'led' : (this.gp('dd') === 'btn' ? 'btn' : ''));
+    const devLed = S.devLed || 'led1';
+
+    // 16 หมวด [ชื่อ, ชื่อเต็ม, ไอคอน, พื้น, ขอบ, ชนิด] (สีหมวดเป็นค่าชั่วคราว DSG-13 · ชุดเดียวกับ CatRail)
+    const CATS = [
+      ['เริ่มต้น', 'เริ่มต้น', 'M5 21V4M5 4h11l-2 4 2 4H5', '#FFD23F', '#9C7A00', 'basic'],
+      ['ควบคุม', 'ควบคุม', 'M17 2l4 4-4 4M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4M21 13v2a3 3 0 0 1-3 3H3', '#FFAB3D', '#A8610A', 'basic'],
+      ['ตรรกะ', 'ตรรกะ', 'M12 3l9 9-9 9-9-9z', '#62D4C8', '#137A70', 'basic'],
+      ['คณิต', 'คณิต', 'M7 3v8M3 7h8M13 17h8M14.5 14.5l5 5M19.5 14.5l-5 5', '#6CCB5F', '#2F7A26', 'basic'],
+      ['ตัวแปร', 'ตัวแปร', 'M21 8l-9-5-9 5v8l9 5 9-5zM3 8l9 5 9-5M12 13v8', '#FF8F70', '#B03A1C', 'basic'],
+      ['ข้อความ', 'ข้อความ (Text)', 'M4 7V4h16v3M9 20h6M12 4v16', '#B79CFF', '#5F3FC2', 'empty'],
+      ['สื่อสาร', 'สื่อสาร (Serial)', 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z', '#8FA6FF', '#3D4FC0', 'basic'],
+      ['รายการ', 'รายการ (List)', 'M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01', '#FF86A8', '#B02C57', 'empty'],
+      ['ฟังก์ชัน', 'ฟังก์ชัน (Function)', 'M9 3H7a2 2 0 0 0-2 2v4a2 2 0 0 1-2 2 2 2 0 0 1 2 2v4a2 2 0 0 0 2 2h2M15 3h2a2 2 0 0 1 2 2v4a2 2 0 0 0 2 2 2 2 0 0 0-2 2v4a2 2 0 0 1-2 2h-2', '#F08AD3', '#9A2F85', 'empty'],
+      ['เซอร์โว', 'เซอร์โว (Servo)', 'M21 12a9 9 0 1 1-3-6.7M21 3v6h-6', '#5BAEFF', '#1D63B8', 'device'],
+      ['บัส', 'บัส (Bus)', 'M3 12h18M7 8l-4 4 4 4M17 8l4 4-4 4', '#A9B8CC', '#4F6482', 'empty'],
+      ['เสียง', 'เสียง (Sound)', 'M11 5L6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14', '#D58CF2', '#8239A8', 'device'],
+      ['เซนเซอร์', 'เซนเซอร์ (Sensor)', 'M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01', '#5CCBEA', '#17789A', 'device'],
+      ['แสดงผล', 'แสดงผล (Display)', 'M3 4h18v12H3zM8 21h8M12 16v5', '#7FE0A8', '#1F8050', 'empty'],
+      ['ไฟ', 'ไฟ (Light)', 'M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2V17h6v-.3c0-.8.4-1.5 1-2A7 7 0 0 0 12 2z', '#C9E04A', '#6E7F0B', 'device'],
+      ['ตัวละคร', 'ตัวละคร', 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01', '#FFBE94', '#A4521C', 'stage']
+    ];
+    const cc = CATS[cat - 1];
+    const isEmptyCat = cc[5] === 'empty';
+
+    // อุปกรณ์ในวงจรตัวอย่าง (ตรงกับตัวจำลอง circuit=ok) · [id, ชื่อ, สถานะ]
+    const BULB = 'M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2V17h6v-.3c0-.8.4-1.5 1-2A7 7 0 0 0 12 2z';
+    const DT = {
+      led: { icon: BULB, label: 'LED' },
+      btn: { icon: 'M4 4h16v16H4zM12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z', label: 'ปุ่มกด' },
+      pot: { icon: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 12l4-4', label: 'ลูกบิด' },
+      buz: { icon: 'M11 5L6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14', label: 'บัซเซอร์' },
+      srv: { icon: 'M3 8h12v10H3zM15 11h5v4h-5zM7 8V5', label: 'เซอร์โว' }
+    };
+    const DEVS = {
+      led: [['led1', 'LED แดง 1', 'ok'], ['onb', 'LED บนบอร์ด (ขา 13)', 'always']],
+      btn: [['btn1', 'ปุ่มกด 1', 'ok']],
+      pot: [['pot1', 'ลูกบิด 1', 'ok']],
+      buz: [], srv: []
+    };
+    const NAMEOF = { buz: 'บัซเซอร์', srv: 'เซอร์โว' };
+
+    // รายการบล็อกในแต่ละหมวด · k: stmt คำสั่ง (มน) | val ค่า (กลม) | cond เงื่อนไข (หกเหลี่ยม) | hat
+    const T = (v) => ['t', v], S_ = (v) => ['s', v], C = () => ['c', ''], D = (type) => ['d', type], G = (v) => ['g', v];
+    const FLY = {
+      1: { info: ['มีบล็อก เริ่มต้น และ วนซ้ำ ในงานนี้แล้ว · ใช้ได้อย่างละ 1 บล็อก', 'M5 11h14v10H5zM8 11V7a4 4 0 0 1 8 0v4'], blocks: [{ k: 'hat', placed: true, p: [T('เริ่มต้น'), G('วางแล้ว')] }, { k: 'hat', placed: true, p: [T('วนซ้ำ'), G('วางแล้ว')] }] },
+      2: { blocks: [{ k: 'stmt', p: [T('รอ'), S_('200'), T('ms')] }, { k: 'stmt', p: [T('ทำซ้ำ'), S_('10'), T('ครั้ง')] }, { k: 'stmt', p: [T('ทำซ้ำตลอด')] }, { k: 'stmt', p: [T('ถ้า'), C(), T('ทำ')] }, { k: 'stmt', p: [T('ทำซ้ำจนกว่า'), C()] }, { k: 'stmt', p: [T('หยุดโปรแกรม')] }] },
+      3: { blocks: [{ k: 'cond', p: [S_('ก'), T('='), S_('ข')] }, { k: 'cond', p: [C(), T('และ'), C()] }, { k: 'cond', p: [C(), T('หรือ'), C()] }, { k: 'cond', p: [T('ไม่'), C()] }, { k: 'cond', p: [T('จริง')] }, { k: 'cond', p: [T('เท็จ')] }] },
+      4: { blocks: [{ k: 'val', p: [S_('0')] }, { k: 'val', p: [S_('ก'), T('+'), S_('ข')] }, { k: 'val', p: [T('สุ่ม'), S_('1'), T('ถึง'), S_('10')] }, { k: 'val', p: [T('แปลงค่า'), S_('ค่า'), T('เป็น 0–255')] }, { k: 'val', p: [T('จำกัดค่า'), S_('ค่า'), T('0–255')] }] },
+      5: { blocks: [{ k: 'stmt', p: [T('สร้างตัวแปร'), S_('ชื่อ')] }, { k: 'stmt', p: [T('ตั้ง'), S_('ตัวแปร'), T('เป็น'), S_('0')] }, { k: 'stmt', p: [T('เพิ่ม'), S_('ตัวแปร'), T('ทีละ'), S_('1')] }, { k: 'val', p: [S_('ตัวแปร')] }] },
+      6: { blocks: [] },
+      7: { blocks: [{ k: 'stmt', p: [T('Serial print'), S_('ข้อความ')] }] },
+      8: { blocks: [] }, 9: { blocks: [] },
+      10: { blocks: [{ k: 'stmt', p: [T('หมุน'), D('srv'), T('ไปที่'), S_('90'), T('องศา')] }] },
+      11: { blocks: [] },
+      12: { blocks: [{ k: 'stmt', p: [T('เล่นเสียง'), D('buz'), T('ความถี่'), S_('440')] }, { k: 'stmt', p: [T('หยุดเสียง'), D('buz')] }] },
+      13: { blocks: [{ k: 'val', p: [T('อ่าน'), D('btn')] }, { k: 'val', p: [T('อ่าน'), D('pot')] }] },
+      14: { blocks: [] },
+      15: { blocks: [{ k: 'stmt', p: [T('เปิด'), D('led')] }, { k: 'stmt', p: [T('ปิด'), D('led')] }, { k: 'stmt', p: [T('ตั้งความสว่าง'), D('led'), T('เป็น'), S_('128')] }] },
+      16: { info: ['ทำงานเฉพาะในจอ ส่งลงบอร์ดแล้วจะข้ามไป', 'M3 4h18v12H3zM8 21h8M12 16v5'], blocks: [{ k: 'stmt', p: [T('ขยับ'), S_('10'), T('ก้าว')] }, { k: 'stmt', p: [T('พูด'), S_('สวัสดี')] }, { k: 'stmt', p: [T('เปลี่ยนท่า'), S_('ดีใจ')] }, { k: 'stmt', p: [T('กลับตำแหน่งเดิม')] }] }
+    };
+    const F = FLY[cat];
+    const HEX = (n) => 'polygon(' + n + 'px 0,calc(100% - ' + n + 'px) 0,100% 50%,calc(100% - ' + n + 'px) 100%,' + n + 'px 100%,0 50%)';
+    const noDevTypes = [];
+    const fly = F.blocks.map((b) => {
+      const placed = !!b.placed;
+      const fill = cc[3], bord = cc[4];
+      let outer = 'background:' + bord + ';', inner = 'background:' + fill + ';';
+      if (b.k === 'stmt') { outer += 'border-radius:12px;'; inner += 'border-radius:10px;'; }
+      if (b.k === 'val') { outer += 'border-radius:999px;'; inner += 'border-radius:999px;padding:4px 16px;'; }
+      if (b.k === 'cond') { outer += 'clip-path:' + HEX(16) + ';'; inner += 'clip-path:' + HEX(14) + ';padding:4px 24px;'; }
+      if (b.k === 'hat') { outer += 'border-radius:22px 22px 12px 12px;'; inner += 'border-radius:20px 20px 10px 10px;font-weight:700;'; }
+      const parts = b.p.map((p) => {
+        const o = { isT: p[0] === 't', isS: p[0] === 's', isC: p[0] === 'c', isD: p[0] === 'd', isG: p[0] === 'g', v: p[1], ic: '', ds: '' };
+        if (p[0] === 'd') {
+          const lst = DEVS[p[1]];
+          o.ic = DT[p[1]].icon;
+          if (lst.length === 1) { o.v = lst[0][1]; }
+          else { o.v = 'เลือกอุปกรณ์'; o.ds = 'border-style:dashed;border-color:#5A6377'; }
+          if (lst.length === 0 && noDevTypes.indexOf(p[1]) < 0) noDevTypes.push(p[1]);
+        }
+        return o;
+      });
+      const label = b.p.map((p) => (p[0] === 'd' ? (DEVS[p[1]].length === 1 ? DEVS[p[1]][0][1] : 'เลือกอุปกรณ์ ' + DT[p[1]].label) : p[1])).join(' ') + (placed ? ' (ใช้ได้อย่างละ 1 บล็อก มีในงานแล้ว)' : '');
+      return { outer, inner, parts, off: placed, label };
+    });
+    const hasNoDev = noDevTypes.length > 0;
+    const noDevName = hasNoDev ? NAMEOF[noDevTypes[0]] : '';
+    const hasInfo = !!F.info;
+
+    // สีบล็อกในพื้นที่ต่อ (หมวดตามชนิดบล็อก)
+    const col = (n) => ({ f: CATS[n - 1][3], b: CATS[n - 1][4] });
+    const k1 = col(1), k2 = col(2), k3 = col(3), k7 = col(7), k13 = col(13), k15 = col(15);
+    const orphan = program === 'orphan', unset = program === 'unset';
+    const dev = DEVS.led.filter((d) => d[0] === devLed)[0] || DEVS.led[0];
+    let ledName = dev[1], ledIcon = BULB, ledDdStyle = '';
+    let ledAria = 'เลือก LED ตอนนี้ ' + dev[1];
+    if (orphan) { ledName = 'LED แดง 2'; ledDdStyle = 'border:2px dashed #B07F00;background:#FFF4CC'; ledAria = 'LED แดง 2 ไม่พบอุปกรณ์ กดเพื่อเลือกอุปกรณ์ใหม่'; }
+    if (unset) { ledName = 'เลือกอุปกรณ์'; ledDdStyle = 'border:2px dashed #5A6377;background:#fff;color:#5A6377'; ledAria = 'ยังไม่ได้เลือก LED กดเพื่อเลือก'; }
+    const hasTag = orphan || unset;
+    const tagText = (orphan ? 'ไม่พบอุปกรณ์' : 'ยังไม่ได้เลือกอุปกรณ์') + (skip ? ' · ถูกข้ามตอนจำลอง' : ' · บล็อกนี้ไม่ทำงาน');
+    const ringOpen = hl && hasTag ? 'outline:4px solid #1866C9;outline-offset:3px;' : '';
+
+    // dropdown
+    const popType = dd === 'btn' ? 'btn' : 'led';
+    const ST = { ok: ['ต่อสายแล้ว', 'M5 12l5 5L20 7'], always: ['มีให้ใช้เสมอ · ไม่ต้องต่อสาย', 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 16v-4M12 8h.01'] };
+    const popItems = DEVS[popType].map((d) => {
+      const sel = popType === 'led' ? (!orphan && !unset && d[0] === devLed) : true;
+      return { name: d[1], icon: DT[popType].icon, stText: ST[d[2]][0], stIcon: ST[d[2]][1], stColor: d[2] === 'ok' ? '#2E7D32' : '#14243D', sel,
+        style: 'border:' + (sel ? '3px solid #1866C9' : '2px solid #DCE3EC') + ';' + (sel ? 'background:#EAF2FD' : ''),
+        pick: () => this.setState({ devLed: popType === 'led' ? d[0] : devLed, dd: '' }) };
+    });
+    const ddOn = dd === 'led' || dd === 'btn';
+    const popTop = dd === 'btn' ? 162 : 210;
+    const popLeft = dd === 'btn' ? 400 : 392;
+
+    // โค้ด C++ ที่ตรงกับบล็อก (R3 · R16: เลขขามาจากสายที่ต่อจริง เปลี่ยนอุปกรณ์แล้วเลขขาเปลี่ยนตาม)
+    const pinLed = devLed === 'onb' ? 13 : 9;
+    const A = 'ใส่ให้อัตโนมัติ';
+    let src;
+    if (program === 'empty') {
+      src = [[0, 'void setup() {'], [0, '}'], [0, 'void loop() {'], [0, '}']];
+    } else {
+      src = [[0, 'void setup() {'], [1, 'Serial.begin(9600);', A, 'auto']];
+      if (!hasTag) src.push([1, 'pinMode(' + pinLed + ', OUTPUT);', dev[1] + ' → ขา ' + pinLed, 'dev']);
+      src.push([1, 'pinMode(2, INPUT_PULLUP);', 'ปุ่มกด 1 → ขา 2', 'dev']);
+      src.push([0, '}'], [0, 'void loop() {']);
+      src.push(program === 'gap' ? [1, 'if (digitalRead(2) == ) {', 'ช่องนี้ยังว่าง · แปลงโค้ดไม่ได้', 'warn'] : [1, 'if (digitalRead(2) == LOW) {', 'กด = สูง (กลับค่าให้แล้ว)', 'auto']);
+      if (orphan) src.push([2, '// เปิด LED แดง 2: ไม่พบอุปกรณ์ · ข้ามบล็อกนี้', 'ไม่พบอุปกรณ์', 'warn']);
+      else if (unset) src.push([2, '// เปิด [ยังไม่ได้เลือกอุปกรณ์] · ข้ามบล็อกนี้', 'ยังไม่ได้เลือก', 'warn']);
+      else src.push([2, 'digitalWrite(' + pinLed + ', HIGH);']);
+      src.push([2, 'Serial.println("กดแล้ว");'], [1, '}'], [0, '}']);
+    }
+    const lines = src.map((r, k) => {
+      const kind = r[3];
+      let noteStyle = '';
+      if (kind === 'warn') noteStyle = 'background:#FFF4CC;color:#14243D;';
+      return { n: String(k + 1), t: r[1], style: 'padding-left:' + (r[0] * 16) + 'px;', hasNote: !!r[2], note: r[2] || '', noteStyle };
+    });
+
+    const wsH = codeOpen ? 436 : 656;
+    return {
+      cat: String(cat), stageFlag: target === 'stage' ? 'yes' : 'no', pickCat,
+      flyStyle: 'position:absolute;left:112px;top:0;width:184px;height:' + wsH + 'px;box-sizing:border-box;background:#fff;border-right:2px solid #DCE3EC;overflow:hidden',
+      flyBodyStyle: 'height:' + (wsH - 52) + 'px',
+      flyChipStyle: 'display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:32px;height:32px;box-sizing:border-box;border-radius:10px;color:#14243D;background:' + cc[3] + ';border:2px ' + (isEmptyCat ? 'dashed ' : 'solid ') + cc[4],
+      flyIcon: cc[2], flyName: cc[1], fly,
+      isEmptyCat, hasNoDev, noDevName, hasInfo, infoText: F.info ? F.info[0] : '', infoIcon: F.info ? F.info[1] : '',
+      goControl: () => pickCat(2), goLight: () => pickCat(15), goSim,
+      wsStyle: 'position:absolute;left:296px;top:0;width:464px;height:' + wsH + 'px;overflow:hidden;background-color:#F8FAFD;background-image:radial-gradient(#C6D6EA 1.6px,transparent 1.6px);background-size:20px 20px',
+      isEmpty: program === 'empty', hasProgram: program !== 'empty', hasLoose: program === 'loose', isGap: program === 'gap', notGap: program !== 'gap',
+      hat1O: 'background:' + k1.b + ';border-radius:22px 22px 12px 12px', hat1I: 'background:' + k1.f + ';border-radius:20px 20px 10px 10px',
+      hat2O: 'background:' + k1.b + ';border-radius:22px 22px 12px 12px', hat2I: 'background:' + k1.f + ';border-radius:20px 20px 10px 10px',
+      ifO: 'background:' + k2.b, ifI: 'background:' + k2.f,
+      condO: 'background:' + k3.b + ';clip-path:' + HEX(16), condI: 'background:' + k3.f + ';clip-path:' + HEX(14) + ';padding:2px 22px;min-height:40px;width:auto',
+      valO: 'background:' + k13.b + ';border-radius:999px', valI: 'background:' + k13.f + ';border-radius:999px;padding:0 10px 0 12px;min-height:34px',
+      openO: 'background:' + k15.b + ';' + ringOpen, openI: 'background:' + k15.f,
+      serO: 'background:' + k7.b, serI: 'background:' + k7.f,
+      ledName, ledIcon, ledDdStyle, ledAria, hasTag, tagText,
+      toggleLed: () => this.setState({ dd: dd === 'led' ? '' : 'led' }),
+      toggleBtn: () => this.setState({ dd: dd === 'btn' ? '' : 'btn' }),
+      ddLedOn: dd === 'led', ddBtnOn: dd === 'btn', ddOn,
+      popStyle: 'position:absolute;left:' + popLeft + 'px;top:' + popTop + 'px;width:312px;box-sizing:border-box;padding:6px;background:#fff;border:2px solid #DCE3EC;border-radius:16px;box-shadow:0 8px 20px rgba(20,36,61,.2);z-index:40;display:flex;flex-direction:column;gap:4px',
+      popLabel: popType === 'led' ? 'เลือก LED' : 'เลือกปุ่มกด', popItems,
+      codeStyle: 'position:absolute;left:112px;top:' + wsH + 'px;width:648px;height:' + (704 - wsH) + 'px;background:#fff;border-top:2px solid #DCE3EC;box-sizing:border-box;overflow:hidden',
+      isCodeOpen: codeOpen, codeChevron: codeOpen ? 'M6 9l6 6 6-6' : 'M6 15l6-6 6 6',
+      lines,
+      onToggleCode: this.gp('onToggleCode') || (() => {})
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -24,8 +24,8 @@ try {
     Invoke-SchoolBotCommand 'dotnet' (@('restore','--disable-build-servers') + $arguments)
     $projectProperties = ([xml](Get-Content -LiteralPath "$project/SchoolBot.Installer.csproj")).Project.PropertyGroup
     $runtimeVersion = $projectProperties.RuntimeFrameworkVersion
-    $noticeParts = @((Get-Content -LiteralPath "$SchoolBotRoot/THIRD-PARTY-NOTICES.md" -Raw),
-        (Get-Content -LiteralPath "$project/Assets/Fonts/OFL.txt" -Raw))
+    $noticeParts = @((Get-Content -LiteralPath "$SchoolBotRoot/THIRD-PARTY-NOTICES.md" -Raw -Encoding UTF8),
+        (Get-Content -LiteralPath "$project/Assets/Fonts/OFL.txt" -Raw -Encoding UTF8))
     foreach ($component in @('microsoft.netcore.app.runtime.win-x64','microsoft.windowsdesktop.app.runtime.win-x64')) {
         $names = if ($component -eq 'microsoft.netcore.app.runtime.win-x64') {
             @('LICENSE.TXT','THIRD-PARTY-NOTICES.TXT')
@@ -34,11 +34,11 @@ try {
             $noticePath = Join-Path $packages "$component/$runtimeVersion/$name"
             if (-not (Test-Path -LiteralPath $noticePath)) { throw "Missing redistributed runtime notice: $noticePath" }
             $noticeParts += "`n$component $runtimeVersion / $name`n"
-            $noticeParts += Get-Content -LiteralPath $noticePath -Raw
+            $noticeParts += Get-Content -LiteralPath $noticePath -Raw -Encoding UTF8
         }
     }
     foreach ($component in @('wpf','winforms')) {
-        $noticeParts += Get-Content -LiteralPath "$project/Licenses/$component-NOTICES.txt" -Raw
+        $noticeParts += Get-Content -LiteralPath "$project/Licenses/$component-NOTICES.txt" -Raw -Encoding UTF8
     }
     [IO.File]::WriteAllText($notices, ($noticeParts -join "`n"), [Text.UTF8Encoding]::new($false))
     if ($Preview) {

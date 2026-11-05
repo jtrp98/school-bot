@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>Block Lab หน้าหลัก A2</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'IBM Plex Sans Thai',system-ui,sans-serif;color:#14243D}
+button{font-family:inherit;cursor:pointer}
+button:focus-visible,input[type=checkbox]:focus-visible,input[type=radio]:focus-visible,input[type=range]:focus-visible{outline:3px solid #1866C9;outline-offset:2px}
+.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border-radius:12px;border:2px solid #C6D6EA;border-bottom-width:4px;background:#fff;color:#14243D;font-size:16px;font-weight:600;line-height:1.6}
+.sp{animation:bl-spin .8s linear infinite}
+@keyframes bl-spin{to{transform:rotate(360deg)}}
+@keyframes bl-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.pop{animation:bl-in .2s cubic-bezier(.2,.8,.2,1)}
+@media (prefers-reduced-motion:reduce){.sp{animation:none}.pop{animation:none}}
+/* tab (segmented · CI §11.6 · OQ126): ราง #DCE3EC · tab สูง 44 · เลือก = พื้นขาว + เงาเบา DSG-20 + ตัว/ไอคอน action-primary ไม่มีกรอบสี */
+.tt{display:inline-flex;align-items:center;gap:8px;box-sizing:border-box;height:44px;padding:0 12px;border:0;border-radius:12px;background:transparent;color:#5A6377;font-size:16px;font-weight:700;line-height:1.6;white-space:nowrap}
+.tt:hover{background:#EAF2FD;color:#14243D}
+.tt.on{background:#FFFFFF;color:#1866C9;box-shadow:0 1px 3px rgba(20,36,61,.18)}
+.tt[aria-disabled="true"]{background:#F4F6F8;color:#5A6377;box-shadow:inset 0 0 0 2px #DCE3EC;cursor:not-allowed}
+/* ชุดที่ 5 (ข้อ 7/13): tooltip CI §11.8 (data-tip · ไม่ใช้ title) · .tipb = ใต้ปุ่ม · .tipe = ชิดขวา · .tipl = ฝั่งซ้าย · ปุ่มไอคอน .hb 44×44 (§11.11) · ปุ่มเริ่ม/หยุดจำลองในหัวแผงขวา .rb · ปุ่มมีข้อความในที่จับที่หุบ .gb */
+.tip{position:relative}
+.tip::after{content:attr(data-tip);display:none;position:absolute;left:50%;transform:translateX(-50%);bottom:calc(100% + 8px);z-index:40;padding:4px 12px;border-radius:8px;background:#14243D;color:#FFFFFF;font-size:14px;font-weight:500;line-height:1.6;white-space:nowrap;text-align:left;pointer-events:none}
+.tip:hover::after,.tip:focus-visible::after{display:block}
+.tip[data-tip=""]::after{display:none!important}
+.tipb::after{bottom:auto;top:calc(100% + 8px)}
+.tipe::after{left:auto;right:0;transform:none}
+.tipl::after{left:auto;right:calc(100% + 8px);bottom:auto;top:50%;transform:translateY(-50%)}
+.hb{display:inline-flex;align-items:center;justify-content:center;position:relative;width:44px;height:44px;padding:0;border:0;border-radius:12px;background:transparent;color:#14243D;flex-shrink:0}
+.hb:hover{background:#EAF2FD}
+.rb{display:inline-flex;align-items:center;justify-content:center;gap:8px;box-sizing:border-box;height:46px;padding:0 16px;border-radius:12px;font-size:16px;font-weight:700;line-height:1.6;white-space:nowrap;flex-shrink:0}
+.rb[aria-disabled="true"]{cursor:not-allowed}
+.gb{display:inline-flex;align-items:center;justify-content:flex-start;gap:8px;box-sizing:border-box;width:100%;height:44px;padding:0 12px;border:0;border-radius:12px;background:transparent;color:#14243D;font-size:16px;font-weight:700;line-height:1.6;white-space:nowrap}
+.gb:hover{background:#EAF2FD}
+.gb[aria-disabled="true"]{background:#F4F6F8;color:#5A6377;box-shadow:inset 0 0 0 2px #DCE3EC;cursor:not-allowed}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+/* รอบ 14 (R3 · OQ144 · ชุดที่ 6): dialog เตือนก่อนกลับโหมดบล็อกจากโหมดโค้ดที่แก้แล้ว (CI §11.10) · คลาสใหม่ขึ้นต้น cmd- เท่านั้น (helmet ทุกชิ้นส่วนรวมเป็น CSS เดียวกันทั้งหน้า) */
+.cmd-bp,.cmd-b2{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:48px;box-sizing:border-box;padding:0 16px;border-radius:12px;font-size:16px;font-weight:700;line-height:1.5;white-space:nowrap}
+.cmd-bp{border:0;border-bottom:4px solid #0F4C99;background:#1866C9;color:#FFFFFF}
+.cmd-b2{border:2px solid #C6D6EA;border-bottom-width:4px;background:#FFFFFF;color:#14243D}
+.cmd-b2:hover{background:#EAF2FD}
+.cmd-bp:active,.cmd-b2:active{border-bottom-width:2px;transform:translateY(2px)}
+</style>
+</helmet>
+<!-- รอบ 10 (2026-10-26 · ชุดที่ 5 พื้นที่ต่อบล็อก + จำลอง + โค้ด): (1) สถานะเริ่มต้น = หยุด (run ค่าเริ่มต้น idle · เดิม running) (2) ปุ่ม เริ่ม/หยุดจำลอง อยู่ในแผงขวา (หัวแผง) ไม่อยู่ในลิ้นชักแล้ว (OQ105) · แผงขวาซ่อนเป็นค่าเริ่มต้น เหลือที่จับเล็กมุมขวาบน (▶ เริ่มจำลอง + ตัวบอก "กำลังจำลอง" + ปุ่ม เปิดตัวจำลอง · OQ113) (3) แถบ "หยุดเพราะแก้ไข" ปุ่ม = "ไปที่ตัวจำลอง" (4) แถบแจ้ง/การ์ด เว้นชุดปุ่มเลื่อน/ซูมแนวตั้งมุมขวาล่าง (BlocksPaneA2)
+     รอบ 7 (2026-10-26 · CI ทั้งหน้า ชุดที่ 3): พื้นที่ 840 มีกรอบครอบ content (ขอบนอก 24 · ห่างแถบบน 12 · ห่างล่าง 16 · ระหว่างแผง 12 / 24 · แผง surface ขอบ 2px radius 16) · tab ทุกตัวแบบ CI (ราง #DCE3EC · เลือก = พื้นขาว + เงาเบา) · แถบหมวดซ้าย = CatRailA2 · popup/dialog/toast ตาม §11.8–11.10 (CardsA2 · PreflightDialogA2 · ฉากหลัง .35 · z 20/30/50) · tooltip แทน title (BlocksPaneA2) · พื้นที่ต่อบล็อกเหลือ 856×516 (ลิ้นชักขยาย) / 856×740 (ยุบ)
+     A2 (บอร์ดสำรวจ · คัดจาก A · A ต้นฉบับไม่แก้) · เลย์เอาต์ตามภาพอ้างอิง (2026-10-22 รอบ 3): แถบหน้าต่าง 60 (WindowBarA2 · รอบ 6 ส่วนหัว: home › ☰ › โลโก้ › | › ว่าง › | › ชิป Uno + เปลี่ยน › | › ชื่องาน › | › [ชิปคลาวด์ เฉพาะผิดปกติ · tweak cloud] › | › ย่อ/ขยาย/ปิด) + พื้นที่ 840 ไม่มีแถบหัวชั้นที่ 2 ไม่มีแถบล่าง · พื้นที่ 840 = BlocksPaneA2 ทั้งชิ้น: แถบหมวด 112 + รายการบล็อก 424 + พื้นที่ต่อบล็อก (560 ตอนลิ้นชักขยาย / 784 ตอนยุบ) + ลิ้นชัก Output | โค้ด C++ (280 / 56) · แถวแท็บลิ้นชักมีปุ่ม ปัญหา N ข้อ · เริ่ม/หยุดจำลอง · หยุดทั้งหมด · ส่งลงบอร์ด (อยู่ใน BlocksPaneA2 · สถานะและ callback ส่งผ่าน prop จากไฟล์นี้) · เป้าหมายบล็อก = บอร์ดตายตัว (ไม่มีหมวดตัวละคร/ตัวสลับ) · prop panels: hide (ค่าเริ่มต้น) ซ่อนตัวจำลอง/stage · show = เปิดคอลัมน์ขวา 680×840 · ขัด R10, R11 (ส่วนหัว + แถบล่าง) และ R3 ของ my-work โดยตั้งใจ (ดู D1 §A2 · OQ72, OQ78–OQ81) · รอบ 4 (2026-10-22): BlocksPaneA2 ต่อบล็อกได้จริง (โมเดลโปรแกรมอยู่ในชิ้นส่วน) · ไฟล์นี้รับ callback on-edit (แก้ตอนจำลอง → run = edited · R10) และ on-issues (จำนวนปัญหา R17 + ช่องว่าง R16 จากโมเดล → ชิป/ป๊อปอัป/ปุ่มส่ง/แปลงโค้ดไม่ผ่าน) · tweak program = โหลดโปรแกรมตัวอย่างแทนที่โมเดล -->
+<div onPointerDownCapture="{{mPtr}}" onKeyDownCapture="{{mKey}}" style="position:relative;width:1440px;height:900px;background:#F4F7FB;overflow:hidden;color:#14243D">
+
+  <!-- แถบหน้าต่าง 60 (สำเนา A2 · ชั้นต่ำกว่า z-stop ตาม CR-10) + พื้นที่ 840 = 900 · [แก้ 2026-10-28 ข้อ 1.13] กล่องหุ้มแถบเป็น stacking context: เดิม z 10 ทำให้ popover/เมนู/tooltip ข้างใน (z 40) ถูกตัดชั้นเหลือ 10 → ปุ่มใน body (เช่น ปุ่มเปิดแผงบล็อก z 24) ทับเมนู ☰ · ยกเป็น z-popover 40 + กล่อง BlocksPaneA2 เป็น z-base 0 (ชั้นข้างในไม่รั่วขึ้นมาแข่งกับส่วนหัว) -->
+  <div style="position:absolute;left:0;top:0;width:1440px;height:60px;z-index:40">
+    <dc-import name="WindowBarA2" os="{{os}}" chip="{{chip}}" work="{{workSave}}" menu="{{menuState}}" job="กดปุ่มแล้วไฟติด" time="10:20" port="COM3" busy="{{sendBusy}}" ovh="{{ovhStr}}" cloud="{{cloudP}}" cloud-pop="{{cloudPopP}}" mode="{{modeP}}" on-mode="{{onMode}}" mode-warn="{{modeWarnP}}" on-mode-stay="{{modeStay}}" on-mode-go="{{modeGo}}" on-change-board="{{onChangeBoard}}" on-reconnect="{{onReconnect}}" debug="{{debugP}}" hint-size="1440px,60px"></dc-import>
+  </div>
+  <!-- A2 ข้อ 1.5 (OQ175): ปุ่ม เปลี่ยน → หน้าเชื่อมบอร์ด ConnectUnoA2 (prototype link · กดผ่าน onChangeBoard) -->
+  <a href="ConnectUnoA2.dc.html" data-go-cu="1" tabindex="-1" aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">ไปหน้าเชื่อมบอร์ด Uno</a>
+
+  <!-- รอบ 6: เมนู ☰ ย้ายเข้า WindowBarA2 (เมนู/ชิป/dialog ของส่วนหัวอยู่ในชิ้นส่วนเอง · scrim/dialog สูงถึง ovh = ขอบบนแถวแท็บ ไม่บังปุ่มหยุดทั้งหมด) -->
+
+  <!-- พื้นที่ 840 (top 60) มีกรอบครอบ content (CI §11.1 · ชุดที่ 3): ขอบนอก 24 · ห่างแถบบน 12 · ห่างล่าง 16 → กรอบ x24 y72 กว้าง 1392 สูง 812 (ตอนซ่อนตัวจำลอง/stage · 688 ตอนเปิดคอลัมน์ขวา เว้น 24 ระหว่างแผงซ้าย–ขวา) · ข้างในมี 2 แผงเว้น 12: แผงที่ 1 แถบหมวด + รายการบล็อก + พื้นที่ต่อบล็อก (516 ตอนลิ้นชักขยาย / 740 ตอนยุบ) · แผงที่ 2 ลิ้นชัก Output | C++ (284 / 60) · พื้นหลังหน้า = background #F4F7FB -->
+  <!-- R22 รอบ 3 (OQ228 · 2026-11-03): ระหว่างลากบล็อก/ค่าที่รับ (และ effect หดหาย 260ms) BlocksPaneA2 แจ้ง on-lift=true → ยกกล่องนี้เป็น z 70 (เหนือส่วนหัว 40 · แถบแจ้ง/การ์ด 50 · แผงขวา) ให้บล็อกที่ลาก + ป้าย "ปล่อยเพื่อลบ" ตามเคอร์เซอร์ทั้งหน้า · ปกติ z 0 เหมือนเดิม (ข้อ 1.13) -->
+  <div style="{{paneWrapStyle}}">
+    <dc-import name="BlocksPaneA2" on-lift="{{onPaneLift}}" w="{{paneW}}" h="812" program="{{program}}" cat="{{cat}}" dd="{{ddProp}}" hl="{{hlFlag}}" debug="{{debugP}}" drawer="{{drawerNow}}" dtab="{{dtabP}}" serial="{{serialP}}" paused="{{pausedP}}" run="{{run}}" issues="{{issuesStr}}" show-issues="{{showIssues}}" send-busy="{{sendBusy}}" on-cat="{{pickCat}}" on-go-sim="{{goSim}}" on-stop-all="{{stopAll}}" on-send="{{sendBoard}}" on-open-pf="{{openPf}}" on-drawer="{{onDrawer}}" on-edit="{{onEdit}}" on-issues="{{onIssues}}" mode="{{modeP}}" code-demo="{{codeDemoP}}" term="{{termP}}" term-sys="{{termSysP}}" out-tick="{{outTickP}}" goto-line="{{gotoLineP}}" on-go-line="{{onGoLine}}" on-code-register="{{onCodeRegister}}" on-code-state="{{onCodeState}}" sim-open="{{simOpenP}}" on-toggle-sim="{{toggleSim}}" hint-size="1392px,812px"></dc-import>
+  </div>
+
+  <!-- ขวา 680×812 (เฉพาะ panels=show): แผงขวา · พื้น surface · radius 16 · ขอบ 2px เป็นชั้นทับ · หัวแผง 76 (padding 12) มีราง tab ตัวจำลอง | เวที + pill สถานะ · เนื้อ 736 -->
+  <sc-if value="{{showPanels}}" hint-placeholder-val="{{false}}">
+    <div id="ma2-right" role="region" aria-label="ตัวจำลองและเวที" style="position:absolute;left:736px;top:72px;width:680px;height:812px;border-radius:16px;overflow:hidden;background:#fff">
+      <div style="position:absolute;left:0;top:0;width:680px;height:76px;box-sizing:border-box;background:#fff;border-bottom:1px solid #DCE3EC;display:flex;align-items:center;gap:12px;padding:12px">
+        <div role="tablist" aria-label="ตัวจำลองและเวที" style="display:flex;align-items:center;gap:4px;padding:4px;background:#DCE3EC;border-radius:12px;flex-shrink:0">
+          <button class="{{simCls}}" role="tab" id="ma2t-sim" aria-selected="{{isSim}}" tabindex="{{simTi}}" onClick="{{tabSim}}" onKeyDown="{{tabKey}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h10v10H7zM9 3v4M15 3v4M9 17v4M15 17v4M3 9h4M3 15h4M17 9h4M17 15h4"></path></svg><span>ตัวจำลอง</span></button>
+          <button class="{{stageCls}}" role="tab" id="ma2t-stage" aria-selected="{{isStage}}" tabindex="{{stageTi}}" onClick="{{tabStage}}" onKeyDown="{{tabKey}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"></path></svg><span>เวที (stage)</span></button>
+        </div>
+        <div style="flex:1;min-width:0"></div>
+        <!-- ชุดที่ 5 (OQ105 · OQ113 · ข้อ 7/13): ปุ่ม เริ่ม/หยุดจำลอง อยู่ที่หัวแผงขวา (เห็นทั้งแท็บตัวจำลองและเวที · คุมทั้งสองพร้อมกัน R10) · ตัวบอกสถานะ (pill) แสดงเมื่อไม่ใช่ "พร้อมจำลอง" · ปุ่มซ่อนแผง (ไอคอน) อยู่ท้ายแถว -->
+        <div style="display:flex;align-items:center;gap:8px;min-width:0">
+          <sc-if value="{{hasPill}}" hint-placeholder-val="{{true}}">
+            <div style="{{pillStyle}}" role="status"><svg class="{{pillIconClass}}" viewBox="0 0 24 24" aria-hidden="true"><path d="{{pillIcon}}"></path></svg><span>{{pillText}}</span></div>
+          </sc-if>
+          <button type="button" class="rb tip tipb" data-tip="{{runTip}}" aria-label="{{runAria}}" aria-disabled="{{runDis}}" onClick="{{toggleRun}}" style="{{runBtnStyle}}"><svg class="{{runIconClass}}" viewBox="0 0 24 24" aria-hidden="true"><path d="{{runIcon}}"></path></svg><span>{{runLabel}}</span></button>
+          <!-- 2026-11-02 (ผู้ใช้สั่ง · R9): ปุ่ม หยุดทั้งหมด ย้ายมาที่นี่ (จากแถวแท็บลิ้นชัก) · ต่อท้ายปุ่มเริ่ม/หยุดจำลอง ก่อนปุ่มซ่อนแผง · ■ 46×46 ขอบ/ไอคอน #D32F2F พื้นขาว (brand §11.x) · z-index 40 = อยู่เหนือฉากหลัง dialog (z 20) → กดได้ตลอดแม้เปิดป๊อปอัป (CR-10 · R9) · กดได้เสมอ -->
+          <button id="ma2-stop" type="button" class="rb tip tipb" data-tip="หยุดทั้งหมด" aria-label="หยุดทั้งหมด" onClick="{{stopAll}}" style="width:46px;padding:0;z-index:40;background:#fff;color:#D32F2F;border:2px solid #D32F2F;border-bottom:4px solid #D32F2F"><svg class="i" viewBox="0 0 24 24" style="width:22px;height:22px;fill:currentColor" aria-hidden="true"><path d="M8 6h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z"></path></svg></button>
+          <button id="ma2-hide" type="button" class="hb tip tipb tipe" data-tip="ซ่อนตัวจำลองและเวที" aria-label="ซ่อนตัวจำลองและเวที" aria-expanded="true" aria-controls="ma2-right" onClick="{{hidePanel}}"><svg class="i" viewBox="0 0 24 24" style="width:24px;height:24px" aria-hidden="true"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM15 3v18M8 9l3 3-3 3"></path></svg></button>
+        </div>
+      </div>
+
+      <sc-if value="{{isSim}}" hint-placeholder-val="{{true}}">
+        <div style="{{contentStyle}}">
+          <dc-import name="SimPaneA2" circuit="{{circuit}}" run="{{run}}" pressed="{{pressedFlag}}" pot="{{pot}}" led="{{ledState}}" h="{{contentH}}" onPress="{{press}}" onRelease="{{release}}" onKeyDown="{{kd}}" onKeyUp="{{ku}}" onPot="{{onPot}}" hint-size="680px,784px"></dc-import>
+        </div>
+      </sc-if>
+      <sc-if value="{{isStage}}" hint-placeholder-val="{{false}}">
+        <div style="{{contentStyle}}">
+          <dc-import name="StagePaneA2" pose="{{stagePose}}" say="" x="0" y="0" frozen="{{frozenText}}" fast="no" state="{{stageState}}" h="{{contentH}}" hint-size="680px,784px"></dc-import>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{hasBannerShow}}" hint-placeholder-val="{{false}}">
+        <div style="{{bannerStyleShow}}" role="status">
+          <svg class="{{bannerIconClass}}" viewBox="0 0 24 24" style="width:24px;height:24px" aria-hidden="true"><path d="{{bannerIcon}}"></path></svg>
+          <div style="flex:1;min-width:0;font-size:18px;font-weight:600;line-height:1.5">{{bannerText}}<span style="font-size:14px;font-weight:500;color:#5A6377">{{bannerCode}}</span></div>
+          <button class="btn" onClick="{{bannerAction}}" style="min-height:44px">{{bannerButton}}</button>
+        </div>
+      </sc-if>
+
+      <!-- ขอบแผงขวา 2px (ชั้นทับ · ไม่รับเมาส์) -->
+      <div aria-hidden="true" style="position:absolute;left:0;top:0;width:100%;height:100%;box-sizing:border-box;border:2px solid #DCE3EC;border-radius:16px;pointer-events:none;z-index:30"></div>
+    </div>
+  </sc-if>
+
+
+  <!-- ที่จับของแผงขวาที่หุบ (OQ113 ผู้ใช้เลือก 2026-10-26 · ชุดที่ 5 ข้อ 7/13): แผงขวา (ตัวจำลอง + เวที) ซ่อนเป็นค่าเริ่มต้น (OQ102) → เหลือที่จับเล็ก = กลุ่มปุ่มกรอบเดียว มุมขวาบนของพื้นที่ต่อบล็อก ห่าง 16 (ชุดปุ่มเลื่อน/ซูมอยู่มุมขวาล่าง ไม่ชนกัน) · มี ▶ เริ่มจำลอง (กดแล้วเริ่มได้โดยไม่ต้องเปิดแผง · R17 ตรวจก่อนเหมือนเดิม) + ตัวบอก "กำลังจำลอง" เมื่อกำลังจำลอง + ปุ่ม เปิดตัวจำลอง (แสดงแผง) · เป็นข้อเสนอตำแหน่ง → OQ137 -->
+  <!-- [แก้ 2026-10-28 ข้อ 1.6] ลบกล่องลอยมุมขวาบน (เริ่มจำลอง / เปิดตัวจำลอง) · เริ่ม/หยุดจำลองอยู่ที่หัวแผงขวาเท่านั้น · ปุ่ม เปิด/ปิดตัวจำลอง ย้ายไปท้ายกรอบปุ่มแนวตั้งขวาล่างใน BlocksPaneA2 (#a2-simtoggle · aria-pressed) -->
+  <span class="sr" role="status" aria-live="polite">{{liveMsg}}</span>
+
+  <!-- แถบแจ้ง (เฉพาะ panels=hide): ไม่มีคอลัมน์ขวาให้วาง จึงลอยมุมขวาล่างของพื้นที่ต่อบล็อก ซ้ายของชุดปุ่มเลื่อน/ซูม 8px (ชุดที่ 5 · เดิมเหนือกลุ่มปุ่มแนวนอน · บนขวา = บล็อกวนซ้ำ + ป้ายเตือนของบล็อกตัวอย่าง + ที่จับแผงขวา จึงไม่วางที่นั่น) · ตามขอบลิ้นชักที่ขยาย/ยุบ · ไม่หายเอง มีปุ่ม -->
+  <sc-if value="{{hasBannerHide}}" hint-placeholder-val="{{false}}">
+    <div style="{{bannerStyleHide}}" role="status">
+      <svg class="{{bannerIconClass}}" viewBox="0 0 24 24" style="width:24px;height:24px" aria-hidden="true"><path d="{{bannerIcon}}"></path></svg>
+      <div style="flex:1;min-width:0;font-size:18px;font-weight:600;line-height:1.5">{{bannerText}}<span style="font-size:14px;font-weight:500;color:#5A6377">{{bannerCode}}</span></div>
+      <button class="btn" onClick="{{bannerAction}}" style="min-height:44px">{{bannerButton}}</button>
+    </div>
+  </sc-if>
+
+  <!-- การ์ดสถานะ SCR-19 (ส่งลงบอร์ด · หยุดทั้งหมด) = toast/popover (CardsA2 · z-toast 50): ลอยขวา เหนือแผงลิ้นชัก 8px (ตามลิ้นชักขยาย/ยุบ) ไม่บังปุ่มหยุดทั้งหมด/ส่งลงบอร์ด · อาจบังปุ่มเลิกทำ/ซูมชั่วคราว -->
+  <sc-if value="{{cardOn}}" hint-placeholder-val="{{false}}">
+    <div style="{{cardStyle}}">
+      <dc-import name="CardsA2" kind="{{cardKind}}" stage="{{cardStage}}" why="{{cardWhy}}" hint-size="420px,260px"></dc-import>
+    </div>
+  </sc-if>
+
+  <!-- dialog (CI §11.10 · ฉากหลัง z-backdrop 20 + dialog z-dialog 30): ฉากหลัง rgba(20,36,61,.35) คลุมจากบนสุดถึงขอบบนแผงลิ้นชักเท่านั้น (ไม่คลุมแผงลิ้นชัก) · [2026-11-02] ปุ่มหยุดทั้งหมดย้ายมาอยู่ในแผงขวา (หัวแผง/ลอยตอนแผงซ่อน) ซึ่งฉากหลังคลุม → ปุ่มใช้ z-index 40 (เหนือฉากหลัง 20 และ dialog 30) จึงยังกดได้ตลอด (CR-10 · R9) -->
+  <sc-if value="{{dialogOn}}" hint-placeholder-val="{{false}}">
+    <div aria-hidden="true" style="{{backdropStyle}}"></div>
+    <div style="{{dlgWrapStyle}}">
+      <div style="pointer-events:auto"><dc-import name="CardsA2" kind="{{dialogKind}}" stage="no" why="usb" hint-size="520px,420px"></dc-import></div>
+    </div>
+  </sc-if>
+
+  <!-- R17 ป๊อปอัปผลตรวจก่อนรัน (มาสคอต + จำนวนข้อ + ลิสต์ · PreflightDialogA2 · dialog 520) · ฉากหลัง/ชั้นเหมือนกัน: ไม่คลุมแผงลิ้นชัก · กดฉากหลัง = กลับไปแก้ · mode=send เมื่อกด "ส่งลงบอร์ด" ตอนยังมีปัญหา -->
+  <sc-if value="{{pfOn}}" hint-placeholder-val="{{false}}">
+    <div aria-hidden="true" onClick="{{pfBack}}" style="{{backdropStyle}}"></div>
+    <div style="{{dlgWrapStyle}}">
+      <div style="pointer-events:auto"><dc-import name="PreflightDialogA2" mode="{{pfMode}}" n="{{pfN}}" on-back="{{pfBack}}" on-continue="{{pfContinue}}" on-pick="{{pfPick}}" hint-size="520px,540px"></dc-import></div>
+    </div>
+  </sc-if>
+
+  <!-- [แก้ 2026-10-28 ข้อ 2.1] dialog กลางจอเตือนก่อนกลับโหมดบล็อก (รอบ 14) ย้ายเป็น popover ใต้ tab โหมดบล็อกใน WindowBarA2 (prop mode-warn · on-mode-stay · on-mode-go) · ไม่มี scrim เต็มจอ -->
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;panels&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;hide&quot;,&quot;options&quot;:[&quot;hide&quot;,&quot;show&quot;],&quot;section&quot;:&quot;A2 · กรอบตัวจำลอง/stage&quot;},&quot;tab&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;sim&quot;,&quot;options&quot;:[&quot;sim&quot;,&quot;stage&quot;],&quot;section&quot;:&quot;หน้าจอ (ใช้เมื่อ panels=show)&quot;},&quot;run&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;idle&quot;,&quot;options&quot;:[&quot;idle&quot;,&quot;compiling&quot;,&quot;running&quot;,&quot;compile-error&quot;,&quot;ended&quot;,&quot;edited&quot;,&quot;broken&quot;],&quot;section&quot;:&quot;หน้าจอ (ค่าเริ่มต้น = หยุด · เปิดหน้ามาไม่เริ่มจำลองเอง)&quot;},&quot;circuit&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;ok&quot;,&quot;options&quot;:[&quot;empty&quot;,&quot;ok&quot;,&quot;led-no-r&quot;,&quot;short&quot;],&quot;section&quot;:&quot;หน้าจอ&quot;},&quot;program&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;empty&quot;,&quot;options&quot;:[&quot;empty&quot;,&quot;sample&quot;,&quot;loose&quot;,&quot;gap&quot;,&quot;orphan&quot;,&quot;unset&quot;],&quot;section&quot;:&quot;โหลดโปรแกรมตัวอย่าง (แทนที่ที่ต่อไว้)&quot;},&quot;drawer&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;open&quot;,&quot;options&quot;:[&quot;open&quot;,&quot;closed&quot;],&quot;section&quot;:&quot;ลิ้นชัก Output | C++&quot;},&quot;dtab&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;out&quot;,&quot;options&quot;:[&quot;out&quot;,&quot;cpp&quot;],&quot;section&quot;:&quot;ลิ้นชัก Output | C++&quot;},&quot;serial&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;uno&quot;,&quot;options&quot;:[&quot;empty&quot;,&quot;sim&quot;,&quot;uno&quot;,&quot;uno-manual&quot;,&quot;unreadable&quot;],&quot;section&quot;:&quot;ลิ้นชัก Output | C++&quot;},&quot;paused&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;no&quot;,&quot;options&quot;:[&quot;no&quot;,&quot;yes&quot;],&quot;section&quot;:&quot;ลิ้นชัก Output | C++&quot;},&quot;cat&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:2,&quot;min&quot;:1,&quot;max&quot;:15,&quot;section&quot;:&quot;แผง&quot;},&quot;dd&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;btn&quot;,&quot;options&quot;:[&quot;closed&quot;,&quot;led&quot;,&quot;btn&quot;],&quot;section&quot;:&quot;แผง&quot;},&quot;issues&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:0,&quot;min&quot;:0,&quot;max&quot;:6,&quot;section&quot;:&quot;ตรวจก่อนรัน (R17)&quot;},&quot;led&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;auto&quot;,&quot;options&quot;:[&quot;auto&quot;,&quot;on&quot;,&quot;off&quot;,&quot;fast&quot;],&quot;section&quot;:&quot;ตัวจำลอง&quot;},&quot;chip&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;connected&quot;,&quot;options&quot;:[&quot;disconnected&quot;,&quot;connecting&quot;,&quot;connected&quot;,&quot;lost&quot;],&quot;section&quot;:&quot;บอร์ด&quot;},&quot;card&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;none&quot;,&quot;options&quot;:[&quot;none&quot;,&quot;nodevice&quot;,&quot;compile&quot;,&quot;send&quot;,&quot;success&quot;,&quot;success-stage&quot;,&quot;fail-usb&quot;,&quot;fail-compile&quot;,&quot;stop0&quot;,&quot;stopA&quot;,&quot;stopB&quot;],&quot;section&quot;:&quot;ส่งลงบอร์ด (SCR-19)&quot;},&quot;dialog&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;none&quot;,&quot;options&quot;:[&quot;none&quot;,&quot;preflightRun&quot;,&quot;preflightSend&quot;,&quot;warn&quot;,&quot;guardRun&quot;,&quot;guardSend&quot;,&quot;modeBack&quot;],&quot;section&quot;:&quot;ตรวจก่อนรัน (R17) / ส่งลงบอร์ด (SCR-19)&quot;},&quot;os&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;win&quot;,&quot;options&quot;:[&quot;win&quot;,&quot;mac&quot;],&quot;section&quot;:&quot;แถบหน้าต่าง&quot;},&quot;save&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;saved&quot;,&quot;options&quot;:[&quot;saved&quot;,&quot;dirty&quot;,&quot;unsaved&quot;],&quot;section&quot;:&quot;แถบหน้าต่าง&quot;},&quot;menu&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;closed&quot;,&quot;options&quot;:[&quot;closed&quot;,&quot;open&quot;],&quot;section&quot;:&quot;แถบหน้าต่าง&quot;},&quot;cloud&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;ok&quot;,&quot;options&quot;:[&quot;ok&quot;,&quot;offline&quot;,&quot;error&quot;],&quot;section&quot;:&quot;แถบหน้าต่าง · ชิปสถานะคลาวด์ (แสดงเมื่อผิดปกติเท่านั้น)&quot;},&quot;cloudPop&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;closed&quot;,&quot;options&quot;:[&quot;closed&quot;,&quot;open&quot;],&quot;section&quot;:&quot;แถบหน้าต่าง · ชิปสถานะคลาวด์ (แสดงเมื่อผิดปกติเท่านั้น)&quot;},&quot;debug&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;off&quot;,&quot;options&quot;:[&quot;off&quot;,&quot;on&quot;],&quot;section&quot;:&quot;วินิจฉัย (ตัวบอกเหตุการณ์ลาก/ซ่อน · ปิดเป็นค่าเริ่มต้น)&quot;},&quot;mode&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;block&quot;,&quot;options&quot;:[&quot;block&quot;,&quot;code&quot;],&quot;section&quot;:&quot;โหมดการเขียน บล็อก | โค้ด (R19 · R3)&quot;},&quot;codeDemo&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;off&quot;,&quot;options&quot;:[&quot;off&quot;,&quot;errors&quot;],&quot;section&quot;:&quot;โหมดโค้ด · ตัวอย่างโค้ดที่มีปัญหา (ดูการเช็ก syntax)&quot;},&quot;term&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;auto&quot;,&quot;options&quot;:[&quot;auto&quot;,&quot;ok&quot;,&quot;off&quot;,&quot;fail&quot;],&quot;section&quot;:&quot;Output terminal · สถานะการส่ง (auto = ตามชิปบอร์ด/สถานะจำลอง)&quot;},&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  componentDidUpdate(pp) {
+    // Tweak mode เปลี่ยน = ใช้ค่าจาก Tweak (ล้างโหมดที่เลือกเองจาก tab ในส่วนหัว)
+    const P = this.props || {};
+    if (pp && pp.mode !== P.mode && this.state.mode !== undefined) this.setState({ mode: undefined, modeDlg: undefined });
+  }
+  renderVals() {
+    const P = this.props || {};
+    const S = this.state || {};
+    const pick = (k, d) => (S[k] !== undefined ? S[k] : ((P[k] !== undefined && P[k] !== null && P[k] !== '') ? P[k] : d));
+
+    // ขนาดคงที่ของเลย์เอาต์ (จอ 1440×900 · CI §11.1 ชุดที่ 3): แถบหน้าต่าง 60 + พื้นที่ 840 · กรอบ content x24 y72 (ขอบนอก 24 · ห่างแถบบน 12) กว้าง 1392 สูง 812 (ห่างล่าง 16) · ระหว่างแผง 12 (แนวตั้ง) / 24 (ซ้าย–ขวา) · ลิ้นชัก 284 ขยาย / 60 ยุบ
+    const FR_Y = 72, FR_H = 812, GAP = 12, DR_OPEN = 284, DR_CLOSED = 60;
+
+    // A2: เปิด/ปิดกรอบตัวจำลอง + stage (ค่าเริ่มต้นซ่อน) · กดปุ่มพาไปตัวจำลอง (ในบล็อก/แถบแจ้ง) = เปิดกรอบคืน
+    const panels = pick('panels', 'hide') === 'show' ? 'show' : 'hide';
+    const hideMode = panels === 'hide';
+    const paneW = hideMode ? 1392 : 688;  // แผงซ้าย: 1392 เต็มกรอบ · 688 = 1392 − 24 − 680 (แผงขวา)
+
+    // สถานะลิ้นชักที่ BlocksPaneA2 แจ้งกลับ (on-drawer) · ใช้วางแถบแจ้ง/การ์ด/พื้นหลังป๊อปอัปให้ตรงขอบแผงลิ้นชัก
+    const drawerNow = S.drawerS !== undefined ? S.drawerS : (P.drawer === 'closed' ? 'closed' : 'open');
+    const wsH = FR_H - GAP - (drawerNow === 'open' ? DR_OPEN : DR_CLOSED); // 516 / 740 (ความสูงพื้นที่ต่อบล็อก = แผงที่ 1)
+    const rowTop = FR_Y + wsH + GAP;                                        // y ของขอบบนแผงลิ้นชัก (600 / 824)
+
+    const tab = pick('tab', 'sim');
+    // ชุดที่ 5 (ข้อ 7 · design-taste ข้อ 7 สถานะเริ่มต้นต้องนิ่ง): ค่าเริ่มต้นของ run = idle (หยุด) · เดิม 'running' ทำให้เปิดหน้ามาแล้ว "กำลังจำลอง" เลย · เริ่มได้เมื่อกดปุ่มเริ่มจำลองเท่านั้น (หัวแผงขวา หรือที่จับตอนหุบ) · ไม่มี state/Tweak/timer อื่นที่เริ่มจำลองตอนโหลด (ตรวจแล้ว: preset `program` · `card` · `dialog` · `led` ไม่ตั้ง run)
+    // รอบ 14 (R19 · OQ145 · R3 · OQ144): โหมดการเขียน บล็อก | โค้ด · ค่าเริ่มต้น = บล็อก · S.mode (กด tab ในส่วนหัว) ชนะ Tweak · ในโหมดโค้ด จำนวนปัญหา = จำนวน syntax ที่ตัวแก้โค้ดรายงานมา (ไม่ใช้ผลตรวจบล็อก R17)
+    const mode = pick('mode', 'block') === 'code' ? 'code' : 'block';
+    const codeMode = mode === 'code';
+    // [แก้ 2026-10-28 ข้อ 2.2 · R3/OQ161] ไม่มีตัวนับ/ชิปปัญหาของโหมดโค้ดแล้ว (เลิกเช็ก syntax realtime) · เริ่มจำลอง/ส่งลงบอร์ดในโหมดโค้ด = แปลงโค้ดก่อน · ไม่ผ่าน = แจ้งใน Output + แถบ "แปลงโค้ดไม่ผ่าน (บรรทัด N)" · ไม่ปิดกั้นปุ่มส่ง · แก้โค้ดแล้ว สถานะแปลงไม่ผ่านกลับเป็นหยุด (onEdit)
+    const cErr = S.cErr || null;
+    let run = pick('run', 'idle');
+    let circuit = pick('circuit', 'ok');
+    if (run === 'broken' && (circuit === 'ok' || circuit === 'empty')) circuit = 'led-no-r';
+    const program = pick('program', 'sample');
+    const dialog = pick('dialog', 'none');
+    const card = pick('card', 'none');
+    const chip = pick('chip', 'connected');
+    const pressed = !!S.pressed && run === 'running';
+    const ever = !!S.ever;
+
+    // A2: เป้าหมายบล็อก = board ตายตัว (หมวดตัวละครไม่แสดง · OQ80) → เลือกได้ 1–15
+    const cat = Math.min(15, Math.max(1, Number(pick('cat', 2)) || 2));
+
+    // ตรวจก่อนรัน (R17): จำนวนข้อ + ช่องว่าง (R16) คำนวณจากโมเดลโปรแกรมใน BlocksPaneA2 แล้วส่งกลับทาง on-issues (state mIssues/mGaps) · ก่อนได้รับค่าแรก ใช้ค่าประมาณจาก program · tweak issues > 0 = ตั้งจำนวนข้อเองเพื่อดูชิป/ป๊อปอัป (override)
+    const issuesT = Math.min(6, Math.max(0, Number(pick('issues', 0)) || 0));
+    const mIssues = S.mIssues !== undefined ? S.mIssues : ((program === 'orphan' || program === 'unset') ? 1 : 0);
+    const mGaps = S.mGaps !== undefined ? S.mGaps : (program === 'gap' ? 1 : 0);
+    const issueN = codeMode ? 0 : (issuesT > 0 ? issuesT : mIssues);
+    const pfOn = S.pf !== undefined ? S.pf === 'open' : (dialog === 'preflightRun' || dialog === 'preflightSend');
+    const pfSend = !!S.pfSend;
+    const pfMode = (pfSend || (S.pf === undefined && dialog === 'preflightSend')) ? 'send' : 'run';
+    const pfN = issueN > 0 ? issueN : 3;
+
+    // ความสูงเนื้อหาตัวจำลอง/stage (panels=show): แผงขวา 812 − หัวแผง 76 = 736 (SimPane/StagePane รับ h นี้ได้ · ยังไม่ได้ render ตรวจ)
+    const HEAD_H = 76;
+    const contentH = FR_H - HEAD_H;
+
+    // pill สถานะจำลอง: อยู่ที่แถบแท็บขวา เฉพาะ panels=show (เหมือน A) · panels=hide ไม่แสดง (ปุ่มเริ่ม/หยุดจำลองใน BlocksPaneA2 บอกสถานะ + แถบแจ้ง)
+    const pillBase = 'display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:0 12px;border-radius:999px;font-size:16px;font-weight:600;line-height:1.6;white-space:nowrap;border:2px solid ';
+    const P_PLAY = 'M6 4l14 8-14 8z', P_ALERT = 'M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01', P_INFO = 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 16v-4M12 8h.01', P_FLAG = 'M5 21V4M5 4h11l-2 4 2 4H5', P_ACT = 'M22 12h-4l-3 9L9 3l-3 9H2', P_SPIN = 'M12 2v4M12 18v4M4.9 4.9l2.9 2.9M16.2 16.2l2.9 2.9M2 12h4M18 12h4M4.9 19.1l2.9-2.9M16.2 7.8l2.9-2.9';
+    let pillText = 'พร้อมจำลอง', pillIcon = P_PLAY, pillIconClass = 'i', pillStyle = pillBase + '#DCE3EC;background:#F4F6F8;color:#5A6377';
+    if (run === 'compiling') { pillText = 'กำลังแปลงโค้ด'; pillIcon = P_SPIN; pillIconClass = 'i sp'; pillStyle = pillBase + '#C6D6EA;background:#EAF2FD;color:#14243D'; }
+    if (run === 'running') { pillText = 'กำลังจำลอง'; pillIcon = P_ACT; pillStyle = pillBase + '#1866C9;background:#EAF2FD;color:#0F4C99'; }
+    if (run === 'compile-error') { pillText = 'แปลงโค้ดไม่ผ่าน'; pillIcon = P_ALERT; pillStyle = pillBase + '#B07F00;background:#FFF4CC;color:#14243D'; }
+    if (run === 'ended') { pillText = 'โปรแกรมจบแล้ว'; pillIcon = P_FLAG; pillStyle = pillBase + '#5A6377;background:#F4F6F8;color:#14243D'; }
+    if (run === 'edited') { pillText = 'หยุดเพราะแก้ไข'; pillIcon = P_INFO; pillStyle = pillBase + '#5A6377;background:#F4F6F8;color:#14243D'; }
+    if (run === 'broken') { pillText = circuit === 'short' ? 'หยุด: ลัดวงจร' : 'หยุด: LED เสีย'; pillIcon = P_ALERT; pillStyle = pillBase + '#B07F00;background:#FFF4CC;color:#14243D'; }
+    // pill ที่หัวแผงขวา: ไม่แสดงตอน "พร้อมจำลอง" (ปุ่ม เริ่มจำลอง บอกอยู่แล้ว · ลดของรก · กว้างหัวแผง 680 พอดี) · หดได้ถ้าข้อความยาว
+    const hasPill = run !== 'idle';
+    pillStyle += ';flex-shrink:1;min-width:0;overflow:hidden';
+    // ปุ่มเริ่ม/หยุดจำลอง (ใช้ซ้ำที่หัวแผงขวา และที่จับตอนหุบ) · สไตล์รอง (OQ89: พื้นขาว ขอบ+ตัวน้ำเงิน · ส่งลงบอร์ดเป็นปุ่มหลักปุ่มเดียว) · ระบุว่าคุมทั้งตัวจำลองและเวที (OQ113)
+    let runLabel = 'เริ่มจำลอง', runIcon = P_PLAY, runIconClass = 'i', runDis = false, handleRunColor = '#1866C9';
+    let runTip = 'เริ่มจำลองทั้งตัวจำลองและเวทีพร้อมกัน', runAria = 'เริ่มจำลอง (ตัวจำลองและเวทีทำงานพร้อมกัน)';
+    let runBtnStyle = 'background:#fff;color:#1866C9;border:2px solid #1866C9;border-bottom:4px solid #1866C9';
+    if (run === 'running') { runLabel = 'หยุดจำลอง'; runIcon = 'M8 5v14M16 5v14'; runTip = 'หยุดจำลอง (หยุดทั้งตัวจำลองและเวที)'; runAria = 'หยุดจำลอง (หยุดทั้งตัวจำลองและเวที)'; }
+    else if (run === 'compiling') { runLabel = 'กำลังแปลงโค้ด'; runIcon = P_SPIN; runIconClass = 'i sp'; runDis = true; runTip = 'กำลังแปลงโค้ด รอสักครู่'; runAria = 'กำลังแปลงโค้ด รอสักครู่'; runBtnStyle = 'background:#F4F6F8;color:#5A6377;border:2px solid #DCE3EC;border-bottom:4px solid #DCE3EC'; handleRunColor = '#5A6377'; }
+
+    // แถบแจ้ง (ไม่หายเอง มีปุ่ม) · panels=show: ลอยเหนือก้นคอลัมน์ขวา (เหมือน A) · panels=hide: ลอยมุมขวาล่างของพื้นที่ต่อบล็อก
+    let hasBanner = false, bannerText = '', bannerCode = '', bannerButton = '', bannerWarn = false, bannerIcon = P_INFO, bannerIconClass = 'i', bannerAction = () => {};
+    // เริ่ม/หยุดจำลอง (OQ31 ปุ่มเดียวสลับ · R17 ตรวจก่อนรันทุกครั้งที่กดเริ่ม · OQ55 ค · หยุดไม่ตรวจ) · ตัวกระตุ้นคือปุ่มเริ่มในแผงขวา/ที่จับตอนหุบ (ชุดที่ 5) · ช่องว่าง (R16) → แปลงโค้ดไม่ผ่าน · มีปัญหาอื่น → ป๊อปอัป R17 · ไม่มี = เริ่ม
+    const goLine = (line) => this.setState({ goto: { line: line, n: ((S.goto && S.goto.n) || 0) + 1 } });
+    // ข้อ 2.2: แปลงโค้ด (จำลอง) = เรียกฟังก์ชันที่ตัวแก้โค้ดลงทะเบียนไว้ · คืนรายการ error [{line,title,hint}] · ไม่ผ่าน → ข้อความภาษาเด็กใน Output (กดไปที่บรรทัดได้) + เปิดแท็บ Output
+    const compileCode = () => (typeof this._compileFn === 'function' ? this._compileFn() : []);
+    const reportErr = (errs, forSend) => {
+      const lines = [{ k: 'err', v: 'แปลงโค้ดไม่ผ่าน · พบ ' + errs.length + ' ข้อที่ต้องแก้ ' + (errs.length > 3 ? '(โชว์ 3 ข้อแรก)' : ''), code: 'E-BUILD' }];
+      errs.slice(0, 3).forEach((e) => lines.push({ k: 'err', v: 'บรรทัด ' + e.line + ' · ' + e.title + ' — ' + e.hint, line: e.line }));
+      if (forSend) lines.push({ k: 'sys', v: 'ยังไม่ได้ส่ง บอร์ดยังใช้โปรแกรมเดิม' });
+      const tick = ((S.sys && S.sys.tick) || 0) + 1;
+      this.setState({ sys: { tick: tick, lines: lines }, outTick: (Number(S.outTick) || 0) + 1, cErr: { line: errs[0].line, n: errs.length } });
+    };
+    const doRun = () => {
+      if (run === 'compiling') return;
+      if (run === 'running') { this.setState({ run: 'idle', pressed: false, live: 'หยุดจำลองแล้ว' }); return; }
+      // โหมดโค้ด (R3 · OQ152): แปลงโค้ดก่อนทุกครั้ง · ไม่ผ่าน = แปลงโค้ดไม่ผ่าน (บรรทัด N) แจ้งใน Output · ผ่าน = เริ่มจำลอง · ไม่ใช้ป๊อปอัป R17 (ผลตรวจบล็อก)
+      if (codeMode) {
+        this.setState({ run: 'compiling', pressed: false, live: 'กำลังแปลงโค้ด' });
+        setTimeout(() => {
+          const errs = compileCode();
+          if (errs.length) { reportErr(errs, false); this.setState({ run: 'compile-error', live: 'แปลงโค้ดไม่ผ่าน บรรทัด ' + errs[0].line }); }
+          else this.setState({ run: 'running', pressed: false, panels: 'show', cErr: null, live: 'เริ่มจำลองแล้ว' });
+        }, 700);
+        return;
+      }
+      if (mGaps > 0) { this.setState({ run: 'compile-error', pressed: false }); return; }
+      if (issueN > 0) { this.setState({ pf: 'open', pfSend: false }); return; }
+      // [แก้ 2026-10-28 ข้อ 1.6 · OQ168] เริ่มจำลองตอนแผงขวาหุบ (ทางอื่นนอกปุ่มหัวแผง) → เปิดแผงเอง · ยังไม่มีคีย์ลัดเริ่มจำลองในหน้านี้
+      this.setState({ run: 'running', pressed: false, panels: 'show', live: 'เริ่มจำลองแล้ว' });
+    };
+    const focusLater = (id) => setTimeout(() => { try { const el = document.getElementById(id); if (el) el.focus(); } catch (er) {} }, 30);
+
+    // ---------- โหมดการเขียน บล็อก | โค้ด (รอบ 14 · R19 · OQ145 · R3 · OQ144) ----------
+    // tab ในส่วนหัวเรียก onMode · โหมดโค้ดที่แก้แล้ว → กลับโหมดบล็อกต้องเตือนก่อน (ปุ่มปลอดภัย = อยู่ต่อในโหมดโค้ด) · สลับโหมด = โปรแกรมเปลี่ยน จึงหยุดจำลอง (R10)
+    const modeDlgOn = S.modeDlg !== undefined ? S.modeDlg === 'open' : dialog === 'modeBack';
+    const onMode = (next) => {
+      const m2 = next === 'code' ? 'code' : 'block';
+      if (m2 === mode) return;
+      if (m2 === 'block' && codeMode && S.cDirty) { this.setState({ modeDlg: 'open' }); return; }
+      this.setState({ mode: m2, run: 'idle', pressed: false, modeDlg: 'closed', live: m2 === 'code' ? 'เปลี่ยนเป็นโหมดโค้ดแล้ว โค้ดแปลงมาจากบล็อก' : 'เปลี่ยนเป็นโหมดบล็อกแล้ว' });
+    };
+    const modeStay = () => { this.setState({ modeDlg: 'closed', live: 'อยู่ต่อในโหมดโค้ด' }); focusLater('mt-tab-code'); };
+    const modeGo = () => { this.setState({ mode: 'block', run: 'idle', pressed: false, modeDlg: 'closed', live: 'กลับไปโหมดบล็อกแล้ว โค้ดที่แก้ยังเก็บไว้ในโหมดโค้ด' }); focusLater('mt-tab-block'); };
+    const modeDlgKey = (e) => { if (e && e.key === 'Escape') { if (e.preventDefault) e.preventDefault(); modeStay(); } };
+    // ตัวแก้โค้ดรายงาน (แก้แล้วหรือยัง · จำนวนปัญหา syntax ที่นับ) เฉพาะเมื่อเปลี่ยน
+    const onCodeState = (dirty) => {
+      if (this._cs && this._cs.d === !!dirty) return;
+      this._cs = { d: !!dirty };
+      this.setState({ cDirty: !!dirty });
+    };
+    // Output terminal: ส่งข้อความได้เมื่อเชื่อมบอร์ด Uno แล้ว หรือกำลังจำลอง (Tweak term ตั้งเองได้)
+    const termSel = pick('term', 'auto');
+    const termP = (termSel === 'ok' || termSel === 'off' || termSel === 'fail') ? termSel : ((run === 'running' || chip === 'connected') ? 'ok' : 'off');
+    // โปรแกรมจบแล้ว → เริ่มใหม่ผ่านขั้นตรวจเดียวกับปุ่มเริ่ม (เดิมข้าม R17)
+    const restart = doRun;
+    if (run === 'compiling') { hasBanner = true; bannerText = 'กำลังแปลงโค้ดก่อนเริ่มจำลอง รอสักครู่'; bannerIcon = P_SPIN; bannerIconClass = 'i sp'; bannerButton = 'รอสักครู่'; }
+    if (run === 'compile-error') {
+      hasBanner = true; bannerWarn = true; bannerIcon = P_ALERT;
+      if (codeMode) { const el0 = cErr ? cErr.line : 1; bannerText = 'แปลงโค้ดไม่ผ่าน (บรรทัด ' + el0 + ') '; bannerCode = 'E-BUILD'; bannerButton = 'ไปที่บรรทัด'; bannerAction = () => goLine(el0); }
+      else { bannerText = 'เริ่มจำลองไม่ได้ ยังมีช่องว่างที่ต้องใส่ '; bannerCode = 'E-BUILD'; bannerButton = 'ไปที่บล็อก'; }
+    }
+    if (run === 'ended') { hasBanner = true; bannerText = 'โปรแกรมจบแล้ว (บล็อก "หยุดโปรแกรม")'; bannerButton = 'เริ่มใหม่'; bannerAction = restart; }
+    // OQ113 (ชุดที่ 5): แถบ "หยุดเพราะแก้ไข" ปุ่มเป็น "ไปที่ตัวจำลอง" (เปิดแผงขวา ที่มีปุ่มเริ่มจำลอง) แทน "เริ่มใหม่" เพราะปุ่มเริ่มย้ายไปอยู่ในแผงขวา · ถ้าแผงเปิดอยู่แล้ว = สลับไปแท็บตัวจำลอง
+    if (run === 'edited') { hasBanner = true; bannerText = 'หยุดจำลองแล้ว เพราะมีการแก้ไข'; bannerButton = 'ไปที่ตัวจำลอง'; bannerAction = () => { this.setState({ tab: 'sim', panels: 'show', live: 'แสดงตัวจำลองและเวทีแล้ว' }); focusLater('ma2-hide'); }; }
+    // อุปกรณ์เสีย: A แสดงแถบนี้เฉพาะแท็บ stage (แท็บตัวจำลองแสดงความเสียหายในภาพเอง) · A2 ซ่อนตัวจำลอง จึงต้องแสดงแถบเสมอ + ปุ่มเปิดกรอบตัวจำลองคืน
+    if (run === 'broken' && (hideMode || tab === 'stage')) { hasBanner = true; bannerWarn = true; bannerIcon = P_ALERT; bannerText = (circuit === 'short' ? 'หยุดจำลองแล้ว สายลัดวงจร ' : 'หยุดจำลองแล้ว LED เสีย '); bannerCode = circuit === 'short' ? 'E-SIM-02' : 'E-SIM-01'; bannerButton = hideMode ? 'เปิดตัวจำลอง' : 'ไปดูที่ตัวจำลอง'; bannerAction = () => this.setState({ tab: 'sim', panels: 'show' }); }
+    const bannerTop = HEAD_H + contentH - 72;
+    // แถบแจ้ง = toast (CI · z-toast 50 · radius 16 · shadow-float) · ขอบ 2px สีตามความหมาย (เตือน = warning-strong)
+    const bannerCommon = 'box-sizing:border-box;display:flex;align-items:center;gap:12px;padding:0 12px 0 16px;border-radius:16px;z-index:50;box-shadow:0 8px 20px rgba(20,36,61,.2);border:2px solid ' + (bannerWarn ? '#B07F00;background:#FFF4CC' : '#C6D6EA;background:#EAF2FD');
+
+    // การ์ด SCR-19 (ส่งลงบอร์ด · หยุดทั้งหมด)
+    const cardMap = { 'nodevice': ['nodevice', 'no', 'usb'], 'compile': ['compile', 'no', 'usb'], 'send': ['send', 'no', 'usb'], 'success': ['success', 'no', 'usb'], 'success-stage': ['success', 'yes', 'usb'], 'fail-usb': ['fail', 'no', 'usb'], 'fail-compile': ['fail', 'no', 'compile'], 'stop0': ['stop0', 'no', 'usb'], 'stopA': ['stopA', 'no', 'usb'], 'stopB': ['stopB', 'no', 'usb'] };
+    const cm = cardMap[card] || null;
+    const busy = card === 'compile' || card === 'send';
+    const clearCard = (ms) => setTimeout(() => this.setState({ card: 'none' }), ms);
+
+    // LED (OQ34: ไม่เกิน 3 ครั้ง/วินาที เกินแล้วแสดงแสงคงที่กลาง ๆ)
+    const ledP = pick('led', 'auto');
+    let ledState = 'off';
+    if (run === 'running') ledState = ledP === 'auto' ? (pressed ? 'on' : 'off') : ledP;
+
+    return {
+      // ข้อ 1.11 (แก้ 2026-10-28): จำ modality ล่าสุด (pointerdown = เวลา ms · keydown = 0) ให้ช่องพิมพ์ใน component ลูกตัดสินว่าแสดงวงโฟกัสไหม (เช่น ชิป "ปัญหา" คลิกเมาส์แล้วย้ายโฟกัสไปช่องโค้ด = ไม่มีวง)
+      mPtr: () => { try { document.documentElement.setAttribute('data-sb-ptr', String(Date.now())); } catch (e) {} },
+      mKey: () => { try { document.documentElement.setAttribute('data-sb-ptr', '0'); } catch (e) {} },
+      os: pick('os', 'win'), chip,
+      // A2 ข้อ 1.5: ชิปบอร์ดเปลี่ยนตาม state ของหน้า (เทียบ MainV6A L1788) · เชื่อมต่อใหม่ = กำลังเชื่อม 1.2 วิ → เชื่อมแล้ว (MainV6A L1513) · เปลี่ยน = ไปหน้า ConnectUnoA2
+      onReconnect: () => { this.setState({ chip: 'connecting' }); clearTimeout(this.reconT); this.reconT = setTimeout(() => this.setState({ chip: 'connected' }), 1200); },
+      onChangeBoard: () => { try { const a = document.querySelector('[data-go-cu]'); if (a) a.click(); } catch (e) {} },
+      modeP: mode, onMode, modeDlgOn, modeWarnP: modeDlgOn ? 'open' : 'closed', modeStay, modeGo, modeDlgKey, onCodeState, termP, yes: true,
+      codeDemoP: pick('codeDemo', 'off') === 'errors' ? 'errors' : 'off',
+      workSave: pick('save', 'saved'),
+      menuState: pick('menu', 'closed'),
+      cloudP: pick('cloud', 'ok') === 'offline' ? 'offline' : (pick('cloud', 'ok') === 'error' ? 'error' : 'ok'),
+      cloudPopP: pick('cloudPop', 'closed') === 'open' ? 'open' : 'closed',
+      ovhStr: String(rowTop),
+      // ปุ่มเริ่ม/หยุดจำลอง (OQ31: ปุ่มเดียวสลับ) อยู่ที่หัวแผงขวา + ที่จับตอนหุบ (ชุดที่ 5 · OQ105/OQ113) · R17: ถ้ามีปัญหา กดเริ่มจำลองแล้วเด้งป๊อปอัป (ตรวจใหม่ทุกครั้งที่กด · OQ55 ค) · หยุดจำลองไม่ตรวจ
+      toggleRun: doRun,
+      hasPill, runLabel, runIcon, runIconClass, runDis, runTip, runAria, runBtnStyle, handleRunColor,
+      showHandle: hideMode, hasHandleStatus: run === 'running' || run === 'compiling',
+      handleStatusStyle: 'display:flex;align-items:center;gap:8px;box-sizing:border-box;height:36px;padding:0 12px;border-radius:8px;font-size:16px;font-weight:600;line-height:1.6;white-space:nowrap;background:#EAF2FD;color:' + (run === 'compiling' ? '#14243D' : '#0F4C99'),
+      // ซ่อน/แสดงแผงขวา (OQ102): ปุ่มซ่อนที่หัวแผง ↔ ที่จับตอนหุบ (ปุ่ม เปิดตัวจำลอง) · aria-expanded · ย้ายโฟกัสไปปุ่มคู่ · ประกาศผลทาง live region · จำค่าล่าสุดตลอดที่เปิดหน้า (OQ102 จำค่าล่าสุดในงาน = ยังไม่บันทึกกับงาน)
+      showPanel: () => { this.setState({ panels: 'show', live: 'แสดงตัวจำลองและเวทีแล้ว' }); focusLater('ma2-hide'); },
+      hidePanel: () => { this.setState({ panels: 'hide', live: 'ซ่อนตัวจำลองและเวทีแล้ว' }); focusLater('a2-simtoggle'); },
+      // ข้อ 1.6: ปุ่มสลับ เปิด/ปิดตัวจำลอง ท้ายกรอบปุ่มแนวตั้ง (BlocksPaneA2) ใช้ state panels เดิม · โฟกัสคงอยู่ที่ปุ่มเดิม
+      simOpenP: hideMode ? 'no' : 'yes',
+      toggleSim: () => { if (hideMode) this.setState({ panels: 'show', live: 'แสดงตัวจำลองและเวทีแล้ว' }); else this.setState({ panels: 'hide', live: 'ซ่อนตัวจำลองและเวทีแล้ว' }); },
+      liveMsg: S.live || '',
+      // แก้โปรแกรมตอนกำลังจำลอง → หยุดเอง (R10) · BlocksPaneA2 เรียกเฉพาะตอน run = running
+      onEdit: () => { if (run === 'running') this.setState({ run: 'edited', pressed: false }); else if (codeMode && run === 'compile-error') this.setState({ run: 'idle', cErr: null }); },
+      // ข้อ 2.2: ผลแปลงโค้ด → Output · ไปที่บรรทัด · ฟังก์ชันแปลงโค้ดของตัวแก้โค้ด
+      termSysP: S.sys || null, outTickP: String(Number(S.outTick) || 0),
+      gotoLineP: S.goto ? S.goto.line + ':' + S.goto.n : '',
+      onGoLine: goLine, onCodeRegister: (f) => { this._compileFn = f; },
+      onIssues: (n, g) => this.setState({ mIssues: n, mGaps: g }),
+      // หยุดทั้งหมด (R9 · OQ79): หยุดจำลอง + แจ้งด้วยการ์ด stop0 (หยุดตัวจำลอง/ตัวละคร · โปรแกรมบนบอร์ดอาจยังทำงาน เพราะ DEV-Q16 ยังไม่ตอบ) · กดได้เสมอ ไม่ถูกปิดกั้นด้วยป๊อปอัป
+      stopAll: () => { this.setState({ run: 'idle', pressed: false, card: 'stop0' }); clearCard(3500); },
+      // ส่งลงบอร์ด (R9/R17): มีปัญหา → ป๊อปอัป mode=send (ส่งถูกปิดกั้น) · ไม่ได้เชื่อม Uno → การ์ด nodevice · ปกติ → แปลงโค้ด → ส่ง → สำเร็จ (ตัวอย่างอัตโนมัติ)
+      sendBoard: () => {
+        if (busy) return;
+        // โหมดบล็อก: ป๊อปอัป R17 เดิม · โหมดโค้ด (OQ161): ไม่ปิดกั้นการส่ง (ส่งได้เสมอ) แปลงโค้ดก่อน ไม่ผ่านแจ้งใน Output "ยังไม่ได้ส่ง บอร์ดยังใช้โปรแกรมเดิม" ไม่ใช่การ์ดสถานะ
+        if (issueN > 0) { this.setState({ pf: 'open', pfSend: true }); return; }
+        if (chip !== 'connected') { this.setState({ card: 'nodevice' }); clearCard(4500); return; }
+        this.setState({ card: 'compile' });
+        if (codeMode) {
+          setTimeout(() => {
+            const errs = compileCode();
+            if (errs.length) { this.setState({ card: 'none', live: 'แปลงโค้ดไม่ผ่าน ยังไม่ได้ส่ง บรรทัด ' + errs[0].line }); reportErr(errs, true); return; }
+            this.setState({ card: 'send' });
+            setTimeout(() => this.setState({ card: 'success' }), 1400);
+            clearCard(4800);
+          }, 1200);
+          return;
+        }
+        setTimeout(() => this.setState({ card: 'send' }), 1200);
+        setTimeout(() => this.setState({ card: 'success' }), 2600);
+        clearCard(6000);
+      },
+      sendBusy: busy ? 'yes' : 'no',
+      issuesStr: String(issueN), showIssues: (issueN > 0 && !pfOn) ? 'yes' : 'no',
+      onDrawer: (v) => this.setState({ drawerS: v === 'closed' ? 'closed' : 'open' }),
+      drawerNow,
+      showPanels: !hideMode, paneW: String(paneW),
+      // R22 รอบ 3: ยกชั้นกล่อง BlocksPaneA2 ระหว่างลาก (ดู comment ที่กล่อง)
+      paneWrapStyle: 'position:absolute;left:24px;top:72px;height:812px;z-index:' + ((this.state || {}).paneLift ? 70 : 0),
+      onPaneLift: (v) => { if (!!(this.state || {}).paneLift !== !!v) this.setState({ paneLift: !!v }); },
+      program, cat: String(cat),
+      ddProp: pick('dd', 'closed'),
+      hlFlag: S.hl === 'yes' ? 'yes' : 'no',
+      // รอบ 11: Tweak debug ส่งต่อให้ BlocksPaneA2 (ตัวบอกวินิจฉัยเหตุการณ์ลาก/ซ่อน · ปิดเป็นค่าเริ่มต้น)
+      debugP: pick('debug', 'off') === 'on' ? 'on' : 'off',
+      dtabP: P.dtab === 'cpp' ? 'cpp' : 'out',
+      serialP: P.serial || 'sim',
+      pausedP: P.paused === 'yes' ? 'yes' : 'no',
+      pickCat: (n) => this.setState({ cat: n }),
+      goSim: () => this.setState({ tab: 'sim', panels: 'show' }),
+      openPf: () => { if (codeMode) return; this.setState({ pf: 'open', pfSend: false }); },
+      pfOn, pfMode, pfN: String(pfN),
+      pfBack: () => this.setState({ pf: 'closed', pfSend: false }),
+      pfContinue: () => this.setState({ pf: 'closed', pfSend: false, run: mGaps > 0 ? 'compile-error' : 'running', pressed: false, panels: mGaps > 0 ? (S.panels) : 'show' }),
+      pfPick: (idx) => this.setState({ pf: 'closed', pfSend: false, hl: idx === 0 ? 'yes' : 'no' }),
+      isSim: tab === 'sim', isStage: tab === 'stage',
+      tabSim: () => this.setState({ tab: 'sim' }), tabStage: () => this.setState({ tab: 'stage' }),
+      // tab แบบ CI (.tt / .tt.on ใน helmet · §11.6) + คีย์ลูกศรซ้ายขวา/Home/End สลับ tab (roving tabindex)
+      simCls: tab === 'sim' ? 'tt on' : 'tt', stageCls: tab === 'stage' ? 'tt on' : 'tt',
+      simTi: tab === 'sim' ? '0' : '-1', stageTi: tab === 'stage' ? '0' : '-1',
+      tabKey: (e) => {
+        try {
+          const k = e && e.key;
+          if (k !== 'ArrowLeft' && k !== 'ArrowRight' && k !== 'Home' && k !== 'End') return;
+          let nxt = tab === 'sim' ? 'stage' : 'sim';
+          if (k === 'Home') nxt = 'sim';
+          else if (k === 'End') nxt = 'stage';
+          if (e.preventDefault) e.preventDefault();
+          this.setState({ tab: nxt });
+          const el = document.getElementById('ma2t-' + nxt);
+          if (el) el.focus();
+        } catch (err) {}
+      },
+      pillText, pillIcon, pillIconClass, pillStyle,
+      contentStyle: 'position:absolute;left:0;top:' + HEAD_H + 'px;width:680px;height:' + contentH + 'px',
+      contentH: String(contentH),
+      circuit, run,
+      pressedFlag: pressed ? 'yes' : 'no',
+      pot: String(S.pot !== undefined ? S.pot : 512),
+      ledState,
+      press: () => this.setState({ pressed: true, ever: true }),
+      release: () => this.setState({ pressed: false }),
+      kd: (e) => { if (e && (e.key === ' ' || e.key === 'Enter')) { if (e.preventDefault) e.preventDefault(); this.setState({ pressed: true, ever: true }); } },
+      ku: (e) => { if (e && (e.key === ' ' || e.key === 'Enter')) this.setState({ pressed: false }); },
+      onPot: (e) => this.setState({ pot: Number(e && e.target ? e.target.value : 512) }),
+      stagePose: String(ever ? 2 : 1),
+      stageState: run === 'running' ? 'running' : 'idle',
+      frozenText: run === 'broken' ? (circuit === 'short' ? 'หยุดอยู่ เพราะสายลัดวงจร' : 'หยุดอยู่ เพราะ LED เสีย') : '',
+      hasBannerShow: hasBanner && !hideMode, hasBannerHide: hasBanner && hideMode,
+      bannerText, bannerCode, bannerButton, bannerIcon, bannerIconClass, bannerAction,
+      bannerStyleShow: 'position:absolute;left:8px;top:' + bannerTop + 'px;width:664px;height:64px;' + bannerCommon,
+      // มุมขวาล่างของพื้นที่ต่อบล็อก (แผงที่ 1): ล่างแถบ = ขอบล่างแผง (72 + wsH) − (ขอบ 8 + ปุ่มเลิกทำ/ซูม ≈ 50 + ช่อง 8) − สูงแถบ 64 → top = wsH − 58 · ขวา = ขอบแผง 1416 − 12 − กว้าง 600 → left 804
+      // ชุดที่ 5: ชุดปุ่มเลื่อน/ซูมแนวตั้ง (56×257) อยู่มุมขวาล่างของแผง (ซ้ายสุด x1344) → แถบแจ้งกว้าง 560 ชิดขวาที่ x1336 (ห่าง 8) · ล่างแถบ = ล่างแผง − 16 (top = 72 + wsH − 16 − 64) · เดิมกว้าง 600 left 804 เหนือกลุ่มปุ่มแนวนอน
+      bannerStyleHide: 'position:absolute;left:776px;top:' + (wsH - 8) + 'px;width:560px;height:64px;' + bannerCommon,
+      cardOn: !!cm, cardKind: cm ? cm[0] : 'success', cardStage: cm ? cm[1] : 'no', cardWhy: cm ? cm[2] : 'usb',
+      // การ์ดสถานะ = toast (z 50): ขวา 36 (ขอบกรอบ 24 + 12) · เหนือแผงลิ้นชัก 8
+      // ชุดที่ 5: เว้นชุดปุ่มเลื่อน/ซูมมุมขวาล่าง (กว้าง 56 + ห่าง 16 + เว้น 16) → ขวา 108
+      cardStyle: 'position:absolute;right:' + (hideMode ? 108 : 36) + 'px;bottom:' + (900 - rowTop + 8) + 'px;z-index:50',
+      // ฉากหลัง dialog (z-backdrop 20) + ชั้น dialog (z-dialog 30 · ไม่รับเมาส์ ยกเว้นตัว dialog) · สูงถึงขอบบนแผงลิ้นชัก
+      backdropStyle: 'position:absolute;left:0;top:0;width:1440px;height:' + rowTop + 'px;background:rgba(20,36,61,.35);z-index:20',
+      dlgWrapStyle: 'position:absolute;left:0;top:0;width:1440px;height:' + rowTop + 'px;display:flex;align-items:center;justify-content:center;z-index:30;pointer-events:none',
+      dialogOn: dialog === 'warn' || dialog === 'guardRun' || dialog === 'guardSend', dialogKind: (dialog === 'warn' || dialog === 'guardRun' || dialog === 'guardSend') ? dialog : 'warn'
+    };
+  }
+}
+</script>
+</body>
+</html>

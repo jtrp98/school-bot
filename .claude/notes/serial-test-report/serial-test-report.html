@@ -1,0 +1,548 @@
+<title>Block Lab Serial ทดสอบบนบอร์ดจริง</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one reading column; verdict and findings first, then each test with its screenshots. */
+:root {
+  --bg: #f4f7fb;
+  --surface: #ffffff;
+  --ink: #142033;
+  --muted: #56667d;
+  --line: #d9e1ec;
+  --accent: #1d4f9c;
+  --pass: #1c7a4b;
+  --pass-bg: #e3f4ea;
+  --warn: #9a5b00;
+  --warn-bg: #fdf0d9;
+  --fail: #b3261e;
+  --fail-bg: #fbe4e2;
+  --skip: #5f6877;
+  --skip-bg: #eceff3;
+  --code-bg: #eef2f8;
+  --font-body: "IBM Plex Sans Thai", "Leelawadee UI", "Noto Sans Thai", Tahoma, sans-serif;
+  --font-mono: "IBM Plex Mono", Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1520; --surface: #172131; --ink: #e6ecf5; --muted: #9aa9bf; --line: #2b3749;
+    --accent: #86acef; --pass: #63c893; --pass-bg: #163a28; --warn: #e6ab52; --warn-bg: #3b2c12;
+    --fail: #f28a80; --fail-bg: #43201d; --skip: #a3acba; --skip-bg: #242d3b; --code-bg: #1f2a3b;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1520; --surface: #172131; --ink: #e6ecf5; --muted: #9aa9bf; --line: #2b3749;
+  --accent: #86acef; --pass: #63c893; --pass-bg: #163a28; --warn: #e6ab52; --warn-bg: #3b2c12;
+  --fail: #f28a80; --fail-bg: #43201d; --skip: #a3acba; --skip-bg: #242d3b; --code-bg: #1f2a3b;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.7;
+}
+.page {
+  max-width: 980px;
+  margin: 0 auto;
+  padding-block: 40px 72px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid;
+  gap: 40px;
+}
+h1, h2, h3 { text-wrap: balance; line-height: 1.3; margin: 0; }
+h1 { font-size: 30px; font-weight: 700; }
+h2 { font-size: 22px; font-weight: 700; }
+h3 { font-size: 18px; font-weight: 600; }
+p { margin: 0; max-width: 68ch; }
+code, .mono { font-family: var(--font-mono); font-size: 0.88em; }
+code { background: var(--code-bg); padding: 1px 6px; border-radius: 4px; overflow-wrap: anywhere; }
+.eyebrow { font-size: 13px; letter-spacing: 0.06em; color: var(--muted); font-weight: 500; }
+header { display: grid; gap: 16px; }
+.meta {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px 20px;
+  font-size: 14px;
+  color: var(--muted);
+}
+.meta dt { font-weight: 600; color: var(--ink); }
+.meta dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.verdict {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 20px 24px;
+  display: grid;
+  gap: 16px;
+}
+.counts { display: flex; flex-wrap: wrap; gap: 10px; }
+.count {
+  display: flex; align-items: baseline; gap: 8px;
+  padding: 6px 14px; border-radius: 999px; font-weight: 600; font-size: 15px;
+}
+.count b { font-size: 20px; font-variant-numeric: tabular-nums; }
+.c-pass { background: var(--pass-bg); color: var(--pass); }
+.c-warn { background: var(--warn-bg); color: var(--warn); }
+.c-fail { background: var(--fail-bg); color: var(--fail); }
+.c-skip { background: var(--skip-bg); color: var(--skip); }
+section { display: grid; gap: 16px; }
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 15px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+th { font-size: 13px; color: var(--muted); font-weight: 600; letter-spacing: 0.03em; }
+tr:last-child td { border-bottom: 0; }
+td.n { font-variant-numeric: tabular-nums; color: var(--muted); width: 3ch; }
+.pill {
+  display: inline-block; white-space: nowrap; font-size: 13px; font-weight: 600;
+  padding: 2px 10px; border-radius: 999px;
+}
+.finding {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--warn);
+  border-radius: 10px;
+  padding: 18px 20px;
+  display: grid;
+  gap: 10px;
+}
+.finding.bug { border-left-color: var(--fail); }
+.finding.minor { border-left-color: var(--skip); }
+.finding .head { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+.finding dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; margin: 0; font-size: 15px; }
+.finding dt { color: var(--muted); font-weight: 600; }
+.finding dd { margin: 0; min-width: 0; }
+.crop { border: 1px solid var(--line); border-radius: 8px; background: #ffffff; max-width: 100%; }
+.test {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 22px 24px;
+  display: grid;
+  gap: 14px;
+}
+.test .head { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+.test ul { margin: 0; padding-left: 22px; display: grid; gap: 4px; max-width: 70ch; }
+.shots { display: grid; gap: 16px; }
+.shots.two { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+figure { margin: 0; display: grid; gap: 6px; min-width: 0; }
+figure img { width: 100%; border: 1px solid var(--line); border-radius: 8px; display: block; }
+figure a { display: block; border-radius: 8px; }
+figure a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+figcaption { font-size: 14px; color: var(--muted); }
+.note { font-size: 14px; color: var(--muted); }
+.legend { display: flex; flex-wrap: wrap; gap: 8px; font-size: 14px; color: var(--muted); align-items: center; }
+</style>
+
+<div class="page">
+  <header>
+    <span class="eyebrow">School Bot · Block Lab · เฟส 5–6</span>
+    <h1>ผลทดสอบ Serial "เปิดอ่าน" และส่งลงบอร์ด บนแอปจริง</h1>
+    <p>ทดสอบตามรายการทดสอบมือของ hardware-safety-reviewer โดยกดปุ่มในหน้าต่างแอปเดสก์ท็อปจริงกับบอร์ด UNO ที่เสียบอยู่ ไม่ใช่หน้า preview · รอบ 4 พฤศจิกายนเพิ่มข้อ 12–15 หลังแก้ตามผลตรวจของ reviewer สองตัว</p>
+    <dl class="meta">
+      <dt>วันที่</dt><dd>3 พฤศจิกายน 2026 (ข้อ 1–11) · 4 พฤศจิกายน 2026 (ข้อ 12–15)</dd>
+      <dt>ตัวแอป</dt><dd><code>dist/desktop-serial-test/school-bot.exe</code> build 21:03 (ข้อ 1–11) · <code>dist/desktop-review-fix/school-bot.exe</code> (ข้อ 12–14) · <code>dist/desktop-crash-test/school-bot.exe</code> ที่ใส่ข้อผิดพลาดทดลองไว้ (ข้อ 15 · ห้ามแจก) · เวอร์ชัน 0.1.5 ทุกตัว ยังไม่ commit ยังไม่ทำ installer</dd>
+      <dt>บอร์ด</dt><dd>UNO โคลน ชิป CH340 (USB <code>1A86:7523</code>) ที่ COM3 ไม่มีอุปกรณ์อื่นต่อ</dd>
+      <dt>เครื่อง</dt><dd>Windows 11 · Arduino IDE 2.3.10 · <code>arduino:avr</code> 1.8.8</dd>
+      <dt>โปรแกรมบนบอร์ด</dt><dd><code>Serial.println("สวัสดี")</code> แล้ว <code>delay(1000)</code> · ข้อ 6 ใช้แบบไม่มี delay</dd>
+      <dt>วิธีทดสอบ</dt><dd>Claude กดปุ่มในหน้าต่างแอปผ่าน Windows UI Automation และถ่ายภาพหน้าจอ · ผู้ดูแลถอดและเสียบสาย USB เอง · ตรวจ process ของ engine หลังแต่ละขั้น</dd>
+    </dl>
+  </header>
+
+  <section class="verdict" aria-labelledby="verdict-title">
+    <h2 id="verdict-title">สรุป</h2>
+    <div class="counts">
+      <span class="count c-pass"><b>11</b> ผ่าน</span>
+      <span class="count c-warn"><b>1</b> ผ่านบางส่วน</span>
+      <span class="count c-skip"><b>2</b> ยังไม่ได้ทดสอบ</span>
+      <span class="count c-pass"><b>1</b> บั๊กแก้แล้ว</span>
+      <span class="count c-pass"><b>2</b> จุดที่ผู้ใช้อาจงง แก้แล้ว</span>
+      <span class="count c-pass"><b>2</b> เรื่องเล็ก แก้แล้ว</span>
+      <span class="count c-pass"><b>1</b> คำถามตัดสินแล้ว</span>
+    </div>
+    <p>เปิดอ่าน ส่งข้อความ ส่งลงบอร์ดระหว่างอ่าน หยุดส่งกลางทาง ถอดสาย ออกจากหน้า และปิดแอป ทำงานถูกต้องบนบอร์ดจริง ไม่มี process ของ engine หรือ avrdude ค้าง และพอร์ตถูกปล่อยทุกครั้ง พบบั๊ก 1 ข้อที่ทำให้ข้อความบรรทัดแรกหลังเปิดอ่านใหม่ผิด จุด UX 2 ข้อในหน้าเชื่อมบอร์ดตอนเสียบสายกลับ และเรื่องเล็ก 2 ข้อ (ข้อความเมื่อส่งไม่สำเร็จ และตัว "&#xFFFD;" หลังเปิดอ่าน) ทั้งหมดแก้แล้วและทดสอบซ้ำบนบอร์ดจริงผ่าน ส่วนคำถาม E ตัดสินแล้วว่าไม่เพิ่มปุ่มหยุดอ่าน ตาม mockup</p>
+    <p>รอบ 4 พฤศจิกายน: ตัวนับข้อความใหม่บนแท็บ Output และข้อความล่าสุดตอนยุบลิ้นชักทำงานบนบอร์ดจริง ส่งลงบอร์ด หยุดส่ง และเปิดอ่านยังทำงานหลังแก้ตามผลตรวจ และเมื่อหน้า Block Lab พังระหว่างส่ง การปิดแอปด้วย Alt+F4 หรือปุ่มปิดจะรอให้ส่งเสร็จ บอกเหตุผลบนจอ แล้วปิดเอง บอร์ดได้โปรแกรมใหม่ครบ</p>
+  </section>
+
+  <section aria-labelledby="results-title">
+    <h2 id="results-title">ผลแต่ละข้อ</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>สิ่งที่ทดสอบ</th><th>ผล</th><th>สิ่งที่วัดได้</th></tr></thead>
+        <tbody>
+          <tr><td class="n">1</td><td>เปิดอ่านข้อความจากบอร์ด</td><td><span class="pill c-pass">ผ่าน</span></td><td>ข้อความขึ้นทุก 1–2 วินาทีตามโปรแกรม</td></tr>
+          <tr><td class="n">2</td><td>ส่งข้อความไทย 60 ตัว</td><td><span class="pill c-pass">ผ่าน</span></td><td>180 ไบต์ ส่งได้ ขึ้นใน log ช่องพิมพ์ล้างเอง</td></tr>
+          <tr><td class="n">3</td><td>ส่งลงบอร์ดระหว่างเปิดอ่าน</td><td><span class="pill c-pass">ผ่าน</span></td><td>หยุดอ่าน ส่งเสร็จใน 8–10 วินาที แล้วอ่านต่อเอง · พบบั๊ก A (แก้แล้ว)</td></tr>
+          <tr><td class="n">4</td><td>หยุดส่งกลางขั้นส่งลงบอร์ด</td><td><span class="pill c-pass">ผ่าน</span></td><td>ถามยืนยันก่อนหยุด · ไม่มี process ค้าง · ลองอีกครั้งแล้วส่งผ่าน</td></tr>
+          <tr><td class="n">5</td><td>ถอดสาย USB ระหว่างอ่าน</td><td><span class="pill c-pass">ผ่าน</span></td><td>หยุดอ่าน ขึ้น "สายหลุด" engine ปิดเอง · พบจุด B และ C ตอนเสียบกลับ (แก้แล้ว)</td></tr>
+          <tr><td class="n">6</td><td>บอร์ดพิมพ์ไม่หยุด 3 นาที</td><td><span class="pill c-pass">ผ่าน</span></td><td>ประมาณ 48 บรรทัดต่อวินาที · หน่วยความจำนิ่ง · UI ตอบสนองปกติ</td></tr>
+          <tr><td class="n">7</td><td>ออกไปหน้าหลักระหว่างอ่าน</td><td><span class="pill c-pass">ผ่าน</span></td><td>ถามบันทึกงานก่อน · engine ปิดใน 0.14 วินาที</td></tr>
+          <tr><td class="n">8</td><td>ปิดแอประหว่างอ่าน</td><td><span class="pill c-pass">ผ่าน</span></td><td>ถามบันทึกงานเมื่อมีงานแก้ · ทุก process ปิดใน 0.34 วินาที</td></tr>
+          <tr><td class="n">9</td><td>สลับไป Arm Lab แล้วจับเวลาหยุดหุ่น</td><td><span class="pill c-warn">ผ่านบางส่วน</span></td><td>engine ของ Block Lab ปิดก่อนเข้า Arm Lab · ไม่ได้จับเวลาหยุดหุ่นเพราะไม่มีแขนกล</td></tr>
+          <tr><td class="n">10</td><td>แขนกลที่ใช้ชิป CH340 เสียบพร้อมกัน</td><td><span class="pill c-skip">ยังไม่ได้ทดสอบ</span></td><td>ไม่มีแขนกลเสียบ และห้ามเปิด Serial บนพอร์ตแขนกล</td></tr>
+          <tr><td class="n">11</td><td>macOS</td><td><span class="pill c-skip">ยังไม่ได้ทดสอบ</span></td><td>ไม่มีเครื่อง Mac</td></tr>
+          <tr><td class="n">12</td><td>ตัวนับข้อความใหม่บนแท็บ Output</td><td><span class="pill c-pass">ผ่าน</span></td><td>อยู่แท็บโค้ดแล้วป้ายนับขึ้นตามบรรทัดที่เข้ามา · กลับ Output ป้ายหาย</td></tr>
+          <tr><td class="n">13</td><td>ข้อความล่าสุดตอนยุบลิ้นชัก</td><td><span class="pill c-pass">ผ่าน</span></td><td>"ล่าสุด: สวัสดี · 106 บรรทัด" ชิดขวาเหมือนดีไซน์ · แสดงเฉพาะแท็บ Output</td></tr>
+          <tr><td class="n">14</td><td>ส่ง · หยุดส่ง · เปิดอ่าน หลังแก้ตามผลตรวจ</td><td><span class="pill c-pass">ผ่าน</span></td><td>ส่งระหว่างอ่าน 10 วินาทีแล้วอ่านต่อ · หยุดส่งใน 0.5 วินาที ไม่มี process ค้าง · ส่งใหม่ 8 วินาที</td></tr>
+          <tr><td class="n">15</td><td>หน้า Block Lab พังระหว่างส่ง แล้วปิดแอป</td><td><span class="pill c-pass">ผ่าน</span></td><td>Alt+F4 และปุ่มปิด: ข้อความรอส่งขึ้นภายใน 0.2 วินาที · แอปปิดเองหลังส่งจบ (7–8 วินาที) · บอร์ดได้โปรแกรมใหม่</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="findings-title">
+    <h2 id="findings-title">สิ่งที่ต้องแก้หรือตัดสินใจ</h2>
+
+    <article class="finding bug">
+      <div class="head"><span class="pill c-fail">บั๊ก A</span><span class="pill c-pass">แก้แล้ว</span><h3>เศษบรรทัดจากรอบอ่านก่อนไปต่อกับบรรทัดแรกของรอบใหม่</h3></div>
+      <div class="shots two">
+        <figure>
+          <img class="crop" src="img/bug1-glued-line.png" alt="ก่อนแก้: log แสดงบรรทัด สวัสดสวัสดี หลังบรรทัด เริ่มอ่านแล้ว" width="1000" height="130">
+          <figcaption>ก่อนแก้: "สวัสด" ไปต่อหน้า "สวัสดี" กลายเป็น "สวัสดสวัสดี"</figcaption>
+        </figure>
+        <figure>
+          <img class="crop" src="img/fix1-separate-line.png" alt="หลังแก้: บรรทัด ส แยกอยู่ก่อนบรรทัด เริ่มอ่านแล้ว" width="1000" height="130">
+          <figcaption>หลังแก้: เศษ "ส" อยู่บรรทัดของตัวเองก่อน "เริ่มอ่านแล้ว" (ตัว &#xFFFD; ดูจุด F)</figcaption>
+        </figure>
+      </div>
+      <dl>
+        <dt>อาการ</dt><dd>หยุดอ่านตอนบอร์ดพิมพ์ไปครึ่งบรรทัด ("สวัสด") พอเปิดอ่านใหม่ บรรทัดแรกขึ้นเป็น "สวัสดสวัสดี"</dd>
+        <dt>เกิดเมื่อ</dt><dd>ทุกครั้งที่การอ่านหยุดกลางบรรทัดแล้วเปิดใหม่ เช่น ส่งลงบอร์ดระหว่างอ่าน ถอดสาย หรือหยุดส่งแล้วกดเปิดอ่าน</dd>
+        <dt>สาเหตุ</dt><dd><code>open()</code> ใน <code>useBoardSerial.ts</code> สร้าง <code>TextDecoder</code> ใหม่ แต่ไม่ล้าง <code>partial</code> ของ log (<code>serialLog.ts</code>) เศษเดิมจึงถูกนำหน้าข้อความแรกที่ได้รับ ทั้งที่บอร์ดเริ่มโปรแกรมใหม่แล้ว</dd>
+        <dt>ความเสี่ยง</dt><dd>ไม่กระทบอุปกรณ์ แต่เด็กเห็นข้อความผิดจากที่บอร์ดส่ง</dd>
+        <dt>สิ่งที่แก้</dt><dd>เพิ่ม <code>endPartialLine()</code> ใน <code>serialLog.ts</code> ให้เศษที่ค้างกลายเป็นบรรทัดของมันเอง เรียกตอนเปิดอ่านรอบใหม่ (ก่อนบรรทัด "เริ่มอ่านแล้ว") และตอนอ่านไม่ได้ (เศษอยู่ก่อนบรรทัด error) · เพิ่ม test ใน <code>tests/block-lab-serial.test.mjs</code></dd>
+        <dt>ตรวจแล้ว</dt><dd><code>npm run typecheck</code> ผ่าน · <code>npm run build</code> ผ่าน (release asset check) · Block Lab tests 17/17 · build แอปใหม่ที่ <code>dist/desktop-serial-fix</code> แล้วส่งลงบอร์ดระหว่างที่บอร์ดพิมพ์ไม่หยุด 4 รอบ เศษ "ส", "สว", "สวัส" แยกบรรทัดทุกรอบ ไม่มีบรรทัดต่อกัน</dd>
+      </dl>
+    </article>
+
+    <article class="finding">
+      <div class="head"><span class="pill c-warn">จุด B</span><span class="pill c-pass">แก้แล้ว</span><h3>เสียบสายกลับแล้วเห็นบอร์ดเดียวกันซ้ำสองการ์ด</h3></div>
+      <figure>
+        <img class="crop" src="img/bug2-duplicate-cards.png" alt="ก่อนแก้: การ์ดบอร์ด CH340 COM3 สองใบ" width="1200" height="100">
+        <figcaption>ก่อนแก้: การ์ดซ้ำสองใบ</figcaption>
+      </figure>
+      <figure>
+        <img class="crop" src="img/fix2-one-card.png" alt="หลังแก้: การ์ดเดียวมีป้าย เสียบกลับแล้ว และหุ่นบอกให้กดยืนยัน" width="1240" height="360">
+        <figcaption>หลังแก้: การ์ดเดียวมีป้าย "เสียบกลับแล้ว" หุ่นและแถบด้านบนบอกให้กด "ใช้ตัวนี้" แล้วยืนยัน</figcaption>
+      </figure>
+      <dl>
+        <dt>อาการ</dt><dd>หน้าเชื่อมบอร์ดแสดงการ์ด "บอร์ดที่ใช้ชิป CH340 · COM3" สองใบ ใบเก่าขึ้น "สายหลุด · รอเสียบกลับ" ใบใหม่มีปุ่ม "ใช้ตัวนี้" ทั้งที่เป็นบอร์ดตัวเดียวกัน</dd>
+        <dt>ที่มา</dt><dd>ตั้งใจให้บอร์ดที่ไม่มีเลขประจำตัวต้องกดยืนยันใหม่ (กันส่งโปรแกรมเข้าแขนกลที่ใช้ชิปเดียวกัน) แต่การแสดงการ์ดเก่าค้างไว้ทำให้เด็กไม่รู้ว่าต้องกดใบไหน</dd>
+        <dt>สิ่งที่แก้</dt><dd>เมื่อมีอุปกรณ์ VID:PID เดียวกันกลับมาที่พอร์ตเดิม (<code>returnedBoard()</code> ใน <code>boardDevices.ts</code>) การ์ดเก่าจะหายไป เหลือการ์ดเดียวที่มีป้าย "เสียบกลับแล้ว" หุ่นพูดว่า "เห็นบอร์ดที่ช่องเดิมแล้ว" แถบด้านบนเปลี่ยนเป็น "…เสียบกลับที่ช่องเดิมแล้ว · รอยืนยันว่าเป็นตัวเดิม" และปุ่มล่างไม่ขึ้น "รอบอร์ดกลับมา…" แล้ว · เด็กยังต้องกด "ใช้ตัวนี้" และปุ่มยืนยันเหมือนเดิม กฎความปลอดภัยไม่เปลี่ยน</dd>
+      </dl>
+    </article>
+
+    <article class="finding">
+      <div class="head"><span class="pill c-warn">จุด C</span><span class="pill c-pass">แก้แล้ว</span><h3>ปุ่มยืนยันบอร์ดเดิมใช้ชื่อเดียวกันทั้งสองฝั่ง</h3></div>
+      <div class="shots two">
+        <figure>
+          <img class="crop" src="img/bug3-footer-label.png" alt="ก่อนแก้: ปุ่ม ตัด บอร์ดที่ใช้ชิป CH340 แล้วต่อ บอร์ดที่ใช้ชิป CH340 (COM3)" width="820" height="85">
+          <figcaption>ก่อนแก้</figcaption>
+        </figure>
+        <figure>
+          <img class="crop" src="img/fix3-confirm-label.png" alt="หลังแก้: ปุ่ม เชื่อมต่อ บอร์ดที่ใช้ชิป CH340 ตัวเดิม (COM3)" width="690" height="85">
+          <figcaption>หลังแก้</figcaption>
+        </figure>
+      </div>
+      <dl>
+        <dt>อาการ</dt><dd>ปุ่มล่างเขียนว่า "ตัด บอร์ดที่ใช้ชิป CH340 แล้วต่อ บอร์ดที่ใช้ชิป CH340 (COM3)" อ่านแล้วเหมือนเปลี่ยนไปบอร์ดอื่น</dd>
+        <dt>สิ่งที่แก้</dt><dd>เมื่อเลือกการ์ดที่เสียบกลับ ปุ่มเป็น "เชื่อมต่อ {ชื่อบอร์ด} ตัวเดิม (COM3)" (key <code>blockLab.connect.footer.confirmBack</code> ครบ th/en/zh) · การเปลี่ยนไปบอร์ดอื่นยังใช้ข้อความ "ตัด … แล้วต่อ …" เหมือนเดิม</dd>
+        <dt>ตรวจแล้ว (B และ C)</dt><dd><code>npm run typecheck</code> ผ่าน · i18n 14/14 · Block Lab tests 18/18 (เพิ่ม test การ์ดเดียวตอนเสียบกลับ) · build แอปที่ <code>dist/desktop-connect-fix</code> (ผ่าน release asset check) · ดูใน preview ด้วยอุปกรณ์จำลอง และลองบนแอปจริง: ถอดสาย COM3 แล้วเสียบกลับ เห็นการ์ดเดียว กดยืนยันแล้วขึ้น "บอร์ดกลับมาแล้ว!"</dd>
+      </dl>
+    </article>
+
+    <article class="finding minor">
+      <div class="head"><span class="pill c-skip">เล็ก D</span><span class="pill c-pass">แก้แล้ว</span><h3>ส่งข้อความไม่สำเร็จทุกกรณีขึ้นว่า "สาย USB อาจหลุด"</h3></div>
+      <figure>
+        <img class="crop" src="img/fix4-too-long.png" alt="หลังแก้: บรรทัด ส่งไม่ได้ ข้อความยาวเกินไป ลองแบ่งเป็นข้อความสั้นลง E-LONG" width="1880" height="80">
+        <figcaption>หลังแก้: ข้อความยาวเกินบอกตรงสาเหตุ พร้อมรหัส E-LONG</figcaption>
+      </figure>
+      <dl>
+        <dt>อาการ</dt><dd>ใส่ข้อความ 90 ตัว (270 ไบต์ เกินขีด 256 ไบต์ของ engine) แล้ว engine ปฏิเสธด้วย <code>INVALID_INPUT</code> แต่ log ขึ้น "สาย USB อาจหลุด" (E-USB) การอ่านยังทำงานต่อปกติ</dd>
+        <dt>โอกาสเกิด</dt><dd>ต่ำ ช่องพิมพ์จำกัด 60 ตัวอยู่แล้ว ข้อความ 90 ตัวนี้ใส่ผ่านเครื่องมือทดสอบที่ข้ามขีดจำกัดของช่อง</dd>
+        <dt>สิ่งที่แก้</dt><dd><code>sendFailure()</code> ใน <code>useBoardSerial.ts</code> เลือกข้อความตามรหัส: <code>TRANSPORT_ERROR</code> = "สาย USB อาจหลุด" (E-USB) · <code>INVALID_INPUT</code> = "ข้อความยาวเกินไป ลองแบ่งเป็นข้อความสั้นลง" (E-LONG) · อื่นๆ = "โปรแกรมขัดข้อง ลองส่งอีกครั้ง" (E-APP) · คำแปลครบ th/en/zh</dd>
+        <dt>ตรวจแล้ว</dt><dd>typecheck · i18n 14/14 · ลองบนแอปจริงด้วยข้อความ 270 ไบต์ ขึ้น E-LONG ตามภาพ</dd>
+      </dl>
+    </article>
+
+    <article class="finding minor">
+      <div class="head"><span class="pill c-skip">คำถาม E</span><span class="pill c-pass">ตัดสินแล้ว</span><h3>ระหว่างอ่านไม่มีปุ่มหยุดอ่าน</h3></div>
+      <dl>
+        <dt>สิ่งที่เห็น</dt><dd>เมื่อเปิดอ่านแล้ว แผง Output มีแค่ "เลื่อนตาม" และ "ล้าง" การอ่านหยุดได้ด้วยการออกจาก Block Lab เลือกบอร์ดอื่น หรือถอดสายเท่านั้น ระหว่างนั้นโปรแกรมอื่นเช่น Arduino IDE ใช้ COM3 ไม่ได้</dd>
+        <dt>การตัดสิน</dt><dd>ไม่เพิ่มปุ่ม "หยุดอ่าน" ตาม mockup TerminalA2 · ยอมรับว่าระหว่างอ่าน โปรแกรมอื่นใช้พอร์ตนั้นไม่ได้ (บันทึกเป็น S7-3 ในรายการคำถามที่ตัดสินแล้ว)</dd>
+      </dl>
+    </article>
+
+    <article class="finding minor">
+      <div class="head"><span class="pill c-skip">เล็ก F</span><span class="pill c-pass">แก้แล้ว</span><h3>บรรทัดแรกหลังเปิดอ่านใหม่อาจขึ้นต้นด้วย "&#xFFFD;"</h3></div>
+      <dl>
+        <dt>อาการ</dt><dd>พบ 1 ใน 4 รอบตอนบอร์ดพิมพ์ไม่หยุด: บรรทัดแรกหลัง "เริ่มอ่านแล้ว" เป็น "&#xFFFD;สวัสดี"</dd>
+        <dt>สาเหตุ (วัดจริง)</dt><dd>เปิด COM3 ตรงๆ 6 รอบแล้วจดเวลาของทุกไบต์ รอบที่บอร์ด reset จริงได้ไบต์ขยะ <code>00 80 1E 66 00 80 9E 98 00 80 9E E0 1E</code> ที่ 23 ms หลังเปิดพอร์ต ส่วนบรรทัดแรกของโปรแกรมมาที่ 1,597 ms (bootloader รอก่อนเริ่มโปรแกรม) ไบต์ขยะนี้เกิดจากสัญญาณตอน UNO reset และถอดรหัสเป็น "&#xFFFD;"</dd>
+        <dt>สิ่งที่แก้</dt><dd>engine ทิ้งไบต์ที่มาถึงใน 250 ms แรกหลังเปิดพอร์ต (<code>sessionSettle</code> ใน <code>engines/mixly/serial_session.go</code>) ช่วงนี้ยังไม่มีข้อความจากโปรแกรมจริงเพราะ bootloader รอประมาณ 1 วินาที บอร์ดที่ไม่ reset ตอนเปิดพอร์ตจะเสียข้อความได้ไม่เกิน 250 ms แรก · เขียนลง <code>docs/API.md</code> แล้ว · เพิ่ม Go test</dd>
+        <dt>ตรวจแล้ว</dt><dd>mixly <code>build-engine -Test</code> ผ่าน (Go test + IPC 13/13) · build แอปใหม่ที่ <code>dist/desktop-serial-df</code> แล้วส่งลงบอร์ดระหว่างที่บอร์ดพิมพ์ไม่หยุด 5 รอบ บรรทัดแรกหลังเปิดอ่านเป็น "สวัสดี" ทุกรอบ ไม่มี "&#xFFFD;" ใน log เลย</dd>
+      </dl>
+    </article>
+  </section>
+
+  <section aria-labelledby="detail-title">
+    <h2 id="detail-title">รายละเอียดพร้อมภาพหน้าจอ</h2>
+    <p class="note">กดที่ภาพเพื่อเปิดขนาดเต็ม 1920×1080</p>
+
+    <article class="test" id="t1">
+      <div class="head"><span class="pill c-pass">ผ่าน</span><h3>1. เปิดอ่านข้อความจากบอร์ด</h3></div>
+      <ul>
+        <li>เลือกบอร์ด CH340 COM3 กด "ใช้ตัวนี้" กด "เชื่อมต่อ" แล้วกด "เปิดอ่านข้อความจากบอร์ด"</li>
+        <li>ขึ้นบรรทัดระบบ "เริ่มอ่านแล้ว · โปรแกรมบนบอร์ดอาจเริ่มใหม่" ตามด้วยข้อความจากบอร์ดพร้อมเวลา ป้าย "จากบอร์ด Uno" ขึ้นข้างหัวข้อ</li>
+      </ul>
+      <div class="shots">
+        <figure>
+          <a href="img/01-read-open.png" target="_blank" rel="noopener"><img src="img/01-read-open.png" alt="หน้า Block Lab แผง Output แสดง สวัสดี ทุกวินาที" width="1920" height="1080" loading="lazy"></a>
+          <figcaption>เปิดอ่านแล้ว ข้อความ "สวัสดี" ขึ้นทุก 1 วินาทีตามโปรแกรม</figcaption>
+        </figure>
+      </div>
+    </article>
+
+    <article class="test" id="t2">
+      <div class="head"><span class="pill c-pass">ผ่าน</span><h3>2. ส่งข้อความไทย 60 ตัว</h3></div>
+      <ul>
+        <li>พิมพ์ "ทดสอบ" 12 ครั้ง (60 ตัวอักษร 180 ไบต์) แล้วกด Enter</li>
+        <li>ข้อความขึ้นใน log ด้วยลูกศรขาออก ช่องพิมพ์ล้างเอง การอ่านทำงานต่อ</li>
+        <li>ช่องพิมพ์ตั้ง <code>maxLength</code> 60 ตัว จึงพิมพ์หรือวางเกินไม่ได้ (ดูจุด D)</li>
+      </ul>
+      <div class="shots">
+        <figure>
+          <a href="img/02-send-thai.png" target="_blank" rel="noopener"><img src="img/02-send-thai.png" alt="log มีบรรทัดขาออก ทดสอบ 12 ครั้ง ระหว่างบรรทัด สวัสดี" width="1920" height="1080" loading="lazy"></a>
+          <figcaption>บรรทัดที่มีลูกศรขึ้น คือข้อความที่ส่งเข้าบอร์ด</figcaption>
+        </figure>
+      </div>
+    </article>
+
+    <article class="test" id="t3">
+      <div class="head"><span class="pill c-pass">ผ่าน</span><h3>3. ส่งลงบอร์ดระหว่างเปิดอ่าน</h3></div>
+      <ul>
+        <li>กด "ส่งลงบอร์ด" ขณะกำลังอ่าน แอปหยุดอ่านเพื่อคืนพอร์ต แปลงโค้ด (ขั้น 1) แล้วส่ง (ขั้น 2)</li>
+        <li>ส่งสำเร็จใน 8–10 วินาที (แปลงโค้ดครั้งต่อไปใช้ cache ประมาณ 2.5 วินาที) แล้วเปิดอ่านต่อเองบนบอร์ดและพอร์ตเดิม</li>
+        <li>ส่งลงบอร์ดรวม 8 ครั้งในการทดสอบนี้ สำเร็จ 6 หยุดกลางทางตามที่ตั้งใจ 2 · ส่งระหว่างอ่านที่ปล่อยให้จบ 3 ครั้ง อ่านต่อเองทุกครั้ง · ช่องพิมพ์ปิดระหว่างส่ง</li>
+        <li>บรรทัด "สวัสดสวัสดี" ในภาพที่สามคือบั๊ก A</li>
+      </ul>
+      <div class="shots two">
+        <figure>
+          <a href="img/03a-send-compile.png" target="_blank" rel="noopener"><img src="img/03a-send-compile.png" alt="การ์ด กำลังแปลงโค้ด ขั้นที่ 1 จาก 2" width="1920" height="1080" loading="lazy"></a>
+          <figcaption>ขั้น 1 แปลงโค้ด · บรรทัดล่างสุด "สวัสด" คือเศษที่ถูกตัดตอนหยุดอ่าน</figcaption>
+        </figure>
+        <figure>
+          <a href="img/03b-send-upload.png" target="_blank" rel="noopener"><img src="img/03b-send-upload.png" alt="การ์ด กำลังส่งลงบอร์ด ขั้นที่ 2 จาก 2" width="1920" height="1080" loading="lazy"></a>
+          <figcaption>ขั้น 2 ส่งลงบอร์ด พร้อมคำเตือน "อย่าถอดสาย USB ระหว่างส่ง"</figcaption>
+        </figure>
+        <figure>
+          <a href="img/03c-send-success-resumed.png" target="_blank" rel="noopener"><img src="img/03c-send-success-resumed.png" alt="การ์ด ส่งลงบอร์ดสำเร็จ และ log เริ่มอ่านใหม่" width="1920" height="1080" loading="lazy"></a>
+          <figcaption>ส่งสำเร็จ แอปเปิดอ่านต่อเอง ("เริ่มอ่านแล้ว")</figcaption>
+        </figure>
+      </div>
+    </article>
+
+    <article class="test" id="t4">
+      <div class="head"><span class="pill c-pass">ผ่าน</span><h3>4. หยุดส่งกลางขั้นส่งลงบอร์ด</h3></div>
+      <ul>
+        <li>กด "ยกเลิก" ตอนขั้น 2 แอปถามก่อนว่าจะ "ส่งต่อ" หรือ "หยุดส่ง" พร้อมเตือนว่าบอร์ดอาจไม่มีโปรแกรมที่ใช้ได้</li>
+        <li>กด "หยุดส่ง" ประมาณ 3.5 วินาทีหลังเริ่ม การ์ดขึ้น "หยุดส่งแล้ว" ไม่มี <code>mixly-engine</code> หรือ avrdude ค้าง</li>
+        <li>แอปไม่เปิดอ่านต่อเองหลังหยุด (ถูกต้องตามที่ออกแบบ) · กด "ลองอีกครั้ง" แล้วส่งผ่าน บอร์ดกลับมาทำงานปกติ</li>
+      </ul>
+      <div class="shots two">
+        <figure>
+          <a href="img/04a-cancel-confirm.png" target="_blank" rel="noopener"><img src="img/04a-cancel-confirm.png" alt="การ์ดถามยืนยัน ส่งต่อ หรือ หยุดส่ง" width="1920" height="1080" loading="lazy"></a>
+          <figcaption>ถามยืนยันก่อนหยุด ปุ่มหลักคือ "ส่งต่อ"</figcaption>
+        </figure>
+        <figure>
+          <a href="img/04b-cancel-stopped.png" target="_blank" rel="noopener"><img src="img/04b-cancel-stopped.png" alt="การ์ด หยุดส่งแล้ว พร้อมปุ่ม ลองอีกครั้ง" width="1920" height="1080" loading="lazy"></a>
+          <figcaption>หยุดแล้ว บอกว่าไม่รู้ว่าบอร์ดมีโปรแกรมอะไร และมีปุ่ม "ลองอีกครั้ง"</figcaption>
+        </figure>
+      </div>
+    </article>
+
+    <article class="test" id="t5">
+      <div class="head"><span class="pill c-pass">ผ่าน</span><h3>5. ถอดสาย USB ระหว่างอ่าน</h3></div>
+      <ul>
+        <li>ผู้ดูแลถอดสายขณะกำลังอ่าน แอปหยุดอ่าน ขึ้น "อ่านข้อความจากบอร์ดต่อไม่ได้ สาย USB อาจหลุด" (E-USB) และป้ายบอร์ดเป็น "สายหลุด"</li>
+        <li>engine ปิดพอร์ตและจบ process เอง</li>
+        <li>เสียบกลับแล้วต้องเลือกบอร์ดใหม่ (ตั้งใจไว้สำหรับบอร์ดที่ไม่มีเลขประจำตัว) ระหว่างนั้นเห็นจุด B และ C · เลือกใหม่แล้วกลับมาอ่านได้ปกติ</li>
+        <li>ทดสอบ 2 รอบ ผลเหมือนกัน</li>
+      </ul>
+      <div class="shots two">
+        <figure>
+          <a href="img/05a-unplug.png" target="_blank" rel="noopener"><img src="img/05a-unplug.png" alt="ป้ายบอร์ด สายหลุด และบรรทัด error E-USB ใน log" width="1920" height="1080" loading="lazy"></a>
+          <figcaption>ถอดสายแล้ว: ป้าย "สายหลุด" ด้านบน และบรรทัดสีแดงใน log</figcaption>
+        </figure>
+        <figure>
+          <a href="img/05b-replug-duplicate.png" target="_blank" rel="noopener"><img src="img/05b-replug-duplicate.png" alt="หน้าเชื่อมบอร์ดมีการ์ด CH340 COM3 สองใบ" width="1920" height="1080" loading="lazy"></a>
+          <figcaption>เสียบกลับแล้ว: การ์ดซ้ำสองใบ (จุด B)</figcaption>
+        </figure>
+        <figure>
+          <a href="img/05c-replug-footer.png" target="_blank" rel="noopener"><img src="img/05c-replug-footer.png" alt="ปุ่มล่าง ตัด บอร์ด CH340 แล้วต่อ บอร์ด CH340" width="1920" height="1080" loading="lazy"></a>
+          <figcaption>กด "ใช้ตัวนี้" แล้ว: ปุ่มล่างชื่อซ้ำกันทั้งสองฝั่ง (จุด C)</figcaption>
+        </figure>
+      </div>
+    </article>
+
+    <article class="test" id="t6">
+      <div class="head"><span class="pill c-pass">ผ่าน</span><h3>6. บอร์ดพิมพ์ไม่หยุด 3 นาที</h3></div>
+      <ul>
+        <li>ส่งโปรแกรมที่ <code>println</code> โดยไม่มี delay (ประมาณ 48 บรรทัดต่อวินาทีที่ 9600 baud) แล้วเปิดอ่าน 3 นาที</li>
+        <li>วัดทุก 30 วินาที: แอป 43–44 MB นิ่ง · WebView ประมาณ 600 MB นิ่ง · <code>mixly-engine</code> 12 MB ขึ้นเป็น 16 MB · UI ตอบภายใน 0.3–0.4 วินาที · เวลาใน log เดินต่อเนื่อง</li>
+        <li>ไม่มีตัวอักษรเสีย (U+FFFD) แม้ข้อความไทย 3 ไบต์ต่อตัวจะถูกตัดข้ามรอบอ่าน</li>
+        <li>บรรทัดสุดท้ายที่เห็นไม่ครบ เช่น "ส" คือบรรทัดที่ยังมาไม่ครบ ตั้งใจแสดงไว้จนกว่าจะขึ้นบรรทัดใหม่</li>
+        <li>engine ใช้หน่วยความจำเพิ่ม 4 MB ใน 3 นาที ควรทดสอบนานกว่านี้เพื่อดูว่าหยุดเพิ่มหรือไม่</li>
+      </ul>
+      <div class="shots">
+        <figure>
+          <a href="img/06-flood-read.png" target="_blank" rel="noopener"><img src="img/06-flood-read.png" alt="log เต็มไปด้วย สวัสดี เวลา 16:44" width="1920" height="1080" loading="lazy"></a>
+          <figcaption>หลังบอร์ดพิมพ์ไม่หยุด 3 นาที ข้อความยังเข้ามาปกติ (เวลาใน log นับจากเปิด log ครั้งแรก)</figcaption>
+        </figure>
+      </div>
+    </article>
+
+    <article class="test" id="t7">
+      <div class="head"><span class="pill c-pass">ผ่าน</span><h3>7. ออกไปหน้าหลักระหว่างอ่าน</h3></div>
+      <ul>
+        <li>กดปุ่มหน้าหลักขณะกำลังอ่าน แอปถาม "บันทึกงานก่อนออกจากหน้านี้ไหม?"</li>
+        <li>กด "ไม่บันทึกงาน" แล้ว <code>mixly-engine</code> ปิดภายใน 0.14 วินาที</li>
+      </ul>
+      <div class="shots">
+        <figure>
+          <a href="img/07a-leave-guard.png" target="_blank" rel="noopener"><img src="img/07a-leave-guard.png" alt="dialog มีการแก้ไขที่ยังไม่ได้บันทึก ตอนออกจากหน้า" width="1920" height="1080" loading="lazy"></a>
+          <figcaption>ถามก่อนออก ระหว่างนี้ยังอ่านอยู่</figcaption>
+        </figure>
+      </div>
+    </article>
+
+    <article class="test" id="t8">
+      <div class="head"><span class="pill c-pass">ผ่าน</span><h3>8. ปิดแอประหว่างอ่าน</h3></div>
+      <ul>
+        <li>ไม่มีงานแก้: กดปิดแอปแล้วปิดทันที ไม่มี engine หรือ WebView ค้าง</li>
+        <li>มีงานแก้: แอปถาม "บันทึกงานก่อนปิดโปรแกรมไหม?" กด "อยู่ต่อ" แล้วยังอ่านต่อ (เวลา 0:21 เดินเป็น 0:24)</li>
+        <li>กดปิดอีกครั้งแล้วเลือก "ไม่บันทึกงาน" แอปและ engine ปิดทั้งหมดใน 0.34 วินาที</li>
+      </ul>
+      <div class="shots">
+        <figure>
+          <a href="img/08-close-guard.png" target="_blank" rel="noopener"><img src="img/08-close-guard.png" alt="dialog บันทึกงานก่อนปิดโปรแกรมไหม" width="1920" height="1080" loading="lazy"></a>
+          <figcaption>dialog ตอนปิดแอปในหน้าต่างจริง (ข้อนี้ค้างตรวจจากเฟส 4.5 ด้วย)</figcaption>
+        </figure>
+      </div>
+    </article>
+
+    <article class="test" id="t9">
+      <div class="head"><span class="pill c-warn">ผ่านบางส่วน</span><h3>9. สลับไป Arm Lab</h3></div>
+      <ul>
+        <li>ในแอปต้องผ่านหน้าหลักก่อนเข้า Arm Lab การอ่านของ Block Lab จึงปิดตั้งแต่ออกจากหน้า (0.14 วินาที ตามข้อ 7)</li>
+        <li>เปิด Arm Lab ได้ ไม่มี engine ของ Block Lab ค้าง ไม่ได้กดเชื่อมหุ่น</li>
+        <li>ยังไม่ได้จับเวลาคำสั่งหยุดหุ่นจริง ต้องมีแขนกลเสียบ และต้องทดสอบโดยไม่เปิด Serial บนพอร์ตแขนกล</li>
+      </ul>
+      <div class="shots">
+        <figure>
+          <a href="img/09-arm-lab.png" target="_blank" rel="noopener"><img src="img/09-arm-lab.png" alt="หน้า Arm Lab งานของฉัน ยังไม่ได้ต่อหุ่น" width="1920" height="1080" loading="lazy"></a>
+          <figcaption>Arm Lab เปิดได้ปกติหลังออกจาก Block Lab</figcaption>
+        </figure>
+      </div>
+    </article>
+
+    <article class="test" id="t10">
+      <div class="head"><span class="pill c-skip">ยังไม่ได้ทดสอบ</span><h3>10–11. แขนกล CH340 และ macOS</h3></div>
+      <ul>
+        <li>แขนกลที่ใช้ชิป CH340: ต้องเสียบแขนกลกับ UNO พร้อมกัน ใช้ Arm Lab กับแขนกลก่อน แล้วยืนยันว่า Block Lab ปฏิเสธการส่งและการเปิดอ่านพอร์ตนั้น (E-ARM) ห้ามเปิด Serial บนพอร์ตแขนกลเอง</li>
+        <li>macOS: ยังไม่มีเครื่อง ส่งลงบอร์ดยังไม่ route บน macOS (อยู่ในตาราง "เลื่อนไปทำทีหลัง" เฟส 6)</li>
+      </ul>
+    </article>
+  </section>
+
+  <section aria-labelledby="round2-title">
+    <h2 id="round2-title">รอบ 4 พฤศจิกายน: หลังแก้ตามผลตรวจ</h2>
+    <p>ก่อนทดสอบรอบนี้ hardware-safety-reviewer ตรวจตัวกันการส่งฝั่ง host (ผล: ปลอดภัยแบบมีเงื่อนไข ไม่มี blocker) และ rules-reviewer ตรวจ diff ทั้งรอบตาม AGENTS.md (ผล: ผ่านแบบมีข้อแก้ ไม่มีเรื่อง hardware) ข้อที่แก้ก่อนทดสอบ:</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>จาก</th><th>สิ่งที่แก้</th></tr></thead>
+        <tbody>
+          <tr><td>hardware-safety</td><td><code>StopUpload</code> หยุดเฉพาะการส่งลงบอร์ด ถ้าการส่งจบไปแล้วจะไม่ไปยกเลิกคำขอถัดไป เช่น คำสั่งของหุ่น</td></tr>
+          <tr><td>hardware-safety</td><td>host บอกได้ว่ากำลังส่งอยู่ (<code>UploadRunning</code>) หน้าต่างปิดแอปจึงขึ้นข้อความรอส่ง แม้หน้า Block Lab พังหรือโหลดใหม่ไปแล้ว</td></tr>
+          <tr><td>hardware-safety</td><td>ตัวกันออกจากหน้า/ปิดแอปเริ่มตั้งแต่ตรวจก่อนส่ง ไม่ใช่เริ่มตอนแปลงโค้ด จึงไม่มีช่องให้หน้าต่างปิดก่อนการส่งเริ่ม</td></tr>
+          <tr><td>hardware-safety</td><td>หมดเวลาหรือเครื่องมือขัดข้องระหว่างขั้นส่ง บอกว่า "บอร์ดอาจมีโปรแกรมไม่ครบ ต้องส่งใหม่"</td></tr>
+          <tr><td>hardware-safety</td><td>ตรวจ "กำลังแปลงโค้ด/ส่งอยู่" ใต้ lock ของ Serial ก่อนเปิดพอร์ต · เวลา 2 นาทีเริ่มนับหลังปล่อยพอร์ต Serial · เอกสารบอกว่าคำสั่งหยุดหุ่นอาจรอหลังการส่งได้ราว 2 นาที</td></tr>
+          <tr><td>rules</td><td>คอมเมนต์ที่มีรหัสงาน วันที่ หรือข้อความตกยุค · ตารางรหัส E-CHK ในคู่มือครู · <code>verify.ps1</code> รัน test ของ Block Lab ครบ 4 ไฟล์ · ชื่อ placeholder ของรหัสข้อผิดพลาดให้ตรงกันทุกภาษา</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">ผ่านก่อน build: mixly <code>build-engine -Test</code> (Go + IPC 13/13) · app <code>go vet</code>/<code>go test</code> · typecheck · i18n 14/14 · frontend 65/65 · desktop build ผ่าน release asset check</p>
+
+    <article class="test" id="t12">
+      <div class="head"><span class="pill c-pass">ผ่าน</span><h3>12. ตัวนับข้อความใหม่บนแท็บ Output</h3></div>
+      <ul>
+        <li>ต่อบล็อก <code>Serial.println("สวัสดี")</code> กับ <code>delay(1000)</code> ด้วยการแตะบล็อกในรายการ เลือกบอร์ด CH340 COM3 แล้วเปิดอ่าน</li>
+        <li>สลับไปแท็บโค้ด ป้ายบนแท็บ Output นับ 5, 6 แล้ว 33 ตามบรรทัดที่เข้ามา (ชื่อสำหรับโปรแกรมอ่านจอ "Output มีข้อความใหม่ N บรรทัด")</li>
+        <li>กลับแท็บ Output แล้วป้ายหาย</li>
+      </ul>
+      <figure>
+        <img class="crop" src="img/12-output-unread.png" alt="ลิ้นชักแท็บโค้ด Arduino C++ ป้ายบนแท็บ Output แสดง 6" width="1920" height="310" loading="lazy">
+        <figcaption>อยู่แท็บโค้ด ป้ายสีน้ำเงินนับบรรทัดที่ยังไม่ได้ดู</figcaption>
+      </figure>
+    </article>
+
+    <article class="test" id="t13">
+      <div class="head"><span class="pill c-pass">ผ่าน</span><h3>13. ข้อความล่าสุดตอนยุบลิ้นชัก</h3></div>
+      <ul>
+        <li>ยุบลิ้นชักขณะอยู่แท็บ Output แถวแท็บขึ้น "ล่าสุด: สวัสดี · 106 บรรทัด" ชิดขวาข้างปุ่มส่งลงบอร์ด ตรงกับดีไซน์</li>
+        <li>ตอนยุบอยู่แท็บโค้ดไม่แสดงข้อความนี้ เหมือนดีไซน์ (แสดงเฉพาะแท็บ Output)</li>
+      </ul>
+      <figure>
+        <img class="crop" src="img/13-drawer-peek.png" alt="แถวแท็บตอนยุบ ป้าย Output 5 และข้อความ ล่าสุด สวัสดี 106 บรรทัด" width="1920" height="80" loading="lazy">
+        <figcaption>ลิ้นชักยุบ ป้ายนับยังเดินต่อ และเห็นข้อความล่าสุด</figcaption>
+      </figure>
+    </article>
+
+    <article class="test" id="t14">
+      <div class="head"><span class="pill c-pass">ผ่าน</span><h3>14. ส่ง · หยุดส่ง · เปิดอ่าน หลังแก้</h3></div>
+      <ul>
+        <li>ส่งลงบอร์ดระหว่างอ่าน: แปลงโค้ดราว 4 วินาที ส่งเสร็จราว 10 วินาที แล้วเปิดอ่านต่อเอง · ส่งรอบสองใช้ cache เสร็จใน 3 วินาที</li>
+        <li>หยุดส่ง: กด "ยกเลิก" 1.5 วินาทีหลังขึ้น "กำลังส่งลงบอร์ด…" กด "หยุดส่ง" แล้วการ์ดขึ้น "หยุดส่งแล้ว" ใน 0.5 วินาที ไม่มี <code>mixly-engine</code>, arduino-cli หรือ avrdude ค้าง และแอปไม่เปิดอ่านต่อเอง</li>
+        <li>"ลองอีกครั้ง" ส่งสำเร็จใน 8 วินาที เปิดอ่านแล้วได้ "สวัสดี" ทุกวินาที</li>
+        <li>เวลาในบันทึกคือเวลาที่แอปอ่านได้ (อ่านทุก 300 ms) บางบรรทัดจึงขึ้นวินาทีเดียวกันหรือข้ามหนึ่งวินาที</li>
+      </ul>
+      <div class="shots">
+        <figure>
+          <a href="img/14-stop-send.png" target="_blank" rel="noopener"><img src="img/14-stop-send.png" alt="การ์ด หยุดส่งแล้ว พร้อมปุ่ม ลองอีกครั้ง และปุ่ม เปิดอ่าน ในแผง Output" width="1920" height="1080" loading="lazy"></a>
+          <figcaption>หยุดส่งแล้ว บอกว่าไม่รู้ว่าบอร์ดมีโปรแกรมอะไร และมีปุ่ม "เปิดอ่าน" ให้กดเอง</figcaption>
+        </figure>
+      </div>
+    </article>
+
+    <article class="test" id="t15">
+      <div class="head"><span class="pill c-pass">ผ่าน</span><h3>15. หน้า Block Lab พังระหว่างส่ง แล้วปิดแอป</h3></div>
+      <ul>
+        <li>build แยกที่ <code>dist/desktop-crash-test</code> โดยใส่ <code>throw</code> ชั่วคราวในการ์ดส่งตอนขั้นส่งลงบอร์ด แล้วลบออกจาก source ทันทีหลัง build (ค้นคำในโค้ดและ frontend ที่ build ใหม่แล้วไม่เจอ)</li>
+        <li>Alt+F4: หน้าพังที่ 3.1 วินาที → กด "ปิดทันที" → ข้อความ "กำลังรอส่งลงบอร์ดให้เสร็จก่อน (ไม่เกิน 2 นาที) แล้วแอปจะปิดเอง · อย่าถอดสาย USB" ขึ้นที่ 3.3 วินาที ขณะเครื่องมือส่งยังทำงาน → แอปปิดเองที่ 7.9 วินาที หลังเครื่องมือจบ ไม่มี engine ค้าง</li>
+        <li>อ่าน COM3 หลังปิดแอป ได้ "สวัสดีสวัสดี…" ไม่ขึ้นบรรทัด ตรงกับโปรแกรมใหม่ (<code>Serial.print</code>)</li>
+        <li>ปุ่มปิดแอป (ยังอยู่บนหน้าที่พัง): ข้อความรอส่งขึ้นที่ 2.4 วินาที แอปปิดเองที่ 7.0 วินาที บอร์ดได้โปรแกรม <code>println</code> "สวัสดี" กลับมาเหมือนก่อนทดสอบ</li>
+        <li>ข้อสังเกต: หน้าต่างปิดแอปของแอปหลักยังมีประโยคเรื่องหยุดหุ่นและการบันทึกที่ไม่ตรงกับ Block Lab</li>
+      </ul>
+      <figure>
+        <img class="crop" src="img/15-crash-close-note.png" alt="หน้าต่าง ปิดแอป แสดงข้อความ กำลังรอส่งลงบอร์ดให้เสร็จก่อน ไม่เกิน 2 นาที" width="1200" height="600" loading="lazy">
+        <figcaption>หลังหน้าพัง หน้าต่างปิดแอปบอกว่ากำลังรอส่งลงบอร์ด ปุ่มทั้งหมดรอจนส่งเสร็จ</figcaption>
+      </figure>
+    </article>
+  </section>
+
+  <section aria-labelledby="scope-title">
+    <h2 id="scope-title">ขอบเขตของผลนี้</h2>
+    <ul class="note" style="margin:0;padding-left:22px;display:grid;gap:4px;max-width:70ch">
+      <li>ทดสอบกับบอร์ด UNO โคลน CH340 ตัวเดียว บน Windows 11 เครื่องเดียว ยังไม่ได้ลอง UNO แท้ (ATmega16U2)</li>
+      <li>ใช้ตัวแอปจาก source ที่ยังไม่ commit · ยังไม่ได้ทำ installer จากโค้ดชุดนี้</li>
+      <li>ทุกขั้นกดผ่านปุ่มในหน้าต่างแอปจริง ยกเว้นการใส่ข้อความ 90 ตัวในจุด D ที่ใส่ค่าผ่านเครื่องมือทดสอบโดยตรง</li>
+      <li>บั๊ก A, จุด B, C, D, F แก้แล้วในโค้ดที่ยังไม่ commit · คำถาม E ตัดสินแล้วว่าคงตาม mockup</li>
+      <li>ข้อ 12–15 ทดสอบด้วยการกดผ่าน Windows UI Automation ทั้งหมด ไม่มีคนกด · ข้อ 15 ใช้ build ที่มีข้อผิดพลาดทดลอง ซึ่งไม่ใช่ตัวที่จะแจก</li>
+      <li>ยังไม่ได้ทดสอบ: กด F5/Ctrl+R กลางการส่ง · ถอดสายกลางการส่ง · End task/logoff ระหว่างส่ง · เครื่องช้าที่แปลง U8g2 นาน · แขนกลกับ UNO CH340 เสียบพร้อมกัน</li>
+    </ul>
+  </section>
+</div>

@@ -1,0 +1,948 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>1D · Block Studio 1C – เมนูตาม Mixly</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&amp;family=Noto+Sans+Thai:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1866C9}a:hover{color:#0F4C99}
+button{font-family:inherit;cursor:pointer}
+button:disabled{cursor:not-allowed}
+</style>
+</helmet>
+<div ref="{{rootRef}}" onPointerMove="{{onMove}}" onPointerUp="{{onUp}}" onPointerCancel="{{onUp}}" onPointerDown="{{onRootDown}}" style="width: 1440px; height: 900px; display: flex; flex-direction: column; background: #FFFFFF; color: #14243D; font-family: 'Noto Sans Thai', 'Leelawadee UI', Tahoma, sans-serif; overflow: hidden; position: relative; user-select: none">
+
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true"><defs><pattern id="sbHatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="7" height="7" fill="#E4E7EC"></rect><path d="M0 0 L0 7" stroke="#EDF0F4" stroke-width="3"></path></pattern></defs></svg>
+
+  <!-- Top bar -->
+  <header style="height: 60px; flex-shrink: 0; display: flex; align-items: center; gap: 20px; padding: 0 20px; border-bottom: 2px solid #EEF1F5; box-sizing: border-box">
+    <button aria-label="เมนูครู (ต้องใส่รหัส)" style="width: 44px; height: 44px; border: 2px solid #DCE3EC; border-bottom-width: 4px; border-radius: 12px; background: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#14243D" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button aria-label="เมนูครู (ต้องใส่รหัส)" style="width: 44px; height: 44px; border: 2px solid #DCE3EC; border-bottom-width: 4px; border-radius: 12px; background: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#14243D" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
+    
+    <div style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 10px; min-width: 0">
+      
+      <span style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: #5A6377">
+        
+        
+      </span>
+    <span style="font-size:20px;font-weight:600;line-height:28px;letter-spacing:-0.2px"><span style="color:#F08A1C">School</span> <span style="color:#3FA3DC">Bot</span></span>
+<font color="#2f7bea">Block</font>
+<span style="color: #E8A100">Lab</span></div>
+    <div data-dc-group="" style="box-sizing: border-box"><span style="width:2px;height:24px;border-radius:1px;background:#C6D6EA"></span></div>
+  
+
+<span style="display:inline-flex;align-items:center;gap:6px">
+        <sc-if value="{{isBlock}}" hint-placeholder-val="{{true}}">
+          <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><rect x="3" y="2.5" width="13" height="6" rx="2" fill="#2F7BEA"></rect><rect x="8" y="9.5" width="13" height="5.5" rx="2" fill="#5BC0EB"></rect><rect x="3" y="16.5" width="13" height="5.5" rx="2" fill="#FFB703"></rect></svg>
+        </sc-if>
+        <sc-if value="{{isArm}}" hint-placeholder-val="{{false}}">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#2F7BEA" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21h8M8 21v-5l6-6M14 10l4-6M16 4l4 2"></path><circle cx="8" cy="14" r="1.6" fill="#FFB703" stroke="#FFB703"></circle></svg>
+        </sc-if>
+        <span style="font-size:20px;font-weight:700;line-height:28px;letter-spacing:-0.2px"></span>
+      </span><button style="display:inline-flex;flex-direction:column;align-items:flex-end;justify-content:center;height:56px;max-width:240px;min-width:0;padding:0 4px;border:0;background:transparent;color:#14243D" aria-label="เปลี่ยนชื่องาน {{jobName}} · {{workText}}">
+        <span style="display:inline-flex;align-items:center;gap:6px;max-width:100%;font-size:16px;font-weight:700;line-height:24px"><svg class="i" viewBox="0 0 24 24" style="width:14px;height:14px;color:#5A6377" aria-hidden="true"><path d="M4 20l4-1 11-11a2.8 2.8 0 0 0-4-4L4 15zM13.5 6.5l4 4"></path></svg><span title="{{jobName}}" style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><span style="font-family: &quot;IBM Plex Sans Thai&quot;, system-ui, sans-serif">กดปุ่มแล้วไฟติด</span></span></span>
+        <span style="display:inline-flex;align-items:center;gap:5px;max-width:100%;font-size:14px;font-weight:600;line-height:22px;color:#2E7D32"><svg class="i" viewBox="0 0 24 24" style="width:14px;height:14px" aria-hidden="true"><path d="{{workIcon}}"></path></svg><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><span style="font-family: &quot;IBM Plex Sans Thai&quot;, system-ui, sans-serif">ยังไม่ได้บันทึกงานในเครื่อง</span></span></span>
+      </button></header>
+
+  <!-- Mission strip -->
+  
+
+  
+
+  <!-- Bottom bar -->
+  <div style="flex: 1; min-height: 0; display: flex">
+
+    <!-- Menu list -->
+    <nav aria-label="เมนูบล็อก" style="width: 112px; flex-shrink: 0; border-right: 2px solid #EEF1F5; background: #FAFBFD; display: flex; flex-direction: column; gap: 3px; padding: 10px; box-sizing: border-box; overflow: auto">
+      <button aria-label="ค้นหาบล็อก" style="height: 40px; flex-shrink: 0; border: 2px solid #DCE3EC; border-radius: 10px; background: #FFFFFF; display: flex; align-items: center; gap: 8px; padding: 0 12px; color: #5A6377; font-size: 14px; font-weight: 600; margin-bottom: 4px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>
+        ค้นหาบล็อก
+      </button>
+      <sc-for list="{{menus}}" as="m" hint-placeholder-count="14">
+        <button onClick="{{m.pick}}" aria-pressed="{{m.selected}}" style="height: 38px; flex-shrink: 0; border: 2px solid {{m.border}}; border-radius: 10px; background: {{m.bg}}; display: flex; align-items: center; gap: 10px; padding: 0 10px; text-align: left">
+          <span style="width: 14px; height: 14px; flex-shrink: 0; border-radius: 4px; background: {{m.color}}; border-bottom: 3px solid {{m.edge}}"></span>
+          <span style="flex: 1; min-width: 0; font-size: 14px; font-weight: {{m.weight}}; color: #14243D; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{m.name}}</span>
+          <span style="font-size: 12px; color: #5A6377">{{m.count}}</span>
+        </button>
+        <sc-if value="{{m.divider}}" hint-placeholder-val="{{false}}"><div style="height: 2px; flex-shrink: 0; background: #E4E9F0; margin: 4px 2px"></div></sc-if>
+      </sc-for>
+    </nav>
+
+    <!-- Palette (drop here to delete) -->
+    <aside ref="{{palRef}}" aria-label="บล็อกในเมนู" style="width: 383px; flex-shrink: 0; border-right: 2px solid #EEF1F5; display: flex; flex-direction: column; min-height: 0; position: relative">
+      <div style="padding: 14px 18px 8px; display: flex; flex-direction: column; gap: 2px">
+        <span style="font-family: 'Mitr', sans-serif; font-size: 20px; font-weight: 500">{{paletteTitle}}</span>
+        
+      </div>
+      <div style="flex: 1; min-height: 0; overflow: auto; width: 374px">
+        <sc-if value="{{showFavEmpty}}" hint-placeholder-val="{{false}}">
+          <div style="margin: 8px 18px; padding: 24px 18px; border: 2px dashed #F5C66B; border-radius: 16px; background: #FFFBF2; text-align: center; font-size: 14px; color: #5A6377; line-height: 1.55">ยังไม่มีบล็อกโปรด แตะรูปดาวข้างบล็อกที่ใช้บ่อย</div>
+        </sc-if>
+        <div ref="{{palInRef}}" style="position: relative; width: {{palW}}px; height: {{palH}}px">
+          <sc-for list="{{palPieces}}" as="p" hint-placeholder-count="0">
+            <sc-if value="{{p.isPath}}" hint-placeholder-val="{{false}}"><svg width="{{p.sw0}}" height="{{p.sh0}}" style="position: absolute; left: {{p.x}}px; top: {{p.y}}px; overflow: visible; pointer-events: none; opacity: {{p.op}}"><path d="{{p.d}}" fill="{{p.fill}}" stroke="{{p.stroke}}" stroke-width="{{p.swid}}" onPointerDown="{{p.down}}" style="pointer-events: {{p.pe}}; cursor: {{p.cur}}; touch-action: none"></path></svg></sc-if>
+            <sc-if value="{{p.isText}}" hint-placeholder-val="{{false}}"><span style="position: absolute; left: {{p.x}}px; top: {{p.y}}px; height: {{p.h}}px; line-height: {{p.h}}px; font-size: 14px; font-weight: 400; color: {{p.color}}; white-space: nowrap; pointer-events: none; opacity: {{p.op}}">{{p.t}}</span></sc-if>
+            <sc-if value="{{p.isInput}}" hint-placeholder-val="{{false}}"><input value="{{p.value}}" onChange="{{p.change}}" onFocus="{{p.focus}}" aria-label="{{p.aria}}" style="position: absolute; left: {{p.x}}px; top: {{p.y}}px; width: {{p.w}}px; height: {{p.h}}px; box-sizing: border-box; padding: 0 4px; margin: 0; border: {{p.border}}; border-radius: 999px; background: {{p.bg}}; color: {{p.color}}; font: 400 14px 'Noto Sans Thai', Tahoma, sans-serif; text-align: center; user-select: text"></sc-if>
+            <sc-if value="{{p.isDrop}}" hint-placeholder-val="{{false}}"><button onClick="{{p.open}}" aria-label="{{p.aria}}" style="position: absolute; left: {{p.x}}px; top: {{p.y}}px; width: {{p.w}}px; height: {{p.h}}px; box-sizing: border-box; padding: 0 6px; margin: 0; border: {{p.border}}; border-radius: {{p.radius}}; background: {{p.bg}}; color: {{p.color}}; font-size: 14px; font-weight: 400; white-space: nowrap; display: flex; align-items: center; justify-content: center; gap: 4px">{{p.t}}<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="{{p.color}}" stroke-width="3.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"></path></svg></button></sc-if>
+            <sc-if value="{{p.isBtn}}" hint-placeholder-val="{{false}}"><button onClick="{{p.click}}" aria-label="{{p.aria}}" style="position: absolute; left: {{p.x}}px; top: {{p.y}}px; width: {{p.w}}px; height: {{p.h}}px; box-sizing: border-box; padding: 0; margin: 0; border-radius: 50%; border: 2px solid {{p.color}}; background: transparent; color: {{p.color}}; font-size: 16px; font-weight: 700; line-height: 1; display: flex; align-items: center; justify-content: center; opacity: {{p.op}}">{{p.t}}</button></sc-if>
+            <sc-if value="{{p.isStar}}" hint-placeholder-val="{{false}}"><button onClick="{{p.click}}" aria-label="{{p.aria}}" style="position: absolute; left: {{p.x}}px; top: {{p.y}}px; width: 44px; height: 44px; padding: 0; margin: 0; border: none; background: transparent; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="{{p.fill}}" stroke="{{p.stroke}}" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"></path></svg></button></sc-if>
+          </sc-for>
+        </div>
+      </div>
+      <sc-if value="{{overPal}}" hint-placeholder-val="{{false}}">
+        <div style="position: absolute; inset: 0; background: rgba(140, 22, 22, 0.86); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: #FFFFFF; pointer-events: none">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"></path></svg>
+          <span style="font-size: 18px; font-weight: 700">ปล่อยเพื่อลบบล็อก</span>
+        </div>
+      </sc-if>
+    </aside>
+
+    <!-- Code panel -->
+    <sc-if value="{{codeOpen}}" hint-placeholder-val="{{false}}">
+      <section aria-label="โค้ด Python" style="width: 380px; flex-shrink: 0; border-right: 2px solid #EEF1F5; background: #F7F9FC; display: flex; flex-direction: column">
+        <div style="height: 56px; flex-shrink: 0; display: flex; align-items: center; gap: 10px; padding: 0 12px 0 18px; border-bottom: 2px solid #EEF1F5">
+          <span style="font-size: 16px; font-weight: 700">โค้ด Python</span>
+          <span style="font-size: 12px; font-weight: 700; color: #5A6377; background: #E9EDF3; border-radius: 6px; padding: 2px 8px">อ่านอย่างเดียว</span>
+          <span style="flex: 1"></span>
+          <button onClick="{{toggleCode}}" aria-label="ซ่อนโค้ด" style="width: 40px; height: 40px; border: none; border-radius: 10px; background: transparent; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5A6377" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"></path></svg></button>
+        </div>
+        <div style="flex: 1; overflow: auto; padding: 14px 0; font-family: 'JetBrains Mono', Consolas, monospace; font-size: 12.5px; line-height: 1.75">
+          <sc-for list="{{codeLines}}" as="l" hint-placeholder-count="10">
+            <div style="display: flex; background: {{l.bg}}"><span style="width: 36px; flex-shrink: 0; text-align: right; color: #9AA3B5; padding-right: 12px">{{l.n}}</span><span style="white-space: pre; color: {{l.color}}">{{l.text}}</span></div>
+          </sc-for>
+        </div>
+      </section>
+    </sc-if>
+
+    <!-- Workspace -->
+    <main ref="{{wsRef}}" aria-label="พื้นที่ต่อบล็อก" style="flex: 1; min-width: 0; position: relative; background-color: #FFFFFF; background-image: radial-gradient(#DCE3EC 1.3px, transparent 1.3px); background-size: 24px 24px; overflow: hidden; touch-action: none">
+      <sc-for list="{{wsPieces}}" as="p" hint-placeholder-count="0">
+            <sc-if value="{{p.isPath}}" hint-placeholder-val="{{false}}"><svg width="{{p.sw0}}" height="{{p.sh0}}" style="position: absolute; left: {{p.x}}px; top: {{p.y}}px; overflow: visible; pointer-events: none; opacity: {{p.op}}"><path d="{{p.d}}" fill="{{p.fill}}" stroke="{{p.stroke}}" stroke-width="{{p.swid}}" onPointerDown="{{p.down}}" style="pointer-events: {{p.pe}}; cursor: {{p.cur}}; touch-action: none"></path></svg></sc-if>
+            <sc-if value="{{p.isText}}" hint-placeholder-val="{{false}}"><span style="position: absolute; left: {{p.x}}px; top: {{p.y}}px; height: {{p.h}}px; line-height: {{p.h}}px; font-size: 14px; font-weight: 400; color: {{p.color}}; white-space: nowrap; pointer-events: none; opacity: {{p.op}}">{{p.t}}</span></sc-if>
+            <sc-if value="{{p.isInput}}" hint-placeholder-val="{{false}}"><input value="{{p.value}}" onChange="{{p.change}}" onFocus="{{p.focus}}" aria-label="{{p.aria}}" style="position: absolute; left: {{p.x}}px; top: {{p.y}}px; width: {{p.w}}px; height: {{p.h}}px; box-sizing: border-box; padding: 0 4px; margin: 0; border: {{p.border}}; border-radius: 999px; background: {{p.bg}}; color: {{p.color}}; font: 400 14px 'Noto Sans Thai', Tahoma, sans-serif; text-align: center; user-select: text"></sc-if>
+            <sc-if value="{{p.isDrop}}" hint-placeholder-val="{{false}}"><button onClick="{{p.open}}" aria-label="{{p.aria}}" style="position: absolute; left: {{p.x}}px; top: {{p.y}}px; width: {{p.w}}px; height: {{p.h}}px; box-sizing: border-box; padding: 0 6px; margin: 0; border: {{p.border}}; border-radius: {{p.radius}}; background: {{p.bg}}; color: {{p.color}}; font-size: 14px; font-weight: 400; white-space: nowrap; display: flex; align-items: center; justify-content: center; gap: 4px">{{p.t}}<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="{{p.color}}" stroke-width="3.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"></path></svg></button></sc-if>
+            <sc-if value="{{p.isBtn}}" hint-placeholder-val="{{false}}"><button onClick="{{p.click}}" aria-label="{{p.aria}}" style="position: absolute; left: {{p.x}}px; top: {{p.y}}px; width: {{p.w}}px; height: {{p.h}}px; box-sizing: border-box; padding: 0; margin: 0; border-radius: 50%; border: 2px solid {{p.color}}; background: transparent; color: {{p.color}}; font-size: 16px; font-weight: 700; line-height: 1; display: flex; align-items: center; justify-content: center; opacity: {{p.op}}">{{p.t}}</button></sc-if>
+            <sc-if value="{{p.isStar}}" hint-placeholder-val="{{false}}"><button onClick="{{p.click}}" aria-label="{{p.aria}}" style="position: absolute; left: {{p.x}}px; top: {{p.y}}px; width: 44px; height: 44px; padding: 0; margin: 0; border: none; background: transparent; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="{{p.fill}}" stroke="{{p.stroke}}" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"></path></svg></button></sc-if>
+          </sc-for>
+      <div style="position: absolute; top: 14px; right: 16px">
+        <button onClick="{{toggleCode}}" aria-pressed="{{codeOpen}}" style="height: 44px; padding: 0 14px; border: 2px solid #DCE3EC; border-bottom-width: 4px; border-radius: 12px; background: #FFFFFF; color: #14243D; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#14243D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 8l-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"></path></svg>
+          {{codeBtnLabel}}
+        </button>
+      </div>
+      
+      <sc-if value="{{hasToast}}" hint-placeholder-val="{{false}}">
+        <div role="status" style="position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%); display: flex; align-items: center; gap: 14px; background: #14243D; color: #FFFFFF; border-radius: 14px; padding: 10px 10px 10px 18px; font-size: 15px; font-weight: 600; white-space: nowrap">
+          {{toastText}}
+          <button onClick="{{undoToast}}" onPointerDown="{{stopEv}}" style="height: 40px; padding: 0 14px; border: none; border-radius: 10px; background: #2A3D5C; color: #9CC3F0; font-size: 15px; font-weight: 700">เลิกทำ</button>
+        </div>
+      </sc-if>
+    <img src="/_blob/c19b7cef312b1d001bca7476264be389" alt="Screenshot 2569-10-22 at 10.36.15" width="850" height="160" style="position: absolute; left: 551px; top: 682px; width: 313px; height: 59px"><img src="/_blob/c19b7cef312b1d001bca7476264be389" alt="Screenshot 2569-10-22 at 10.36.15" width="850" height="160" style="position: absolute; left: 872px; top: 683px; width: 52px; height: 59px; object-fit: cover; object-position: 99.9163% 50%"></main>
+  </div><footer style="height: 84px; flex-shrink: 0; display: flex; align-items: center; gap: 16px; padding: 0 20px; border-top: 2px solid #EEF1F5; box-sizing: border-box">
+    <button disabled="{{stopDisabled}}" style="height: 56px; padding: 0 22px; border: none; border-bottom: 4px solid #A12222; border-radius: 14px; background: #D32F2F; color: #FFFFFF; font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 10px; opacity: {{stopOpacity}}">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="#FFFFFF"><rect x="5" y="5" width="14" height="14" rx="2.5"></rect></svg>
+      หยุดทั้งหมด
+    </button>
+    <div style="flex: 1; display: flex; align-items: center; justify-content: flex-end; gap: 14px">
+      <span style="display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600"><span style="width: 10px; height: 10px; border-radius: 50%; background: {{statusDot}}"></span>{{statusText}}</span>
+      <button disabled="{{sendDisabled}}" style="height: 56px; padding: 0 24px; border: none; border-bottom: 4px solid {{sendEdge}}; border-radius: 14px; background: {{sendBg}}; color: {{sendFg}}; font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 10px">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="{{sendFg}}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4M7 9l5-5 5 5M5 20h14"></path></svg>
+        {{sendLabel}}
+      </button>
+    </div>
+  </footer>
+
+  <!-- Drag layer -->
+  <div style="position: absolute; left: 0; top: 0; width: 0; height: 0; pointer-events: none; z-index: 20">
+    <sc-for list="{{dragPieces}}" as="p" hint-placeholder-count="0">
+            <sc-if value="{{p.isPath}}" hint-placeholder-val="{{false}}"><svg width="{{p.sw0}}" height="{{p.sh0}}" style="position: absolute; left: {{p.x}}px; top: {{p.y}}px; overflow: visible; pointer-events: none; opacity: {{p.op}}"><path d="{{p.d}}" fill="{{p.fill}}" stroke="{{p.stroke}}" stroke-width="{{p.swid}}" onPointerDown="{{p.down}}" style="pointer-events: {{p.pe}}; cursor: {{p.cur}}; touch-action: none"></path></svg></sc-if>
+            <sc-if value="{{p.isText}}" hint-placeholder-val="{{false}}"><span style="position: absolute; left: {{p.x}}px; top: {{p.y}}px; height: {{p.h}}px; line-height: {{p.h}}px; font-size: 14px; font-weight: 400; color: {{p.color}}; white-space: nowrap; pointer-events: none; opacity: {{p.op}}">{{p.t}}</span></sc-if>
+            <sc-if value="{{p.isInput}}" hint-placeholder-val="{{false}}"><input value="{{p.value}}" onChange="{{p.change}}" onFocus="{{p.focus}}" aria-label="{{p.aria}}" style="position: absolute; left: {{p.x}}px; top: {{p.y}}px; width: {{p.w}}px; height: {{p.h}}px; box-sizing: border-box; padding: 0 4px; margin: 0; border: {{p.border}}; border-radius: 999px; background: {{p.bg}}; color: {{p.color}}; font: 400 14px 'Noto Sans Thai', Tahoma, sans-serif; text-align: center; user-select: text"></sc-if>
+            <sc-if value="{{p.isDrop}}" hint-placeholder-val="{{false}}"><button onClick="{{p.open}}" aria-label="{{p.aria}}" style="position: absolute; left: {{p.x}}px; top: {{p.y}}px; width: {{p.w}}px; height: {{p.h}}px; box-sizing: border-box; padding: 0 6px; margin: 0; border: {{p.border}}; border-radius: {{p.radius}}; background: {{p.bg}}; color: {{p.color}}; font-size: 14px; font-weight: 400; white-space: nowrap; display: flex; align-items: center; justify-content: center; gap: 4px">{{p.t}}<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="{{p.color}}" stroke-width="3.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"></path></svg></button></sc-if>
+            <sc-if value="{{p.isBtn}}" hint-placeholder-val="{{false}}"><button onClick="{{p.click}}" aria-label="{{p.aria}}" style="position: absolute; left: {{p.x}}px; top: {{p.y}}px; width: {{p.w}}px; height: {{p.h}}px; box-sizing: border-box; padding: 0; margin: 0; border-radius: 50%; border: 2px solid {{p.color}}; background: transparent; color: {{p.color}}; font-size: 16px; font-weight: 700; line-height: 1; display: flex; align-items: center; justify-content: center; opacity: {{p.op}}">{{p.t}}</button></sc-if>
+            <sc-if value="{{p.isStar}}" hint-placeholder-val="{{false}}"><button onClick="{{p.click}}" aria-label="{{p.aria}}" style="position: absolute; left: {{p.x}}px; top: {{p.y}}px; width: 44px; height: 44px; padding: 0; margin: 0; border: none; background: transparent; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="{{p.fill}}" stroke="{{p.stroke}}" stroke-width="2" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"></path></svg></button></sc-if>
+          </sc-for>
+  </div>
+
+  <!-- Dropdown menu -->
+  <sc-if value="{{hasDD}}" hint-placeholder-val="{{false}}">
+    <div role="listbox" style="position: absolute; left: {{ddX}}px; top: {{ddY}}px; z-index: 30; min-width: 120px; background: #FFFFFF; border: 2px solid #DCE3EC; border-radius: 12px; padding: 6px; box-shadow: 0 8px 24px rgba(20, 36, 61, 0.18); display: flex; flex-direction: column; gap: 2px">
+      <sc-for list="{{ddOpts}}" as="o" hint-placeholder-count="2">
+        <button onClick="{{o.pick}}" onPointerDown="{{stopEv}}" style="height: 40px; padding: 0 12px; border: none; border-radius: 8px; background: {{o.bg}}; color: #14243D; font-size: 15px; font-weight: {{o.weight}}; text-align: left; white-space: nowrap">{{o.label}}</button>
+      </sc-for>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"menu":{"editor":"enum","options":["fav","IN/OUT","Control","Math","Condition","Text","Serial","Servo","Stepper","แสง","pioneer","บัส","บล็อกอินพุต","บล็อกเอาต์พุต"],"default":"Control","section":"สถานะ"},"showSource":{"editor":"boolean","default":false,"section":"สถานะ"},"codeOpen":{"editor":"boolean","default":false,"section":"สถานะ"},"robotState":{"editor":"enum","options":["connected","notConnected","running"],"default":"connected","section":"สถานะ"},"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  componentDidMount() {
+    try {
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { this._mc = {}; this.forceUpdate(); });
+    } catch (e) {}
+  }
+
+  /* ---------- constants & catalog ---------- */
+  K() {
+    if (this._K) return this._K;
+    const LIST = [{"id":"r16-0","row":16,"m":"IN/OUT","k":"cmd","p":[{"t":"x","v":"ShiftOut ขาข้อมูล"},{"t":"s","k":"r","i":0,"d":"0","e":0,"n":1},{"t":"x","v":"ขานาฬิกา"},{"t":"s","k":"r","i":1,"d":"0","e":0,"n":1},{"t":"x","v":"ลำดับบิต"},{"t":"d","i":2,"o":["บิตสูงก่อน","บิตต่ำก่อน"],"d":"บิตสูงก่อน"},{"t":"x","v":"ค่า"},{"t":"s","k":"r","i":3,"d":"0","e":0,"n":1}]},{"id":"r18-0","row":18,"m":"Control","k":"cmd","p":[{"t":"x","v":"หยุดโปรแกรม"}]},{"id":"r19-0","row":19,"m":"Control","k":"c","h":[{"t":"x","v":"ทำ"}],"f":[{"t":"x","v":"วนซ้ำ"},{"t":"d","i":0,"o":["ขณะที่เงื่อนไขเป็นจริง","จนกว่าเงื่อนไขเป็นจริง"],"d":"ขณะที่เงื่อนไขเป็นจริง"},{"t":"s","k":"h","i":1,"d":"จริง","e":0,"n":0}],"note":"ช่องเงื่อนไขต้องตั้งชนิด Boolean แม้จะไม่ว่าง"},{"id":"r20-0","row":20,"m":"Control","k":"c","h":[{"t":"x","v":"วนซ้ำ"},{"t":"d","i":0,"o":["ขณะที่เงื่อนไขเป็นจริง","จนกว่าเงื่อนไขเป็นจริง"],"d":"ขณะที่เงื่อนไขเป็นจริง"},{"t":"s","k":"h","i":1,"d":"จริง","e":0,"n":0},{"t":"x","v":"ทำ"}],"note":"เหมือนแถว 19"},{"id":"r21-0","row":21,"m":"Control","k":"cmd","p":[{"t":"x","v":"หน่วงเวลา"},{"t":"d","i":0,"o":["มิลลิวินาที","ไมโครวินาที"],"d":"มิลลิวินาที"},{"t":"s","k":"r","i":1,"d":"1000","e":0,"n":1}]},{"id":"r22-0","row":22,"m":"Control","k":"if","note":"ช่องว่าง"},{"id":"r24-0","row":24,"m":"Control","k":"c","h":[{"t":"x","v":"ใช้ i จาก"},{"t":"s","k":"r","i":0,"d":"1","e":0,"n":1},{"t":"x","v":"ถึง"},{"t":"s","k":"r","i":1,"d":"10","e":0,"n":1},{"t":"x","v":"เพิ่มทีละ"},{"t":"s","k":"r","i":2,"d":"1","e":0,"n":1},{"t":"x","v":"ทำ"}]},{"id":"r24-1","row":24,"m":"Control","k":"c","h":[{"t":"x","v":"switch"},{"t":"s","k":"r","i":0,"d":"","e":1,"n":0}],"note":"ช่องว่าง"},{"id":"r26-0","row":26,"m":"Control","k":"round","p":[{"t":"x","v":"เวลาที่ระบบทำงาน"}]},{"id":"r40-0","row":40,"m":"Math","k":"round","p":[{"t":"s","k":"r","i":0,"d":"0","e":0,"n":1},{"t":"d","i":1,"o":["+","−","×","÷"],"d":"+"},{"t":"s","k":"r","i":2,"d":"0","e":0,"n":1}]},{"id":"r40-1","row":40,"m":"Math","k":"round","p":[{"t":"x","v":"0"}],"note":"ใน Zelos เป็นช่องมนสีขาวพิมพ์ได้"},{"id":"r41-0","row":41,"m":"Math","k":"round","p":[{"t":"s","k":"r","i":0,"d":"0","e":0,"n":1},{"t":"d","i":1,"o":["&","|","^"],"d":"&"},{"t":"s","k":"r","i":2,"d":"0","e":0,"n":1},{"t":"x","v":"(บิต)"}]},{"id":"r42-0","row":42,"m":"Math","k":"round","p":[{"t":"d","i":0,"o":["sin","cos","tan"],"d":"sin"},{"t":"s","k":"r","i":1,"d":"","e":1,"n":0}],"note":"ช่องว่าง"},{"id":"r43-0","row":43,"m":"Math","k":"cmd","p":[{"t":"s","k":"r","i":0,"d":"item","e":0,"n":0},{"t":"d","i":1,"o":["+=","-=","*=","/="],"d":"+="},{"t":"s","k":"r","i":2,"d":"1","e":0,"n":1}]},{"id":"r44-0","row":44,"m":"Math","k":"round","p":[{"t":"s","k":"r","i":0,"d":"item","e":0,"n":0},{"t":"d","i":1,"o":["++","--"],"d":"++"}]},{"id":"r50-0","row":50,"m":"Math","k":"round","p":[{"t":"x","v":"จำกัดค่า"},{"t":"s","k":"r","i":0,"d":"","e":1,"n":0},{"t":"x","v":"ระหว่าง"},{"t":"s","k":"r","i":1,"d":"0","e":0,"n":1},{"t":"x","v":"และ"},{"t":"s","k":"r","i":2,"d":"0","e":0,"n":1}],"note":"ช่องแรกว่าง"},{"id":"r51-0","row":51,"m":"Math","k":"round","p":[{"t":"x","v":"แมป"},{"t":"d","i":0,"o":["จำนวนเต็ม","ทศนิยม"],"d":"จำนวนเต็ม"},{"t":"s","k":"r","i":1,"d":"","e":1,"n":0},{"t":"x","v":"จาก ["},{"t":"s","k":"r","i":2,"d":"0","e":0,"n":1},{"t":"x","v":","},{"t":"s","k":"r","i":3,"d":"0","e":0,"n":1},{"t":"x","v":"] ถึง ["},{"t":"s","k":"r","i":4,"d":"0","e":0,"n":1},{"t":"x","v":","},{"t":"s","k":"r","i":5,"d":"0","e":0,"n":1},{"t":"x","v":"]"}],"note":"ช่องแรกว่าง"},{"id":"r53-0","row":53,"m":"Condition","k":"hex","p":[{"t":"s","k":"h","i":0,"d":"","e":1,"n":0},{"t":"d","i":1,"o":["และ","หรือ"],"d":"และ"},{"t":"s","k":"h","i":2,"d":"","e":1,"n":0}],"note":"ว่างทั้ง 2 ช่อง"},{"id":"r55-0","row":55,"m":"Condition","k":"hex","p":[{"t":"x","v":"ไม่"},{"t":"s","k":"h","i":0,"d":"","e":1,"n":0}],"note":"ช่องว่าง"},{"id":"r56-0","row":56,"m":"Condition","k":"hex","p":[{"t":"d","i":0,"o":["จริง","เท็จ"],"d":"จริง"}]},{"id":"r59-0","row":59,"m":"Text","k":"round","p":[{"t":"x","v":"\"hello\""}]},{"id":"r60-0","row":60,"m":"Text","k":"round","p":[{"t":"s","k":"r","i":0,"d":"hello","e":0,"n":0},{"t":"x","v":"เชื่อมต่อ"},{"t":"s","k":"r","i":1,"d":"hello","e":0,"n":0}]},{"id":"r60-1","row":60,"m":"Text","k":"round","p":[{"t":"x","v":"อักขระ 'a'"}]},{"id":"r61-0","row":61,"m":"Text","k":"round","p":[{"t":"x","v":"เชื่อมต่อสตริง"},{"t":"s","k":"r","i":0,"d":"hello","e":0,"n":0},{"t":"x","v":"+"},{"t":"s","k":"r","i":1,"d":"hello","e":0,"n":0},{"t":"x","v":"+"},{"t":"s","k":"r","i":2,"d":"hello","e":0,"n":0}]},{"id":"r66-0","row":66,"m":"Text","k":"cmd","p":[{"t":"x","v":"ตัวแปรสตริง"},{"t":"s","k":"r","i":0,"d":"hello","e":0,"n":0},{"t":"x","v":"แปลงตัวอักษรเป็น"}]},{"id":"r67-0","row":67,"m":"Text","k":"cmd","p":[{"t":"x","v":"ตัวแปรสตริง"},{"t":"s","k":"r","i":0,"d":"hello","e":0,"n":0},{"t":"x","v":"สตริง"},{"t":"s","k":"r","i":1,"d":"hello","e":0,"n":0},{"t":"x","v":"แทนที่ด้วย"},{"t":"s","k":"r","i":2,"d":"hello","e":0,"n":0}]},{"id":"r71-0","row":71,"m":"Text","k":"round","p":[{"t":"x","v":"สตริงแปลงเป็นจำนวนเต็มยาว"},{"t":"x","v":"ข้อความ"},{"t":"s","k":"r","i":0,"d":"hello","e":0,"n":0}]},{"id":"r73-0","row":73,"m":"Text","k":"round","p":[{"t":"x","v":"แปลงเป็นอักขระ ASCII"},{"t":"x","v":"ตัวเลข"},{"t":"s","k":"r","i":0,"d":"65","e":0,"n":1}]},{"id":"r73-1","row":73,"m":"Text","k":"round","p":[{"t":"x","v":"แปลงเป็นค่า ASCII 'a'"}],"note":"อักขระเป็นช่องพิมพ์ในตัวบล็อก"},{"id":"r74-0","row":74,"m":"Text","k":"round","p":[{"t":"x","v":"แปลงเป็นสตริง ฐาน"},{"t":"s","k":"r","i":0,"d":"0","e":0,"n":1}]},{"id":"r76-0","row":76,"m":"Text","k":"round","p":[{"t":"s","k":"r","i":0,"d":"hello","e":0,"n":0},{"t":"x","v":"รับอักขระตัวที่"},{"t":"s","k":"r","i":1,"d":"1","e":0,"n":1}]},{"id":"r77-0","row":77,"m":"Text","k":"hex","p":[{"t":"s","k":"r","i":0,"d":"hello","e":0,"n":0},{"t":"d","i":1,"o":["เท่ากับ","เริ่มด้วย","ลงท้ายด้วย"],"d":"เท่ากับ"},{"t":"s","k":"r","i":2,"d":"hello","e":0,"n":0}],"note":"ผลเป็นจริง/เท็จ ตัวบล็อกจึงเป็นหกเหลี่ยม"},{"id":"r79-0","row":79,"m":"Text","k":"round","p":[{"t":"s","k":"r","i":0,"d":"hello","e":0,"n":0},{"t":"x","v":"เปรียบเทียบ"},{"t":"s","k":"r","i":1,"d":"hello","e":0,"n":0}],"note":"ผลเป็นตัวเลข (compareTo)"},{"id":"r85-0","row":85,"m":"Serial","k":"cmd","p":[{"t":"x","v":"Serial พิมพ์"},{"t":"s","k":"r","i":0,"d":"hello","e":0,"n":0},{"t":"x","v":"ตัวเลข"}]},{"id":"r87-0","row":87,"m":"Serial","k":"round","p":[{"t":"x","v":"Serial อ่านสตริง"}]},{"id":"r88-0","row":88,"m":"Serial","k":"round","p":[{"t":"x","v":"Serial อ่านสตริงจนถึง"},{"t":"s","k":"r","i":0,"d":",","e":0,"n":0}]},{"id":"r89-0","row":89,"m":"Serial","k":"round","p":[{"t":"x","v":"Serial read"}]},{"id":"r135-0","row":135,"m":"Servo","k":"cmd","p":[{"t":"x","v":"Servo ขา"},{"t":"d","i":0,"o":["2","4","5","12","13"],"d":"2"},{"t":"x","v":"ความกว้างพัลส์"},{"t":"s","k":"r","i":1,"d":"0","e":0,"n":1}]},{"id":"r136-0","row":136,"m":"Servo","k":"round","p":[{"t":"x","v":"Servo ขา"},{"t":"d","i":0,"o":["2","4","5","12","13"],"d":"2"},{"t":"x","v":"อ่านค่ามุม"}]},{"id":"r137-0","row":137,"m":"Stepper","k":"cmd","p":[{"t":"x","v":"เริ่มต้นสเต็ปเปอร์มอเตอร์"},{"t":"s","k":"r","i":0,"d":"0","e":0,"n":1},{"t":"s","k":"r","i":1,"d":"0","e":0,"n":1},{"t":"s","k":"r","i":2,"d":"0","e":0,"n":1},{"t":"s","k":"r","i":3,"d":"0","e":0,"n":1}]},{"id":"r165-0","row":165,"m":"แสง","k":"round","p":[{"t":"x","v":"ค่า R"},{"t":"s","k":"r","i":0,"d":"0","e":0,"n":1},{"t":"x","v":"G"},{"t":"s","k":"r","i":1,"d":"0","e":0,"n":1},{"t":"x","v":"B"},{"t":"s","k":"r","i":2,"d":"0","e":0,"n":1}],"note":"ใช้เสียบช่องสีของแถว 168"},{"id":"r166-0","row":166,"m":"แสง","k":"cmd","p":[{"t":"x","v":"ไฟ RGB เริ่มต้น จำนวนไฟ"},{"t":"s","k":"r","i":0,"d":"4","e":0,"n":1}]},{"id":"r167-0","row":167,"m":"แสง","k":"cmd","p":[{"t":"x","v":"ไฟ RGB ความสว่าง"},{"t":"s","k":"r","i":0,"d":"50","e":0,"n":1}]},{"id":"r168-0","row":168,"m":"แสง","k":"cmd","p":[{"t":"x","v":"ไฟ RGB หมายเลขไฟ"},{"t":"s","k":"r","i":0,"d":"0","e":0,"n":1},{"t":"x","v":"สี"},{"t":"s","k":"r","i":1,"d":"0","e":0,"n":1}]},{"id":"r169-0","row":169,"m":"แสง","k":"cmd","p":[{"t":"x","v":"ไฟ RGB เฉดสี/อิ่มตัว/ความสว่าง"},{"t":"s","k":"r","i":0,"d":"0","e":0,"n":1},{"t":"s","k":"r","i":1,"d":"0","e":0,"n":1},{"t":"s","k":"r","i":2,"d":"0","e":0,"n":1},{"t":"s","k":"r","i":3,"d":"0","e":0,"n":1}]},{"id":"r170-0","row":170,"m":"แสง","k":"cmd","p":[{"t":"x","v":"ไฟ RGB แสดงผลการตั้งค่า"}]},{"id":"r171-0","row":171,"m":"แสง","k":"cmd","p":[{"t":"x","v":"ไฟ RGB เวลาสลับสีรุ้ง"},{"t":"s","k":"r","i":0,"d":"0","e":0,"n":1}]},{"id":"r172-0","row":172,"m":"แสง","k":"cmd","p":[{"t":"x","v":"ไฟ RGB ค่าสีรุ้ง"},{"t":"s","k":"r","i":0,"d":"0","e":0,"n":1}]},{"id":"start","row":17,"m":"pioneer","k":"c","h":[{"t":"x","v":"เริ่มต้น"}],"hat":1,"cap":1,"note":"บล็อกเริ่มต้นจากไฟล์ Function แถว 17"},{"id":"r189-0","row":189,"m":"pioneer","k":"c","h":[{"t":"x","v":"โปรแกรมหลัก วนทำซ้ำ"}],"hat":1,"cap":1},{"id":"r190-0","row":190,"m":"pioneer","k":"cmd","p":[{"t":"x","v":"คืนค่า"}]},{"id":"r191-0","row":191,"m":"pioneer","k":"cmd","p":[{"t":"x","v":"หยุดโปรแกรม"}]},{"id":"r192-0","row":192,"m":"pioneer","k":"cmd","p":[{"t":"x","v":"ไฟ LED สถานะ"}]},{"id":"r194-0","row":194,"m":"pioneer","k":"cmd","p":[{"t":"x","v":"บัซเซอร์บนบอร์ด จำนวนครั้ง"},{"t":"s","k":"r","i":0,"d":"2","e":0,"n":1},{"t":"x","v":"ช่วงเวลา"},{"t":"s","k":"r","i":1,"d":"100","e":0,"n":1}]},{"id":"r195-0","row":195,"m":"pioneer","k":"cmd","p":[{"t":"x","v":"เริ่มต้นเซอร์โวแอนะล็อก 6 ช่อง"}]},{"id":"r196-0","row":196,"m":"pioneer","k":"cmd","p":[{"t":"x","v":"ลูปหลักเซอร์โวแอนะล็อก 6 ช่อง"}]},{"id":"r197-0","row":197,"m":"pioneer","k":"cmd","p":[{"t":"x","v":"แปลงเซอร์โวแอนะล็อกเป็นดิจิทัล"}]},{"id":"r198-0","row":198,"m":"pioneer","k":"cmd","p":[{"t":"x","v":"ฟังก์ชันเริ่มต้นการควบคุมด้วยจอย"}]},{"id":"r199-0","row":199,"m":"pioneer","k":"cmd","p":[{"t":"x","v":"ล้างคำสั่งของคอนโทรลเลอร์ Serial"}]},{"id":"r200-0","row":200,"m":"pioneer","k":"round","p":[{"t":"x","v":"รับคำสั่งของคอนโทรลเลอร์ Serial"}],"note":"ถาม dev: คืนค่าอะไร"},{"id":"r201-0","row":201,"m":"pioneer","k":"cmd","p":[{"t":"x","v":"IK เริ่มต้น L0–L3"},{"t":"s","k":"r","i":0,"d":"0","e":0,"n":1},{"t":"s","k":"r","i":1,"d":"0","e":0,"n":1},{"t":"s","k":"r","i":2,"d":"0","e":0,"n":1},{"t":"s","k":"r","i":3,"d":"0","e":0,"n":1}]},{"id":"r202-0","row":202,"m":"pioneer","k":"cmd","p":[{"t":"x","v":"IK ตำแหน่ง"},{"t":"x","v":"X"},{"t":"s","k":"r","i":0,"d":"0","e":0,"n":1},{"t":"x","v":"Y"},{"t":"s","k":"r","i":1,"d":"0","e":0,"n":1},{"t":"x","v":"Z"},{"t":"s","k":"r","i":2,"d":"0","e":0,"n":1},{"t":"x","v":"time"},{"t":"s","k":"r","i":3,"d":"0","e":0,"n":1}]},{"id":"r203-0","row":203,"m":"pioneer","k":"cmd","p":[{"t":"x","v":"IK ตำแหน่ง"},{"t":"x","v":"X"},{"t":"s","k":"r","i":0,"d":"0","e":0,"n":1},{"t":"x","v":"Y"},{"t":"s","k":"r","i":1,"d":"0","e":0,"n":1},{"t":"x","v":"Z"},{"t":"s","k":"r","i":2,"d":"0","e":0,"n":1},{"t":"x","v":"time"},{"t":"s","k":"r","i":3,"d":"0","e":0,"n":1}],"note":"ซ้ำกับแถว 202"},{"id":"r204-0","row":204,"m":"pioneer","k":"cmd","p":[{"t":"x","v":"ส่งคำสั่งอ่านบัส หมายเลข ID"},{"t":"s","k":"r","i":0,"d":"0","e":0,"n":1}]},{"id":"r205-0","row":205,"m":"pioneer","k":"round","p":[{"t":"x","v":"รับค่าที่อ่านจากอุปกรณ์บัสครั้งล่าสุด"}]},{"id":"r206-0","row":206,"m":"pioneer","k":"cmd","p":[{"t":"x","v":"แยกวิเคราะห์คำสั่งท่าทาง"},{"t":"x","v":"ID"},{"t":"s","k":"r","i":0,"d":"0","e":0,"n":1},{"t":"x","v":"PWM"},{"t":"s","k":"r","i":1,"d":"0","e":0,"n":1},{"t":"x","v":"TIME"},{"t":"s","k":"r","i":2,"d":"0","e":0,"n":1}]},{"id":"r207-0","row":207,"m":"pioneer","k":"cmd","p":[{"t":"x","v":"แยกคำสั่งหยุด ID"},{"t":"s","k":"r","i":0,"d":"0","e":0,"n":1}]},{"id":"r208-0","row":208,"m":"pioneer","k":"cmd","p":[{"t":"x","v":"แยกวิเคราะห์สตริงคำสั่งท่าทาง"},{"t":"s","k":"r","i":0,"d":"0","e":0,"n":1}]},{"id":"r209-0","row":209,"m":"pioneer","k":"cmd","p":[{"t":"x","v":"ทำกลุ่มท่าทางออฟไลน์ เริ่ม"},{"t":"s","k":"r","i":0,"d":"1","e":0,"n":1},{"t":"x","v":"สิ้นสุด"},{"t":"s","k":"r","i":1,"d":"3","e":0,"n":1},{"t":"x","v":"จำนวนครั้ง"},{"t":"s","k":"r","i":2,"d":"1","e":0,"n":1}]},{"id":"r210-0","row":210,"m":"pioneer","k":"cmd","p":[{"t":"x","v":"แยกวิเคราะห์สตริงคำสั่ง"},{"t":"s","k":"r","i":0,"d":"0","e":0,"n":1}]},{"id":"r211-0","row":211,"m":"pioneer","k":"hex","p":[{"t":"x","v":"กลุ่มท่าทางทำเสร็จแล้ว?"}],"note":"ตอนนี้เป็นจิ๊กซอว์ ต้องเปลี่ยนเป็นหกเหลี่ยม"},{"id":"r212-0","row":212,"m":"pioneer","k":"cmd","p":[{"t":"x","v":"หยุดท่าทาง"}]},{"id":"r213-0","row":213,"m":"pioneer","k":"cmd","p":[{"t":"x","v":"รีสตาร์ทคอนโทรลเลอร์"}]},{"id":"r217-0","row":217,"m":"บัส","k":"cmd","p":[{"t":"x","v":"อุปกรณ์บัส ID"},{"t":"s","k":"r","i":0,"d":"1","e":0,"n":1},{"t":"x","v":"ค่า"},{"t":"s","k":"r","i":1,"d":"500","e":0,"n":1},{"t":"x","v":"เวลา"},{"t":"s","k":"r","i":2,"d":"1000","e":0,"n":1}]},{"id":"r218-0","row":218,"m":"บัส","k":"cmd","p":[{"t":"x","v":"เซอร์โวบัส ID"},{"t":"s","k":"r","i":0,"d":"1","e":0,"n":1},{"t":"x","v":"มุม"},{"t":"s","k":"r","i":1,"d":"90","e":0,"n":1},{"t":"x","v":"เวลา"},{"t":"s","k":"r","i":2,"d":"1000","e":0,"n":1}]},{"id":"r219-0","row":219,"m":"บัส","k":"cmd","p":[{"t":"x","v":"มอเตอร์บัส ID"},{"t":"s","k":"r","i":0,"d":"1","e":0,"n":1},{"t":"x","v":"ความเร็ว"},{"t":"s","k":"r","i":1,"d":"0","e":0,"n":1},{"t":"x","v":"เวลา"},{"t":"s","k":"r","i":2,"d":"0","e":0,"n":1}]},{"id":"r220-0","row":220,"m":"บัส","k":"cmd","p":[{"t":"x","v":"มอเตอร์ 2 ช่อง"},{"t":"s","k":"r","i":0,"d":"0","e":0,"n":1},{"t":"s","k":"r","i":1,"d":"0","e":0,"n":1},{"t":"s","k":"r","i":2,"d":"0","e":0,"n":1},{"t":"s","k":"r","i":3,"d":"0","e":0,"n":1},{"t":"s","k":"r","i":4,"d":"0","e":0,"n":1},{"t":"s","k":"r","i":5,"d":"0","e":0,"n":1}]},{"id":"r221-0","row":221,"m":"บัส","k":"cmd","p":[{"t":"x","v":"มอเตอร์ 4 ช่อง"},{"t":"s","k":"r","i":0,"d":"0","e":0,"n":1},{"t":"s","k":"r","i":1,"d":"0","e":0,"n":1},{"t":"s","k":"r","i":2,"d":"0","e":0,"n":1},{"t":"s","k":"r","i":3,"d":"0","e":0,"n":1},{"t":"s","k":"r","i":4,"d":"0","e":0,"n":1},{"t":"s","k":"r","i":5,"d":"0","e":0,"n":1},{"t":"s","k":"r","i":6,"d":"0","e":0,"n":1},{"t":"s","k":"r","i":7,"d":"0","e":0,"n":1}]},{"id":"r222-0","row":222,"m":"บัส","k":"cmd","p":[{"t":"x","v":"หยุดโมดูลบัส ID"},{"t":"s","k":"r","i":0,"d":"0","e":0,"n":1}]},{"id":"r223-0","row":223,"m":"บล็อกอินพุต","k":"hex","p":[{"t":"x","v":"ปุ่ม-DG"},{"t":"x","v":"ขา"},{"t":"s","k":"r","i":0,"d":"2","e":0,"n":1}],"note":"ดิจิทัลได้ 2 สถานะ ใช้เป็นเงื่อนไขได้ตรง ๆ"},{"id":"r224-0","row":224,"m":"บล็อกอินพุต","k":"hex","p":[{"t":"x","v":"สวิตช์ตรวจจับระยะใกล้อินฟราเรด-DG"},{"t":"x","v":"ขา"},{"t":"s","k":"r","i":0,"d":"2","e":0,"n":1}],"note":"ดิจิทัลได้ 2 สถานะ ใช้เป็นเงื่อนไขได้ตรง ๆ"},{"id":"r225-0","row":225,"m":"บล็อกอินพุต","k":"hex","p":[{"t":"x","v":"สวิตช์วัดความเอียง-DG"},{"t":"x","v":"ขา"},{"t":"s","k":"r","i":0,"d":"2","e":0,"n":1}],"note":"ดิจิทัลได้ 2 สถานะ ใช้เป็นเงื่อนไขได้ตรง ๆ"},{"id":"r226-0","row":226,"m":"บล็อกอินพุต","k":"hex","p":[{"t":"x","v":"เซนเซอร์การสั่น-DG"},{"t":"x","v":"ขา"},{"t":"s","k":"r","i":0,"d":"2","e":0,"n":1}],"note":"ดิจิทัลได้ 2 สถานะ ใช้เป็นเงื่อนไขได้ตรง ๆ"},{"id":"r227-0","row":227,"m":"บล็อกอินพุต","k":"hex","p":[{"t":"x","v":"เซนเซอร์สัมผัส-DG"},{"t":"x","v":"ขา"},{"t":"s","k":"r","i":0,"d":"2","e":0,"n":1}],"note":"ดิจิทัลได้ 2 สถานะ ใช้เป็นเงื่อนไขได้ตรง ๆ"},{"id":"r228-0","row":228,"m":"บล็อกอินพุต","k":"hex","p":[{"t":"x","v":"เซนเซอร์อินฟราเรดตรวจจับคน-DG"},{"t":"x","v":"ขา"},{"t":"s","k":"r","i":0,"d":"2","e":0,"n":1}],"note":"ดิจิทัลได้ 2 สถานะ ใช้เป็นเงื่อนไขได้ตรง ๆ"},{"id":"r229-0","row":229,"m":"บล็อกอินพุต","k":"hex","p":[{"t":"x","v":"เซนเซอร์แสง-DG"},{"t":"x","v":"ขา"},{"t":"s","k":"r","i":0,"d":"2","e":0,"n":1}],"note":"ดิจิทัลได้ 2 สถานะ ใช้เป็นเงื่อนไขได้ตรง ๆ"},{"id":"r230-0","row":230,"m":"บล็อกอินพุต","k":"hex","p":[{"t":"x","v":"เซนเซอร์ความร้อน-DG"},{"t":"x","v":"ขา"},{"t":"s","k":"r","i":0,"d":"2","e":0,"n":1}],"note":"ดิจิทัลได้ 2 สถานะ ใช้เป็นเงื่อนไขได้ตรง ๆ"},{"id":"r231-0","row":231,"m":"บล็อกอินพุต","k":"hex","p":[{"t":"x","v":"เซนเซอร์เสียง-DG"},{"t":"x","v":"ขา"},{"t":"s","k":"r","i":0,"d":"2","e":0,"n":1}],"note":"ดิจิทัลได้ 2 สถานะ ใช้เป็นเงื่อนไขได้ตรง ๆ"},{"id":"r232-0","row":232,"m":"บล็อกอินพุต","k":"hex","p":[{"t":"x","v":"อินฟราเรด-DG"},{"t":"x","v":"ขา"},{"t":"s","k":"r","i":0,"d":"2","e":0,"n":1}],"note":"ดิจิทัลได้ 2 สถานะ ใช้เป็นเงื่อนไขได้ตรง ๆ"},{"id":"r233-0","row":233,"m":"บล็อกอินพุต","k":"hex","p":[{"t":"x","v":"เซนเซอร์เปลวไฟ-DG"},{"t":"x","v":"ขา"},{"t":"s","k":"r","i":0,"d":"2","e":0,"n":1}],"note":"ดิจิทัลได้ 2 สถานะ ใช้เป็นเงื่อนไขได้ตรง ๆ"},{"id":"r234-0","row":234,"m":"บล็อกอินพุต","k":"hex","p":[{"t":"x","v":"เซนเซอร์ฮอลล์-DG"},{"t":"x","v":"ขา"},{"t":"s","k":"r","i":0,"d":"2","e":0,"n":1}],"note":"ดิจิทัลได้ 2 สถานะ ใช้เป็นเงื่อนไขได้ตรง ๆ"},{"id":"r235-0","row":235,"m":"บล็อกอินพุต","k":"hex","p":[{"t":"x","v":"เซนเซอร์เดินตามเส้น-DG"},{"t":"x","v":"ขา"},{"t":"s","k":"r","i":0,"d":"2","e":0,"n":1}],"note":"ดิจิทัลได้ 2 สถานะ ใช้เป็นเงื่อนไขได้ตรง ๆ"},{"id":"r236-0","row":236,"m":"บล็อกอินพุต","k":"hex","p":[{"t":"x","v":"เซนเซอร์ดิน-DG"},{"t":"x","v":"ขา"},{"t":"s","k":"r","i":0,"d":"2","e":0,"n":1}],"note":"ดิจิทัลได้ 2 สถานะ ใช้เป็นเงื่อนไขได้ตรง ๆ"},{"id":"r237-0","row":237,"m":"บล็อกอินพุต","k":"round","p":[{"t":"x","v":"เซนเซอร์วัดความเร็ว-DG"},{"t":"x","v":"ขา"},{"t":"s","k":"r","i":0,"d":"2","e":0,"n":1}],"note":"ผลเป็นตัวเลข แม้ชื่อจะเป็น DG ถาม dev ยืนยัน"},{"id":"r240-0","row":240,"m":"บล็อกอินพุต","k":"round","p":[{"t":"x","v":"จอยสติ๊กแอนะล็อก-AD"},{"t":"x","v":"ขา"},{"t":"s","k":"r","i":0,"d":"2","e":0,"n":1}]},{"id":"r241-0","row":241,"m":"บล็อกอินพุต","k":"round","p":[{"t":"x","v":"ปุ่มหมุน-AD"},{"t":"x","v":"ขา"},{"t":"s","k":"r","i":0,"d":"2","e":0,"n":1}]},{"id":"r242-0","row":242,"m":"บล็อกอินพุต","k":"round","p":[{"t":"x","v":"เซนเซอร์ความร้อน-AD"},{"t":"x","v":"ขา"},{"t":"s","k":"r","i":0,"d":"2","e":0,"n":1}]},{"id":"r244-0","row":244,"m":"บล็อกอินพุต","k":"round","p":[{"t":"x","v":"เซนเซอร์แสง-AD"},{"t":"x","v":"ขา"},{"t":"s","k":"r","i":0,"d":"2","e":0,"n":1}]},{"id":"r248-0","row":248,"m":"บล็อกอินพุต","k":"round","p":[{"t":"x","v":"เซนเซอร์อุณหภูมิและความชื้น"},{"t":"x","v":"DTA"},{"t":"s","k":"r","i":0,"d":"2","e":0,"n":1}]},{"id":"r249-0","row":249,"m":"บล็อกอินพุต","k":"round","p":[{"t":"x","v":"วัดระยะอัลตราโซนิก (cm)"},{"t":"x","v":"Trig"},{"t":"s","k":"r","i":0,"d":"12","e":0,"n":1},{"t":"x","v":"Echo"},{"t":"s","k":"r","i":1,"d":"13","e":0,"n":1}]},{"id":"r250-0","row":250,"m":"บล็อกอินพุต","k":"round","p":[{"t":"x","v":"อัลตราโซนิก RGB (cm)"},{"t":"x","v":"ขา"},{"t":"s","k":"r","i":0,"d":"2","e":0,"n":1}]},{"id":"r253-0","row":253,"m":"บล็อกอินพุต","k":"cmd","p":[{"t":"x","v":"เซนเซอร์สี (IIC) ไฟส่องช่วย"}]},{"id":"r254-0","row":254,"m":"บล็อกอินพุต","k":"round","p":[{"t":"x","v":"เซนเซอร์สี (IIC) รับค่า"}]},{"id":"r255-0","row":255,"m":"บล็อกอินพุต","k":"cmd","p":[{"t":"x","v":"เซนเซอร์ท่าทางมือ เริ่มต้นท่าทางมือ"}]},{"id":"r256-0","row":256,"m":"บล็อกอินพุต","k":"round","p":[{"t":"x","v":"เซนเซอร์ท่าทางมือ รับค่าท่าทางมือ"}]},{"id":"r257-0","row":257,"m":"บล็อกอินพุต","k":"cmd","p":[{"t":"x","v":"เซนเซอร์ท่าทางมือ เริ่มต้นสี"}]},{"id":"r258-0","row":258,"m":"บล็อกอินพุต","k":"round","p":[{"t":"x","v":"เซนเซอร์ท่าทางมือ รับค่าสี"}]},{"id":"r259-0","row":259,"m":"บล็อกอินพุต","k":"cmd","p":[{"t":"x","v":"ไจโรสโคป (S6) เริ่มต้น"}]},{"id":"r260-0","row":260,"m":"บล็อกอินพุต","k":"cmd","p":[{"t":"x","v":"ไจโรสโคป (S6) อ่าน/เขียน"}]},{"id":"r261-0","row":261,"m":"บล็อกอินพุต","k":"round","p":[{"t":"x","v":"ไจโรสโคป (S6) รับค่า"}]},{"id":"r262-0","row":262,"m":"บล็อกอินพุต","k":"cmd","p":[{"t":"x","v":"อัตราการเต้นหัวใจ (S6) เริ่มต้น"}]},{"id":"r266-0","row":266,"m":"บล็อกเอาต์พุต","k":"cmd","p":[{"t":"x","v":"บัซเซอร์แอกทีฟ ขา"},{"t":"s","k":"r","i":0,"d":"2","e":0,"n":1},{"t":"x","v":"ตั้งเป็น"},{"t":"s","k":"r","i":1,"d":"สูง","e":0,"n":0}]},{"id":"r267-0","row":267,"m":"บล็อกเอาต์พุต","k":"cmd","p":[{"t":"x","v":"บัซเซอร์พาสซีฟ ขา"},{"t":"s","k":"r","i":0,"d":"0","e":0,"n":1},{"t":"x","v":"ความถี่ (โน้ต)"},{"t":"s","k":"r","i":1,"d":"0","e":0,"n":1}]},{"id":"r268-0","row":268,"m":"บล็อกเอาต์พุต","k":"cmd","p":[{"t":"x","v":"บัซเซอร์พาสซีฟ ความถี่ ระยะเวลา"},{"t":"s","k":"r","i":0,"d":"0","e":0,"n":1},{"t":"s","k":"r","i":1,"d":"0","e":0,"n":1},{"t":"s","k":"r","i":2,"d":"0","e":0,"n":1}]},{"id":"r269-0","row":269,"m":"บล็อกเอาต์พุต","k":"cmd","p":[{"t":"x","v":"ลำโพง ขา"},{"t":"s","k":"r","i":0,"d":"0","e":0,"n":1},{"t":"x","v":"ความถี่ (โน้ต)"},{"t":"s","k":"r","i":1,"d":"0","e":0,"n":1}]},{"id":"r270-0","row":270,"m":"บล็อกเอาต์พุต","k":"cmd","p":[{"t":"x","v":"ลำโพง ความถี่ ระยะเวลา"},{"t":"s","k":"r","i":0,"d":"0","e":0,"n":1},{"t":"s","k":"r","i":1,"d":"0","e":0,"n":1},{"t":"s","k":"r","i":2,"d":"0","e":0,"n":1}]},{"id":"r271-0","row":271,"m":"บล็อกเอาต์พุต","k":"cmd","p":[{"t":"x","v":"หยุดเสียง ขา"},{"t":"s","k":"r","i":0,"d":"0","e":0,"n":1}]},{"id":"r272-0","row":272,"m":"บล็อกเอาต์พุต","k":"cmd","p":[{"t":"x","v":"รีเลย์ ขา"},{"t":"s","k":"r","i":0,"d":"2","e":0,"n":1},{"t":"x","v":"ตั้งเป็น"},{"t":"s","k":"r","i":1,"d":"สูง","e":0,"n":0}]},{"id":"r273-0","row":273,"m":"บล็อกเอาต์พุต","k":"cmd","p":[{"t":"x","v":"เอาต์พุต PWM ขา"},{"t":"s","k":"r","i":0,"d":"0","e":0,"n":1},{"t":"x","v":"ค่า"},{"t":"s","k":"r","i":1,"d":"0","e":0,"n":1}]},{"id":"r275-0","row":275,"m":"บล็อกเอาต์พุต","k":"cmd","p":[{"t":"x","v":"มอเตอร์ M1 ขา 1"},{"t":"s","k":"r","i":0,"d":"0","e":0,"n":1},{"t":"x","v":"ขา 2"},{"t":"s","k":"r","i":1,"d":"0","e":0,"n":1},{"t":"x","v":"ความเร็ว"},{"t":"s","k":"r","i":2,"d":"0","e":0,"n":1}]},{"id":"r278-0","row":278,"m":"บล็อกเอาต์พุต","k":"round","p":[{"t":"x","v":"รับค่าปุ่มรีโมต"}]},{"id":"r279-0","row":279,"m":"บล็อกเอาต์พุต","k":"round","p":[{"t":"x","v":"มาโครกำหนดค่าปุ่มอินฟราเรด"}]},{"id":"r280-0","row":280,"m":"บล็อกเอาต์พุต","k":"cmd","p":[{"t":"x","v":"จอย PS2 เริ่มต้น"},{"t":"x","v":"DAT"},{"t":"s","k":"r","i":0,"d":"0","e":0,"n":1},{"t":"x","v":"CMD"},{"t":"s","k":"r","i":1,"d":"0","e":0,"n":1},{"t":"x","v":"CS"},{"t":"s","k":"r","i":2,"d":"0","e":0,"n":1},{"t":"x","v":"CLK"},{"t":"s","k":"r","i":3,"d":"0","e":0,"n":1}]},{"id":"r281-0","row":281,"m":"บล็อกเอาต์พุต","k":"cmd","p":[{"t":"x","v":"จอย PS2 รีเฟรชข้อมูลจอย"}]},{"id":"r282-0","row":282,"m":"บล็อกเอาต์พุต","k":"hex","p":[{"t":"x","v":"ปุ่ม PS2 สถานะ กด"}],"note":"ผลเป็นกด/ไม่กด"},{"id":"r283-0","row":283,"m":"บล็อกเอาต์พุต","k":"round","p":[{"t":"x","v":"จอยสติ๊ก PS2"}]}];
+    const byId = {};
+    LIST.forEach((c) => { byId[c.id] = c; });
+    const COL = {
+      'IN/OUT': ['#0B6E73', '#074D50', '#FFFFFF'], 'Control': ['#1F7A45', '#155530', '#FFFFFF'], 'Math': ['#6D3FD6', '#4C2C95', '#FFFFFF'],
+      'Condition': ['#2B5DB8', '#1E4180', '#FFFFFF'], 'Text': ['#B0306F', '#7B214D', '#FFFFFF'], 'Serial': ['#B0306F', '#7B214D', '#FFFFFF'],
+      'Servo': ['#FFB020', '#C27A00', '#14243D'], 'Stepper': ['#FFB020', '#C27A00', '#14243D'], 'แสง': ['#5B6B00', '#3F4A00', '#FFFFFF'],
+      'pioneer': ['#FFB020', '#C27A00', '#14243D'], 'บัส': ['#FFB020', '#C27A00', '#14243D'],
+      'บล็อกอินพุต': ['#0B6E73', '#074D50', '#FFFFFF'], 'บล็อกเอาต์พุต': ['#5B6B00', '#3F4A00', '#FFFFFF']
+    };
+    const MENUS = ['IN/OUT', 'Control', 'Math', 'Condition', 'Text', 'Serial', 'Servo', 'Stepper', 'แสง', 'pioneer', 'บัส', 'บล็อกอินพุต', 'บล็อกเอาต์พุต'];
+    this._K = { LIST, byId, COL, MENUS, R: 7, NX: 14, ND: 5, A: 18, SNAP: 34 };
+    return this._K;
+  }
+  R3() {
+    if (!this._R) this._R = { root: { current: null }, ws: { current: null }, pal: { current: null }, palIn: { current: null }, trash: { current: null } };
+    return this._R;
+  }
+  tw(t) {
+    this._mc = this._mc || {};
+    const s = String(t);
+    if (this._mc[s] !== undefined) return this._mc[s];
+    let w = s.length * 8.2;
+    try {
+      if (!this._cx) this._cx = document.createElement('canvas').getContext('2d');
+      this._cx.font = "400 14px 'Noto Sans Thai', Tahoma, sans-serif";
+      w = this._cx.measureText(s).width;
+    } catch (e) {}
+    this._mc[s] = Math.ceil(w);
+    return this._mc[s];
+  }
+  clone(m) { return JSON.parse(JSON.stringify(m)); }
+  cur() { return (this.state && this.state.model) || this.initModel(); }
+
+  /* ---------- model ---------- */
+  newNode(m, cid) {
+    const c = this.K().byId[cid];
+    this._seq = (this._seq || 0) + 1;
+    const id = 'b' + Date.now().toString(36) + this._seq;
+    const n = { id, c: cid, f: {}, s: {}, m: [] };
+    if (c.k === 'c' || c.k === 'if') n.m = [[]];
+    if (c.k === 'if') n.br = { elif: 0, els: false };
+    this.allToks(c, n).forEach((tk) => { if (tk.t === 's' || tk.t === 'd') n.f[tk.i] = tk.d; });
+    m.nodes[id] = n;
+    return id;
+  }
+  initModel() {
+    if (this._init) return this._init;
+    const m = { nodes: {}, top: [] };
+    const N = (cid, f, s, mo) => { const id = this.newNode(m, cid); const n = m.nodes[id]; Object.assign(n.f, f || {}); Object.assign(n.s, s || {}); if (mo) n.m = mo; return id; };
+    const done = N('r211-0');
+    const notB = N('r55-0', {}, { 0: done });
+    const wt = N('r20-0', {}, { 1: notB }, [[N('r21-0', { 1: '50' })]]);
+    const btn = N('r223-0', { 0: '2' });
+    const iff = N('r22-0', {}, { 0: btn }, [[N('r209-0'), wt, N('r194-0')]]);
+    const fe = N('r189-0', {}, {}, [[iff, N('r21-0', { 1: '20' })]]);
+    const st = N('start', {}, {}, [[N('r166-0', { 0: '4' })]]);
+    m.top.push({ x: 24, y: 70, ids: [st] });
+    m.top.push({ x: 24, y: 214, ids: [fe] });
+    m.top.push({ x: 470, y: 70, ids: [N('r212-0'), N('r21-0', { 1: '500' })] });
+    this._init = m;
+    return m;
+  }
+  isHat(c) { return !!c.hat; }
+  hasPrev(c) { return (c.k === 'cmd' || c.k === 'c' || c.k === 'if') && !c.hat; }
+  hasNext(c) { return (c.k === 'cmd' || c.k === 'c' || c.k === 'if') && !c.cap; }
+  isRep(c) { return c.k === 'round' || c.k === 'hex'; }
+  sections(c, n) {
+    if (c.k === 'cmd' || c.k === 'round' || c.k === 'hex') return { flat: c.p || [] };
+    if (c.k === 'c') return { bars: [c.h || [], c.f ? c.f : null] };
+    const br = n.br || { elif: 0, els: false };
+    const bars = [[{ t: 'x', v: 'ถ้า' }, { t: 's', k: 'h', i: 0, d: '', e: 1 }, { t: 'x', v: 'ทำ' }]];
+    for (let k = 1; k <= br.elif; k++) bars.push([{ t: 'x', v: 'ไม่อย่างนั้นถ้า' }, { t: 's', k: 'h', i: k, d: '', e: 1 }, { t: 'x', v: 'ทำ' }]);
+    if (br.els) bars.push([{ t: 'x', v: 'ไม่อย่างนั้น' }]);
+    bars.push('btns');
+    return { bars };
+  }
+  allToks(c, n) {
+    const sec = this.sections(c, n);
+    if (sec.flat) return sec.flat;
+    return sec.bars.filter((b) => Array.isArray(b)).reduce((a, b) => a.concat(b), []);
+  }
+  findLoc(m, id) {
+    for (let ti = 0; ti < m.top.length; ti++) { const k = m.top[ti].ids.indexOf(id); if (k >= 0) return { t: 'top', ti, k }; }
+    for (const nid in m.nodes) {
+      const n = m.nodes[nid];
+      for (let mk = 0; mk < n.m.length; mk++) { const k = n.m[mk].indexOf(id); if (k >= 0) return { t: 'mouth', nid, mk, k }; }
+      for (const si in n.s) if (n.s[si] === id) return { t: 'slot', nid, si };
+    }
+    return null;
+  }
+  detach(m, id) {
+    const L = this.findLoc(m, id);
+    if (!L) return [id];
+    if (L.t === 'top') {
+      const e = m.top[L.ti];
+      if (L.k === 0) { m.top.splice(L.ti, 1); return e.ids; }
+      return e.ids.splice(L.k);
+    }
+    if (L.t === 'mouth') return m.nodes[L.nid].m[L.mk].splice(L.k);
+    m.nodes[L.nid].s[L.si] = null;
+    return [id];
+  }
+  delTree(m, id) {
+    const n = m.nodes[id];
+    if (!n) return 0;
+    let c = 1;
+    n.m.forEach((l) => l.forEach((x) => { c += this.delTree(m, x); }));
+    Object.keys(n.s).forEach((k) => { if (n.s[k]) c += this.delTree(m, n.s[k]); });
+    delete m.nodes[id];
+    return c;
+  }
+  descendants(m, ids, acc) {
+    ids.forEach((id) => {
+      const n = m.nodes[id]; if (!n) return;
+      acc[id] = true;
+      n.m.forEach((l) => this.descendants(m, l, acc));
+      Object.keys(n.s).forEach((k) => { if (n.s[k]) this.descendants(m, [n.s[k]], acc); });
+    });
+    return acc;
+  }
+  pushHist(m) {
+    this._hist = this._hist || [];
+    this._hist.push(JSON.stringify(m));
+    if (this._hist.length > 60) this._hist.shift();
+    this._fut = [];
+  }
+
+  /* ---------- measuring ---------- */
+  rowSize(tokens, n, st) {
+    let w = 0, h = 26;
+    const items = [];
+    tokens.forEach((tk, j) => {
+      let it;
+      if (tk.t === 'x') it = { tk, w: this.tw(tk.v), h: 20 };
+      else if (tk.t === 'd') { const v = String(n.f[tk.i] ?? tk.d); it = { tk, v, w: this.tw(v) + 30, h: 26 }; }
+      else {
+        const ch = n.s[tk.i];
+        if (ch && st.nodes[ch]) { const z = this.repSize(ch, st); it = { tk, ch, w: z.w, h: z.h }; }
+        else if (tk.e) it = { tk, w: tk.k === 'h' ? 48 : 38, h: 26, hole: true };
+        else if (tk.k === 'h') { const v = String(n.f[tk.i] ?? tk.d ?? 'จริง'); it = { tk, v, w: this.tw(v) + 44, h: 26, hexDef: true }; }
+        else { const v = String(n.f[tk.i] ?? tk.d); it = { tk, v, w: Math.max(34, this.tw(v) + 22), h: 26, input: true }; }
+      }
+      items.push(it);
+      w += it.w + (j ? 7 : 0);
+      h = Math.max(h, it.h);
+    });
+    return { w, h, items };
+  }
+  repSize(id, st) {
+    const n = st.nodes[id], c = this.K().byId[n.c];
+    const r = this.rowSize(c.p || [], n, st);
+    const h = Math.max(34, r.h + 8);
+    const pad = c.k === 'hex' ? h / 2 + 4 : 13;
+    return { w: Math.max(r.w + pad * 2, h + 8), h, r, pad };
+  }
+  blockSize(id, st) {
+    const n = st.nodes[id], c = this.K().byId[n.c];
+    const sec = this.sections(c, n);
+    if (sec.flat) { const r = this.rowSize(sec.flat, n, st); return { w: Math.max(r.w + 26, 70), h: Math.max(44, r.h + 16), r }; }
+    const bars = sec.bars.map((b, bi) => {
+      if (b === 'btns') return { btns: true, w: 96, h: 34 };
+      if (b === null) return { w: 0, h: 26 };
+      const r = this.rowSize(b, n, st);
+      return { r, w: r.w + 26, h: Math.max(bi === 0 && c.hat ? 52 : 44, r.h + 16) };
+    });
+    const W = Math.max(c.hat ? 200 : 150, ...bars.map((b) => b.w));
+    const mouths = [];
+    for (let k = 0; k < bars.length - 1; k++) mouths.push(Math.max(30, this.listH(n.m[k] || [], st)));
+    let h = 0;
+    bars.forEach((b, k) => { h += b.h; if (k < mouths.length) h += mouths[k]; });
+    return { w: W, h, bars, mouths };
+  }
+  listH(ids, st) { return ids.reduce((a, id) => a + (st.nodes[id] ? this.blockSize(id, st).h : 0), 0); }
+
+  /* ---------- shapes ---------- */
+  topD(w, hat) {
+    const { R, NX, ND } = this.K();
+    if (hat) return 'M0,16 A16,16 0 0 1 16,0 H' + (w - R) + ' A' + R + ',' + R + ' 0 0 1 ' + w + ',' + R;
+    return 'M0,' + R + ' A' + R + ',' + R + ' 0 0 1 ' + R + ',0 H' + NX + ' l4,' + ND + ' h16 l4,-' + ND + ' H' + (w - R) + ' A' + R + ',' + R + ' 0 0 1 ' + w + ',' + R;
+  }
+  botD(w, y, tab) {
+    const { R, NX, ND } = this.K();
+    return ' V' + (y - R) + ' A' + R + ',' + R + ' 0 0 1 ' + (w - R) + ',' + y + (tab ? ' H' + (NX + 24) + ' l-4,' + ND + ' h-16 l-4,-' + ND : '') + ' H' + R + ' A' + R + ',' + R + ' 0 0 1 0,' + (y - R) + ' Z';
+  }
+  stackD(w, h, hat, tab) { return this.topD(w, hat) + this.botD(w, h, tab); }
+  cD(W, bars, mouths, hat, tab) {
+    const { R, NX, ND, A } = this.K();
+    let d = this.topD(W, hat), y = 0;
+    bars.forEach((b, k) => {
+      const yb = y + b.h;
+      if (k < mouths.length) {
+        const mh = mouths[k];
+        d += ' V' + (yb - R) + ' A' + R + ',' + R + ' 0 0 1 ' + (W - R) + ',' + yb;
+        d += ' H' + (A + NX + 24) + ' l-4,' + ND + ' h-16 l-4,-' + ND + ' H' + (A + R) + ' A' + R + ',' + R + ' 0 0 0 ' + A + ',' + (yb + R);
+        d += ' V' + (yb + mh - R) + ' A' + R + ',' + R + ' 0 0 0 ' + (A + R) + ',' + (yb + mh);
+        d += ' H' + (A + NX) + ' l4,' + ND + ' h16 l4,-' + ND + ' H' + (W - R) + ' A' + R + ',' + R + ' 0 0 1 ' + W + ',' + (yb + mh + R);
+        y = yb + mh;
+      } else {
+        d += this.botD(W, yb, tab);
+      }
+    });
+    return d;
+  }
+  pillD(w, h) { const r = h / 2; return 'M' + r + ',0 H' + (w - r) + ' A' + r + ',' + r + ' 0 0 1 ' + (w - r) + ',' + h + ' H' + r + ' A' + r + ',' + r + ' 0 0 1 ' + r + ',0 Z'; }
+  hexD(w, h) { const r = h / 2; return 'M' + r + ',0 H' + (w - r) + ' L' + w + ',' + r + ' L' + (w - r) + ',' + h + ' H' + r + ' L0,' + r + ' Z'; }
+
+  /* ---------- pieces ---------- */
+  P(o) {
+    return Object.assign({ isPath: false, isText: false, isInput: false, isDrop: false, isBtn: false, isStar: false, x: 0, y: 0, w: 0, h: 0, op: 1, pe: 'none', cur: 'default', swid: 1, sw0: 1, sh0: 1, d: '', fill: 'none', stroke: 'none', t: '', color: '#14243D', bg: 'transparent', border: 'none', radius: '999px', clip: 'none', value: '', aria: '' }, o);
+  }
+  look(c, ctx, id) {
+    const col = c.hat ? ['#C2410C', '#872D08', '#FFFFFF'] : this.K().COL[c.m];
+    if (ctx.ghost && ctx.ghost[id]) return { fill: '#C9CFD8', stroke: '#AEB6C2', fg: '#C9CFD8', ghost: true, hole: 'rgba(0,0,0,0.06)' };
+    if (ctx.dis) return { fill: 'url(#sbHatch)', stroke: '#A9B2C0', fg: '#5A6377', dis: true, hole: 'none', holeStroke: '#A9B2C0' };
+    return { fill: col[0], stroke: col[1], fg: col[2], hole: 'rgba(0,0,0,0.22)', holeStroke: 'none', dark: col[2] !== '#FFFFFF' };
+  }
+  pathPiece(ctx, x, y, w, h, d, lk, id, extra) {
+    const down = ctx.down ? ctx.down(id) : null;
+    ctx.pieces.push(this.P(Object.assign({ isPath: true, x, y, sw0: Math.max(1, Math.ceil(w)), sh0: Math.max(1, Math.ceil(h)), d, fill: lk.fill, stroke: lk.stroke, pe: down ? 'visiblePainted' : 'none', cur: down ? 'grab' : 'default', down }, extra || {})));
+  }
+  placeRow(r, n, x, yTop, rowH, ctx, lk) {
+    let ix = x;
+    const cy = yTop + rowH / 2;
+    const C = this.K();
+    r.items.forEach((it, j) => {
+      if (j) ix += 7;
+      const tk = it.tk;
+      if (lk.ghost) {
+        if (it.ch) this.placeRep(it.ch, ix, cy - it.h / 2, ctx);
+        ix += it.w; return;
+      }
+      if (tk.t === 'x') {
+        ctx.pieces.push(this.P({ isText: true, x: ix, y: cy - 10, h: 20, t: tk.v, color: lk.fg }));
+      } else if (tk.t === 'd') {
+        const bg = lk.dis ? 'transparent' : (lk.dark ? 'rgba(20,36,61,0.12)' : 'rgba(0,0,0,0.2)');
+        const border = lk.dis ? '1.5px solid #A9B2C0' : 'none';
+        if (ctx.live) {
+          ctx.pieces.push(this.P({ isDrop: true, x: ix, y: cy - 13, w: it.w, h: 26, t: it.v, color: lk.fg, bg, border, radius: '8px', aria: 'เลือกค่า', open: this.openDD(n.id, tk.i, tk.o) }));
+        } else {
+          ctx.pieces.push(this.P({ isPath: true, x: ix, y: cy - 13, sw0: it.w, sh0: 26, d: 'M8,0 H' + (it.w - 8) + ' A8,8 0 0 1 ' + it.w + ',8 V18 A8,8 0 0 1 ' + (it.w - 8) + ',26 H8 A8,8 0 0 1 0,18 V8 A8,8 0 0 1 8,0 Z', fill: lk.dis ? 'none' : bg, stroke: lk.dis ? '#A9B2C0' : 'none' }));
+          ctx.pieces.push(this.P({ isText: true, x: ix + 9, y: cy - 10, h: 20, t: it.v + ' ▾', color: lk.fg }));
+        }
+      } else if (it.ch) {
+        this.placeRep(it.ch, ix, cy - it.h / 2, ctx);
+      } else if (it.hole) {
+        const d = tk.k === 'h' ? this.hexD(it.w, 26) : this.pillD(it.w, 26);
+        ctx.pieces.push(this.P({ isPath: true, x: ix, y: cy - 13, sw0: it.w, sh0: 26, d, fill: lk.hole, stroke: lk.holeStroke || 'none', swid: 1.5 }));
+        if (ctx.slots) ctx.slots.push({ nid: n.id, si: tk.i, k: tk.k, x: ix, y: cy, w: it.w, h: 26 });
+      } else if (it.hexDef) {
+        ctx.pieces.push(this.P({ isPath: true, x: ix, y: cy - 13, sw0: it.w, sh0: 26, d: this.hexD(it.w, 26), fill: lk.dis ? 'none' : C.COL.Condition[0], stroke: lk.dis ? '#A9B2C0' : C.COL.Condition[1], swid: 1.5 }));
+        if (ctx.live) ctx.pieces.push(this.P({ isDrop: true, x: ix + 10, y: cy - 13, w: it.w - 20, h: 26, t: it.v, color: '#FFFFFF', bg: 'transparent', radius: '0', aria: 'เลือก จริง หรือ เท็จ', open: this.openDD(n.id, tk.i, ['จริง', 'เท็จ']) }));
+        else ctx.pieces.push(this.P({ isText: true, x: ix + 14, y: cy - 10, h: 20, t: it.v, color: '#FFFFFF' }));
+        if (ctx.slots) ctx.slots.push({ nid: n.id, si: tk.i, k: 'h', x: ix, y: cy, w: it.w, h: 26 });
+      } else {
+        const bg = lk.dis ? 'transparent' : '#FFFFFF';
+        const fg = lk.dis ? '#FFFFFF' : '#14243D';
+        if (ctx.live) {
+          ctx.pieces.push(this.P({ isInput: true, x: ix, y: cy - 13, w: it.w, h: 26, value: it.v, color: fg, bg, border: lk.dis ? '1.5px solid #A9B2C0' : '1px solid rgba(0,0,0,0.12)', aria: 'ค่าในบล็อก', change: this.onField(n.id, tk.i, !!tk.n), focus: this.onFieldFocus() }));
+        } else {
+          ctx.pieces.push(this.P({ isPath: true, x: ix, y: cy - 13, sw0: it.w, sh0: 26, d: this.pillD(it.w, 26), fill: bg, stroke: lk.dis ? '#A9B2C0' : 'rgba(0,0,0,0.12)' }));
+          ctx.pieces.push(this.P({ isText: true, x: ix + (it.w - this.tw(it.v)) / 2, y: cy - 10, h: 20, t: it.v, color: fg }));
+        }
+        if (ctx.slots) ctx.slots.push({ nid: n.id, si: tk.i, k: 'r', x: ix, y: cy, w: it.w, h: 26 });
+      }
+      ix += it.w;
+    });
+  }
+  placeRep(id, x, y, ctx) {
+    const st = ctx.st, n = st.nodes[id], c = this.K().byId[n.c];
+    const z = this.repSize(id, st);
+    const lk = this.look(c, ctx, id);
+    const d = c.k === 'hex' ? this.hexD(z.w, z.h) : this.pillD(z.w, z.h);
+    this.pathPiece(ctx, x, y, z.w, z.h, d, lk, id);
+    if (ctx.pos) ctx.pos[id] = { x, y };
+    this.placeRow(z.r, n, x + z.pad, y, z.h, ctx, lk);
+    return z;
+  }
+  placeBlock(id, x, y, ctx) {
+    const K = this.K(), st = ctx.st, n = st.nodes[id], c = K.byId[n.c];
+    const z = this.blockSize(id, st);
+    const lk = this.look(c, ctx, id);
+    if (ctx.pos) ctx.pos[id] = { x, y };
+    if (z.r) {
+      this.pathPiece(ctx, x, y, z.w, z.h + K.ND, this.stackD(z.w, z.h, !!c.hat, this.hasNext(c)), lk, id);
+      this.placeRow(z.r, n, x + 13, y, z.h, ctx, lk);
+      return z;
+    }
+    this.pathPiece(ctx, x, y, z.w, z.h + K.ND, this.cD(z.w, z.bars, z.mouths, !!c.hat, this.hasNext(c)), lk, id);
+    let yy = y;
+    z.bars.forEach((b, k) => {
+      if (b.btns) {
+        if (!lk.ghost) this.mutBtns(ctx, n, x + 14, yy + 5, lk);
+      } else if (b.r) {
+        this.placeRow(b.r, n, x + 13, yy + (k === 0 && c.hat ? 4 : 0), b.h - (k === 0 && c.hat ? 4 : 0), ctx, lk);
+      }
+      yy += b.h;
+      if (k < z.mouths.length) {
+        const ref = { nid: id, mk: k };
+        if (ctx.conns) ctx.conns.push({ t: 'ins', ref, k: 0, x: x + K.A, y: yy });
+        this.placeList(n.m[k] || [], ref, x + K.A, yy, ctx);
+        yy += z.mouths[k];
+      }
+    });
+    return z;
+  }
+  mutBtns(ctx, n, x, y, lk) {
+    if (!ctx.live) {
+      ctx.pieces.push(this.P({ isText: true, x, y: y + 2, h: 20, t: '⊖  ⊕', color: lk.fg }));
+      return;
+    }
+    const br = n.br || { elif: 0, els: false };
+    const canMinus = br.elif > 0 || br.els;
+    ctx.pieces.push(this.P({ isBtn: true, x, y, w: 24, h: 24, t: '−', color: lk.fg, op: canMinus ? 1 : 0.4, aria: 'เอาทางล่าสุดออก', click: this.onMut(n.id, -1) }));
+    ctx.pieces.push(this.P({ isBtn: true, x: x + 32, y, w: 24, h: 24, t: '+', color: lk.fg, aria: br.els ? 'เพิ่ม ไม่อย่างนั้นถ้า' : 'เพิ่ม ไม่อย่างนั้น', click: this.onMut(n.id, 1) }));
+  }
+  placeList(ids, ref, x, y, ctx) {
+    const st = ctx.st;
+    let yy = y;
+    ids.forEach((id, i) => {
+      if (!st.nodes[id]) return;
+      const c = this.K().byId[st.nodes[id].c];
+      const z = this.placeBlock(id, x, yy, ctx);
+      yy += z.h;
+      if (ctx.conns && this.hasNext(c)) ctx.conns.push({ t: 'ins', ref, k: i + 1, x, y: yy });
+    });
+    return yy - y;
+  }
+  layoutWS(model, ghost) {
+    const ctx = { st: model, pieces: [], conns: [], slots: [], pos: {}, ghost, live: true, down: (id) => (e) => this.onDown(e, { src: 'ws', id }) };
+    model.top.forEach((e, ti) => {
+      const first = model.nodes[e.ids[0]];
+      if (!first) return;
+      const c = this.K().byId[first.c];
+      ctx.dis = !c.hat;
+      if (this.isRep(c)) { this.placeRep(e.ids[0], e.x, e.y, ctx); return; }
+      if (this.hasPrev(c)) ctx.conns.push({ t: 'above', ti, x: e.x, y: e.y });
+      this.placeList(e.ids, { ti }, e.x, e.y, ctx);
+    });
+    return ctx;
+  }
+  getList(m, ref) { return ref.ti !== undefined ? m.top[ref.ti].ids : m.nodes[ref.nid].m[ref.mk]; }
+
+  /* ---------- snapping ---------- */
+  groupGeo(model, drag) {
+    const o = this._wsO || { x: 0, y: 0 };
+    const gx = drag.px - o.x - drag.offX, gy = drag.py - o.y - drag.offY;
+    const c = this.K().byId[model.nodes[drag.ids[0]].c];
+    if (this.isRep(c)) { const z = this.repSize(drag.ids[0], model); return { gx, gy, gh: z.h, c, rep: true }; }
+    const last = this.K().byId[model.nodes[drag.ids[drag.ids.length - 1]].c];
+    return { gx, gy, gh: this.listH(drag.ids, model), c, last };
+  }
+  findCand(model, drag, base) {
+    const G = this.groupGeo(model, drag);
+    const S = this.K().SNAP;
+    let best = null, bd = S * S;
+    if (G.c.hat) return null;
+    if (G.rep) {
+      base.slots.forEach((s) => {
+        if (s.k === 'h' && G.c.k !== 'hex') return;
+        const dx = G.gx - s.x, dy = (G.gy + G.gh / 2) - s.y, d = dx * dx + dy * dy;
+        if (d < bd) { bd = d; best = { t: 'slot', nid: s.nid, si: s.si, x: s.x, y: s.y, w: s.w, k: s.k }; }
+      });
+      return best;
+    }
+    const lastNext = this.hasNext(G.last);
+    base.conns.forEach((cn) => {
+      let d;
+      if (cn.t === 'ins') {
+        if (!this.hasPrev(G.c)) return;
+        const L = this.getList(model, cn.ref);
+        if (cn.k < L.length && !lastNext) return;
+        const dx = G.gx - cn.x, dy = G.gy - cn.y; d = dx * dx + dy * dy;
+      } else {
+        if (!lastNext) return;
+        const dx = G.gx - cn.x, dy = (G.gy + G.gh) - cn.y; d = dx * dx + dy * dy;
+      }
+      if (d < bd) { bd = d; best = Object.assign({}, cn, { gh: G.gh }); }
+    });
+    return best;
+  }
+  applyCand(m, ids, cand) {
+    if (cand.t === 'slot') { m.nodes[cand.nid].s[cand.si] = ids[0]; return; }
+    if (cand.t === 'ins') { this.getList(m, cand.ref).splice(cand.k, 0, ...ids); return; }
+    const e = m.top[cand.ti];
+    e.ids = ids.concat(e.ids);
+    e.y = e.y - cand.gh;
+  }
+
+  /* ---------- events ---------- */
+  rootPt(e) { return { x: (e.clientX - this._rr.left) / this._sc, y: (e.clientY - this._rr.top) / this._sc }; }
+  measureRoot() {
+    const R = this.R3();
+    const root = R.root.current;
+    if (!root) return false;
+    this._rr = root.getBoundingClientRect();
+    this._sc = this._rr.width / 1440 || 1;
+    if (R.ws.current) { const w = R.ws.current.getBoundingClientRect(); this._wsO = { x: (w.left - this._rr.left) / this._sc, y: (w.top - this._rr.top) / this._sc }; }
+    return true;
+  }
+  onDown(e, info) {
+    if (e.button !== undefined && e.button !== 0) return;
+    e.stopPropagation();
+    if (e.preventDefault) e.preventDefault();
+    if (!this.measureRoot()) return;
+    try { this.R3().root.current.setPointerCapture(e.pointerId); } catch (x) {}
+    this._press = { info, sx: e.clientX, sy: e.clientY };
+    if (this.state && this.state.dd) this.setState({ dd: null });
+  }
+  zoneAt(e) {
+    const R = this.R3();
+    const inside = (el) => { if (!el) return false; const r = el.getBoundingClientRect(); return e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom; };
+    if (inside(R.trash.current)) return 'trash';
+    if (inside(R.pal.current)) return 'pal';
+    return null;
+  }
+  beginDrag(info, pt) {
+    const R = this.R3();
+    const before = this.cur();
+    const m = this.clone(before);
+    let ids, ox, oy;
+    if (info.src === 'pal') {
+      ids = [this.newNode(m, info.cat)];
+      const pc = R.palIn.current.getBoundingClientRect();
+      ox = (pc.left - this._rr.left) / this._sc + info.ox;
+      oy = (pc.top - this._rr.top) / this._sc + info.oy;
+      this._fromPal = true;
+    } else {
+      const p = (this._lastPos || {})[info.id] || { x: 0, y: 0 };
+      ids = this.detach(m, info.id);
+      ox = this._wsO.x + p.x;
+      oy = this._wsO.y + p.y;
+      this._fromPal = false;
+    }
+    this.pushHist(before);
+    this.setState({ model: m, toast: null, drag: { ids, offX: pt.x - ox, offY: pt.y - oy, px: pt.x, py: pt.y, over: null } });
+  }
+  onMoveEv(e) {
+    const p = this._press;
+    if (!p) return;
+    const S = this.state || {};
+    const pt = this.rootPt(e);
+    if (!S.drag) {
+      if (Math.abs(e.clientX - p.sx) + Math.abs(e.clientY - p.sy) < 5) return;
+      this.beginDrag(p.info, pt);
+      return;
+    }
+    this.setState({ drag: Object.assign({}, S.drag, { px: pt.x, py: pt.y, over: this.zoneAt(e) }) });
+  }
+  onUpEv(e) {
+    const p = this._press;
+    this._press = null;
+    try { this.R3().root.current.releasePointerCapture(e.pointerId); } catch (x) {}
+    const S = this.state || {};
+    const d = S.drag;
+    if (!p || !d) return;
+    const m = this.clone(S.model);
+    const over = this.zoneAt(e);
+    if (over) {
+      let cnt = 0;
+      d.ids.forEach((id) => { cnt += this.delTree(m, id); });
+      if (this._fromPal) { (this._hist || []).pop(); this._fromPal = false; this.setState({ model: m, drag: null }); return; }
+      this.setState({ model: m, drag: null, toast: { text: 'ลบ ' + cnt + ' บล็อกแล้ว', kind: 'model' } });
+      return;
+    }
+    const cand = this._cand;
+    if (cand) this.applyCand(m, d.ids, cand);
+    else {
+      const G = this.groupGeo(m, d);
+      m.top.push({ x: Math.max(6, Math.round(G.gx)), y: Math.max(6, Math.round(G.gy)), ids: d.ids });
+    }
+    this._fromPal = false;
+    this.setState({ model: m, drag: null });
+  }
+  openDD(nid, si, opts) {
+    return (e) => {
+      if (!this.measureRoot()) return;
+      const r = e.currentTarget.getBoundingClientRect();
+      this.setState({ dd: { nid, si, opts, x: (r.left - this._rr.left) / this._sc, y: (r.bottom - this._rr.top) / this._sc + 4 } });
+    };
+  }
+  onField(nid, si, numeric) {
+    return (e) => {
+      const v = e.target.value;
+      if (numeric && !/^-?\d*\.?\d*$/.test(v)) return;
+      const m = this.clone(this.cur());
+      if (!m.nodes[nid]) return;
+      m.nodes[nid].f[si] = v;
+      this.setState({ model: m });
+    };
+  }
+  onFieldFocus() { return () => this.pushHist(this.cur()); }
+  onMut(nid, dir) {
+    return () => {
+      const before = this.cur();
+      const m = this.clone(before);
+      const n = m.nodes[nid];
+      if (!n) return;
+      const br = n.br || { elif: 0, els: false };
+      if (dir > 0) {
+        this.pushHist(before);
+        if (!br.els) { br.els = true; n.m.push([]); }
+        else { br.elif += 1; n.m.splice(br.elif, 0, []); }
+        n.br = br;
+        this.setState({ model: m, toast: null });
+        return;
+      }
+      let spill = [], rep = null;
+      if (br.elif > 0) { spill = n.m.splice(br.elif, 1)[0] || []; rep = n.s[br.elif] || null; delete n.s[br.elif]; br.elif -= 1; }
+      else if (br.els) { spill = n.m.pop() || []; br.els = false; }
+      else return;
+      this.pushHist(before);
+      n.br = br;
+      const p = (this._lastPos || {})[nid] || { x: 20, y: 20 };
+      const w = this.blockSize(nid, m).w;
+      if (spill.length) m.top.push({ x: p.x + w + 28, y: p.y, ids: spill });
+      if (rep) m.top.push({ x: p.x + w + 28, y: p.y + (spill.length ? this.listH(spill, m) + 16 : 0), ids: [rep] });
+      const moved = spill.length || rep;
+      this.setState({ model: m, toast: moved ? { text: 'ย้ายบล็อกในทางที่ลบออกมาวางข้าง ๆ', kind: 'model' } : null });
+    };
+  }
+  doUndo() {
+    this._hist = this._hist || []; this._fut = this._fut || [];
+    if (!this._hist.length) return;
+    this._fut.push(JSON.stringify(this.cur()));
+    this.setState({ model: JSON.parse(this._hist.pop()), toast: null, dd: null });
+  }
+  doRedo() {
+    this._hist = this._hist || []; this._fut = this._fut || [];
+    if (!this._fut.length) return;
+    this._hist.push(JSON.stringify(this.cur()));
+    this.setState({ model: JSON.parse(this._fut.pop()), toast: null, dd: null });
+  }
+
+  /* ---------- code ---------- */
+  val(m, n, tk) {
+    if (tk.t === 'd') return String(n.f[tk.i] ?? tk.d);
+    const ch = n.s[tk.i];
+    if (ch && m.nodes[ch]) return this.expr(m, ch);
+    if (tk.e) return '___';
+    const v = String(n.f[tk.i] ?? tk.d);
+    if (tk.k === 'h') return v === 'เท็จ' ? 'False' : 'True';
+    if (tk.n || v === 'item') return v === '' ? '0' : v;
+    return JSON.stringify(v);
+  }
+  args(m, n, c) { return this.allToks(c, n).filter((t) => t.t !== 'x').map((t) => this.val(m, n, t)); }
+  expr(m, id) {
+    const n = m.nodes[id], c = this.K().byId[n.c], a = this.args(m, n, c);
+    const OP = { '−': '-', '×': '*', '÷': '/' };
+    switch (c.id) {
+      case 'r26-0': return 'time.ticks_ms()';
+      case 'r40-0': return '(' + a[0] + ' ' + (OP[a[1]] || a[1]) + ' ' + a[2] + ')';
+      case 'r40-1': return '0';
+      case 'r41-0': return '(' + a[0] + ' ' + a[1] + ' ' + a[2] + ')';
+      case 'r42-0': return 'math.' + a[0] + '(' + a[1] + ')';
+      case 'r44-0': return a[0] + (a[1] === '++' ? ' + 1' : ' - 1');
+      case 'r50-0': return 'max(' + a[1] + ', min(' + a[2] + ', ' + a[0] + '))';
+      case 'r53-0': return '(' + a[0] + (a[1] === 'และ' ? ' and ' : ' or ') + a[2] + ')';
+      case 'r55-0': return 'not ' + a[0];
+      case 'r56-0': return a[0] === 'จริง' ? 'True' : 'False';
+      case 'r59-0': return '"hello"';
+      case 'r60-0': return 'str(' + a[0] + ') + str(' + a[1] + ')';
+      default: return 'blk_r' + c.row + '(' + a.join(', ') + ')';
+    }
+  }
+  stmts(m, ids, ind, out) {
+    const real = ids.filter((id) => m.nodes[id]);
+    if (!real.length) { out.push(ind + 'pass'); return; }
+    real.forEach((id) => {
+      const n = m.nodes[id], c = this.K().byId[n.c];
+      if (c.k === 'if') {
+        const br = n.br || { elif: 0, els: false };
+        for (let k = 0; k <= br.elif; k++) {
+          const ch = n.s[k];
+          out.push(ind + (k ? 'elif ' : 'if ') + (ch && m.nodes[ch] ? this.expr(m, ch) : '___') + ':');
+          this.stmts(m, n.m[k] || [], ind + '    ', out);
+        }
+        if (br.els) { out.push(ind + 'else:'); this.stmts(m, n.m[br.elif + 1] || [], ind + '    ', out); }
+        return;
+      }
+      const a = this.args(m, n, c);
+      if (c.k === 'c') {
+        const until = String(a[0] || '').indexOf('จนกว่า') === 0;
+        if (c.id === 'r20-0') { out.push(ind + 'while ' + (until ? 'not ' : '') + a[1] + ':'); this.stmts(m, n.m[0], ind + '    ', out); return; }
+        if (c.id === 'r19-0') { out.push(ind + 'while True:'); this.stmts(m, n.m[0], ind + '    ', out); out.push(ind + '    if ' + (until ? '' : 'not ') + a[1] + ': break'); return; }
+        if (c.id === 'r24-0') { out.push(ind + 'for i in range(' + a[0] + ', ' + a[1] + ', ' + a[2] + '):'); this.stmts(m, n.m[0], ind + '    ', out); return; }
+        out.push(ind + 'blk_r' + c.row + '(' + a.join(', ') + '):');
+        this.stmts(m, n.m[0], ind + '    ', out);
+        return;
+      }
+      let s;
+      switch (c.id) {
+        case 'r18-0': s = 'raise SystemExit'; break;
+        case 'r21-0': s = (a[0] === 'ไมโครวินาที' ? 'time.sleep_us(' : 'time.sleep_ms(') + a[1] + ')'; break;
+        case 'r43-0': s = a[0] + ' ' + a[1] + ' ' + a[2]; break;
+        case 'r85-0': s = 'print(' + a[0] + ')'; break;
+        default: s = 'blk_r' + c.row + '(' + a.join(', ') + ')';
+      }
+      out.push(ind + s);
+    });
+  }
+  gen(m) {
+    const out = ['import time', 'import math', ''];
+    const tops = m.top.filter((e) => m.nodes[e.ids[0]] && this.K().byId[m.nodes[e.ids[0]].c].hat);
+    const starts = tops.filter((e) => m.nodes[e.ids[0]].c === 'start');
+    const loops = tops.filter((e) => m.nodes[e.ids[0]].c === 'r189-0');
+    if (!tops.length) out.push('# ยังไม่มีบล็อกเริ่มต้น หรือ โปรแกรมหลัก');
+    starts.forEach((e) => {
+      out.push('# เริ่มต้น');
+      const l = m.nodes[e.ids[0]].m[0] || [];
+      if (l.length) this.stmts(m, l, '', out);
+      out.push('');
+    });
+    loops.forEach((e) => {
+      out.push('while True:  # โปรแกรมหลัก วนทำซ้ำ');
+      this.stmts(m, m.nodes[e.ids[0]].m[0] || [], '    ', out);
+      out.push('');
+    });
+    return out.map((t) => (t.indexOf('blk_') >= 0 || t.indexOf('___') >= 0 ? t + '  # ❓' : t));
+  }
+
+  /* ---------- render ---------- */
+  renderVals() {
+    const K = this.K(), R = this.R3();
+    const S = this.state || {}, P = this.props || {};
+    const model = this.cur();
+    const drag = S.drag || null;
+    const menu = S.menu ?? (P.menu ?? 'Control');
+    const codeOpen = S.codeOpen ?? (P.codeOpen ?? false);
+    const robot = P.robotState ?? 'connected';
+    const favs = S.favs ?? ['r22-0', 'r21-0', 'r209-0', 'r223-0'];
+
+    // workspace
+    const base = this.layoutWS(model, null);
+    this._lastPos = base.pos;
+    let cand = null;
+    if (drag && !drag.over) cand = this.findCand(model, drag, base);
+    this._cand = cand;
+    let view = base;
+    if (cand && cand.t !== 'slot') {
+      const pm = this.clone(model);
+      this.applyCand(pm, drag.ids, cand);
+      view = this.layoutWS(pm, this.descendants(pm, drag.ids, {}));
+    }
+    let wsPieces = view.pieces;
+    if (cand && cand.t === 'slot') {
+      const d = cand.k === 'h' ? this.hexD(cand.w + 6, 32) : this.pillD(cand.w + 6, 32);
+      wsPieces = wsPieces.concat([this.P({ isPath: true, x: cand.x - 3, y: cand.y - 16, sw0: cand.w + 6, sh0: 32, d, fill: 'rgba(255,255,255,0.35)', stroke: '#FFFFFF', swid: 3 })]);
+    }
+
+    // drag layer
+    let dragPieces = [];
+    if (drag) {
+      const dctx = { st: model, pieces: [], live: false, down: null };
+      const ox = drag.px - drag.offX, oy = drag.py - drag.offY;
+      const c0 = K.byId[model.nodes[drag.ids[0]].c];
+      if (this.isRep(c0)) this.placeRep(drag.ids[0], ox, oy, dctx);
+      else this.placeList(drag.ids, null, ox, oy, dctx);
+      dragPieces = dctx.pieces.map((p) => Object.assign(p, { op: 0.92 }));
+    }
+
+    // palette
+    const items = menu === 'fav' ? favs.filter((id) => K.byId[id]) : K.LIST.filter((c) => c.m === menu).map((c) => c.id);
+    const pctx = { st: { nodes: {} }, pieces: [], live: false };
+    let py = 12, pw = 380;
+    items.forEach((cid, idx) => {
+      const tmp = { nodes: {} };
+      const tid = this.newNode(tmp, cid);
+      pctx.st = tmp;
+      const c = K.byId[cid];
+      const bx = 56, by = py;
+      pctx.down = () => (e) => this.onDown(e, { src: 'pal', cat: cid, ox: bx, oy: by });
+      pctx.dis = false;
+      let z;
+      if (this.isRep(c)) z = this.placeRep(tid, bx, by, pctx);
+      else z = this.placeBlock(tid, bx, by, pctx);
+      const fav = favs.includes(cid);
+      pctx.pieces.push(this.P({ isStar: true, x: 6, y: by + Math.min(z.h, 44) / 2 - 22, w: 44, h: 44, fill: fav ? '#FFB020' : 'none', stroke: fav ? '#C27A00' : '#8A94A6', aria: fav ? 'เอาออกจากของโปรด' : 'เพิ่มในของโปรด', click: () => {
+        const next = fav ? favs.filter((x) => x !== cid) : favs.concat([cid]);
+        this.setState({ favs: next, toast: { text: fav ? 'เอาออกจากของโปรดแล้ว' : 'เพิ่มในของโปรดแล้ว', kind: 'fav', prev: favs } });
+      } }));
+      if (P.showSource) pctx.pieces.push(this.P({ isText: true, x: bx, y: by + z.h + 6, h: 16, t: 'แถว ' + c.row + (c.note ? ' · ' + c.note : ''), color: '#5A6377' }));
+      py += z.h + (P.showSource ? 30 : 18) + K.ND;
+      pw = Math.max(pw, bx + z.w + 24);
+    });
+
+    // menus
+    const menuRow = (id, name, color, edge, count, divider) => ({
+      name, color, edge, count, divider, selected: id === menu,
+      bg: id === menu ? '#EAF2FD' : 'transparent', border: id === menu ? '#1866C9' : 'transparent', weight: id === menu ? 700 : 600,
+      pick: () => this.setState({ menu: id })
+    });
+    const menus = [menuRow('fav', 'ของโปรด', '#FFB020', '#C27A00', String(favs.length), true)]
+      .concat(K.MENUS.map((mn) => menuRow(mn, mn, K.COL[mn][0], K.COL[mn][1], String(K.LIST.filter((c) => c.m === mn).length), false)));
+    const counts = {};
+    items.forEach((cid) => { const k = K.byId[cid].k === 'if' ? 'c' : K.byId[cid].k; counts[k] = (counts[k] || 0) + 1; });
+    const SH = { cmd: 'คำสั่ง', c: 'บล็อกครอบ', round: 'มน', hex: 'หกเหลี่ยม' };
+    const sub = ['cmd', 'c', 'round', 'hex'].filter((k) => counts[k]).map((k) => SH[k] + ' ' + counts[k]).join(' · ');
+
+    const RS = {
+      connected: { name: 'หุ่นกลุ่ม 3', sub: 'เชื่อมต่อแล้ว', dot: '#2E7D32', chipBg: '#FFFFFF', status: 'มีการแก้ไขที่ยังไม่ได้ส่งลงหุ่น', statusDot: '#FFB020', send: 'ส่งลงหุ่นและเริ่มทำงาน', ok: true, connect: false },
+      notConnected: { name: 'ยังไม่ได้เชื่อมต่อหุ่น', sub: 'เสียบสาย USB แล้วกดเชื่อมต่อ', dot: '#8A94A6', chipBg: '#F7F9FC', status: 'เชื่อมต่อหุ่นก่อน จึงจะส่งโปรแกรมได้', statusDot: '#8A94A6', send: 'ส่งลงหุ่นและเริ่มทำงาน', ok: false, connect: true },
+      running: { name: 'หุ่นกลุ่ม 3', sub: 'โปรแกรมกำลังทำงาน', dot: '#2E7D32', chipBg: '#FFFFFF', status: 'ตรงกับหุ่นแล้ว · โปรแกรมทำงานบนหุ่นกลุ่ม 3', statusDot: '#2E7D32', send: 'ส่งลงหุ่นอีกครั้ง', ok: true, connect: false }
+    }[robot] || {};
+
+    const code = codeOpen ? this.gen(model).map((t, i) => ({
+      n: i + 1, text: t,
+      color: t.indexOf('❓') >= 0 ? '#8A5A00' : (t.trim().indexOf('#') === 0 ? '#5A6377' : '#14243D'),
+      bg: t.indexOf('❓') >= 0 ? '#FFF4DC' : 'transparent'
+    })) : [];
+
+    const toast = S.toast || null;
+    const dd = S.dd || null;
+    const hist = this._hist || [], fut = this._fut || [];
+    const over = drag ? drag.over : null;
+
+    return {
+      rootRef: R.root, wsRef: R.ws, palRef: R.pal, palInRef: R.palIn, trashRef: R.trash,
+      onMove: (e) => this.onMoveEv(e), onUp: (e) => this.onUpEv(e),
+      onRootDown: () => { if (this.state && this.state.dd) this.setState({ dd: null }); },
+      stopEv: (e) => e.stopPropagation(),
+      wsPieces, palPieces: pctx.pieces, dragPieces, palW: pw, palH: py + 24,
+      overPal: over === 'pal',
+      trashBg: over === 'trash' ? '#D32F2F' : '#FFFFFF', trashBorder: over === 'trash' ? '#A12222' : '#DCE3EC', trashIcon: over === 'trash' ? '#FFFFFF' : '#5A6377',
+      hasDD: !!dd, ddX: dd ? dd.x : 0, ddY: dd ? dd.y : 0,
+      ddOpts: dd ? dd.opts.map((o) => {
+        const curV = String(((this.cur().nodes[dd.nid] || {}).f || {})[dd.si] ?? '');
+        return { label: o, bg: o === curV ? '#EAF2FD' : 'transparent', weight: o === curV ? 700 : 500, pick: () => {
+          const before = this.cur(); const m = this.clone(before);
+          if (m.nodes[dd.nid]) { this.pushHist(before); m.nodes[dd.nid].f[dd.si] = o; }
+          this.setState({ model: m, dd: null });
+        } };
+      }) : [],
+      robotName: RS.name, robotSub: RS.sub, robotDot: RS.dot, robotChipBg: RS.chipBg, showConnect: RS.connect,
+      statusText: RS.status, statusDot: RS.statusDot, sendLabel: RS.send, sendDisabled: !RS.ok,
+      sendBg: RS.ok ? '#FFB020' : '#EEF1F5', sendEdge: RS.ok ? '#C27A00' : '#DCE3EC', sendFg: RS.ok ? '#14243D' : '#8A94A6',
+      stopDisabled: !RS.ok, stopOpacity: RS.ok ? 1 : 0.45,
+      undo: () => this.doUndo(), redo: () => this.doRedo(),
+      noUndo: !hist.length, noRedo: !fut.length, undoOp: hist.length ? 1 : 0.45, redoOp: fut.length ? 1 : 0.45,
+      menus,
+      paletteTitle: menu === 'fav' ? 'ของโปรดของฉัน' : menu,
+      paletteSub: menu === 'fav' ? 'บล็อกที่ใช้บ่อย หยิบได้ทันที' : (items.length + ' บล็อก · ' + sub),
+      showFavEmpty: menu === 'fav' && favs.length === 0,
+      codeOpen, codeBtnLabel: codeOpen ? 'ซ่อนโค้ด' : 'ดูโค้ด', toggleCode: () => this.setState({ codeOpen: !codeOpen }), codeLines: code,
+      hasToast: !!toast, toastText: toast ? toast.text : '',
+      undoToast: () => {
+        if (toast && toast.kind === 'fav') this.setState({ favs: toast.prev, toast: null });
+        else this.doUndo();
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -20,6 +20,7 @@ try {
     Invoke-SchoolBotCommand $SchoolBotNpm @('run','build')
 } finally { Pop-Location }
 & "$PSScriptRoot/build-engine.ps1" -Engine zide -OutputDirectory (Join-Path $schoolBotDesktopOutput 'engines/zide')
+& "$PSScriptRoot/build-engine.ps1" -Engine mixly -OutputDirectory (Join-Path $schoolBotDesktopOutput 'engines/mixly')
 $schoolBotManifest = Join-Path $SchoolBotRoot 'app/frontend/package.json'
 $schoolBotResourceVersion = (Get-Content -LiteralPath $schoolBotManifest -Raw | ConvertFrom-Json).version
 if ($schoolBotResourceVersion -cnotmatch '^\d+\.\d+\.\d+$') { throw 'package.json version must be x.y.z.' }
@@ -59,5 +60,5 @@ try {
             "$schoolBotCopyAdvice $schoolBotCopyError")
     }
     Assert-SchoolBotDesktopExecutable -Directory $schoolBotDesktopOutput -Version $schoolBotResourceVersion
-    Write-Host "Desktop ready: $schoolBotVersionedExe (bundle demo-engine and engines/zide with the app)."
+    Write-Host "Desktop ready: $schoolBotVersionedExe (bundle demo-engine, engines/zide and engines/mixly with the app)."
 } finally { Pop-Location }

@@ -7,6 +7,9 @@ type Props = ReturnType<typeof useWindowClose>;
 
 export function CloseDialog(props: Props) {
   const { panel, onKeyDown } = useCloseDialog(props.closeBusy);
+  // While stopping, what the close waits for (when a guard named it) says more than the step.
+  const phaseKey = `entry.close.phases.${props.closePhase}`;
+  const statusKey = props.closePhase === "stopping" && props.closeNote ? props.closeNote : phaseKey;
 
   return (
     <div
@@ -36,7 +39,7 @@ export function CloseDialog(props: Props) {
       >
         <p className="m-0 font-body text-[16px] leading-[32px] text-muted">{t("modal.close.description")}</p>
         {!props.closeSaveAvailable && <p className="m-0 leading-[32px]">{t("entry.close.saveUnavailable")}</p>}
-        {props.closeBusy && <p role="status" aria-live="polite">{t(`entry.close.phases.${props.closePhase}`)}</p>}
+        {props.closeBusy && <p role="status" aria-live="polite">{t(statusKey)}</p>}
         {props.closeError && (
           <p role="alert" className="m-0 leading-[32px] text-err-ink">
             {t(props.closeError)}

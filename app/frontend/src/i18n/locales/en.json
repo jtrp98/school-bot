@@ -1397,10 +1397,6 @@
       "unitCompleteLabel": "Unit complete",
       "startUnit": "Start unit",
       "robotDisconnected": "Robot disconnected",
-      "dragBlocksFromTheToolboxConnectThemIntoOne": "Drag blocks from the toolbox. Connect them into one sequence.",
-      "blockProjectSavedLocally": "Block project saved locally.",
-      "noSavedBlockProjectYet": "No saved block project yet.",
-      "savedBlockProjectLoaded": "Saved block project loaded.",
       "writeASequenceThenBringItToLife": "Write a sequence, then bring it to life.",
       "savedProgramLoaded": "Saved program loaded.",
       "noSavedProgramYet": "No saved program yet.",
@@ -1699,28 +1695,9 @@
   },
   "blocks": {
     "messages": {
-      "engineCommandTrace": "Engine command trace",
-      "buildYourSequence": "Build your sequence",
-      "thinkItConnectItTryIt": "Think it. Connect it. Try it.",
-      "localWorkspaceBlockly": "LOCAL WORKSPACE · BLOCKLY",
-      "runBlocks": "Run blocks ▷",
       "visualProgrammingWorkspace": "Visual programming workspace"
     },
-    "move": "move",
-    "direction": {
-      "right": "right",
-      "left": "left"
-    },
-    "tiles": "tiles",
-    "jump": "jump",
-    "repeat": "repeat",
-    "times": "times",
-    "run": {
-      "result": "Blocks accepted by the shared engine. Showing the command trace."
-    },
-    "workspace": {
-      "scope": "Movement, jump and bounded repeat are supported. Variables, functions, conditions and device blocks are still in development."
-    }
+    "move": "move"
   },
   "adventure": {
     "messages": {
@@ -1831,6 +1808,927 @@
         "saving": "Saving failed. Your work has not been stored and the window remains open. Try again or check disk space.",
         "stopping": "The robot stop request failed. The window remains open and physical stop is not confirmed. Retry closing or cancel.",
         "closing": "Closing failed. The window remains open. Retry closing or cancel."
+      }
+    }
+  },
+  "blockLab": {
+    "board": {
+      "change": "Change",
+      "notConnected": "Board not connected",
+      "notConnectedHint": "Plug in the board's USB cable, then press Change to pick the board",
+      "usbOnly": "Connects over USB, no internet needed",
+      "tapToClose": "Tap anywhere to close",
+      "changeLabel": "Change Uno board",
+      "changeHere": "You're on the board screen. Pick a board from the cards.",
+      "connectedChip": "{{boardName}} · {{port}}",
+      "connectedChipWithChip": "{{boardName}} · {{port}} · {{chipName}}",
+      "connectedTitle": "Uno board connected",
+      "connectedBody": "This board is chosen. When you're ready, press Send to board.",
+      "connectedMeta": "Port {{port}} · over USB, no internet needed",
+      "connectedMetaWithChip": "Port {{port}} · {{chipName}} chip · over USB, no internet needed",
+      "lost": "Cable out",
+      "lostTitle": "Board cable out",
+      "lostBody": {
+        "anySocket": "Plug the USB cable back into any socket. When the board shows up in the list again, the app chooses it again.",
+        "sameSocket": "Plug the USB cable back into the same socket, then press Use this on the board's card again. Boards like this have no serial number, so the app asks you to confirm it is the same one."
+      },
+      "linkMeta": "{{boardName}} · port {{port}}",
+      "connectedTitleSerial": "Board chosen; it may be an Uno",
+      "unknown": "Can't check board",
+      "unknownTitle": "Can't check the board right now",
+      "unknownBody": "The app couldn't read the port list, so it can't tell whether the board is still plugged in · press Change, then Search again",
+      "label": {
+        "connectedUno": "Uno board connected: {{boardName}} on {{port}}",
+        "connectedSerial": "Board chosen, may be an Uno: {{boardName}} on {{port}}",
+        "lost": "Board cable out: {{boardName}} on {{port}}",
+        "unknown": "Can't check the board right now: {{boardName}} on {{port}}"
+      },
+      "simulated": "Simulated",
+      "reconnect": "Reconnect",
+      "reconnectTip": "Try connecting the same Uno board again"
+    },
+    "connect": {
+      "title": "Connect Uno board",
+      "back": "Back to Block Lab",
+      "say": {
+        "lost": {
+          "title": "The board's cable is out. That's OK.",
+          "sub": "Plug the USB cable back in and wait a moment. The board will show up in the list again."
+        },
+        "returned": {
+          "title": "A board is back in the same socket",
+          "sub": "Press Use this on its card, then the button below, to confirm it is the same board."
+        },
+        "back": {
+          "title": "The board is back!",
+          "sub": "Taking you back to your blocks…"
+        },
+        "naming": {
+          "title": "Found it!",
+          "sub": "Name the board in the bar below, like “Group 3 board”, so it's easy to find next time."
+        },
+        "ok": {
+          "title": "Found it!",
+          "sub": "Taking you back to your blocks…"
+        },
+        "connected": {
+          "title": "Your board is connected",
+          "sub": "Go back to your work, or pick another board from the cards below."
+        },
+        "switching": {
+          "title": "Your board is connected",
+          "sub": "Another board is picked. Press connect below to switch boards."
+        },
+        "scanFailed": {
+          "title": "Can't look for boards right now. That's OK.",
+          "sub": "Read the red box, then press Try again."
+        },
+        "scanning": {
+          "title": "Looking for boards…",
+          "sub": "Just a moment."
+        },
+        "disconnected": {
+          "title": "Disconnected",
+          "sub": "Pick a board from the cards below to connect again any time."
+        },
+        "none": {
+          "title": "No board found yet",
+          "sub": "Plug in the cable, then press Search again."
+        },
+        "search": {
+          "title": "Let's find our board",
+          "sub": "Follow the blue box one step at a time."
+        },
+        "one": {
+          "title": "Found 1 board",
+          "sub": "This computer has just one board plugged in. Press connect."
+        },
+        "many": {
+          "title": "Found {{boardCount}} boards. Which one is ours?",
+          "sub": "Check the board names on the cards. If they aren't named yet, press “Find it by unplugging”."
+        },
+        "oneMaybe": {
+          "title": "Found 1 device that may be an Uno board",
+          "sub": "Other gadgets use this chip too. If it is our board, press Use this, then connect."
+        }
+      },
+      "lost": {
+        "title": "{{boardName}}'s cable is out · waiting for the board",
+        "titleReturned": "{{boardName}} is back in the same socket · confirm it is the same board"
+      },
+      "cableTips": {
+        "pushIn": "Push the plug all the way in at the computer and the board, then wait 3 seconds.",
+        "otherSocket": "Try another USB socket on the computer.",
+        "otherSocketRescan": "Try another USB socket on the computer, then press “Search again”.",
+        "newCard": "In another USB socket the board may show up as a new card. Press Use this on that card.",
+        "light": "Check the USB cable: the board's light should be on. If not, try another cable."
+      },
+      "tips": {
+        "show": "Plugged in but not showing?",
+        "hide": "Hide tips"
+      },
+      "connected": {
+        "label": "Connected board",
+        "title": "Connected: {{boardName}} ({{port}})",
+        "since": "Connected since {{time}} · over USB, no internet needed",
+        "disconnect": "Disconnect",
+        "backToWork": "Back to work"
+      },
+      "returned": {
+        "title": "The board is back",
+        "body": "The board shows up in the list again and is still chosen. Carry on with your work."
+      },
+      "disconnect": {
+        "label": "Confirm disconnect",
+        "title": "Disconnect?",
+        "body": "You can connect again any time · your work stays in the app",
+        "confirm": "Disconnect"
+      },
+      "disconnected": {
+        "title": "{{boardName}} disconnected",
+        "body": "To keep using it here, tap its card below and connect again · your work stays in the app"
+      },
+      "scanFailed": {
+        "title": "Couldn't look for boards on this computer",
+        "body": "Press Try again. If it still fails, tell your teacher this code.",
+        "codeLabel": "Tell your teacher this code",
+        "retry": "Try again"
+      },
+      "list": {
+        "title": "Boards found on this computer",
+        "searching": "Searching…",
+        "autoUpdate": "Updates by itself when a cable is plugged in or out",
+        "rescan": "Search again"
+      },
+      "card": {
+        "unnamedUno": "Uno board",
+        "unnamedChip": "{{chipName}} board",
+        "unnamedUsbSerial": "USB serial board",
+        "port": "Port {{port}}",
+        "portUnnamed": "Port {{port}} · not named yet",
+        "portChip": "Port {{port}} · {{chipName}} chip",
+        "portMaybeUno": "Port {{port}} · may be an Uno board · not named yet",
+        "pick": "Use this",
+        "picked": "Selected",
+        "inUse": "In use",
+        "waitingBack": "Waiting for cable",
+        "tag": {
+          "lost": "Cable out · waiting",
+          "inUse": "In use",
+          "disconnected": "Disconnected · you can connect again",
+          "ours": "Our board",
+          "oursMoved": "Back on {{port}} · our board",
+          "returned": "Plugged back in"
+        },
+        "unnamedOther": "USB device",
+        "pickAria": {
+          "pick": "Use this: {{boardName}} on {{port}}",
+          "picked": "Selected: {{boardName}} on {{port}}",
+          "inUse": "In use: {{boardName}} on {{port}}",
+          "waitingBack": "Waiting for the cable: {{boardName}} on {{port}}"
+        }
+      },
+      "search": {
+        "start": "Not sure which one? Find it by unplugging",
+        "unplug": {
+          "title": "Unplug your group's board's USB cable from the computer",
+          "body": "Unplug just one. The app watches which card disappears."
+        },
+        "plugBack": {
+          "title": "The card that disappeared is our board. Plug the cable back in.",
+          "body": "Any socket is fine. The app watches which card comes back."
+        },
+        "slow": {
+          "title": "The board hasn't come back yet",
+          "body": "Is the cable in? If it is but nothing shows, see the tips below."
+        },
+        "tooMany": {
+          "title": "{{cardCount}} cards disappeared. Too many were unplugged.",
+          "body": "Plug all the cables back in, press “Start over”, then unplug only your group's cable."
+        },
+        "found": {
+          "title": "Found it! Your group's board is selected.",
+          "titleMoved": "Found it! The board came back on {{port}} (a different socket is fine).",
+          "body": "Press connect below."
+        }
+      },
+      "empty": {
+        "title": "No boards found on this computer yet",
+        "body": "Follow the steps below one by one, then press “Search again”."
+      },
+      "others": {
+        "toggle": "Other devices that are unlikely to be boards ({{deviceCount}}) · usually not needed",
+        "usbName": "Other USB device",
+        "serialName": "Non-USB port",
+        "usbReason": "Not an Uno board the app knows, so it can't be chosen",
+        "serialReason": "Not connected over USB, so it isn't an Uno board"
+      },
+      "help": {
+        "title": "Can't find our board? Try these one by one",
+        "titleMore": "More checks",
+        "tips": {
+          "cable": "Plug the USB cable in firmly at the computer and the board",
+          "light": "Check the USB cable and see that the board's light is on",
+          "dataCable": "Use a data cable. Some charging cables can't carry data."
+        }
+      },
+      "hint": {
+        "waitLost": "Wait for the board to come back. Plug the USB cable back in.",
+        "inUse": "This board is already connected",
+        "busy": "Wait for this step to finish first",
+        "pickFirst": "Tap Use this on a board card first, then press connect",
+        "nameFirst": "Type a board name first, or press Skip for now"
+      },
+      "naming": {
+        "title": "Found it! Give this board a name",
+        "body": "Next time this name shows in the list, so your group finds its board right away.",
+        "placeholder": "e.g. Group 3 board",
+        "label": "Board name",
+        "skip": "Skip for now",
+        "save": "Save name and start"
+      },
+      "ok": {
+        "title": "{{boardName}} connected!",
+        "body": "Going back to your blocks in {{seconds}} seconds",
+        "start": "Start now"
+      },
+      "footer": {
+        "waitingBack": "Waiting for the board…",
+        "pickFirst": "Choose a board first",
+        "connect": "Connect {{boardName}} ({{port}})",
+        "switch": "Disconnect {{oldName}} and connect {{newName}} ({{port}})",
+        "confirmBack": "Reconnect {{boardName}} ({{port}})"
+      },
+      "baud": {
+        "label": "Baud rate · set to match the program",
+        "selectLabel": "Baud rate set to match Block Lab's program (can't be changed)",
+        "tip": "Programs made from blocks always use this speed, so it is set to match and can't be changed · tell your teacher if it looks wrong",
+        "tipNone": "Choose a board first and the baud rate appears by itself",
+        "value": "{{baudRate}} bps",
+        "none": "Choose a board first"
+      },
+      "preview": {
+        "toggle": "Sample ports (preview)",
+        "title": "Simulated ports in the preview",
+        "note": "Made-up data; no real port is read · tick to plug in or unplug",
+        "movePort": "Move socket"
+      }
+    },
+    "job": {
+      "untitled": "Untitled project",
+      "label": "Project name",
+      "placeholder": "Name your project, like Button lights the LED",
+      "rename": "Rename project {{jobName}}",
+      "renameHint": "Tap to rename the project"
+    },
+    "rail": {
+      "label": "Block categories",
+      "scrollUp": "Scroll up",
+      "scrollDown": "Scroll down",
+      "emptyCategory": "{{categoryName}} · no blocks yet",
+      "groups": {
+        "basics": "Basics",
+        "data": "Data",
+        "schoolBot": "School Bot"
+      },
+      "scrollUpLabel": "Scroll to the categories above",
+      "scrollDownLabel": "Scroll to the categories below"
+    },
+    "categories": {
+      "start": "Start",
+      "control": "Control",
+      "logic": "Logic",
+      "math": "Math",
+      "text": "Text",
+      "variable": "Variables",
+      "list": "Lists",
+      "function": "Functions",
+      "car": "Car Control",
+      "motor": "Motors",
+      "sensor": "Sensor",
+      "display": "Display",
+      "serial": "Serial",
+      "remote": "Remote Control"
+    },
+    "emptyCategory": {
+      "title": "This category has no blocks yet",
+      "hint": "Try a category that has blocks",
+      "goTo": "Go to {{categoryName}}"
+    },
+    "workspace": {
+      "label": "Block workspace",
+      "controls": "Workspace tools",
+      "redo": "Redo",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "fit": "Fit to screen",
+      "fitTip": "Fit to screen (0) · show every block",
+      "undoTip": "Undo ({{shortcut}})",
+      "undoUnavailable": "Nothing to undo yet",
+      "redoTip": "Redo ({{shortcut}})",
+      "redoUnavailable": "Nothing to redo yet",
+      "zoomOutTip": "Zoom out (-) · now {{percent}}%",
+      "zoomOutUnavailable": "Can't zoom out further · lowest is {{percent}}%",
+      "zoomInTip": "Zoom in (+) · now {{percent}}%",
+      "zoomInUnavailable": "Can't zoom in further · highest is {{percent}}%",
+      "zoomLevel": "Zoom {{percent}}%",
+      "dropped": "Placed",
+      "hint": {
+        "title": "Drag blocks under “loop”",
+        "tap": "or tap a block in the list to add it"
+      },
+      "releaseToDelete": "Let go to delete"
+    },
+    "function": {
+      "title": "function",
+      "inputs": "inputs",
+      "inputName": "input:",
+      "allowStatements": "allow statements",
+      "callDisabledWarning": "Can't run the function '%1' because its block is disabled."
+    },
+    "comment": {
+      "open": "Open comment",
+      "close": "Close comment",
+      "bubble": "Comment: %1",
+      "label": "Comment",
+      "collapse": "Collapse comment",
+      "expand": "Expand comment"
+    },
+    "blockState": {
+      "disabled": "disabled"
+    },
+    "blockSettings": {
+      "open": "Edit this block",
+      "close": "Close block settings",
+      "workspace": "Block settings"
+    },
+    "blockMenu": {
+      "cleanUp": "Clean up blocks",
+      "duplicate": "Duplicate",
+      "deleteOne": "Delete 1 block",
+      "deleteMany": "Delete %1 blocks",
+      "deleteAll": "Delete all blocks ({{blockCount}})",
+      "reason": {
+        "nothingToUndo": "Nothing to undo yet",
+        "nothingToRedo": "Nothing to redo yet",
+        "noBlocks": "No blocks yet",
+        "onlyOne": "There can be only one of each"
+      },
+      "createCall": "Make a call block “%1”",
+      "createValue": "Make a value “%1”",
+      "deleteInput": "Delete this input"
+    },
+    "fieldMenu": {
+      "pin": "Choose a pin",
+      "value": "Choose a value",
+      "variable": "Choose a variable",
+      "color": "Choose a colour",
+      "colorNow": "Current colour"
+    },
+    "toast": {
+      "addedToLoop": "Added “{{blockText}}” to the end of “loop”",
+      "addedFree": "Added “{{blockText}}” in free space",
+      "deleted": "Blocks deleted: {{blockCount}}",
+      "onlyOne": "“{{blockName}}” is already in this project · one of each"
+    },
+    "drawer": {
+      "label": "Output and code",
+      "tabs": "Choose what to show",
+      "output": "Output",
+      "cpp": "Arduino C++ code",
+      "send": "Send to board",
+      "collapse": "Collapse the bottom drawer",
+      "expand": "Expand the bottom drawer",
+      "readOnly": "Read only",
+      "cppDesktopOnly": "C++ code shows in the desktop app",
+      "cppGenerating": "Turning blocks into code…",
+      "cppFailed": "Could not turn the blocks into code",
+      "outputUnread": "Output has {{lineCount}} new lines",
+      "peek": {
+        "latest": "Latest: {{message}} · {{lineCount}} lines",
+        "unreadable": "Can't read the board ({{errorCode}})",
+        "notReading": "Not reading from the board yet"
+      }
+    },
+    "preflight": {
+      "title": "Can't send to the board yet. Fix these first",
+      "summary": "Things to fix: {{count}}",
+      "sub": "Fix every item, then press Send to board again",
+      "listLabel": "Things to fix: {{count}}",
+      "itemLabel": "Item {{number}} {{title}} · How to fix: {{fix}} · Press to show the block",
+      "fixLine": "How to fix: {{fix}}",
+      "show": "Show me",
+      "more": "{{count}} more · Scroll the list to see them",
+      "locked": "Sending stays locked until everything is fixed",
+      "lockedNote": "Fix it, then send again · If it still shows, tell your teacher the code at the end",
+      "back": "Go back and fix",
+      "emptySlot": {
+        "title": "The \"{{blockName}}\" block has an empty slot",
+        "fix": "Drag a value block into every empty slot"
+      },
+      "loose": {
+        "title": "The \"{{blockName}}\" block is not joined to \"on start\" or \"loop\"",
+        "fix": "Drag it under \"on start\" or \"loop\", or delete it if you don't need it"
+      },
+      "pinShared": {
+        "title": "Pin {{pin}} is used in more than one way: {{uses}}",
+        "fix": "Give each device its own pin. Change the pin in one of the blocks"
+      },
+      "timer2": {
+        "title": "The buzzer sound and the IR remote can't be used in the same program",
+        "fix": "Choose one of them and remove the blocks of the other"
+      },
+      "engine": {
+        "title": "This program couldn't be checked",
+        "fix": "Tell your teacher the code at the end and the message below"
+      },
+      "use": {
+        "input": "input",
+        "output": "output",
+        "tone": "buzzer sound",
+        "servo": "servo",
+        "neopixel": "RGB lights",
+        "ultrasonic": "distance sensor",
+        "i2c": "I2C screen or sensor"
+      }
+    },
+    "send": {
+      "progressLabel": "Sending progress",
+      "steps": {
+        "compile": "Step 1 of 2 · Convert code",
+        "upload": "Step 2 of 2 · Send to board"
+      },
+      "errorCode": "Error code: {{errorCode}}",
+      "retry": "Try again",
+      "close": "Close",
+      "toolOutput": "Tool message (for the teacher)",
+      "noBoard": {
+        "title": "Uno board not found",
+        "body": "Try these one at a time",
+        "pick": "Choose board",
+        "tips": {
+          "cable": "Plug the USB cable into the board and the computer",
+          "wait": "Wait a moment, then press \"Try again\"",
+          "pick": "Press \"Choose board\" and choose our Uno board"
+        }
+      },
+      "compiling": {
+        "title": "Converting the code…",
+        "body": "Please wait. Nothing has been sent to the board yet.",
+        "cancel": "Cancel"
+      },
+      "uploading": {
+        "title": "Sending to the board…",
+        "body": "Don't unplug the USB cable while sending",
+        "cancel": "Cancel",
+        "confirmStop": "If you stop now, the program must be sent to the board again, and we won't know what program the board has.",
+        "keep": "Keep sending",
+        "stop": "Stop sending"
+      },
+      "stopping": {
+        "title": "Stopping…",
+        "body": "Please wait. Don't unplug the USB cable yet."
+      },
+      "cancelled": {
+        "compile": {
+          "title": "Cancelled",
+          "body": "Nothing was sent to the board"
+        },
+        "upload": {
+          "title": "Sending stopped",
+          "body": "We don't know what program the board has now. Press \"Try again\" to send it again."
+        }
+      },
+      "sent": {
+        "title": "Sent to the board",
+        "body": "The program is now on the Uno board.",
+        "done": "Done",
+        "previewNote": "Preview: simulated result only. The pins were not checked and nothing was sent to a board."
+      },
+      "failed": {
+        "compile": {
+          "title": "The code couldn't be converted",
+          "body": "The board hasn't received the program. That's OK, you can try again.",
+          "tips": {
+            "check": "Check your blocks, then press \"Try again\"",
+            "teacher": "If it still fails, ask your teacher to open the tool message below"
+          }
+        },
+        "upload": {
+          "title": "Couldn't send to the board",
+          "body": "The board may have only part of the program. Send it to the board again.",
+          "tips": {
+            "cable": "Check that the USB cable is plugged in firmly at both ends",
+            "monitor": "Close other programs using the board's port, such as the Serial Monitor in Arduino IDE",
+            "again": "Press \"Send to board\" again"
+          }
+        },
+        "timeout": {
+          "title": "That took too long",
+          "body": "So it stopped for now. The board may have only part of the program. Send it to the board again.",
+          "tips": {
+            "cable": "Check that the USB cable is plugged in firmly at both ends",
+            "again": "Press \"Try again\""
+          }
+        },
+        "compileTimeout": {
+          "title": "Converting the code took too long",
+          "body": "The board hasn't received the program. Try again: it will be faster next time, because the computer keeps what it already converted.",
+          "tips": {
+            "again": "Press \"Try again\"",
+            "teacher": "If it is too slow every time, ask your teacher to open the tool message below"
+          }
+        },
+        "toolchain": {
+          "title": "This computer can't send to the board yet",
+          "body": "It needs the Arduino software first. Ask your teacher for help.",
+          "tips": {
+            "install": "Teacher: install Arduino IDE 2",
+            "open": "Open Arduino IDE once and wait until it finishes installing \"Arduino AVR Boards\"",
+            "again": "Come back and press \"Try again\""
+          }
+        },
+        "busy": {
+          "title": "Something else is still running",
+          "body": "The board hasn't received the program. Wait a moment, then try again.",
+          "tips": {
+            "again": "Wait 2–3 seconds, then press \"Try again\""
+          }
+        },
+        "engine": {
+          "title": "The sending tool had a problem",
+          "body": "The board may not have the program yet. That's OK, you can try again.",
+          "tips": {
+            "again": "Press \"Try again\"",
+            "teacher": "If it still fails, ask your teacher to open the tool message below"
+          }
+        },
+        "robotPort": {
+          "title": "This port belongs to the robot arm",
+          "body": "Robot arm control is using this port, so nothing was sent to the board.",
+          "tips": {
+            "pick": "Press \"Choose board\" and choose the right Uno board",
+            "replug": "If it really is the Uno board, unplug it and plug it back in while the board screen is open, then press Use this again"
+          }
+        }
+      },
+      "guard": {
+        "title": "Sending to the board",
+        "ok": "OK",
+        "body": {
+          "new": "Wait until sending is done before starting a new project · Don't unplug the USB cable",
+          "leave": "Wait until sending is done before leaving Block Lab · Don't unplug the USB cable",
+          "close": "Wait until sending is done before closing the app · Don't unplug the USB cable",
+          "board": "Wait until sending is done before changing the board · Don't unplug the USB cable"
+        },
+        "closeWait": "Waiting for sending to finish (up to 2 minutes); the app will close by itself · Don't unplug the USB cable"
+      }
+    },
+    "terminal": {
+      "title": "Messages from the board",
+      "follow": "Auto-scroll",
+      "clear": "Clear",
+      "nothingYet": "No messages to scroll or clear yet",
+      "emptyTitle": "No messages yet",
+      "emptyHint": "Use the {{categoryName}} blocks to send messages, and what the board sends shows up here",
+      "inputLabel": "Type a message for the board, then press Enter",
+      "placeholderOff": "Can't send · no board connected",
+      "send": "Send",
+      "sendUnavailable": "Can't send: no board is connected",
+      "explainTitle": "Can't send a message right now",
+      "explainBody": "No Uno board is connected, so the message has nowhere to go · plug in the board's USB cable, then press Change to choose the board",
+      "explainClose": "Got it",
+      "followOff": "Paused",
+      "clearLabel": "Clear messages",
+      "logLabel": "Messages from the board and messages sent",
+      "trimmed": "Older messages were removed · keeping the latest 200 lines",
+      "newLines": "New lines: {{lineCount}} · go to bottom",
+      "badge": {
+        "uno": "From the Uno board",
+        "unreadable": "Can't read"
+      },
+      "reopen": "Start reading",
+      "prefix": {
+        "board": "From board: ",
+        "sent": "Sent: ",
+        "error": "Error: ",
+        "system": "System: "
+      },
+      "manual": {
+        "open": "Read messages from the board",
+        "idle": "Not reading yet",
+        "restart": "Press to start reading (the board's program may restart)"
+      },
+      "unreadable": {
+        "title": "Can't read messages from the board",
+        "body": "The USB cable came out, or another program is using the port · plug the cable in again, then try again",
+        "retry": "Try again"
+      },
+      "robotPort": {
+        "title": "This port belongs to the robot arm",
+        "body": "Robot arm control is using this port · choose the right Uno board, or unplug it and plug it back in while the board screen is open"
+      },
+      "log": {
+        "opened": "Reading started · the board's program may have restarted",
+        "dropped": "Some messages were lost because the board sent them faster than they could be read",
+        "readFailed": "Can't keep reading the board; the USB cable may have come out",
+        "robotPort": "Can't read: this port belongs to the robot arm",
+        "sendFailed": "Couldn't send “{{message}}”. The USB cable may have come out. Try sending again",
+        "sendTooLong": "Couldn't send “{{message}}”. The message is too long. Try shorter messages",
+        "sendFailedInApp": "Couldn't send “{{message}}”. Something went wrong in the app. Try sending again"
+      },
+      "placeholderReady": "Type a message, then press Enter to send it to the board",
+      "placeholderNotReading": "Can't send · press Start reading first",
+      "sendReady": "Send the message to the board",
+      "sendEmpty": "Type a message first, then press Send",
+      "sendNotReading": "Can't send: not reading messages from the board yet",
+      "explainBodyNotReading": "Start reading messages from the board first, so what you send reaches it · press Read messages from the board, then try sending again",
+      "sentLive": "Sent",
+      "helpReady": "Type a message and press Enter to send it to the board's Serial. Up arrow brings back earlier messages",
+      "waitSend": "Wait for the send to finish; reading starts again by itself"
+    },
+    "blocks": {
+      "common": {
+        "do": "do %1"
+      },
+      "hat": {
+        "placed": "Placed",
+        "placed_tip": "One of each per project · already placed"
+      },
+      "base_setup": "on start",
+      "base_setup_note": "do once",
+      "sb_loop": "loop",
+      "sb_loop_note": "keep doing",
+      "controls_delay": "wait %1 %2",
+      "controls_if": "if %1",
+      "controls_whileUntil": "repeat %1 %2",
+      "sb_forever": "forever",
+      "controls_for": "count %1 from %2 to %3 by %4",
+      "sb_repeat": "repeat %1 times",
+      "controls_flow_statements": "%1",
+      "sb_wait_until": "wait until %1",
+      "controls_end_program": "stop program",
+      "logic_compare": "%1 %2 %3",
+      "logic_operation": "%1 %2 %3",
+      "logic_negate": "not %1",
+      "logic_boolean": "%1",
+      "math_number": "%1",
+      "math_arithmetic": "%1 %2 %3",
+      "sb_random": "random %1 to %2",
+      "math_to_int": "%1 %2",
+      "base_map": "map %1 from %2 – %3 to %4 – %5",
+      "math_constrain": "constrain %1 between %2 and %3",
+      "text": "%1",
+      "text_join": "join %1 %2",
+      "sb_text_letter": "letter %1 of %2",
+      "text_length": "length of %1",
+      "sb_text_contains": "%1 contains %2",
+      "variables_declare": "make variable %1 type %2 starting at %3",
+      "variables_get": "%1",
+      "variables_set": "set %1 to %2",
+      "sb_variable_change": "change %1 by %2",
+      "procedures_return": "return %1",
+      "serial_print": "Serial %1 %2",
+      "serial_readstr": "text received on Serial",
+      "serial_available": "Serial has new text",
+      "sb_button": "button on pin %1 is pressed",
+      "sb_touch": "touch sensor on pin %1 is touched",
+      "sb_reed_switch": "reed switch on pin %1 senses a magnet",
+      "sb_sound": "sound sensor on pin %1 hears sound",
+      "sb_light": "light sensor on pin %1 senses light",
+      "sb_line_tracker": "line tracker on pin %1 sees the line",
+      "sb_potentiometer": "potentiometer on pin %1",
+      "sb_soil_moisture": "soil moisture on pin %1",
+      "sb_water_level": "water level on pin %1",
+      "sb_grayscale": "grayscale on pin %1",
+      "sb_ir_obstacle": "obstacle sensor on pin %1 as %2",
+      "sb_tilt": "tilt switch on pin %1 as %2",
+      "sb_pir": "motion sensor on pin %1 as %2",
+      "sb_mq7": "CO gas sensor on pin %1 as %2",
+      "sb_mq3": "alcohol sensor on pin %1 as %2",
+      "sb_active_buzzer": "buzzer on pin %1 %2",
+      "sb_relay": "relay on pin %1 %2",
+      "sb_fan": "fan on pins A %1 B %2 %3 speed %4",
+      "sb_fan_stop": "stop fan on pins A %1 B %2",
+      "sb_buzzer_tone": "buzzer on pin %1 play %2 Hz",
+      "sb_buzzer_tone_for": "buzzer on pin %1 play %2 Hz for %3 ms",
+      "sb_buzzer_stop": "stop buzzer on pin %1",
+      "sb_rgb_setup": "set up RGB lights on pin %1 count %2 brightness %3",
+      "sb_rgb_set": "RGB light on pin %1 number %2 color %3",
+      "sb_rgb_color": "color red %1 green %2 blue %3",
+      "sb_rgb_named_color": "color %1",
+      "sb_ultrasonic": "distance (cm) Trig pin %1 Echo pin %2",
+      "sb_mpu6050": "MPU6050 %1",
+      "sb_dht11": "DHT11 on pin %1 %2",
+      "sb_gesture_is": "gesture is %1",
+      "sb_gesture_light": "gesture sensor light %1",
+      "sb_color_sensor": "color sensor %1",
+      "sb_servo": "servo on pin %1 turn to %2 degrees",
+      "sb_oled_print": "OLED line %1 show %2",
+      "sb_oled_clear": "clear OLED",
+      "sb_led": "LED on pin %1 %2",
+      "sb_led_brightness": "LED on pin %1 brightness %2",
+      "sb_ir_received": "IR remote on pin %1 got a signal",
+      "sb_ir_button": "pressed button is %1",
+      "options": {
+        "delay": {
+          "delay": "milliseconds",
+          "delaymicroseconds": "microseconds"
+        },
+        "while": {
+          "while": "while",
+          "until": "until"
+        },
+        "flow": {
+          "break": "break out of loop",
+          "continue": "skip to next loop"
+        },
+        "logic": {
+          "and": "and",
+          "or": "or"
+        },
+        "boolean": {
+          "true": "true",
+          "false": "false"
+        },
+        "math": {
+          "mod": "mod"
+        },
+        "round": {
+          "round": "round",
+          "ceil": "round up",
+          "floor": "round down",
+          "abs": "absolute",
+          "sqrt": "square root"
+        },
+        "type": {
+          "int": "whole number",
+          "float": "decimal",
+          "string": "text",
+          "boolean": "true/false"
+        },
+        "print": {
+          "print": "print",
+          "println": "print line"
+        },
+        "state": {
+          "high": "on",
+          "low": "off"
+        },
+        "mode": {
+          "digital": "digital",
+          "analog": "analog"
+        },
+        "fan": {
+          "forward": "forward",
+          "reverse": "reverse"
+        },
+        "color": {
+          "red": "red",
+          "green": "green",
+          "blue": "blue",
+          "yellow": "yellow",
+          "cyan": "cyan",
+          "magenta": "magenta",
+          "white": "white",
+          "off": "off"
+        },
+        "mpu": {
+          "accel_x": "acceleration X",
+          "accel_y": "acceleration Y",
+          "accel_z": "acceleration Z",
+          "gyro_x": "rotation X",
+          "gyro_y": "rotation Y",
+          "gyro_z": "rotation Z"
+        },
+        "dht": {
+          "temperature": "temperature (°C)",
+          "humidity": "humidity (%)"
+        },
+        "gesture": {
+          "dir_left": "left",
+          "dir_right": "right",
+          "dir_up": "up",
+          "dir_down": "down",
+          "dir_near": "near",
+          "dir_far": "far"
+        },
+        "light": {
+          "red": "red",
+          "green": "green",
+          "blue": "blue",
+          "ambient": "ambient",
+          "clear": "clear"
+        }
+      },
+      "function_input": {
+        "tray_tip": "Tap this block to add an input · or drag it into inputs",
+        "placed_tip": "Press and hold this block to delete this input · or drag it somewhere new"
+      }
+    },
+    "sensorGroups": {
+      "buttons": "Buttons and presses",
+      "motion": "Bump, tilt and shake",
+      "light": "Light and color",
+      "sound": "Sound",
+      "distance": "Distance and obstacles",
+      "environment": "Weather and environment",
+      "actuators": "Outputs"
+    },
+    "startPlaced": {
+      "hint": "On start and Loop are already in this project · one of each"
+    },
+    "defaults": {
+      "text": "Hello"
+    },
+    "project": {
+      "unsaved": "Not saved yet",
+      "saved": "Saved {{time}}",
+      "savedEdited": "Saved {{time}} · new changes",
+      "opened": "Saved",
+      "openedEdited": "Unsaved changes",
+      "saveFailed": "Couldn't save. Try again",
+      "confirm": {
+        "title": "You have unsaved changes",
+        "titleNamed": "“{{jobName}}” isn't saved",
+        "body": {
+          "new": "Save this project before starting a new one?",
+          "leave": "Save this project before leaving this page?",
+          "close": "Save this project before closing the app?"
+        },
+        "keep": "Keep working",
+        "discard": "Don't save"
+      }
+    },
+    "menu": {
+      "label": "Menu",
+      "new": "New project",
+      "save": "Save project",
+      "saveCopy": "Save a copy…",
+      "export": "Export as .sbb file",
+      "checkConnection": "Check connection",
+      "about": "About School Bot Studio",
+      "notYet": "Not available in this version yet"
+    },
+    "list": {
+      "label": "Block list",
+      "show": "Show block list",
+      "hide": "Hide block list",
+      "hideHint": "Hide block list (Esc)",
+      "dropToDelete": "Drop here to delete"
+    },
+    "deleteAll": {
+      "title": "Delete all blocks ({{blockCount}})?",
+      "body": "If you delete them by mistake, press Undo to get them back.",
+      "keep": "Keep them",
+      "confirm": "Delete all"
+    },
+    "colorPicker": {
+      "mixedName": "R{{red}} G{{green}} B{{blue}}",
+      "basicLabel": "8 basic colours",
+      "tabs": {
+        "label": "How to pick a colour",
+        "basic": "Basic",
+        "basicLabel": "Pick a basic colour",
+        "wheel": "Wheel",
+        "wheelLabel": "Pick on the colour wheel",
+        "numbers": "Numbers",
+        "numbersLabel": "Type R G B numbers"
+      },
+      "wheel": {
+        "hueLabel": "Hue",
+        "hue": "Hue {{hue}}° · {{hueName}}",
+        "hueText": "Hue {{hue}} degrees, {{hueName}}",
+        "hint": "Drag on the ring or press ← →",
+        "lightness": "Lightness {{lightness}}%",
+        "lightnessText": "Lightness {{lightness}} percent",
+        "rgb": "R {{red}} · G {{green}} · B {{blue}}"
+      },
+      "hues": {
+        "red": "red",
+        "orange": "orange",
+        "yellow": "yellow",
+        "lime": "lime",
+        "green": "green",
+        "mint": "mint",
+        "cyan": "cyan",
+        "azure": "azure",
+        "blue": "blue",
+        "purple": "purple",
+        "magenta": "magenta",
+        "pink": "pink"
+      },
+      "numbers": {
+        "red": "R (red)",
+        "green": "G (green)",
+        "blue": "B (blue)",
+        "redLabel": "Red value, 0 to 255",
+        "greenLabel": "Green value, 0 to 255",
+        "blueLabel": "Blue value, 0 to 255",
+        "hint": "0–255 · press Enter or leave the box to use it",
+        "notDigits": "Numbers only · using {{number}}",
+        "empty": "Empty, so 0 is used",
+        "tooHigh": "0–255 only · set to 255"
       }
     }
   }

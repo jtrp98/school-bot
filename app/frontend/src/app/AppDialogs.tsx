@@ -34,7 +34,8 @@ const settingsMsgClass =
 type Props = { v: Pick<Parameters<typeof AppView>[0]["v"],
   "info" | "message" | "cloudBusy" | "settings" | "setSettings" | "pending" | "setPending"
   | "closeRequested" | "setCloseRequested" | "closeBusy" | "closeError" | "closeErrorReason"
-  | "closeWindow" | "closePhase" | "closeSaveAvailable" | "closeSaveRequested" | "cloud" | "confirmSwitch">;  };
+  | "closeWindow" | "closePhase" | "closeNote" | "closeSaveAvailable" | "closeSaveRequested"
+  | "cloud" | "confirmSwitch">;  };
 
 // Preview reports a non-numeric marker, which must not be shown as a release number.
 function formatVersion(version?: string): string {

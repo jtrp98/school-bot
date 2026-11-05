@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>แถบล่าง Block Lab</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'IBM Plex Sans Thai',system-ui,sans-serif}
+button{font-family:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid #B85E00;outline-offset:2px}
+.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.sp{animation:bl-spin .8s linear infinite}
+@keyframes bl-spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.sp{animation:none}}
+</style>
+</helmet>
+<div style="position:relative;width:1440px;height:76px;box-sizing:border-box;background:#fff;border-top:2px solid #DCE3EC;display:flex;align-items:center;padding:0 16px;color:#14243D">
+
+  <!-- หยุดทั้งหมด (ซ้าย · ตำแหน่งตายตัว · z-stop) -->
+  <div style="position:relative;z-index:70;display:flex;align-items:center;gap:12px">
+    <button aria-label="หยุดทั้งหมด" style="display:inline-flex;align-items:center;justify-content:center;width:60px;height:60px;border-radius:50%;background:#D32F2F;color:#fff;border:0;border-bottom:4px solid #8E1B1B;padding:0"><svg class="i" viewBox="0 0 24 24" style="width:26px;height:26px;fill:currentColor" aria-hidden="true"><path d="M8 6h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z"></path></svg></button>
+    <div style="display:flex;flex-direction:column">
+      <span style="font-size:20px;font-weight:700;line-height:1.4">หยุดทั้งหมด</span>
+      <span style="font-size:14px;font-weight:500;line-height:1.5;color:#5A6377">หยุดตัวจำลองและตัวละคร</span>
+    </div>
+  </div>
+
+  <!-- ข้อความสถานะกลาง -->
+  <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;min-width:0;font-size:16px;font-weight:500;color:#5A6377" role="status">
+    <sc-if value="{{noteOk}}" hint-placeholder-val="{{false}}"><svg class="i" viewBox="0 0 24 24" style="color:#2E7D32" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg></sc-if>
+    <span style="{{noteStyle}}">{{note}}</span>
+  </div>
+
+  <!-- ส่งลงบอร์ด (ขวา · ห่างจากปุ่มหยุด) -->
+  <button aria-disabled="{{isBusy}}" style="{{sendStyle}}"><svg class="{{sendIconClass}}" viewBox="0 0 24 24" aria-hidden="true"><path d="{{sendIcon}}"></path></svg><span>{{sendLabel}}</span></button>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"busy":{"editor":"enum","default":"no","options":["no","yes"]},"note":{"editor":"text","default":"ยังไม่ได้ส่งโปรแกรมลงบอร์ด"},"noteIcon":{"editor":"enum","default":"none","options":["none","ok"]},"$preview":{"width":1440,"height":76}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const busy = this.props.busy === 'yes';
+    const base = 'display:inline-flex;align-items:center;justify-content:center;gap:10px;height:60px;min-width:212px;padding:0 24px;border-radius:12px;font-size:20px;font-weight:700;line-height:1.5;';
+    return {
+      isBusy: busy,
+      note: this.props.note || 'ยังไม่ได้ส่งโปรแกรมลงบอร์ด',
+      noteOk: this.props.noteIcon === 'ok',
+      noteStyle: this.props.noteIcon === 'ok' ? 'color:#14243D;font-weight:600' : 'color:#5A6377',
+      sendLabel: busy ? 'กำลังส่ง…' : 'ส่งลงบอร์ด',
+      sendIcon: busy ? 'M12 2v4M12 18v4M4.9 4.9l2.9 2.9M16.2 16.2l2.9 2.9M2 12h4M18 12h4M4.9 19.1l2.9-2.9M16.2 7.8l2.9-2.9' : 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12',
+      sendIconClass: busy ? 'i sp' : 'i',
+      sendStyle: base + (busy ? 'background:#F4F6F8;color:#14243D;border:2px solid #DCE3EC;border-bottom:4px solid #DCE3EC' : 'background:#FF8A00;color:#14243D;border:0;border-bottom:4px solid #B85E00')
+    };
+  }
+}
+</script>
+</body>
+</html>

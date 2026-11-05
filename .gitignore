@@ -26,3 +26,4 @@ app/resource_windows_amd64.syso
 *.pkg
 *.pdb
 *.zip
+.vs/

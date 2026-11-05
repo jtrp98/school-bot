@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>แผงข้อความจากบอร์ด</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'IBM Plex Sans Thai',system-ui,sans-serif}
+button{font-family:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid #B85E00;outline-offset:2px}
+.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.sb{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 12px;border-radius:12px;border:2px solid #C6D6EA;background:#fff;color:#14243D;font-size:16px;font-weight:600;line-height:1.6}
+</style>
+</helmet>
+<!-- SCR-26 แผงข้อความจากบอร์ด · ใต้พื้นที่แท็บ เห็นทั้งสองแท็บ -->
+<div style="position:relative;width:680px;height:{{rootH}}px;box-sizing:border-box;background:#fff;border-top:2px solid #DCE3EC;color:#14243D;overflow:hidden">
+
+  <!-- หัวแผง -->
+  <div style="display:flex;align-items:center;gap:8px;height:{{headH}}px;padding:0 8px 0 14px">
+    <svg class="i" viewBox="0 0 24 24" style="width:24px;height:24px" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+    <span style="font-size:18px;font-weight:700;white-space:nowrap">ข้อความจากบอร์ด</span>
+    <sc-if value="{{hasBadge}}" hint-placeholder-val="{{true}}">
+      <span style="{{badgeStyle}}"><svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px" aria-hidden="true"><path d="{{badgeIcon}}"></path></svg>{{badgeText}}</span>
+    </sc-if>
+    <div style="flex:1;min-width:0;text-align:right;font-size:16px;color:#5A6377;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.7">{{previewText}}</div>
+    <sc-if value="{{isOpen}}" hint-placeholder-val="{{true}}">
+      <button class="sb" aria-pressed="{{autoOn}}" style="{{autoStyle}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17V3M6 11l6 6 6-6M19 21H5"></path></svg><span>{{autoLabel}}</span></button>
+      <button class="sb" aria-label="ล้างข้อความ"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"></path></svg><span>ล้าง</span></button>
+    </sc-if>
+    <button class="sb" style="width:44px;padding:0" aria-expanded="{{isOpen}}" aria-label="{{toggleLabel}}" onClick="{{onToggle}}"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{chevron}}"></path></svg></button>
+  </div>
+
+  <!-- เนื้อแผง (เมื่อขยาย) -->
+  <sc-if value="{{isOpen}}" hint-placeholder-val="{{true}}">
+    <div style="position:relative;height:100px;border-top:2px solid #DCE3EC">
+
+      <sc-if value="{{isEmpty}}" hint-placeholder-val="{{false}}">
+        <div style="display:flex;align-items:center;gap:14px;height:100px;padding:0 20px">
+          <svg class="i" viewBox="0 0 24 24" style="width:32px;height:32px;color:#5A6377" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+          <div style="font-size:16px;line-height:1.6"><div style="font-weight:700">ยังไม่มีข้อความ</div><div style="color:#5A6377">ใช้บล็อก "Serial print" ในหมวด สื่อสาร แล้วข้อความจะขึ้นที่นี่</div></div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{hasLines}}" hint-placeholder-val="{{true}}">
+        <div role="log" aria-live="off" aria-label="ข้อความจากบอร์ด" style="height:100px;overflow:hidden;padding:2px 14px;box-sizing:border-box">
+          <sc-for list="{{shown}}" as="ln" hint-placeholder-count="4">
+            <div style="display:flex;gap:12px;align-items:baseline;font-size:16px;line-height:1.6;height:24px"><span style="width:44px;flex-shrink:0;font-size:14px;color:#5A6377">{{ln.t}}</span><span style="font-weight:500">{{ln.v}}</span></div>
+          </sc-for>
+        </div>
+        <sc-if value="{{isPaused}}" hint-placeholder-val="{{false}}">
+          <button class="sb" style="position:absolute;right:12px;bottom:8px;min-height:44px;background:#EAF2FD;border-color:#1866C9;color:#0F4C99;box-shadow:0 8px 20px rgba(20,36,61,.2)"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"></path></svg><span>มีข้อความใหม่ 3 บรรทัด · ไปล่างสุด</span></button>
+        </sc-if>
+      </sc-if>
+
+      <sc-if value="{{isManual}}" hint-placeholder-val="{{false}}">
+        <div style="display:flex;align-items:center;gap:16px;height:100px;padding:0 20px">
+          <button class="sb" style="min-height:48px;background:#1866C9;color:#fff;border-color:#1866C9;border-bottom:4px solid #0F4C99;padding:0 18px;font-size:18px"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2v6M15 2v6M6 8h12v4a6 6 0 0 1-12 0zM12 18v4"></path></svg><span>เปิดอ่านข้อความจากบอร์ด</span></button>
+          <div style="font-size:16px;line-height:1.6;color:#5A6377">ตอนนี้ยังไม่ได้อ่าน<br>กดเพื่อเริ่มอ่าน (โปรแกรมบนบอร์ดอาจเริ่มใหม่)</div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{isUnreadable}}" hint-placeholder-val="{{false}}">
+        <div style="display:flex;align-items:center;gap:14px;height:100px;box-sizing:border-box;padding:0 16px;background:#FFF4CC;border-top:0">
+          <svg class="i" viewBox="0 0 24 24" style="width:28px;height:28px;color:#B07F00" aria-hidden="true"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01"></path></svg>
+          <div style="flex:1;min-width:0;font-size:16px;line-height:1.6"><div style="font-weight:700">อ่านข้อความจากบอร์ดไม่ได้ <span style="font-size:14px;font-weight:500;color:#5A6377">E-USB</span></div><div>สาย USB หลุด หรือมีโปรแกรมอื่นใช้พอร์ตอยู่ · เสียบสายใหม่ แล้วลองอีกครั้ง</div></div>
+          <button class="sb" style="border-color:#B07F00;min-height:44px">ลองอีกครั้ง</button>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"state":{"editor":"enum","default":"sim","options":["empty","sim","uno","uno-manual","unreadable"]},"open":{"editor":"enum","default":"open","options":["open","closed"]},"paused":{"editor":"enum","default":"no","options":["no","yes"]},"onToggle":{"editor":null},"$preview":{"width":680,"height":150}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const st = this.props.state || 'sim';
+    const open = (this.props.open || 'open') === 'open';
+    const paused = this.props.paused === 'yes';
+    const all = [
+      { t: '0:01', v: 'กดแล้ว' }, { t: '0:02', v: 'กดแล้ว' }, { t: '0:04', v: 'กดแล้ว' }, { t: '0:05', v: 'ลูกบิด = 340' },
+      { t: '0:06', v: 'ลูกบิด = 512' }, { t: '0:08', v: 'กดแล้ว' }, { t: '0:09', v: 'กดแล้ว' }
+    ];
+    const hasLines = st === 'sim' || st === 'uno';
+    const shown = paused ? all.slice(1, 5) : all.slice(-4);
+    const badgeBase = 'display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 10px;border-radius:999px;font-size:14px;font-weight:600;white-space:nowrap;border:2px solid ';
+    let hasBadge = true, badgeText = 'จากตัวจำลอง', badgeIcon = 'M3 4h18v12H3zM8 21h8M12 16v5', badgeStyle = badgeBase + '#C6D6EA;background:#EAF2FD;color:#14243D';
+    if (st === 'uno' || st === 'uno-manual') { badgeText = 'จากบอร์ด Uno'; badgeIcon = 'M9 2v6M15 2v6M6 8h12v4a6 6 0 0 1-12 0zM12 18v4'; badgeStyle = badgeBase + '#14243D;background:#fff;color:#14243D'; }
+    if (st === 'unreadable') { badgeText = 'อ่านไม่ได้'; badgeIcon = 'M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01'; badgeStyle = badgeBase + '#B07F00;background:#FFF4CC;color:#14243D'; }
+    if (st === 'empty') hasBadge = false;
+    let previewText = '';
+    if (!open) previewText = st === 'empty' ? 'ยังไม่มีข้อความ' : (hasLines ? 'ล่าสุด: กดแล้ว · 7 บรรทัด' : (st === 'unreadable' ? 'อ่านข้อความจากบอร์ดไม่ได้ (E-USB)' : 'ยังไม่ได้อ่านจากบอร์ด'));
+    return {
+      rootH: open ? 150 : 52, headH: open ? 46 : 50,
+      isOpen: open,
+      isEmpty: st === 'empty', hasLines, isManual: st === 'uno-manual', isUnreadable: st === 'unreadable',
+      isPaused: paused && hasLines,
+      shown, hasBadge, badgeText, badgeIcon, badgeStyle, previewText,
+      autoOn: !paused, autoLabel: paused ? 'หยุดเลื่อน' : 'เลื่อนตาม',
+      autoStyle: paused ? 'background:#FFF4CC;border-color:#B07F00' : 'background:#EAF2FD;border-color:#1866C9',
+      toggleLabel: open ? 'ย่อแผงข้อความจากบอร์ด' : 'ขยายแผงข้อความจากบอร์ด',
+      chevron: open ? 'M6 9l6 6 6-6' : 'M6 15l6-6 6 6',
+      onToggle: this.props.onToggle || (() => {})
+    };
+  }
+}
+</script>
+</body>
+</html>

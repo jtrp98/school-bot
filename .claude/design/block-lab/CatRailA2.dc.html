@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>แถบหมวดบล็อก A2</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'IBM Plex Sans Thai',system-ui,sans-serif}
+button{font-family:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid #1866C9;outline-offset:-3px}
+.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+/* ข้อ 18 (OQ94): เอา scrollbar ออก · เลื่อนได้ด้วยล้อ/ทัชแพด/ปุ่ม เลื่อนขึ้น-ลง/คีย์บอร์ด · สัญญาณว่ายังมีต่อ = ปุ่ม เลื่อนขึ้น/เลื่อนลง เต็มความกว้างแถบ 112 (เห็นตลอดเมื่อยังเลื่อนได้) */
+.rs{overflow-y:auto;overflow-x:hidden;scrollbar-width:none;-ms-overflow-style:none}
+.rs::-webkit-scrollbar{display:none;width:0;height:0}
+/* รายการนำทางแนวตั้งแบบ tab (CI §11.7 · OQ127): ราง #DCE3EC · selected = พื้นขาว + เงาเบา DSG-20 + ตัว action-primary ไม่มีกรอบสี · hover = action-primary-subtle · ไอคอนหมวดคงสีหมวด · กว้าง 104 (แถบ 112 − margin 4+4 · ไม่มี scrollbar แล้ว) */
+.cr{box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;width:104px;min-height:60px;margin:4px 4px 0 4px;padding:4px 2px;border:0;border-radius:12px;background:transparent;color:#5A6377;font-size:16px;font-weight:700;line-height:1.6;text-align:center}
+.cr:hover{background:#EAF2FD;color:#14243D}
+.cr.on{background:#FFFFFF;color:#1866C9;box-shadow:0 1px 3px rgba(20,36,61,.18)}
+</style>
+</helmet>
+<!-- ข้อ 1.1 (2026-11-02 · R18 แก้): 14 หมวด 3 กลุ่ม (พื้นฐาน 5 · ข้อมูล 3 · School Bot 6) + ตัวละคร (หัวกลุ่ม "พิเศษ" · เฉพาะเมื่อเลือก stage) · ชื่อยาว (Car Control, Servo / Motor, Remote Control) ตัด 2 บรรทัดที่ช่องว่าง แถวสูงตามข้อความ · หัวกลุ่ม = เส้นคั่น + ชื่อกลุ่มกลางแถบ
+     (เดิม) แถบหมวดบล็อก R18 · สำเนาของ A2 (CatRail เดิมของบอร์ด A ไม่แก้) · 16 หมวด 4 กลุ่มต่อเนื่อง · เลื่อนในแถบ (รอบ 8: ไม่มี scrollbar แล้ว · ปุ่ม เลื่อนขึ้น/เลื่อนลง เต็มความกว้าง 112 เป็นสัญญาณว่ายังมีต่อ ไม่พึ่ง hover) · หมวดที่เลือกเลื่อนเข้าจอเสมอ · จำตำแหน่งเลื่อนข้ามการเปลี่ยนหมวด · หมวด "ตัวละคร" + หัวกลุ่ม "อื่น ๆ" โผล่เมื่อเลือก stage เท่านั้น
+     ต่างจาก CatRail (ชุดที่ 3 · 2026-10-26): (1) ราง พื้น #DCE3EC (เดิมขาว + ขอบขวา 2px) ไม่มีเส้นขอบขวาเอง · เส้นขอบแผงอยู่ที่ BlocksPaneA2 (2) selected = พื้นขาว + เงาเบา + ตัวข้อความ action-primary ไม่มีกรอบ 3px (เดิมกรอบ 3px ฟ้า + พื้น #EAF2FD) (3) hover = พื้น #EAF2FD (เดิมไม่มี) (4) ตัวอักษรทุกหมวด 16/700 · ไม่เลือก = text-secondary (5) เส้นแบ่งกลุ่ม border-strong · รอบ 8 (ชุดที่ 4 · OQ94): เอา scrollbar ออก ปุ่ม เลื่อนขึ้น/ลง เต็ม 112 · รายการหมวดกว้าง 104 -->
+<div style="position:relative;width:112px;height:{{h}}px;box-sizing:border-box;background:#DCE3EC;overflow:hidden;color:#14243D">
+
+  <div id="cr-{{uid}}" class="rs" onScroll="{{onScroll}}" onKeyDown="{{onKey}}" role="group" aria-label="หมวดบล็อก" style="position:absolute;left:0;top:0;width:112px;height:{{h}}px;box-sizing:border-box;padding-bottom:4px">
+    <sc-for list="{{groups}}" as="g" hint-placeholder-count="4">
+      <div role="group" aria-label="{{g.label}}">
+        <div aria-hidden="true" style="{{g.headStyle}}">{{g.label}}</div>
+        <sc-for list="{{g.items}}" as="c" hint-placeholder-count="5">
+          <button class="{{c.cls}}" id="{{c.id}}" aria-pressed="{{c.sel}}" aria-label="{{c.aria}}" tabindex="{{c.tab}}" onClick="{{c.pick}}"><span style="{{c.chipStyle}}"><svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px" aria-hidden="true"><path d="{{c.icon}}"></path></svg></span><span style="max-width:100%;overflow-wrap:break-word">{{c.name}}</span></button>
+        </sc-for>
+      </div>
+    </sc-for>
+  </div>
+
+  <sc-if value="{{showUp}}" hint-placeholder-val="{{false}}">
+    <button aria-label="เลื่อนดูหมวดด้านบน" onClick="{{scrollUp}}" style="position:absolute;left:0;top:0;width:112px;height:44px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:4px;padding:0;border:0;border-bottom:2px solid #C6D6EA;background:#EAF2FD;color:#0F4C99;font-size:14px;font-weight:700;line-height:1.6"><svg class="i" viewBox="0 0 24 24" style="width:18px;height:18px" aria-hidden="true"><path d="M6 15l6-6 6 6"></path></svg><span>เลื่อนขึ้น</span></button>
+  </sc-if>
+  <sc-if value="{{showDown}}" hint-placeholder-val="{{true}}">
+    <button aria-label="เลื่อนดูหมวดด้านล่าง" onClick="{{scrollDown}}" style="position:absolute;left:0;bottom:0;width:112px;height:44px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:4px;padding:0;border:0;border-top:2px solid #C6D6EA;background:#EAF2FD;color:#0F4C99;font-size:14px;font-weight:700;line-height:1.6"><svg class="i" viewBox="0 0 24 24" style="width:18px;height:18px" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg><span>เลื่อนลง</span></button>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"cat":{"editor":"int","default":2,"min":1,"max":16},"stage":{"editor":"enum","default":"no","options":["no","yes"]},"pos":{"editor":"enum","default":"auto","options":["auto","top","mid","end"]},"uid":{"editor":"text","default":"a2"},"h":{"editor":"int","default":740},"emptyMark":{"editor":"enum","default":"yes","options":["yes","no"]},"onCat":{"editor":null},"$preview":{"width":112,"height":740}}'>
+class Component extends DCLogic {
+  gp(name) {
+    const P = this.props || {};
+    const kebab = name.replace(/[A-Z]/g, (m) => '-' + m.toLowerCase());
+    if (P[name] !== undefined) return P[name];
+    if (P[name.toLowerCase()] !== undefined) return P[name.toLowerCase()];
+    if (P[kebab] !== undefined) return P[kebab];
+    return undefined;
+  }
+  catNum() { return Math.min(16, Math.max(1, Number(this.gp('cat')) || 2)); }
+  componentDidMount() { this.syncRail(true); }
+  componentDidUpdate() { this.syncRail(false); }
+  syncRail(first) {
+    try {
+      const uid = this.gp('uid') || 'a2';
+      const el = document.getElementById('cr-' + uid);
+      if (!el) return;
+      const pos = this.gp('pos') || 'auto';
+      const cat = this.catNum();
+      const key = pos + '|' + cat + '|' + (this.gp('stage') === 'yes');
+      if (first || this._key !== key) {
+        this._key = key;
+        const max = el.scrollHeight - el.clientHeight;
+        if (pos === 'top') el.scrollTop = 0;
+        else if (pos === 'end') el.scrollTop = max;
+        else if (pos === 'mid') el.scrollTop = Math.round(max / 2);
+        else {
+          // หมวดที่เลือกเลื่อนเข้าจอเสมอ (เว้นที่ให้แถบ เลื่อนขึ้น/เลื่อนลง 52px)
+          const it = document.getElementById('cc-' + uid + '-' + cat);
+          if (it) {
+            const top = it.offsetTop, bot = top + it.offsetHeight;
+            if (top < el.scrollTop + 52) el.scrollTop = Math.max(0, top - 52);
+            else if (bot > el.scrollTop + el.clientHeight - 52) el.scrollTop = bot - el.clientHeight + 52;
+          }
+        }
+      }
+      const max2 = el.scrollHeight - el.clientHeight;
+      const e = el.scrollTop < 4 ? 'top' : (el.scrollTop > max2 - 4 ? 'end' : 'mid');
+      if ((this.state || {}).edge !== e) this.setState({ edge: e });
+    } catch (err) {}
+  }
+  renderVals() {
+    const uid = this.gp('uid') || 'a2';
+    const h = Number(this.gp('h')) || 740;
+    const cat = this.catNum();
+    const stage = this.gp('stage') === 'yes';
+    const emptyMark = this.gp('emptyMark') !== 'no';
+    const pos = this.gp('pos') || 'auto';
+    const S = this.state || {};
+    const onCat = this.gp('onCat') || (() => {});
+    // ข้อ 1.1 (R18 แก้ 2026-11-02): 14 หมวด 3 กลุ่ม + ตัวละคร (ถอด Arm Control) · [เลขหมวด, ชื่อบนแถบ, ชื่อเต็ม, ไอคอน, พื้น, ขอบ, กลุ่ม, ชนิด] · เลขหมวดเป็นรหัสคงเดิม (ข้ามเลข 9 ที่ว่าง) เพื่อให้สีหมวดอื่นตรงกับ BlocksPaneA2/BlockA2 ไม่เปลี่ยน
+    // สีหมวด = ค่าชั่วคราว DSG-13 · ยกสีเดิมตามชื่อหมวด · หมวดใหม่: Car Control = ม่วงเดิมของ "เสียง" · Remote Control = น้ำตาลอ่อนใหม่ #D2A679 (ตัวเข้ม 7.02 : 1)
+    const CATS = [
+      [1, 'เริ่มต้น', 'เริ่มต้น', 'M5 21V4M5 4h11l-2 4 2 4H5', '#FFD23F', '#9C7A00', 0, 'basic'],
+      [2, 'ควบคุม', 'ควบคุม', 'M17 2l4 4-4 4M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4M21 13v2a3 3 0 0 1-3 3H3', '#FFAB3D', '#A8610A', 0, 'basic'],
+      [3, 'ตรรกะ', 'ตรรกะ', 'M12 3l9 9-9 9-9-9z', '#62D4C8', '#137A70', 0, 'basic'],
+      [4, 'คณิต', 'คณิต', 'M7 3v8M3 7h8M13 17h8M14.5 14.5l5 5M19.5 14.5l-5 5', '#6CCB5F', '#2F7A26', 0, 'basic'],
+      [5, 'ข้อความ', 'ข้อความ', 'M4 7V4h16v3M9 20h6M12 4v16', '#B79CFF', '#5F3FC2', 0, 'empty'],
+      [6, 'ตัวแปร', 'ตัวแปร', 'M21 8l-9-5-9 5v8l9 5 9-5zM3 8l9 5 9-5M12 13v8', '#FF8F70', '#B03A1C', 1, 'basic'],
+      [7, 'รายการ', 'รายการ', 'M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01', '#FF86A8', '#B02C57', 1, 'empty'],
+      [8, 'ฟังก์ชัน', 'ฟังก์ชัน', 'M9 3H7a2 2 0 0 0-2 2v4a2 2 0 0 1-2 2 2 2 0 0 1 2 2v4a2 2 0 0 0 2 2h2M15 3h2a2 2 0 0 1 2 2v4a2 2 0 0 0 2 2 2 2 0 0 0-2 2v4a2 2 0 0 1-2 2h-2', '#F08AD3', '#9A2F85', 1, 'basic'],
+      [10, 'Car Control', 'Car Control', 'M5 17h14v-5l-2-5H7l-2 5zM5 12h14M8 17v2M16 17v2M8 14h.01M16 14h.01', '#D58CF2', '#8239A8', 2, 'empty'],
+      [11, 'มอเตอร์', 'มอเตอร์', 'M21 12a9 9 0 1 1-3-6.7M21 3v6h-6', '#5BAEFF', '#1D63B8', 2, 'empty'],
+      [12, 'Sensor', 'Sensor', 'M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01', '#5CCBEA', '#17789A', 2, 'device'],
+      [13, 'Display', 'Display', 'M3 4h18v12H3zM8 21h8M12 16v5', '#7FE0A8', '#1F8050', 2, 'device'],
+      [14, 'Serial', 'Serial', 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z', '#8FA6FF', '#3D4FC0', 2, 'basic'],
+      [15, 'Remote Control', 'Remote Control', 'M8 2h8v20H8zM12 6h.01M10 10h4M10 14h4M10 18h4', '#D2A679', '#7A4E1F', 2, 'empty'],
+      [16, 'ตัวละคร', 'ตัวละคร', 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01', '#FFBE94', '#A4521C', 3, 'stage']
+    ];
+    const GROUPS = ['พื้นฐาน', 'ข้อมูล', 'School Bot', 'พิเศษ'];
+    const vis = [];
+    const groups = [];
+    for (let g = 0; g < 4; g++) {
+      if (g === 3 && !stage) continue;
+      const items = CATS.filter((c) => c[6] === g).map((c) => {
+        const sel = c[0] === cat;
+        const isEmpty = c[7] === 'empty';
+        vis.push(c[0]);
+        return {
+          n: String(c[0]), id: 'cc-' + uid + '-' + c[0], name: c[1], icon: c[3], sel,
+          cls: sel ? 'cr on' : 'cr',
+          tab: sel ? 0 : -1,
+          aria: c[2] + (isEmpty ? ' · ยังไม่มีบล็อก' : ''),
+          pick: () => onCat(c[0]),
+          // หมวดว่างใน MVP: ขอบประ (รูปทรง ไม่ใช่ความจาง) · ชิปไอคอนคงสีหมวดทุกสถานะ (ทั้งเลือก/ไม่เลือก)
+          chipStyle: 'display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;box-sizing:border-box;border-radius:9px;color:#14243D;background:' + c[4] + ';border:2px ' + ((isEmpty && emptyMark) ? 'dashed ' : 'solid ') + c[5]
+        };
+      });
+      groups.push({
+        label: GROUPS[g], items,
+        // ข้อ 1.1: หัวกลุ่ม = เส้นคั่น border-strong 2px (เว้นขอบ 8) + ชื่อกลุ่ม 14/700 text-secondary กลางแถบ (4.66 : 1 บนราง #DCE3EC) · เว้นบน 12 ให้เห็นเป็นก้อน 3 กลุ่ม · หัวกลุ่มไม่ใช่ปุ่ม ไม่รับโฟกัส (ชื่อกลุ่มอ่านจาก role=group aria-label)
+        headStyle: 'box-sizing:border-box;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;line-height:1.6;color:#5A6377;text-align:center;' + (g === 0 ? 'height:28px;margin:4px 4px 0 4px;padding:0 4px' : 'height:34px;margin:12px 8px 0 8px;padding:4px 0 0 0;border-top:2px solid #C6D6EA')
+      });
+    }
+    let edge = S.edge;
+    if (!edge) edge = (pos === 'end' || pos === 'mid') ? pos : 'top';
+
+    const scrollBy = (dir) => {
+      try {
+        const el = document.getElementById('cr-' + uid);
+        if (!el) return;
+        const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        el.scrollTo({ top: el.scrollTop + dir * 280, behavior: reduce ? 'auto' : 'smooth' });
+      } catch (err) {}
+    };
+    const measure = (el) => {
+      const max = el.scrollHeight - el.clientHeight;
+      return el.scrollTop < 4 ? 'top' : (el.scrollTop > max - 4 ? 'end' : 'mid');
+    };
+    return {
+      uid, h: String(h), groups,
+      showUp: edge !== 'top', showDown: edge !== 'end',
+      scrollUp: () => scrollBy(-1), scrollDown: () => scrollBy(1),
+      onScroll: (e) => {
+        try {
+          const el = e && e.target;
+          if (!el || el.scrollHeight === undefined) return;
+          const nx = measure(el);
+          if ((this.state || {}).edge !== nx) this.setState({ edge: nx });
+        } catch (err) {}
+      },
+      // คีย์บอร์ด: ลูกศรขึ้น-ลง / Home / End ย้ายโฟกัสระหว่างหมวด (เลื่อนตาม focus) · Enter/Space เลือก
+      onKey: (e) => {
+        try {
+          const k = e && e.key;
+          if (k !== 'ArrowDown' && k !== 'ArrowUp' && k !== 'Home' && k !== 'End') return;
+          const ae = document.activeElement;
+          const m = ae && ae.id ? ae.id.match(/-(\d+)$/) : null;
+          let idx = m ? vis.indexOf(Number(m[1])) : -1;
+          if (idx < 0) idx = vis.indexOf(cat);
+          if (k === 'ArrowDown') idx = Math.min(vis.length - 1, idx + 1);
+          else if (k === 'ArrowUp') idx = Math.max(0, idx - 1);
+          else if (k === 'Home') idx = 0;
+          else idx = vis.length - 1;
+          const nxt = document.getElementById('cc-' + uid + '-' + vis[idx]);
+          if (nxt) { if (e.preventDefault) e.preventDefault(); nxt.focus(); }
+        } catch (err) {}
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

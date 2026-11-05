@@ -1,0 +1,54 @@
+{
+  "blocks": [
+    {
+      "type": "sb_loop",
+      "statements": {
+        "DO": {
+          "type": "sb_oled_print",
+          "fields": {"LINE": "1"},
+          "values": {"TEXT": {"type": "sb_ultrasonic", "fields": {"TRIG": "A2", "ECHO": "A3"}}},
+          "next": {
+            "type": "sb_oled_print",
+            "fields": {"LINE": "2"},
+            "values": {"TEXT": {"type": "sb_mpu6050", "fields": {"VALUE": "ACCEL_X"}}},
+            "next": {
+              "type": "sb_oled_print",
+              "fields": {"LINE": "3"},
+              "values": {"TEXT": {"type": "sb_dht11", "fields": {"PIN": "2", "VALUE": "TEMPERATURE"}}},
+              "next": {
+                "type": "sb_oled_print",
+                "fields": {"LINE": "4"},
+                "values": {"TEXT": {"type": "sb_color_sensor", "fields": {"CHANNEL": "RED"}}},
+                "next": {
+                  "type": "controls_if",
+                  "values": {
+                    "IF0": {
+                      "type": "logic_operation",
+                      "fields": {"OP": "AND"},
+                      "values": {
+                        "A": {"type": "sb_ir_received", "fields": {"PIN": "11"}},
+                        "B": {"type": "sb_ir_button", "fields": {"BUTTON": "0xFFA25D"}}
+                      }
+                    }
+                  },
+                  "statements": {"DO0": {"type": "sb_oled_clear"}},
+                  "next": {
+                    "type": "controls_if",
+                    "values": {"IF0": {"type": "sb_gesture_is", "fields": {"DIRECTION": "DIR_LEFT"}}},
+                    "statements": {
+                      "DO0": {
+                        "type": "sb_oled_print",
+                        "fields": {"LINE": "1"},
+                        "values": {"TEXT": {"type": "sb_gesture_light", "fields": {"CHANNEL": "AMBIENT"}}}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

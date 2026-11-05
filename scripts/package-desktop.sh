@@ -18,7 +18,7 @@ while [[ $# -gt 0 ]]; do
 done
 if [[ "$skip_build" == false ]]; then bash "$root/scripts/build-desktop.sh" "${build_flags[@]}"; fi
 bundle="$root/app/bin/darwin-universal/School Bot.app"
-for executable in school-bot demo-engine engines/zide/zide-engine; do
+for executable in school-bot demo-engine engines/zide/zide-engine engines/mixly/mixly-engine; do
   test -x "$bundle/Contents/MacOS/$executable"
   lipo -verify_arch x86_64 arm64 "$bundle/Contents/MacOS/$executable"
 done
