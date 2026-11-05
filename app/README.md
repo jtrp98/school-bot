@@ -19,7 +19,6 @@ frontend/src/modes/
   block-programming/            Team 3
 frontend/src/components/
   shared/                      Shared UI, window controls, tokens and styles
-  block-programming/           Block Lab workspace and result panels
   coding-adventure/            Lesson views and Phaser playground
   robot-control/               Reusable robot inputs, hold buttons and icons
 ```
@@ -31,6 +30,7 @@ frontend/src/components/
 - การรับเหตุการณ์ปิดหน้าต่างและคำสั่งเต็มจอ/ย่อหน้าต่างเรียกผ่าน `core/client.ts` ด้วย โดย component และ hook ยังดูแล close guards, keyboard handlers และ cleanup ของตัวเอง
 - `modes/` เก็บ entrypoints, state, workflows และการเรียก engine; component รับข้อมูลและ callbacks ผ่าน typed props
 - `frontend/src/app/` และ `frontend/src/home/` เก็บ views, dialogs และข้อมูลประกอบของ App/Home; state และ workflow ยังอยู่ใน hooks ของ `App.tsx` และ `Home.tsx` ส่วนหน้าเชื่อมต่อ งานของฉัน และ simulator แยก view ออกจาก hook ภายใน mode เดิม
+- หน้าตรวจสิทธิ์ใน `frontend/src/app/entry/` (`EntryGate`, `LicenseStatus`, `useEntry`) และ `frontend/scripts/render-entry-preview.mjs` ไม่ได้ต่อกับ `App.tsx`/`AppView.tsx` ในเวอร์ชันนี้ แอปเข้าหน้าหลักได้ทันที ไฟล์เก็บไว้ต่อกลับตอนทำระบบ license
 - Workspace แยกการสร้าง view data, การแก้ไขท่า, popover และค่าเริ่มต้นออกจาก `WorkspaceLogic.ts`; ตัวควบคุมยังเป็นเจ้าของ lifecycle, timers และ cleanup ส่วน keyboard/selection handlers อยู่ใน `workspaceKeyboardActions.ts` และ `workspaceSelectionActions.ts` การจำลอง playback, glide และ release อยู่ใน `workspaceSampleMotion.ts` โดยเรียกผ่านเมธอดของตัวควบคุมเพื่อรักษา native overrides
 - `NativeWorkspace.tsx` เก็บ generation, pending commands, stop และ close guards ร่วมกันเพื่อรักษาลำดับ invalidate/drain/stop; `nativeWorkspaceView.ts` สร้างเฉพาะข้อมูลแสดงผลและผูก handlers คงที่ที่ตัวควบคุมสร้างไว้ การแสดงตำแหน่งยังเป็นค่าคำสั่งหรือค่าที่อ่านล่าสุดตามเดิม
 - ตารางท่า การ์ดท่า และแผงข้อต่อใช้ view data จาก `rowsView.ts`, `tilesView.ts`, `jointsView.ts` และ handlers จาก `*Actions.ts` ที่อ่าน state เมื่อถูกเรียก; การเลื่อนและ focus ใช้ callback refs ผ่าน `workspaceDom.ts` ส่วนการปรับ selection/range ให้ตรงกับลำดับท่าอยู่ใน lifecycle ผ่าน `workspaceReconcile.ts`

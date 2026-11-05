@@ -24,8 +24,28 @@ Upstream repository: https://gitee.com/mixly2/mixly2.0_src
 The upstream AVR serial sample in `tests/fixtures/avr-serial.mix` is test input
 from `sample/Arduino AVR/04-文本/01-serial_string-1.mix`; it is not in the binary.
 
+## Bundled Arduino libraries (`libraries/`)
+
+Shipped as source beside the engine because arduino-cli compiles them into each Block Lab
+program. Each folder is the upstream library without examples, documentation, images and
+editor files; the remaining sources and license files are unmodified. Their license texts
+stay inside each library folder.
+
+| Library (folder) | Version | Copied from | License (file) |
+| --- | --- | --- | --- |
+| Servo (`Servo`) | 1.2.1 | sb-app-mixly `arduino-cli/libraries/Servo` | LGPL-2.1 (`LICENSE.txt`) |
+| Adafruit NeoPixel (`Adafruit_NeoPixel`) | 1.12.0 | sb-app-mixly `arduino-cli/libraries/Adafruit_NeoPixel` | LGPL-3.0 (`COPYING`) |
+| U8g2 (`U8g2`) | 2.34.22 | sb-app-mixly `arduino-cli/libraries/U8g2` | BSD-2-Clause; fonts under the licenses listed in `LICENSE` |
+| IRremote (`IRremote`) | 3.7.1 | sb-app-mixly `arduino-cli/libraries/IRremote` | MIT (`LICENSE`; contributors in `Contributors.md`) |
+| ZLTech dht (`ZLTech_dht`) | 0.1.01: Rob Tillaart's DHTLib, modified by ZLTech | Mixly Thai build, ZLTech UNO package V2.0.9, `libraries/ZLTech_dht` | Source purchased from ZLTech by the School Bot publisher. Based on Rob Tillaart's DHTLib 0.1.01 (Arduino Playground); the files carry no license text. |
+| ZLTech APDS9960 (`ZLTech_APDS9960`) | 1.0.0 (RTrobot) | Same package, `libraries/ZLTech_APDS9960` | Beerware, stated in `src/APDS9960.h` |
+| ZLTech Adafruit TCS34725 (`ZLTech_Adafruit_TCS34725`) | 1.3.1 (Adafruit) with ZLTech's `getR/getG/getB/getC` | Same package, `libraries/ZLTech_Adafruit_TCS34725` | BSD-3-Clause (`license.txt`) |
+
+The LGPL libraries are distributed as source, so recipients can change and rebuild them. A
+program compiled with them is built on the user's computer; School Bot does not distribute it.
+
 The engine does not redistribute Electron, Arduino CLI, Python, mpremote, esptool,
-kflash, board cores, firmware images or external libraries. A toolchain distribution
+kflash, board cores or firmware images. A toolchain distribution
 must preserve those components' own notices and licenses when it supplies them.
 The engine's binary embeds the imported generator text. This is not encryption
 and does not prevent inspection or reverse engineering.

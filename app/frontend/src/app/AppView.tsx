@@ -1,12 +1,9 @@
 import { AppDialogs } from "./AppDialogs";
-import { CloseDialog } from "./CloseDialog";
-import { EntryGate } from "./entry/EntryGate";
-import { LicenseStatus } from "./entry/LicenseStatus";
 import { AppNavigation } from "./AppNavigation";
 import { Robot, Lessons, CodeLab, Blocks, titles, titleIcons, avatarLetter, ModeBoundary } from "./appData";
 import { t as translate } from "../i18n";
 
-import { Suspense, type CSSProperties } from "react";
+import { Suspense } from "react";
 import { preview } from "../core/client";
 
 import { Icon } from "../components/shared/Icons";
@@ -102,8 +99,10 @@ const loadingNoticeClass =
   "text-blue-press rounded-control py-[12px] px-[16px] text-[13px] [&.error]:text-err-ink [&.error]:bg-err-tint " +
   "[&.error]:border-err-line sh-loading my-[28px] mx-[36px]";
 
+// The page fills the window; a touchpad scroll past its end must not bounce the whole mode.
 const pageClass =
-  "page [flex:1] min-w-0 h-[var(--app-viewport-height,_100vh)] flex flex-col [&.is-full]:overflow-auto";
+  "page [flex:1] min-w-0 h-[var(--app-viewport-height,_100vh)] flex flex-col [&.is-full]:overflow-auto " +
+  "[overscroll-behavior:none]";
 
 const pageBodyClass =
   "page-body [flex:1] min-h-0 overflow-auto py-[28px] px-[36px] [@media(max-width:_1100px)]:p-[24px] " +
@@ -159,44 +158,19 @@ const msgPreClass =
 export function AppView({ v }: Props) {
   const {
     view, nonce, message, setMessage, settings, menuOpen, setMenuOpen, profile, setProfile,
-    pending, closeRequested, setCloseRequested, closeBusy, desktop, classLine, closeWindow,
-    go, shell, langName, langSeg, full, entry, entryAdapter, licenseBar, licenseBarHeight,
+    pending, closeRequested, desktop, classLine, requestClose,
+    go, shell, langName, langSeg, full,
   } = v;
   return (
     <ShellContext.Provider value={shell}>
       <WindowChromeProvider
         desktop={desktop}
         preview={preview}
-        escapeBlocked={!entry.entered || settings || !!pending || profile || menuOpen || closeRequested}
-        onClose={() => {
-          if (closeBusy) return;
-          if (!entry.entered || view === "home") void closeWindow();
-          else setCloseRequested(true);
-        }}
+        escapeBlocked={settings || !!pending || profile || menuOpen || closeRequested}
+        onClose={requestClose}
       >
-      <div className={`${windowLayoutClass} ${(desktop || preview) ? windowChromeClass : ""} ${entry.entered
-        ? "grid grid-rows-[auto_minmax(0,1fr)]" : ""}`}
-        style={entry.entered ? {
-          "--app-viewport-height": `calc(100vh - ${licenseBarHeight}px)`,
-        } as CSSProperties : undefined}
-      >
-      {!entry.entered && <EntryGate entry={entry} adapter={entryAdapter} language={langSeg} preview={preview} />}
-      {!entry.entered && closeRequested && <CloseDialog {...v} />}
-      {entry.entered && (
-        <div ref={licenseBar} className="min-w-0 [overflow-wrap:anywhere]">
-          <LicenseStatus status={entry.status} />
-          <div className="bg-surface px-[16px] py-[8px] font-body text-[14px] leading-[28px]">
-            {entry.account
-              ? translate("entry.choice.account", { username: entry.account })
-              : translate("entry.choice.guestTitle")}
-          </div>
-        </div>
-      )}
-      {entry.hasEntered && (
-      <div
-        inert={!entry.entered}
-        className={`app-shell relative h-[var(--app-viewport-height,_100vh)] overflow-hidden ${entry.entered ? "flex" : "hidden"}`}
-      >
+      <div className={`${windowLayoutClass} ${(desktop || preview) ? windowChromeClass : ""}`}>
+      <div className="app-shell relative flex h-[var(--app-viewport-height,_100vh)] overflow-hidden">
 
         {!full && (
           <nav
@@ -256,6 +230,8 @@ export function AppView({ v }: Props) {
               >
                 {view === "robot-control" ? (
                   <Robot />
+                ) : view === "block-programming" ? (
+                  <Blocks />
                 ) : (
                   <>
                     <AppBar
@@ -271,7 +247,6 @@ export function AppView({ v }: Props) {
                     <div className={view === "coding-adventure" ? lessonsBodyClass : pageBodyClass}>
                       {view === "coding-adventure" && <Lessons />}
                       {view === "code-lab" && <CodeLab />}
-                      {view === "block-programming" && <Blocks />}
                     </div>
                   </>
                 )}
@@ -404,12 +379,11 @@ export function AppView({ v }: Props) {
           </div>
         )}
 
-        {entry.entered && <AppDialogs v={v} />}
+        <AppDialogs v={v} />
 
 
 
       </div>
-      )}
       </div>
       </WindowChromeProvider>
     </ShellContext.Provider>

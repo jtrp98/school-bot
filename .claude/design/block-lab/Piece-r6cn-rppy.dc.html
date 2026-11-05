@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>Block Lab หน้าหลัก A2</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+  <helmet>
+    <style>
+      html, body { margin: 0; height: 100%; }
+    </style>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'IBM Plex Sans Thai',system-ui,sans-serif;color:#14243D}
+button{font-family:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid #B85E00;outline-offset:2px}
+.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border-radius:12px;border:2px solid #C6D6EA;border-bottom-width:4px;background:#fff;color:#14243D;font-size:16px;font-weight:600;line-height:1.6}
+.sp{animation:bl-spin .8s linear infinite}
+@keyframes bl-spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.sp{animation:none}}
+</style>
+  </helmet>
+<div style="position: absolute; left: 0px; top: 138px; width: 1440px; height: 76px; z-index: 60; position: absolute; left: 0px; top: 0px; right: auto; bottom: auto; margin: 0px; box-sizing: border-box; width: 1440px;">
+    <dc-import name="BottomBar" busy="{{busy}}" note="{{bottomNote}}" noteIcon="{{noteIcon}}" hint-size="1440px,76px"></dc-import>
+  </div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;panels&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;hide&quot;,&quot;options&quot;:[&quot;hide&quot;,&quot;show&quot;],&quot;section&quot;:&quot;A2 · กรอบตัวจำลอง/stage&quot;},&quot;tab&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;sim&quot;,&quot;options&quot;:[&quot;sim&quot;,&quot;stage&quot;],&quot;section&quot;:&quot;หน้าจอ (ใช้เมื่อ panels=show)&quot;},&quot;run&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;running&quot;,&quot;options&quot;:[&quot;idle&quot;,&quot;compiling&quot;,&quot;running&quot;,&quot;compile-error&quot;,&quot;ended&quot;,&quot;edited&quot;,&quot;broken&quot;],&quot;section&quot;:&quot;หน้าจอ&quot;},&quot;circuit&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;ok&quot;,&quot;options&quot;:[&quot;empty&quot;,&quot;ok&quot;,&quot;led-no-r&quot;,&quot;short&quot;],&quot;section&quot;:&quot;หน้าจอ&quot;},&quot;program&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;sample&quot;,&quot;options&quot;:[&quot;empty&quot;,&quot;sample&quot;,&quot;loose&quot;,&quot;gap&quot;,&quot;orphan&quot;,&quot;unset&quot;],&quot;section&quot;:&quot;หน้าจอ&quot;},&quot;drawer&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;open&quot;,&quot;options&quot;:[&quot;open&quot;,&quot;closed&quot;],&quot;section&quot;:&quot;ลิ้นชัก Output | C++&quot;},&quot;dtab&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;out&quot;,&quot;options&quot;:[&quot;out&quot;,&quot;cpp&quot;],&quot;section&quot;:&quot;ลิ้นชัก Output | C++&quot;},&quot;serial&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;sim&quot;,&quot;options&quot;:[&quot;empty&quot;,&quot;sim&quot;,&quot;uno&quot;,&quot;uno-manual&quot;,&quot;unreadable&quot;],&quot;section&quot;:&quot;ลิ้นชัก Output | C++&quot;},&quot;paused&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;no&quot;,&quot;options&quot;:[&quot;no&quot;,&quot;yes&quot;],&quot;section&quot;:&quot;ลิ้นชัก Output | C++&quot;},&quot;cat&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:2,&quot;min&quot;:1,&quot;max&quot;:16,&quot;section&quot;:&quot;แผง&quot;},&quot;target&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;board&quot;,&quot;options&quot;:[&quot;board&quot;,&quot;stage&quot;],&quot;section&quot;:&quot;แผง&quot;},&quot;dd&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;closed&quot;,&quot;options&quot;:[&quot;closed&quot;,&quot;led&quot;,&quot;btn&quot;],&quot;section&quot;:&quot;แผง&quot;},&quot;issues&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:0,&quot;min&quot;:0,&quot;max&quot;:6,&quot;section&quot;:&quot;ตรวจก่อนรัน (R17)&quot;},&quot;led&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;auto&quot;,&quot;options&quot;:[&quot;auto&quot;,&quot;on&quot;,&quot;off&quot;,&quot;fast&quot;],&quot;section&quot;:&quot;ตัวจำลอง&quot;},&quot;sound&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;on&quot;,&quot;options&quot;:[&quot;on&quot;,&quot;off&quot;],&quot;section&quot;:&quot;ตัวจำลอง&quot;},&quot;chip&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;connected&quot;,&quot;options&quot;:[&quot;disconnected&quot;,&quot;connecting&quot;,&quot;connected&quot;,&quot;lost&quot;],&quot;section&quot;:&quot;บอร์ด&quot;},&quot;card&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;none&quot;,&quot;options&quot;:[&quot;none&quot;,&quot;nodevice&quot;,&quot;compile&quot;,&quot;send&quot;,&quot;success&quot;,&quot;success-stage&quot;,&quot;fail-usb&quot;,&quot;fail-compile&quot;,&quot;stop0&quot;,&quot;stopA&quot;,&quot;stopB&quot;],&quot;section&quot;:&quot;ส่งลงบอร์ด (SCR-19)&quot;},&quot;dialog&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;none&quot;,&quot;options&quot;:[&quot;none&quot;,&quot;preflightRun&quot;,&quot;preflightSend&quot;,&quot;warn&quot;,&quot;guardRun&quot;,&quot;guardSend&quot;],&quot;section&quot;:&quot;ตรวจก่อนรัน (R17) / ส่งลงบอร์ด (SCR-19)&quot;},&quot;os&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;win&quot;,&quot;options&quot;:[&quot;win&quot;,&quot;mac&quot;],&quot;section&quot;:&quot;แถบหน้าต่าง&quot;},&quot;save&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;saved&quot;,&quot;options&quot;:[&quot;saved&quot;,&quot;dirty&quot;,&quot;unsaved&quot;],&quot;section&quot;:&quot;แถบหน้าต่าง&quot;},&quot;menu&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;closed&quot;,&quot;options&quot;:[&quot;closed&quot;,&quot;open&quot;],&quot;section&quot;:&quot;แถบหน้าต่าง&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const P = this.props || {};
+    const S = this.state || {};
+    const pick = (k, d) => (S[k] !== undefined ? S[k] : ((P[k] !== undefined && P[k] !== null && P[k] !== '') ? P[k] : d));
+
+    // A2: เปิด/ปิดกรอบตัวจำลอง + stage (ค่าเริ่มต้นซ่อน) · กดปุ่มพาไปตัวจำลอง (ในบล็อก/แถบแจ้ง) = เปิดกรอบคืน
+    const panels = pick('panels', 'hide') === 'show' ? 'show' : 'hide';
+    const hideMode = panels === 'hide';
+    const paneW = hideMode ? 1440 : 760;
+
+    const tab = pick('tab', 'sim');
+    const run = pick('run', 'running');
+    let circuit = pick('circuit', 'ok');
+    if (run === 'broken' && (circuit === 'ok' || circuit === 'empty')) circuit = 'led-no-r';
+    const program = pick('program', 'sample');
+    const sound = pick('sound', 'on');
+    const dialog = pick('dialog', 'none');
+    const card = pick('card', 'none');
+    const pressed = !!S.pressed && run === 'running';
+    const ever = !!S.ever;
+
+    // เป้าหมายของพาเลตบล็อก (R1/R18 · OQ66 Proposed): บอร์ด (ค่าเริ่มต้น) | ตัวละคร
+    const target = pick('target', 'board') === 'stage' ? 'stage' : 'board';
+    let cat = Math.min(16, Math.max(1, Number(pick('cat', 2)) || 2));
+    if (target === 'stage' && S.cat === undefined) cat = 16;
+    if (target !== 'stage' && cat === 16) cat = S.prevCat || 2;
+    const prevCat = S.prevCat || 2;
+
+    // ตรวจก่อนรัน (R17): จำนวนข้อ · program orphan/unset = มีอย่างน้อย 1 ข้อ
+    const issuesT = Math.min(6, Math.max(0, Number(pick('issues', 0)) || 0));
+    const issueN = issuesT > 0 ? issuesT : ((program === 'orphan' || program === 'unset') ? 1 : 0);
+    const pfOn = S.pf !== undefined ? S.pf === 'open' : (dialog === 'preflightRun' || dialog === 'preflightSend');
+    const pfMode = (S.pf === undefined && dialog === 'preflightSend') ? 'send' : 'run';
+    const pfN = issueN > 0 ? issueN : 3;
+    const skipFlag = (run === 'running' && (program === 'orphan' || program === 'unset')) ? 'yes' : 'no';
+
+    // ความสูงเนื้อหาตัวจำลอง/stage (A2: ไม่มีแผงข้อความใต้ขวาแล้ว → 648 เต็ม)
+    const contentH = 648;
+
+    // เริ่ม/หยุดจำลอง (OQ31: ปุ่มเดียวสลับ)
+    let runLabel = 'เริ่มจำลอง', runIcon = 'M6 4l14 8-14 8z', runIconClass = 'i', runDisabled = false;
+    let runStyle = 'background:#1866C9;border-color:#1866C9;border-bottom-color:#0F4C99;color:#fff;min-height:48px;padding:0 20px;font-size:18px;font-weight:700';
+    if (run === 'running') {
+      runLabel = 'หยุดจำลอง'; runIcon = 'M8 5v14M16 5v14';
+      runStyle = 'background:#fff;border-color:#1866C9;border-bottom-color:#1866C9;color:#1866C9;min-height:48px;padding:0 20px;font-size:18px;font-weight:700';
+    } else if (run === 'compiling') {
+      runLabel = 'กำลังแปลงโค้ด…'; runIcon = 'M12 2v4M12 18v4M4.9 4.9l2.9 2.9M16.2 16.2l2.9 2.9M2 12h4M18 12h4M4.9 19.1l2.9-2.9M16.2 7.8l2.9-2.9'; runIconClass = 'i sp'; runDisabled = true;
+      runStyle = 'background:#EAF2FD;border-color:#C6D6EA;border-bottom-color:#C6D6EA;color:#14243D;min-height:48px;padding:0 20px;font-size:18px;font-weight:700';
+    }
+
+    // สถานะ (pill) · panels=show: อยู่ที่แถบแท็บขวา เหมือน A · panels=hide: อยู่ที่หัวหน้า (ข้างปุ่มเริ่มจำลอง)
+    const pillBase = 'display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:0 12px;border-radius:999px;font-size:16px;font-weight:600;line-height:1.6;white-space:nowrap;border:2px solid ';
+    const P_PLAY = 'M6 4l14 8-14 8z', P_ALERT = 'M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01', P_INFO = 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 16v-4M12 8h.01', P_FLAG = 'M5 21V4M5 4h11l-2 4 2 4H5', P_ACT = 'M22 12h-4l-3 9L9 3l-3 9H2', P_SPIN = 'M12 2v4M12 18v4M4.9 4.9l2.9 2.9M16.2 16.2l2.9 2.9M2 12h4M18 12h4M4.9 19.1l2.9-2.9M16.2 7.8l2.9-2.9';
+    let pillText = 'พร้อมจำลอง', pillIcon = P_PLAY, pillIconClass = 'i', pillStyle = pillBase + '#DCE3EC;background:#F4F6F8;color:#5A6377';
+    if (run === 'compiling') { pillText = 'กำลังแปลงโค้ด'; pillIcon = P_SPIN; pillIconClass = 'i sp'; pillStyle = pillBase + '#C6D6EA;background:#EAF2FD;color:#14243D'; }
+    if (run === 'running') { pillText = 'กำลังจำลอง'; pillIcon = P_ACT; pillStyle = pillBase + '#1866C9;background:#EAF2FD;color:#0F4C99'; }
+    if (run === 'compile-error') { pillText = 'แปลงโค้ดไม่ผ่าน'; pillIcon = P_ALERT; pillStyle = pillBase + '#B07F00;background:#FFF4CC;color:#14243D'; }
+    if (run === 'ended') { pillText = 'โปรแกรมจบแล้ว'; pillIcon = P_FLAG; pillStyle = pillBase + '#5A6377;background:#F4F6F8;color:#14243D'; }
+    if (run === 'edited') { pillText = 'หยุดเพราะแก้ไข'; pillIcon = P_INFO; pillStyle = pillBase + '#5A6377;background:#F4F6F8;color:#14243D'; }
+    if (run === 'broken') { pillText = circuit === 'short' ? 'หยุด: ลัดวงจร' : 'หยุด: LED เสีย'; pillIcon = P_ALERT; pillStyle = pillBase + '#B07F00;background:#FFF4CC;color:#14243D'; }
+
+    // แถบแจ้ง (ไม่หายเอง มีปุ่ม) · panels=show: ลอยเหนือก้นคอลัมน์ขวา (เหมือน A) · panels=hide: ลอยมุมขวาบนของพื้นที่ต่อบล็อก
+    let hasBanner = false, bannerText = '', bannerCode = '', bannerButton = '', bannerWarn = false, bannerIcon = P_INFO, bannerIconClass = 'i', bannerAction = () => {};
+    const restart = () => this.setState({ run: 'running', pressed: false });
+    if (run === 'compiling') { hasBanner = true; bannerText = 'กำลังแปลงโค้ดก่อนเริ่มจำลอง รอสักครู่'; bannerIcon = P_SPIN; bannerIconClass = 'i sp'; bannerButton = 'รอสักครู่'; }
+    if (run === 'compile-error') { hasBanner = true; bannerWarn = true; bannerIcon = P_ALERT; bannerText = 'เริ่มจำลองไม่ได้ ช่อง "ถ้า" ยังว่าง '; bannerCode = 'E-BUILD'; bannerButton = 'ไปที่บล็อก'; }
+    if (run === 'ended') { hasBanner = true; bannerText = 'โปรแกรมจบแล้ว (บล็อก "หยุดโปรแกรม")'; bannerButton = 'เริ่มใหม่'; bannerAction = restart; }
+    if (run === 'edited') { hasBanner = true; bannerText = 'หยุดจำลองแล้ว เพราะมีการแก้ไข'; bannerButton = 'เริ่มใหม่'; bannerAction = restart; }
+    // อุปกรณ์เสีย: A แสดงแถบนี้เฉพาะแท็บ stage (แท็บตัวจำลองแสดงความเสียหายในภาพเอง) · A2 ซ่อนตัวจำลอง จึงต้องแสดงแถบเสมอ + ปุ่มเปิดกรอบตัวจำลองคืน
+    if (run === 'broken' && (hideMode || tab === 'stage')) { hasBanner = true; bannerWarn = true; bannerIcon = P_ALERT; bannerText = (circuit === 'short' ? 'หยุดจำลองแล้ว สายลัดวงจร ' : 'หยุดจำลองแล้ว LED เสีย '); bannerCode = circuit === 'short' ? 'E-SIM-02' : 'E-SIM-01'; bannerButton = hideMode ? 'เปิดตัวจำลอง' : 'ไปดูที่ตัวจำลอง'; bannerAction = () => this.setState({ tab: 'sim', panels: 'show' }); }
+    const bannerTop = 56 + contentH - 72;
+    const bannerCommon = 'box-sizing:border-box;display:flex;align-items:center;gap:12px;padding:0 10px 0 14px;border-radius:12px;z-index:10;box-shadow:0 8px 20px rgba(20,36,61,.2);border:2px solid ' + (bannerWarn ? '#B07F00;background:#FFF4CC' : '#C6D6EA;background:#EAF2FD');
+
+    // การ์ด SCR-19
+    const cardMap = { 'nodevice': ['nodevice', 'no', 'usb'], 'compile': ['compile', 'no', 'usb'], 'send': ['send', 'no', 'usb'], 'success': ['success', 'no', 'usb'], 'success-stage': ['success', 'yes', 'usb'], 'fail-usb': ['fail', 'no', 'usb'], 'fail-compile': ['fail', 'no', 'compile'], 'stop0': ['stop0', 'no', 'usb'], 'stopA': ['stopA', 'no', 'usb'], 'stopB': ['stopB', 'no', 'usb'] };
+    const cm = cardMap[card] || null;
+    const cardLeft = !!cm && cm[0].indexOf('stop') === 0;
+    const cardRight = !!cm && !cardLeft;
+    const busy = (card === 'compile' || card === 'send') ? 'yes' : 'no';
+    const ok = card === 'success' || card === 'success-stage';
+
+    // LED (OQ34: ไม่เกิน 3 ครั้ง/วินาที เกินแล้วแสดงแสงคงที่กลาง ๆ)
+    const ledP = pick('led', 'auto');
+    let ledState = 'off';
+    if (run === 'running') ledState = ledP === 'auto' ? (pressed ? 'on' : 'off') : ledP;
+
+    const segBase = 'display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 14px;border-radius:11px;font-size:16px;color:#14243D;';
+    const segOn = segBase + 'border:3px solid #1866C9;background:#EAF2FD;font-weight:700';
+    const segOff = segBase + 'border:3px solid transparent;background:transparent;font-weight:600';
+
+    return {
+      os: pick('os', 'win'), chip: pick('chip', 'connected'),
+      workSave: pick('save', 'saved'),
+      menuOpen: pick('menu', 'closed') === 'open',
+      menuState: pick('menu', 'closed'),
+      menuPopStyle: 'position:absolute;top:58px;left:' + (pick('os', 'win') === 'mac' ? 200 : 60) + 'px;width:280px;box-sizing:border-box;background:#fff;border:2px solid #DCE3EC;border-radius:16px;box-shadow:0 8px 20px rgba(20,36,61,.2);padding:8px;z-index:40;display:flex;flex-direction:column;gap:2px',
+      runLabel, runIcon, runIconClass, runStyle, runDisabled,
+      // R17: ถ้ามีปัญหา กดเริ่มจำลองแล้วเด้งป๊อปอัป (ตรวจใหม่ทุกครั้งที่กด · OQ55 ค) · หยุดจำลองไม่ตรวจ
+      toggleRun: () => {
+        if (run === 'compiling') return;
+        if (run === 'running') { this.setState({ run: 'idle', pressed: false }); return; }
+        if (issueN > 0) { this.setState({ pf: 'open' }); return; }
+        this.setState({ run: 'running', pressed: false });
+      },
+      hideMode, showPanels: !hideMode, paneW: String(paneW),
+      paneBoxStyle: 'position:absolute;left:0;top:120px;width:' + paneW + 'px;height:704px',
+      program, cat: String(cat), target,
+      ddProp: pick('dd', 'closed'),
+      skipFlag, hlFlag: S.hl === 'yes' ? 'yes' : 'no',
+      drawerP: P.drawer === 'closed' ? 'closed' : 'open',
+      dtabP: P.dtab === 'cpp' ? 'cpp' : 'out',
+      serialP: P.serial || 'sim',
+      pausedP: P.paused === 'yes' ? 'yes' : 'no',
+      pickCat: (n) => this.setState({ cat: n }),
+      goSim: () => this.setState({ tab: 'sim', panels: 'show' }),
+      isBoardTarget: target === 'board', isStageTarget: target === 'stage',
+      boardBtnStyle: target === 'board' ? segOn : segOff, stageBtnStyle: target === 'stage' ? segOn : segOff,
+      setBoard: () => this.setState({ target: 'board', cat: cat === 16 ? prevCat : cat }),
+      setStage: () => this.setState({ target: 'stage', prevCat: cat === 16 ? prevCat : cat, cat: 16 }),
+      showChip: issueN > 0 && !pfOn,
+      chipText: 'ปัญหา ' + issueN + ' ข้อ',
+      chipAria: 'ปัญหาก่อนรัน ' + issueN + ' ข้อ กดเพื่อดูรายการ',
+      openPf: () => this.setState({ pf: 'open' }),
+      pfOn, pfMode, pfN: String(pfN),
+      pfBack: () => this.setState({ pf: 'closed' }),
+      pfContinue: () => this.setState({ pf: 'closed', run: 'running', pressed: false }),
+      pfPick: (idx) => this.setState({ pf: 'closed', hl: idx === 0 ? 'yes' : 'no' }),
+      isSim: tab === 'sim', isStage: tab === 'stage',
+      tabSim: () => this.setState({ tab: 'sim' }), tabStage: () => this.setState({ tab: 'stage' }),
+      tabSimStyle: tab === 'sim' ? 'display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 16px;border:2px solid #DCE3EC;border-bottom:0;border-radius:12px 12px 0 0;background:#fff;color:#14243D;font-size:16px;font-weight:700;box-shadow:inset 0 -4px 0 #1866C9;margin-bottom:-2px' : 'display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 16px;border:2px solid transparent;border-bottom:0;border-radius:12px 12px 0 0;background:transparent;color:#5A6377;font-size:16px;font-weight:600',
+      tabStageStyle: tab === 'stage' ? 'display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 16px;border:2px solid #DCE3EC;border-bottom:0;border-radius:12px 12px 0 0;background:#fff;color:#14243D;font-size:16px;font-weight:700;box-shadow:inset 0 -4px 0 #1866C9;margin-bottom:-2px' : 'display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 16px;border:2px solid transparent;border-bottom:0;border-radius:12px 12px 0 0;background:transparent;color:#5A6377;font-size:16px;font-weight:600',
+      pillText, pillIcon, pillIconClass, pillStyle,
+      soundOn: sound === 'on',
+      soundAria: sound === 'on' ? 'เสียงเปิดอยู่ กดเพื่อปิดเสียงทั้งหมด' : 'เสียงปิดอยู่ กดเพื่อเปิดเสียง',
+      soundStyle: 'min-height:48px;width:48px;padding:0;' + (sound === 'on' ? 'background:#EAF2FD;border-color:#1866C9;border-bottom-color:#1866C9' : 'background:#F4F6F8;border-color:#DCE3EC;border-bottom-color:#DCE3EC'),
+      soundIcon: sound === 'on' ? 'M11 5L6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14' : 'M11 5L6 9H2v6h4l5 4zM22 9l-6 6M16 9l6 6',
+      toggleSound: () => this.setState({ sound: sound === 'on' ? 'off' : 'on' }),
+      contentStyle: 'position:absolute;left:0;top:56px;width:680px;height:' + contentH + 'px',
+      contentH: String(contentH),
+      circuit, run,
+      pressedFlag: pressed ? 'yes' : 'no',
+      pot: String(S.pot !== undefined ? S.pot : 512),
+      ledState,
+      press: () => this.setState({ pressed: true, ever: true }),
+      release: () => this.setState({ pressed: false }),
+      kd: (e) => { if (e && (e.key === ' ' || e.key === 'Enter')) { if (e.preventDefault) e.preventDefault(); this.setState({ pressed: true, ever: true }); } },
+      ku: (e) => { if (e && (e.key === ' ' || e.key === 'Enter')) this.setState({ pressed: false }); },
+      onPot: (e) => this.setState({ pot: Number(e && e.target ? e.target.value : 512) }),
+      stagePose: String(ever ? 2 : 1),
+      stageState: run === 'running' ? 'running' : 'idle',
+      frozenText: run === 'broken' ? (circuit === 'short' ? 'หยุดอยู่ เพราะสายลัดวงจร' : 'หยุดอยู่ เพราะ LED เสีย') : '',
+      hasBannerShow: hasBanner && !hideMode, hasBannerHide: hasBanner && hideMode,
+      bannerText, bannerCode, bannerButton, bannerIcon, bannerIconClass, bannerAction,
+      bannerStyleShow: 'position:absolute;left:8px;top:' + bannerTop + 'px;width:664px;height:64px;' + bannerCommon,
+      bannerStyleHide: 'position:absolute;left:832px;top:128px;width:600px;height:64px;' + bannerCommon,
+      busy, bottomNote: ok ? 'ส่งลงบอร์ดสำเร็จ 10:42' : 'ยังไม่ได้ส่งโปรแกรมลงบอร์ด', noteIcon: ok ? 'ok' : 'none',
+      cardRight, cardLeft, cardKind: cm ? cm[0] : 'success', cardStage: cm ? cm[1] : 'no', cardWhy: cm ? cm[2] : 'usb',
+      dialogOn: dialog === 'warn' || dialog === 'guardRun' || dialog === 'guardSend', dialogKind: (dialog === 'warn' || dialog === 'guardRun' || dialog === 'guardSend') ? dialog : 'warn'
+    };
+  }
+}
+</script>
+</body>
+</html>

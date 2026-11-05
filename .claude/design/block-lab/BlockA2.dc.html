@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>บล็อก A2</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'IBM Plex Sans Thai',system-ui,sans-serif}
+.ba-i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.ba-dp{box-sizing:border-box;display:flex;align-items:center;gap:4px;margin:0;padding:0 8px;border:0;border-radius:8px;color:#14243D;font-family:inherit;font-size:16px;font-weight:600;line-height:20px;white-space:nowrap;text-align:left}
+.ba-dp>*{flex-shrink:0}
+button.ba-dp{cursor:pointer}
+button.ba-dp::after{content:"";position:absolute;left:-6px;right:-6px;top:-8px;bottom:-8px}
+.ba-ct{position:absolute;margin:0;padding:0;border:0;border-radius:12px;background:transparent;display:flex;align-items:center;justify-content:center;width:44px;height:44px;cursor:pointer;font-family:inherit}
+/* ช่องติ๊ก (OQ181 · "ยอมให้ใส่คำสั่ง" ในกล่องเฟืองฟังก์ชัน): ช่อง 28 ขาว ขอบ 2px #14243D · พื้นที่กด 44 · ติ๊ก = ✓ เข้ม */
+.ba-ck{position:absolute;box-sizing:border-box;margin:0;padding:0;display:flex;align-items:center;justify-content:center;border:2px solid #14243D;border-radius:8px;background:#FFFFFF;color:#14243D;cursor:pointer;font-family:inherit}
+.ba-ck::after{content:"";position:absolute;left:-8px;right:-8px;top:-8px;bottom:-8px}
+/* R21 (2026-10-30): วงโฟกัส 2 ชั้น = ขาว 2px + น้ำเงิน #1866C9 3px · น้ำเงินบนพื้นหมวดต่ำกว่า 3:1 หลายหมวด (ชมพู 2.45 · เซอร์โว 2.36 · เซนเซอร์ 2.96) แต่ติดกับวงขาว 5.55:1 ทุกหมวด · ปุ่ม dropdown/ช่องติ๊ก = ขาว (box-shadow) ชิดในของ outline offset 2 · ปุ่มควบคุมกลม (เฟือง/?/±) = วงขาว+น้ำเงินรอบวงกลม 28 */
+button.ba-dp:focus-visible,button.ba-ck:focus-visible{outline:3px solid #1866C9;outline-offset:2px;box-shadow:0 0 0 2px #FFFFFF}
+button.ba-ct:focus-visible{outline:none}
+button.ba-ct:focus-visible>span{box-shadow:0 0 0 2px #FFFFFF,0 0 0 5px #1866C9}
+input.ba-in:focus{outline:none}
+input.ba-in.kb:focus{outline:none;border-color:#1866C9!important;border-width:2px!important;border-style:solid!important;box-shadow:0 0 0 3px #D0EBFD}
+/* tooltip CI (brand §11.8): พื้น #14243D ตัวขาว 14/500 radius 8 z-popover 40 · ใต้ปุ่ม · ขึ้นตอน hover และ focus-visible */
+.ba-tip::after{content:attr(data-tip);display:none;position:absolute;left:50%;transform:translateX(-50%);top:calc(100% + 8px);z-index:40;padding:4px 12px;border-radius:8px;background:#14243D;color:#FFFFFF;font-size:14px;font-weight:500;line-height:1.6;white-space:nowrap;text-align:left;pointer-events:none}
+.ba-tip:hover::after,.ba-tip:focus-visible::after{display:block}
+</style>
+</helmet>
+<!-- BlockA2 · component บล็อกเวอร์ชันใหม่ชิ้นเดียว (A2 รอบ 8 · ชุดที่ 4 · OQ107 · R2 (13)) · ไม่ทับของเดิม (บอร์ด A วาดบล็อกในไฟล์ BlocksPane เอง ไม่มี component บล็อก)
+     ใช้ได้ 2 แบบ:
+     (ก) ตัวอย่างเดี่ยว (ไม่ส่ง items): คำนวณขนาดเองจาก prop text · kind · cat · state · [ค่า] = ช่องค่าแคปซูลขาว · () = ช่องเงื่อนไขหกเหลี่ยมว่าง · {ชื่อ} = dropdown อุปกรณ์ · hat ใช้ chip + icon
+     (ข) ในบอร์ด A2 (BlocksPaneA2 ส่ง w h bars mouths tab hd items): BlocksPaneA2 เป็นผู้คำนวณเรขาคณิตทั้งหมด (วัดข้อความ · ตำแหน่งช่อง · บล็อกซ้อนกัน · เกาะ) ส่งมาเป็นข้อมูล · ไฟล์นี้เป็นเจ้าของ "หน้าตา" ทั้งหมด: รูปทรง (หัวโดม · ปากตัว C · รอยบาก · แคปซูล · หกเหลี่ยม) · สีพื้น/ขอบ 16 หมวด · ตัวอักษรเข้ม text-primary #14243D 700 16px (รอบ 9 · คืนตัวเข้ม OQ135 · ยกเลิกตัวขาว/DSG-19 · ≥ 6.5:1 ทุกหมวด) · ช่องขาว/dropdown · สถานะ normal / disabled / ghost / warn
+     ข้อจำกัด (ตรงไปตรงมา): dc ไม่ให้ไฟล์หนึ่ง import โค้ดของอีกไฟล์ → ตรรกะวัดขนาด/จัดตำแหน่งอยู่ที่ BlocksPaneA2 (แหล่งเดียวของเรขาคณิตในบอร์ด) · โหมด (ก) มีตัววัด/จัดตำแหน่งแถวเดียวของตัวเองเฉพาะดูตัวอย่าง (ซ้ำกับของ BlocksPaneA2 บางส่วน) ถ้าสองที่ไม่ตรงกัน บอร์ดใช้ของ BlocksPaneA2 -->
+<div aria-hidden="{{ah}}" onPointerDownCapture="{{mPtr}}" onKeyDownCapture="{{mKey}}" style="position:relative;width:{{rootW}}px;height:{{rootH}}px;pointer-events:none;color:#14243D;font-family:'IBM Plex Sans Thai',system-ui,sans-serif">
+  <svg width="{{sw}}" height="{{sh}}" aria-hidden="true" style="position:absolute;left:0;top:0;overflow:visible;pointer-events:none">
+    <path d="{{shapeD}}" fill="{{fill}}" stroke="{{stroke}}" stroke-width="{{swid}}" stroke-linejoin="round" stroke-dasharray="{{dash}}" onPointerDown="{{down}}" onContextMenu="{{ctxm}}" style="pointer-events:{{pe}};cursor:{{cur}};touch-action:none"></path>
+  </svg>
+  <sc-for list="{{its}}" as="it" hint-placeholder-count="0">
+    <sc-if value="{{it.isText}}" hint-placeholder-val="{{false}}"><span style="{{it.st}}">{{it.t}}</span></sc-if>
+    <sc-if value="{{it.isIcon}}" hint-placeholder-val="{{false}}"><svg class="ba-i" viewBox="0 0 24 24" aria-hidden="true" style="{{it.st}}"><path d="{{it.d}}"></path></svg></sc-if>
+    <sc-if value="{{it.isChip}}" hint-placeholder-val="{{false}}"><span style="{{it.st}}"><sc-if value="{{it.chk}}" hint-placeholder-val="{{false}}"><svg class="ba-i" viewBox="0 0 24 24" aria-hidden="true" style="width:16px;height:16px"><path d="M5 12l5 5L20 7"></path></svg></sc-if>{{it.t}}</span></sc-if>
+    <sc-if value="{{it.isHole}}" hint-placeholder-val="{{false}}"><svg width="{{it.w}}" height="{{it.h}}" aria-hidden="true" style="position:absolute;left:{{it.x}}px;top:{{it.y}}px;overflow:visible;pointer-events:none"><path d="{{it.d}}" fill="{{it.fill}}"></path></svg></sc-if>
+    <sc-if value="{{it.isSlotS}}" hint-placeholder-val="{{false}}"><span style="{{it.st}}">{{it.t}}</span></sc-if>
+    <sc-if value="{{it.isSlotL}}" hint-placeholder-val="{{false}}"><input class="{{it.cls}}" value="{{it.value}}" onChange="{{it.change}}" onFocus="{{it.focus2}}" aria-label="{{it.aria}}" style="{{it.st}}"></sc-if>
+    <sc-if value="{{it.isDevS}}" hint-placeholder-val="{{false}}"><span class="ba-dp" style="{{it.st}}"><sc-if value="{{it.hasSw}}" hint-placeholder-val="{{false}}"><span aria-hidden="true" style="{{it.swSt}}"></span></sc-if><sc-if value="{{it.noSw}}" hint-placeholder-val="{{true}}"><svg class="ba-i" viewBox="0 0 24 24" aria-hidden="true" style="width:16px;height:16px"><path d="{{it.ic}}"></path></svg></sc-if><span>{{it.t}}</span><svg class="ba-i" viewBox="0 0 24 24" aria-hidden="true" style="width:10px;height:10px;stroke-width:3.5"><path d="M6 9l6 6 6-6"></path></svg></span></sc-if>
+    <sc-if value="{{it.isDevL}}" hint-placeholder-val="{{false}}"><button class="ba-dp" onClick="{{it.open}}" onPointerDown="{{stop}}" aria-haspopup="listbox" aria-expanded="{{it.exp}}" aria-label="{{it.aria}}" style="{{it.st}}"><sc-if value="{{it.hasSw}}" hint-placeholder-val="{{false}}"><span aria-hidden="true" style="{{it.swSt}}"></span></sc-if><sc-if value="{{it.noSw}}" hint-placeholder-val="{{true}}"><svg class="ba-i" viewBox="0 0 24 24" aria-hidden="true" style="width:16px;height:16px"><path d="{{it.ic}}"></path></svg></sc-if><span>{{it.t}}</span><svg class="ba-i" viewBox="0 0 24 24" aria-hidden="true" style="width:10px;height:10px;stroke-width:3.5"><path d="M6 9l6 6 6-6"></path></svg></button></sc-if>
+    <sc-if value="{{it.isChkL}}" hint-placeholder-val="{{false}}"><button type="button" class="ba-ck" role="checkbox" aria-checked="{{it.on}}" aria-label="{{it.aria}}" onClick="{{it.click}}" onPointerDown="{{stop}}" style="{{it.st}}"><sc-if value="{{it.on}}" hint-placeholder-val="{{false}}"><svg class="ba-i" viewBox="0 0 24 24" aria-hidden="true" style="width:18px;height:18px;stroke-width:3.2"><path d="M5 12l5 5L20 7"></path></svg></sc-if></button></sc-if>
+    <sc-if value="{{it.isChkS}}" hint-placeholder-val="{{false}}"><span aria-hidden="true" style="{{it.st}}"><sc-if value="{{it.on}}" hint-placeholder-val="{{false}}"><svg class="ba-i" viewBox="0 0 24 24" aria-hidden="true" style="width:18px;height:18px;stroke-width:3.2"><path d="M5 12l5 5L20 7"></path></svg></sc-if></span></sc-if>
+    <sc-if value="{{it.isSolS}}" hint-placeholder-val="{{false}}"><span aria-hidden="true" style="{{it.st}}"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:20px;height:20px;flex-shrink:0"><path d="{{it.sd}}" fill="{{it.sfill}}" fill-rule="evenodd" stroke="{{it.sstroke}}" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></sc-if>
+    <sc-if value="{{it.isSolL}}" hint-placeholder-val="{{false}}"><button type="button" class="ba-ct ba-tip" data-tip="{{it.aria}}" onClick="{{it.click}}" onPointerDown="{{stop}}" aria-haspopup="{{it.hasPop}}" aria-expanded="{{it.exp}}" aria-label="{{it.aria}}" style="{{it.stb}}"><span style="{{it.st}}"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:20px;height:20px;flex-shrink:0"><path d="{{it.sd}}" fill="{{it.sfill}}" fill-rule="evenodd" stroke="{{it.sstroke}}" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></button></sc-if>
+    <sc-if value="{{it.isCtlS}}" hint-placeholder-val="{{false}}"><span aria-hidden="true" style="{{it.st}}"><svg class="ba-i" viewBox="0 0 24 24" aria-hidden="true" style="width:16px;height:16px"><path d="{{it.ic}}"></path></svg></span></sc-if>
+    <sc-if value="{{it.isCtlL}}" hint-placeholder-val="{{false}}"><button class="ba-ct ba-tip" data-tip="{{it.aria}}" onClick="{{it.click}}" aria-label="{{it.aria}}" style="{{it.st}}"><span style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;box-sizing:border-box;border:1.5px solid currentColor;border-radius:50%"><svg class="ba-i" viewBox="0 0 24 24" aria-hidden="true" style="width:16px;height:16px"><path d="{{it.ic}}"></path></svg></span></button></sc-if>
+    <sc-if value="{{it.isCtlG}}" hint-placeholder-val="{{false}}"><button class="ba-ct ba-tip" data-tip="{{it.aria}}" onClick="{{it.click}}" onPointerDown="{{stop}}" aria-haspopup="dialog" aria-expanded="{{it.exp}}" aria-label="{{it.aria}}" style="{{it.st}}"><span style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;box-sizing:border-box;border:1.5px solid currentColor;border-radius:50%"><svg class="ba-i" viewBox="0 0 24 24" aria-hidden="true" style="width:16px;height:16px"><path d="{{it.ic}}"></path></svg></span></button></sc-if>
+  </sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"kind":{"editor":"enum","default":"stack","options":["hat","stack","c","value","boolean"],"section":"บล็อก"},"cat":{"editor":"int","default":2,"min":1,"max":16,"section":"บล็อก"},"text":{"editor":"text","default":"รอ [200] ms","section":"บล็อก"},"chip":{"editor":"text","default":"","section":"บล็อก"},"icon":{"editor":"enum","default":"flag","options":["flag","loop"],"section":"บล็อก"},"state":{"editor":"enum","default":"normal","options":["normal","disabled","ghost","warn"],"section":"บล็อก"},"bw":{"editor":"float","default":1.5,"min":1,"max":3,"step":0.5,"section":"ขอบ"},"w":{"editor":null},"h":{"editor":null},"bars":{"editor":null},"mouths":{"editor":null},"tab":{"editor":null},"hd":{"editor":null},"items":{"editor":null},"down":{"editor":null},"ctx":{"editor":null},"stop":{"editor":null},"decor":{"editor":null},"$preview":{"width":260,"height":120}}'>
+class Component extends DCLogic {
+  componentDidMount() {
+    // โหมดตัวอย่างเดี่ยววัดข้อความด้วย canvas ต้องรอฟอนต์โหลดแล้ววาดใหม่ (โหมดในบอร์ดไม่ใช้ตัววัดนี้)
+    const re = () => { if (Array.isArray(this.gp('items'))) return; this._mc = {}; try { this.forceUpdate(); } catch (e) {} };
+    try {
+      if (document.fonts && document.fonts.load) {
+        document.fonts.load("700 16px 'IBM Plex Sans Thai'", 'กขคเริ่มต้น').then(re, () => {});
+        document.fonts.load("600 16px 'IBM Plex Sans Thai'", 'กขคเริ่มต้น').then(re, () => {});
+      }
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(re);
+    } catch (e) {}
+  }
+  gp(name) {
+    const P = this.props || {};
+    const kebab = name.replace(/[A-Z]/g, (m) => '-' + m.toLowerCase());
+    if (P[name] !== undefined) return P[name];
+    if (P[name.toLowerCase()] !== undefined) return P[name.toLowerCase()];
+    if (P[kebab] !== undefined) return P[kebab];
+    return undefined;
+  }
+  // R=มุม NX=ตำแหน่งรอยบาก ND=ลึกรอยบาก A=ย่อหน้าปาก HD=ความสูงโดมหัว SH=สูงช่อง PX=padding แนวนอน IG=ช่องว่างระหว่างชิ้นในแถว
+  K() { return { R: 7, NX: 14, ND: 5, A: 18, HD: 22, SH: 28, PX: 12, IG: 8 }; }
+  // 16 หมวด [พื้น, ขอบ] (DSG-13 ชั่วคราว) · ข้อ 1.1 (2026-10-28): เรียงตามหมวดใหม่ R18 (15 หมวด 3 กลุ่ม + ตัวละคร) ลำดับเดียวกับ CatRailA2/BlocksPaneA2
+  // 1 เริ่มต้น 2 ควบคุม 3 ตรรกะ 4 คณิต 5 ข้อความ · 6 ตัวแปร 7 รายการ 8 ฟังก์ชัน · 9 (ว่าง · ถอด Arm Control 2026-11-02 · ช่องสีเทากันพัง ไม่มีหมวดใช้) 10 Car Control 11 มอเตอร์ (เดิม Servo / Motor · OQ193) 12 Sensor 13 Display 14 Serial 15 Remote Control · 16 ตัวละคร
+  CATS() {
+    return [
+      ['#FFD23F', '#9C7A00'], ['#FFAB3D', '#A8610A'], ['#62D4C8', '#137A70'], ['#6CCB5F', '#2F7A26'],
+      ['#B79CFF', '#5F3FC2'], ['#FF8F70', '#B03A1C'], ['#FF86A8', '#B02C57'], ['#F08AD3', '#9A2F85'],
+      ['#DCE3EC', '#5A6377'], ['#D58CF2', '#8239A8'], ['#5BAEFF', '#1D63B8'], ['#5CCBEA', '#17789A'],
+      ['#7FE0A8', '#1F8050'], ['#8FA6FF', '#3D4FC0'], ['#D2A679', '#7A4E1F'], ['#FFBE94', '#A4521C']
+    ];
+  }
+  tw(t, wt) {
+    this._mc = this._mc || {};
+    const w0 = wt || 700;
+    const s = String(t);
+    const key = w0 + '|' + s;
+    if (this._mc[key] !== undefined) return this._mc[key];
+    let w = s.length * 9;
+    try {
+      if (!this._cx) this._cx = document.createElement('canvas').getContext('2d');
+      this._cx.font = w0 + " 16px 'IBM Plex Sans Thai', system-ui, sans-serif";
+      w = this._cx.measureText(s).width;
+    } catch (e) {}
+    this._mc[key] = Math.ceil(w);
+    return this._mc[key];
+  }
+
+  /* ---------- รูปทรง (Tinkercad: หัวโดมมน · ปากตัว C มีรอยบากรับบล็อกถัดไป · แคปซูล · หกเหลี่ยม) ---------- */
+  // hat: โดมครึ่งวงรีกว้าง ≤132 สูง hd เหนือแถบหัว (ค่าประมาณจากสายตา · ผู้ใช้ยังไม่ส่งไฟล์ภาพให้วัด OQ108) · อื่น ๆ: มุม 7 + รอยบากบน
+  topD(w, hat, hd) {
+    const K = this.K(), R = K.R, NX = K.NX, ND = K.ND;
+    // hd = 0: บล็อกครอบหัวแบน (กล่อง "ค่าที่รับ" ในกล่องเฟือง · ไม่มีโดม ไม่มีรอยบาก · มุมซ้ายบนเหลี่ยมแบบ Mixly)
+    if (hat && hd === 0) return 'M0,0 H' + (w - R) + ' A' + R + ',' + R + ' 0 0 1 ' + w + ',' + R;
+    if (hat) {
+      const dw = Math.min(132, Math.round(w * 0.62));
+      return 'M0,' + hd + ' A' + (dw / 2) + ',' + hd + ' 0 0 1 ' + dw + ',' + hd + ' H' + (w - R) + ' A' + R + ',' + R + ' 0 0 1 ' + w + ',' + (hd + R);
+    }
+    return 'M0,' + R + ' A' + R + ',' + R + ' 0 0 1 ' + R + ',0 H' + NX + ' l4,' + ND + ' h16 l4,-' + ND + ' H' + (w - R) + ' A' + R + ',' + R + ' 0 0 1 ' + w + ',' + R;
+  }
+  botD(w, y, tab) {
+    const K = this.K(), R = K.R, NX = K.NX, ND = K.ND;
+    return ' V' + (y - R) + ' A' + R + ',' + R + ' 0 0 1 ' + (w - R) + ',' + y + (tab ? ' H' + (NX + 24) + ' l-4,' + ND + ' h-16 l-4,-' + ND : '') + ' H' + R + ' A' + R + ',' + R + ' 0 0 1 0,' + (y - R) + ' Z';
+  }
+  stackD(w, h, tab) { return this.topD(w, false, 0) + this.botD(w, h, tab); }
+  // บล็อกครอบ (c / hat): bars = ความสูงแต่ละแถบ (hat: แถบแรกรวมโดม) · mouths = ความสูงปากระหว่างแถบ
+  cD(W, bars, mouths, hat, tab, hd) {
+    const K = this.K(), R = K.R, NX = K.NX, ND = K.ND, A = K.A;
+    let d = this.topD(W, hat, hd), y = 0;
+    bars.forEach((bh, k) => {
+      const yb = y + bh;
+      if (k < mouths.length) {
+        const mh = mouths[k];
+        d += ' V' + (yb - R) + ' A' + R + ',' + R + ' 0 0 1 ' + (W - R) + ',' + yb;
+        d += ' H' + (A + NX + 24) + ' l-4,' + ND + ' h-16 l-4,-' + ND + ' H' + (A + R) + ' A' + R + ',' + R + ' 0 0 0 ' + A + ',' + (yb + R);
+        d += ' V' + (yb + mh - R) + ' A' + R + ',' + R + ' 0 0 0 ' + (A + R) + ',' + (yb + mh);
+        d += ' H' + (A + NX) + ' l4,' + ND + ' h16 l4,-' + ND + ' H' + (W - R) + ' A' + R + ',' + R + ' 0 0 1 ' + W + ',' + (yb + mh + R);
+        y = yb + mh;
+      } else {
+        d += this.botD(W, yb, tab);
+      }
+    });
+    return d;
+  }
+  pillD(w, h) { const r = h / 2; return 'M' + r + ',0 H' + (w - r) + ' A' + r + ',' + r + ' 0 0 1 ' + (w - r) + ',' + h + ' H' + r + ' A' + r + ',' + r + ' 0 0 1 ' + r + ',0 Z'; }
+  hexD(w, h) { const r = h / 2; return 'M' + r + ',0 H' + (w - r) + ' L' + w + ',' + r + ' L' + (w - r) + ',' + h + ' H' + r + ' L0,' + r + ' Z'; }
+
+  /* ---------- โหมดตัวอย่างเดี่ยว: แยก text เป็นชิ้น · วัด · จัดตำแหน่งแถวเดียว ---------- */
+  parse(text) {
+    const out = [];
+    String(text || '').split(/(\[[^\]]*\]|\([^)]*\)|\{[^}]*\})/).forEach((s) => {
+      if (!s) return;
+      const c0 = s.charAt(0);
+      if (c0 === '[') out.push({ t: 'slot', v: s.substring(1, s.length - 1) });
+      else if (c0 === '(') out.push({ t: 'hole' });
+      else if (c0 === '{') out.push({ t: 'dev', v: s.substring(1, s.length - 1) });
+      else { const v = s.trim(); if (v) out.push({ t: 'x', v: v }); }
+    });
+    return out;
+  }
+  solo(kind) {
+    const K = this.K(), SH = K.SH;
+    const hat = kind === 'hat';
+    const BULB = 'M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2V17h6v-.3c0-.8.4-1.5 1-2A7 7 0 0 0 12 2z';
+    const FLAG = 'M5 21V4M5 4h11l-2 4 2 4H5';
+    const LOOP = 'M17 2l4 4-4 4M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4M21 13v2a3 3 0 0 1-3 3H3';
+    const its = [];
+    if (hat) its.push({ t: 'i', d: this.gp('icon') === 'loop' ? LOOP : FLAG, w: 20, h: 20 });
+    this.parse(this.gp('text')).forEach((tk) => {
+      if (tk.t === 'x') its.push({ t: 'x', text: tk.v, w: this.tw(tk.v, 700), h: 20 });
+      else if (tk.t === 'slot') its.push({ t: 'slot', value: tk.v, empty: tk.v === '', w: tk.v === '' ? 46 : Math.max(36, this.tw(tk.v, 600) + 24), h: SH });
+      else if (tk.t === 'hole') its.push({ t: 'hole', w: 48, h: SH });
+      else its.push({ t: 'dev', text: tk.v, ic: BULB, dst: 'ok', w: 8 + 16 + 4 + this.tw(tk.v, 600) + 4 + 10 + 8, h: SH });
+    });
+    const chip = String(this.gp('chip') || '');
+    if (hat && chip) its.push({ t: 'chip', text: chip, w: this.tw(chip, 600) + 20, h: SH });
+    let rowW = 0, rowH = SH;
+    its.forEach((it, j) => { rowW += it.w + (j ? K.IG : 0); rowH = Math.max(rowH, it.h); });
+    let w, h, cy, pad = K.PX, bars = null, mouths = null, tab = false;
+    if (kind === 'value' || kind === 'boolean') {
+      h = Math.max(34, rowH + 6);
+      pad = kind === 'boolean' ? h / 2 + 4 : K.PX;
+      w = Math.max(rowW + pad * 2, h + 8);
+      cy = h / 2;
+    } else if (kind === 'stack') {
+      h = Math.max(44, rowH + 16);
+      w = Math.max(rowW + K.PX * 2, 70);
+      cy = h / 2; tab = true;
+    } else {
+      const base = Math.max(44, rowH + 16);
+      const b0 = (hat ? K.HD : 0) + base;
+      bars = [b0, 26]; mouths = [30];
+      w = Math.max(hat ? 200 : 150, rowW + K.PX * 2);
+      h = b0 + 30 + 26;
+      cy = (hat ? K.HD : 0) + base / 2;
+      tab = !hat;
+    }
+    let ix = pad;
+    const items = its.map((it) => {
+      const o = Object.assign({}, it, { x: ix, y: cy - it.h / 2 });
+      ix += it.w + K.IG;
+      return o;
+    });
+    return { w: w, h: h, bars: bars, mouths: mouths, tab: tab, hd: K.HD, items: items };
+  }
+
+  renderVals() {
+    const K = this.K();
+    const kinds = ['hat', 'stack', 'c', 'value', 'boolean'];
+    const kind = kinds.indexOf(this.gp('kind')) >= 0 ? this.gp('kind') : 'stack';
+    const sts = ['normal', 'disabled', 'ghost', 'warn'];
+    const state = sts.indexOf(this.gp('state')) >= 0 ? this.gp('state') : 'normal';
+    const cat = Math.min(16, Math.max(1, Number(this.gp('cat')) || 2));
+    const bwP = Number(this.gp('bw'));
+    const bw = bwP > 0 ? bwP : 1.5;
+    const items0 = this.gp('items');
+    const wP = Number(this.gp('w'));
+    let g;
+    if (Array.isArray(items0) && wP > 0) {
+      const bars0 = this.gp('bars'), mouths0 = this.gp('mouths');
+      g = { w: wP, h: Number(this.gp('h')) || 44, bars: Array.isArray(bars0) ? bars0 : null, mouths: Array.isArray(mouths0) ? mouths0 : null, tab: this.gp('tab') === 'yes' || this.gp('tab') === true, hd: (this.gp('hd') !== undefined && this.gp('hd') !== null && this.gp('hd') !== '' && Number(this.gp('hd')) === 0) ? 0 : (Number(this.gp('hd')) || K.HD), items: items0 };
+    } else {
+      g = this.solo(kind);
+    }
+    const w = g.w, h = g.h;
+    // รูปร่างเปลือก
+    let d;
+    let sh = h + K.ND;
+    if (kind === 'value') { d = this.pillD(w, h); sh = h; }
+    else if (kind === 'boolean') { d = this.hexD(w, h); sh = h; }
+    else if (kind === 'stack') d = this.stackD(w, h, g.tab);
+    else {
+      const bars = g.bars || [Math.max(44, h - 56) + (kind === 'hat' ? K.HD : 0), 26];
+      const mouths = g.mouths || [30];
+      d = this.cD(w, bars, mouths, kind === 'hat', g.tab, g.hd);
+    }
+    // สี/ขอบตามสถานะ
+    const CAT = this.CATS()[cat - 1];
+    // ตัวอักษร/ไอคอนบนบล็อก = text-primary #14243D (รอบ 9 · OQ135 · ตัวขาวถูกยกเลิก) · ตรวจแล้ว ≥ 6.5:1 บนพื้น 16 หมวด
+    let fill = CAT[0], stroke = CAT[1], swid = bw, dash = 'none', fg = '#14243D', holeFill = 'rgba(0,0,0,0.22)';
+    if (state === 'disabled') { fill = '#F4F6F8'; stroke = '#5A6377'; swid = 2; dash = '6 4'; fg = '#5A6377'; holeFill = 'rgba(0,0,0,0.08)'; }
+    else if (state === 'ghost') { fill = '#C9CFD8'; stroke = '#AEB6C2'; swid = 1; fg = '#C9CFD8'; holeFill = 'rgba(0,0,0,0.06)'; }
+    else if (state === 'warn') { stroke = '#B07F00'; swid = 2.5; dash = '6 3'; }
+    const down = typeof this.gp('down') === 'function' ? this.gp('down') : null;
+    const live = (it) => !!it.live;
+    const DARK = '#14243D', MUTE = '#5A6377';
+    const items = state === 'ghost' ? [] : g.items;
+    // ข้อ 1.11 (แก้รอบ 2 2026-10-28): ช่องตัวเลข .ba-in ค่าเริ่มต้น = ไม่มีวง · มีวงเฉพาะเมื่อมี keydown นำทาง (Tab/Enter/Space/ลูกศร) ก่อน focus ภายใน 1 วินาทีและหลัง pointerdown ล่าสุด · ธงใน instance (this._md) ฟังที่ window ของเอกสารตัวเอง · pointerdown ล้างธงและวงทุกครั้ง
+    if (!this._md) {
+      const md = this._md = { k: 0, p: 0 };
+      const navK = { Tab: 1, Enter: 1, ' ': 1, ArrowUp: 1, ArrowDown: 1, ArrowLeft: 1, ArrowRight: 1, Home: 1, End: 1 };
+      // แก้รอบ 3: key ที่กดในช่องพิมพ์ (ยกเว้น Tab) ไม่นับเป็นการนำทาง · เริ่มพิมพ์ (ตัวอักษร/Backspace/Delete/input) = ล้างวงช่องตัวเลขทันที
+      md.nav = (e) => { if (!e || !navK[e.key]) return false; const t = e.target; const ed = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable); return !ed || e.key === 'Tab'; };
+      md.typ = (e) => { if (!e) return; const t = e.target; const ed = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable); if (!ed) return; if (e.type === 'input' || (e.key && (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Delete'))) { md.k = 0; const v = (this.state || {}).kbi; if (v != null && v !== -1) this.setState({ kbi: -1 }); } };
+      try {
+        window.addEventListener('keydown', (e) => { if (md.nav(e)) md.k = Date.now(); md.typ(e); }, true);
+        window.addEventListener('input', (e) => md.typ(e), true);
+        window.addEventListener('pointerdown', () => { md.p = Date.now(); md.k = 0; const v = (this.state || {}).kbi; if (v != null && v !== -1) this.setState({ kbi: -1 }); }, true);
+      } catch (e) {}
+    }
+    const kbIn = () => { const md = this._md; return md.k > md.p && Date.now() - md.k < 1000; };
+    const kbi = (this.state || {}).kbi;
+    const its = items.map((it, idx) => {
+      const o = { cls: 'ba-in' + (kbi === idx ? ' kb' : ''), focus2: (e) => { const k = kbIn() ? idx : -1; if ((this.state || {}).kbi !== k) this.setState({ kbi: k }); if (typeof it.focus === 'function') it.focus(e); }, isText: false, isIcon: false, isChip: false, isHole: false, isSlotS: false, isSlotL: false, isDevS: false, isDevL: false, isCtlS: false, isCtlL: false, isCtlG: false, isSolS: false, isSolL: false, sd: '', sfill: 'none', sstroke: 'none', stb: '', hasPop: 'false', isChkL: false, isChkS: false, on: false, x: it.x, y: it.y, w: it.w || 0, h: it.h || 0, t: '', d: '', st: '', fill: '', ic: '', exp: false, aria: '', open: null, change: null, focus: null, click: null, value: '', chk: false };
+      const pos = 'position:absolute;left:' + it.x + 'px;top:' + it.y + 'px;';
+      if (it.t === 'x') {
+        o.isText = true; o.t = it.text;
+        o.st = pos + 'height:20px;line-height:20px;font-size:16px;font-weight:700;color:' + fg + ';white-space:nowrap;pointer-events:none';
+      } else if (it.t === 'i') {
+        o.isIcon = true; o.d = it.d;
+        o.st = pos + 'width:' + (it.w || 20) + 'px;height:' + (it.w || 20) + 'px;color:' + fg + ';pointer-events:none';
+      } else if (it.t === 'chip') {
+        o.isChip = true; o.t = it.placed ? 'วางแล้ว' : it.text; o.chk = !!it.placed;
+        o.st = pos + 'box-sizing:border-box;width:' + it.w + 'px;height:' + it.h + 'px;display:flex;align-items:center;gap:4px;padding:0 10px;border-radius:999px;font-size:16px;font-weight:600;line-height:20px;white-space:nowrap;color:' + DARK + ';pointer-events:none;' + (it.placed ? 'background:#FFFFFF;border:2px solid ' + DARK : 'background:rgba(255,255,255,0.6)');
+      } else if (it.t === 'hole') {
+        o.isHole = true; o.d = this.hexD(it.w, it.h); o.fill = holeFill;
+      } else if (it.t === 'slot') {
+        if (live(it)) {
+          o.isSlotL = true; o.value = it.value; o.aria = it.aria || ''; o.change = it.change || null; o.focus = it.focus || null;
+          o.st = pos + 'width:' + it.w + 'px;height:' + it.h + 'px;box-sizing:border-box;padding:0 4px;margin:0;border-radius:999px;color:' + DARK + ";font:600 16px 'IBM Plex Sans Thai',system-ui,sans-serif;text-align:center;user-select:text;pointer-events:auto;" + (it.empty ? 'background:#FFFFFF;border:2px dashed #14243D' :'background:#FFFFFF;border:1px solid rgba(0,0,0,0.12)');
+        } else {
+          o.isSlotS = true; o.t = it.value;
+          o.st = pos + 'width:' + it.w + 'px;height:' + it.h + 'px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border-radius:999px;font-size:16px;font-weight:600;line-height:20px;color:' + DARK + ';white-space:nowrap;pointer-events:none;' + (it.empty ? 'background:#FFFFFF;border:2px dashed #14243D' :'background:#FFFFFF;border:1px solid rgba(0,0,0,0.12)');
+        }
+      } else if (it.t === 'dev') {
+        o.t = it.text; o.ic = it.ic;
+        // ข้อ 1.7: ช่องสี (บล็อกค่าสี) = ตัวอย่างสี 16×16 ขอบ 2px #14243D (≥ 3:1 กับพื้นบล็อกทุกหมวด) แทนไอคอน + ชื่อสี/ค่า R G B เป็นข้อความ (ไม่สื่อด้วยสีอย่างเดียว)
+        // plain = dropdown ชนิดข้อมูล (OQ181 · ไม่มีไอคอน/ตัวอย่างสีหน้าข้อความ)
+        o.hasSw = !!it.sw; o.noSw = !it.sw && !it.plain;
+        o.swSt = 'display:inline-block;width:16px;height:16px;box-sizing:border-box;border-radius:5px;flex-shrink:0;border:2px solid #14243D;background:' + (it.sw || 'transparent');
+        // dropdown: ตัวอักษร/ไอคอน/ลูกศรคงสีเข้ม (ผู้ใช้สั่ง) · พื้นเข้มกว่าสีบล็อก (นำ #14243D 12% ซ้อน) · เตือน/ยังไม่เลือก = ขอบประ
+        let sty = 'background:rgba(20,36,61,0.12)';
+        if (it.dst === 'orphan') sty = 'background:#FFF4CC;border:2px dashed #B07F00';
+        else if (it.dst === 'unset') sty = 'background:#FFFFFF;border:2px dashed ' + MUTE + ';color:' + MUTE;
+        if (live(it)) {
+          o.isDevL = true; o.open = it.open || null; o.exp = !!it.exp; o.aria = it.aria || '';
+          o.st = pos + 'width:' + it.w + 'px;height:' + it.h + 'px;pointer-events:auto;' + sty;
+        } else {
+          o.isDevS = true;
+          o.st = pos + 'width:' + it.w + 'px;height:' + it.h + 'px;pointer-events:none;' + sty;
+        }
+      } else if (it.t === 'chk') {
+        // ช่องติ๊ก 28×28 (OQ181): live = ปุ่ม role=checkbox · ไม่ live = รูปนิ่ง
+        o.on = !!it.on;
+        if (live(it)) {
+          o.isChkL = true; o.click = it.click || null; o.aria = it.aria || '';
+          o.st = pos + 'width:28px;height:28px;pointer-events:auto';
+        } else {
+          o.isChkS = true;
+          o.st = pos + 'width:28px;height:28px;box-sizing:border-box;border:2px solid #14243D;border-radius:8px;background:#FFFFFF;color:#14243D;display:flex;align-items:center;justify-content:center;pointer-events:none';
+        }
+      } else if (it.t === 'ctl' && (it.gear || it.k === 'help')) {
+        // R21 (6) · OQ213 · brand §6 "ไอคอนทึบ": เฟือง/? บนแถวหัวบล็อก = ขาวทึบบนวงกลม 28 สีขอบเข้มของหมวด (ขาวบนสีขอบเข้ม 4.04–7.15 : 1 ทุกหมวด · ปิดใช้ = #5A6377 6.0 : 1 เพราะพื้น #F4F6F8 ทำให้ขาวล้วนหาย)
+        // เฟือง = วงกลมสีเข้ม + เฟืองขาวทึบมีรูกลาง (evenodd · รูเห็นสีวงกลม) · ? = วงกลมขาวขอบ 2px สีเข้ม + เครื่องหมาย ? สีเข้มของหมวด (4.04–7.15 : 1 บนขาว) · ไอคอนควบคุมอื่น (± ฯลฯ) คงเส้น 2.4 ด้านล่าง
+        const dk = state === 'disabled' ? '#5A6377' : CAT[1];
+        const isG = !!it.gear;
+        o.sd = isG ? 'M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2zM15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z' : 'M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01';
+        o.sfill = isG ? '#FFFFFF' : 'none';
+        o.sstroke = isG ? 'none' : dk;
+        const disc = 'width:28px;height:28px;box-sizing:border-box;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid ' + dk + ';background:' + (isG ? dk : '#FFFFFF');
+        if (live(it)) {
+          o.isSolL = true; o.exp = !!it.exp; o.click = it.click || null; o.aria = it.aria || '';
+          o.hasPop = isG ? 'dialog' : 'false';
+          o.stb = 'left:' + it.x + 'px;top:' + it.y + 'px;pointer-events:auto';
+          o.st = disc;
+        } else {
+          o.isSolS = true;
+          o.st = 'position:absolute;left:' + (it.x + 8) + 'px;top:' + (it.y + 8) + 'px;pointer-events:none;' + disc;
+        }
+      } else if (it.t === 'ctl') {
+        o.ic = it.ic;
+        if (live(it)) {
+          o.isCtlL = !it.gear; o.isCtlG = !!it.gear; o.exp = !!it.exp; o.click = it.click || null; o.aria = it.aria || '';
+          o.st = 'left:' + it.x + 'px;top:' + it.y + 'px;color:' + fg + ';pointer-events:auto';
+        } else {
+          o.isCtlS = true;
+          o.st = 'position:absolute;left:' + (it.x + 8) + 'px;top:' + (it.y + 8) + 'px;width:28px;height:28px;box-sizing:border-box;border:1.5px solid ' + fg + ';border-radius:50%;display:flex;align-items:center;justify-content:center;color:' + fg + ';pointer-events:none';
+        }
+      }
+      return o;
+    });
+    return {
+      mPtr: () => { const md = this._md; md.p = Date.now(); md.k = 0; const v = (this.state || {}).kbi; if (v != null && v !== -1) this.setState({ kbi: -1 }); },
+      mKey: (e) => { if (this._md.nav(e)) this._md.k = Date.now(); this._md.typ(e); },
+      ah: this.gp('decor') === 'yes' ? 'true' : 'false',
+      rootW: String(Math.ceil(w)), rootH: String(Math.ceil(sh)),
+      sw: String(Math.max(1, Math.ceil(w))), sh: String(Math.max(1, Math.ceil(sh))),
+      shapeD: d, fill: fill, stroke: stroke, swid: String(swid), dash: dash,
+      down: down, pe: down ? 'visiblePainted' : 'none', cur: down ? 'grab' : 'default',
+      ctxm: typeof this.gp('ctx') === 'function' ? this.gp('ctx') : null,
+      stop: typeof this.gp('stop') === 'function' ? this.gp('stop') : (() => {}),
+      its: its
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -2,7 +2,8 @@ import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from "re
 
 export interface CloseActions {
   save?: () => Promise<void>;
-  requestStop: () => Promise<void>;
+  // `onWait` names what the close is waiting for, such as an upload that must not be cut off.
+  requestStop: (onWait: (note: string) => void) => Promise<void>;
   close: () => Promise<void>;
 }
 
@@ -14,6 +15,7 @@ export function useWindowClose(actions: CloseActions, enabled: boolean) {
   const [closeBusy, setCloseBusy] = useState(false);
   const [closeFailure, setCloseFailure] = useState<CloseFailure>();
   const [closePhase, setClosePhase] = useState<ClosePhase>("stopping");
+  const [closeNote, setCloseNote] = useState("");
   const pending = useRef(false);
   const [closeSaveRequested, setCloseSaveRequested] = useState(false);
   const closeError = closeFailure ? `entry.close.errors.${closeFailure.phase}` : "";
@@ -33,6 +35,7 @@ export function useWindowClose(actions: CloseActions, enabled: boolean) {
     setCloseBusy(true);
     setCloseSaveRequested(save);
     setCloseFailure(undefined);
+    setCloseNote("");
     setCloseRequestedState(true);
     let phase: ClosePhase = save ? "saving" : "stopping";
     try {
@@ -46,7 +49,7 @@ export function useWindowClose(actions: CloseActions, enabled: boolean) {
       }
       phase = "stopping";
       setClosePhase(phase);
-      await actions.requestStop();
+      await actions.requestStop(setCloseNote);
       phase = "closing";
       setClosePhase(phase);
       await actions.close();
@@ -60,7 +63,7 @@ export function useWindowClose(actions: CloseActions, enabled: boolean) {
   }
 
   return {
-    closeRequested, setCloseRequested, closeBusy, closeError, closeErrorReason, closePhase, closeWindow,
+    closeRequested, setCloseRequested, closeBusy, closeError, closeErrorReason, closePhase, closeNote, closeWindow,
     closeSaveAvailable: !!actions.save, closeSaveRequested,
   };
 }

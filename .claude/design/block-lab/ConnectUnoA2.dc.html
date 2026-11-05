@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>เชื่อมบอร์ด Uno A2</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+/* A2 ข้อ 1.5 (2026-10-28 · OQ175–176): ยกโครงและพฤติกรรมจาก Arm Lab ConnectV3 ทั้งหน้า · เนื้อหา หุ่น → บอร์ด Uno · ตัดส่วนแขนกล (พับแขน/ท่าพัก/อัปโหลดก่อนตัด/หยุดหุ่น) · คลาสทุกตัวขึ้นต้น cu- (helmet ทุกชิ้นรวมเป็น CSS เดียว) · focus วงสีน้ำเงินเฉพาะคีย์บอร์ด (ข้อ 1.11) */
+.cu-root a:focus-visible,.cu-root button:focus-visible,.cu-root .cu-name:focus-visible{outline:3px solid #1866C9;outline-offset:2px}
+@keyframes cuBar{from{width:0}to{width:100%}}
+@keyframes cuIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@keyframes cuSpin{to{transform:rotate(360deg)}}
+.cu-in{animation:cuIn .2s cubic-bezier(.2,.8,.2,1) both}
+.cu-bar{animation:cuBar 2s linear both}
+.cu-spin{animation:cuSpin .8s linear infinite}
+.cu-btn{transition:transform .1s ease,background-color .1s ease,border-color .1s ease}
+.cu-raise:active:not([aria-disabled="true"]){border-bottom-width:2px !important;transform:translateY(2px)}
+.cu-sec:hover:not([aria-disabled="true"]){background:#EAF2FD !important;border-color:#1866C9 !important}
+.cu-name:focus{border-color:#1866C9 !important;outline:none}
+@media (prefers-reduced-motion: reduce){.cu-in,.cu-bar,.cu-spin{animation:none !important}.cu-bar{width:100%}.cu-btn{transition:none !important}}
+</style>
+</helmet>
+<div class="cu-root" style="width: 1440px; height: 900px; position: relative; overflow: hidden; display: flex; flex-direction: column; background: #F4F7FB; font-family: 'IBM Plex Sans Thai', 'Leelawadee UI', sans-serif; color: #14243D; line-height: 1.6">
+<div style="position: relative; z-index: 80; height: 60px; flex-shrink: 0"><dc-import name="WindowBarA2" os="{{os}}" chip="{{wbChip}}" port="{{wbPort}}" work="saved" job="กดปุ่มแล้วไฟติด" time="10:20" ovh="900" on-change-board="{{onWbChange}}" on-reconnect="{{onWbReconnect}}" hint-size="1440px,60px"></dc-import></div>
+<div style="width: 1440px; height: 840px; flex-shrink: 0; overflow: hidden; position: relative; box-sizing: border-box; display: flex; flex-direction: column">
+
+<header style="height: 60px; flex-shrink: 0; box-sizing: border-box; padding: 0 24px; background: #FFFFFF; border-bottom: 2px solid #DCE3EC; display: flex; align-items: center; gap: 16px">
+<span style="font-size: 20px; font-weight: 700; line-height: 1.3">เชื่อมบอร์ด Uno</span>
+<div style="flex-grow: 1"></div>
+<a href="Main-A2.dc.html" class="cu-btn cu-raise cu-sec" style="height: 44px; padding: 0 16px; box-sizing: border-box; border: 2px solid #C6D6EA; border-bottom-width: 4px; border-radius: 12px; background: #FFFFFF; color: #14243D; font-size: 16px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; white-space: nowrap"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>กลับไป Block Lab</a>
+</header>
+
+<main style="flex-grow: 1; min-height: 0; overflow-y: auto; box-sizing: border-box; padding: 24px 48px 20px">
+<div style="max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; align-items: center; gap: 20px">
+<svg width="64" height="74" viewBox="0 0 56 64" aria-hidden="true" style="flex-shrink: 0"><line x1="28" y1="4" x2="28" y2="14" stroke="#1866C9" stroke-width="3" stroke-linecap="round"></line><circle cx="28" cy="5" r="4" fill="#FFFFFF" stroke="#1866C9" stroke-width="2.4"></circle><rect x="6" y="14" width="44" height="38" rx="14" fill="#1866C9"></rect><rect x="12" y="22" width="32" height="20" rx="9" fill="#FFFFFF"></rect><circle cx="22" cy="32" r="4" fill="#14243D"></circle><circle cx="34" cy="32" r="4" fill="#14243D"></circle><path d="M24 46h8" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"></path><ellipse cx="28" cy="60" rx="16" ry="3" fill="#DCE3EC"></ellipse></svg>
+<div style="background: #FFFFFF; border: 2px solid #DCE3EC; border-radius: 16px; padding: 12px 20px; max-width: 800px; display: flex; flex-direction: column">
+<span style="font-size: 24px; font-weight: 700; line-height: 1.3">{{ sayTitle }}</span>
+<span style="font-size: 16px; color: #5A6377">{{ saySub }}</span>
+</div>
+</div>
+
+<!-- ===== หลุด (ยก ST-21 ของ ConnectV3 · ตัดขั้นพาไปท่าพัก) ===== -->
+<sc-if value="{{ lostWait }}" hint-placeholder-val="{{ false }}">
+<section role="alert" aria-label="สายบอร์ดหลุด" class="cu-in" style="display: flex; flex-direction: column; gap: 12px; background: #FFFFFF; border: 2px solid #D32F2F; border-radius: 16px; padding: 16px 20px">
+<div style="display: flex; align-items: center; gap: 16px">
+<span style="width: 48px; height: 48px; border-radius: 999px; border: 2px solid #D32F2F; color: #D32F2F; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-sizing: border-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m19 5 3-3"></path><path d="m2 22 3-3"></path><path d="M6.3 20.3a2.4 2.4 0 0 0 3.4 0L12 18l-6-6-2.3 2.3a2.4 2.4 0 0 0 0 3.4Z"></path><path d="M7.5 13.5 10 11"></path><path d="M10.5 16.5 13 14"></path><path d="m12 6 6 6 2.3-2.3a2.4 2.4 0 0 0 0-3.4l-2.6-2.6a2.4 2.4 0 0 0-3.4 0Z"></path></svg></span>
+<div style="display: flex; flex-direction: column; flex-grow: 1; min-width: 0">
+<span style="font-size: 20px; font-weight: 700; line-height: 1.3">สาย {{ lostName }} หลุด · รอบอร์ดกลับมา</span>
+<span style="font-size: 16px">ส่งลงบอร์ดไม่ได้ชั่วคราว · เสียบสาย USB กลับช่องไหนก็ได้ โปรแกรมจะต่อให้เอง</span>
+</div>
+<button type="button" class="cu-btn cu-raise cu-sec" onClick="{{ toggleLostTips }}" aria-expanded="{{ lostTips }}" style="height: 48px; padding: 0 16px; border: 2px solid #C6D6EA; border-bottom-width: 4px; border-radius: 12px; background: #FFFFFF; color: #14243D; font-family: inherit; font-size: 16px; font-weight: 600; cursor: pointer; white-space: nowrap">{{ lostTipsLabel }}</button>
+</div>
+<sc-if value="{{ lostTips }}" hint-placeholder-val="{{ false }}">
+<div class="cu-in" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; border-top: 1px solid #DCE3EC; padding-top: 12px">
+<div style="display: flex; gap: 12px; align-items: flex-start; font-size: 16px"><span style="width: 32px; height: 32px; border-radius: 999px; background: #F4F6F8; border: 2px solid #DCE3EC; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0">1</span><span>ดันหัวสายให้สุดทั้งที่คอมและที่บอร์ด แล้วรอ 3 วินาที</span></div>
+<div style="display: flex; gap: 12px; align-items: flex-start; font-size: 16px"><span style="width: 32px; height: 32px; border-radius: 999px; background: #F4F6F8; border: 2px solid #DCE3EC; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0">2</span><span>ลองเสียบช่อง USB อื่นของคอม</span></div>
+<div style="display: flex; gap: 12px; align-items: flex-start; font-size: 16px"><span style="width: 32px; height: 32px; border-radius: 999px; background: #F4F6F8; border: 2px solid #DCE3EC; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0">3</span><span>เช็กสาย USB ไฟบนบอร์ดต้องติด ถ้าไม่ติด ลองสายเส้นอื่น</span></div>
+</div>
+</sc-if>
+</section>
+</sc-if>
+<sc-if value="{{ lostBack }}" hint-placeholder-val="{{ false }}">
+<section role="status" aria-label="บอร์ดกลับมาแล้ว" class="cu-in" style="display: flex; align-items: center; gap: 16px; background: #FFFFFF; border: 2px solid #2E7D32; border-radius: 16px; padding: 16px 20px">
+<span style="width: 48px; height: 48px; border-radius: 999px; border: 2px solid #2E7D32; color: #2E7D32; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-sizing: border-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></span>
+<div style="display: flex; flex-direction: column; flex-grow: 1; min-width: 0">
+<span style="font-size: 20px; font-weight: 700; line-height: 1.3">บอร์ดกลับมาแล้ว</span>
+<span style="font-size: 16px">เชื่อมต่อให้อัตโนมัติแล้ว ส่งโปรแกรมลงบอร์ดต่อได้เลย</span>
+</div>
+</section>
+</sc-if>
+
+<!-- ===== เชื่อมอยู่ ===== -->
+<sc-if value="{{ showConnBox }}" hint-placeholder-val="{{ false }}">
+<section aria-label="บอร์ดที่เชื่อมต่ออยู่" class="cu-in" style="display: flex; flex-direction: column; gap: 12px; background: #FFFFFF; border: 2px solid #2E7D32; border-radius: 16px; padding: 16px 20px">
+<div style="display: flex; align-items: center; gap: 16px">
+<span style="width: 48px; height: 48px; border-radius: 999px; border: 2px solid #2E7D32; color: #2E7D32; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-sizing: border-box"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></span>
+<div style="display: flex; flex-direction: column; flex-grow: 1; min-width: 0">
+<span style="font-size: 20px; font-weight: 700; line-height: 1.3">เชื่อมต่ออยู่: {{ connName }}</span>
+<span style="font-size: 14px; color: #5A6377">{{ connSub }}</span>
+</div>
+<sc-if value="{{ connIdle }}" hint-placeholder-val="{{ true }}">
+<button type="button" class="cu-btn cu-raise cu-sec" onClick="{{ startDisc }}" style="height: 48px; padding: 0 20px; border: 2px solid #C6D6EA; border-bottom-width: 4px; border-radius: 12px; background: #FFFFFF; color: #14243D; font-family: inherit; font-size: 16px; font-weight: 600; cursor: pointer; white-space: nowrap">ตัดการเชื่อมต่อ</button>
+<a href="Main-A2.dc.html" class="cu-btn cu-raise" style="height: 56px; padding: 0 24px; box-sizing: border-box; border-bottom: 4px solid #0F4C99; border-radius: 12px; background: #1866C9; color: #FFFFFF; font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 8px; text-decoration: none; white-space: nowrap">กลับไปทำงานต่อ<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a>
+</sc-if>
+</div>
+<sc-if value="{{ discAsk }}" hint-placeholder-val="{{ false }}">
+<div role="alertdialog" aria-label="ยืนยันตัดการเชื่อมต่อ" class="cu-in" style="display: flex; align-items: center; gap: 16px; background: #FFF4CC; border: 2px solid #B07F00; border-radius: 12px; padding: 12px 16px">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#B07F00" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+<div style="display: flex; flex-direction: column; flex-grow: 1">
+<span style="font-size: 16px; font-weight: 700">ตัดการเชื่อมต่อ?</span>
+<span style="font-size: 16px">ตัดแล้วเชื่อมต่อใหม่ได้ทุกเมื่อ · งานในโปรแกรมยังอยู่ครบ</span>
+</div>
+<button type="button" class="cu-btn cu-raise cu-sec" onClick="{{ cancelDisc }}" autoFocus="{{ yes }}" style="height: 48px; padding: 0 16px; border: 2px solid #C6D6EA; border-bottom-width: 4px; border-radius: 12px; background: #FFFFFF; color: #14243D; font-family: inherit; font-size: 16px; font-weight: 600; cursor: pointer; white-space: nowrap">ยกเลิก</button>
+<button type="button" class="cu-btn cu-raise" onClick="{{ discNow }}" style="height: 48px; padding: 0 20px; border: none; border-bottom: 4px solid #0F4C99; border-radius: 12px; background: #1866C9; color: #FFFFFF; font-family: inherit; font-size: 16px; font-weight: 700; cursor: pointer; white-space: nowrap">ตัดเลย</button>
+</div>
+</sc-if>
+</section>
+</sc-if>
+
+<sc-if value="{{ showDiscDone }}" hint-placeholder-val="{{ false }}">
+<div role="status" class="cu-in" style="display: flex; align-items: center; gap: 16px; background: #FFFFFF; border: 2px solid #DCE3EC; border-radius: 16px; padding: 12px 20px">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#5A6377" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0"><path d="m18.84 12.25 1.72-1.71h-.02a5.004 5.004 0 0 0-.12-7.07 5.006 5.006 0 0 0-6.95 0l-1.72 1.71"></path><path d="m5.17 11.75-1.71 1.71a5.004 5.004 0 0 0 .12 7.07 5.006 5.006 0 0 0 6.95 0l1.71-1.71"></path><path d="M8 2v3"></path><path d="M2 8h3"></path><path d="M16 19v3"></path><path d="M19 16h3"></path></svg>
+<div style="display: flex; flex-direction: column; flex-grow: 1">
+<span style="font-size: 18px; font-weight: 700">{{ discDoneTitle }}</span>
+<span style="font-size: 16px; color: #5A6377">เปิด Arm Lab ได้เลย · ถ้าจะใช้ต่อที่นี่ แตะการ์ดบอร์ดด้านล่างแล้วเชื่อมต่อใหม่ · งานในโปรแกรมยังอยู่ครบ</span>
+</div>
+</div>
+</sc-if>
+
+<div style="display: flex; align-items: center; gap: 12px">
+<span style="font-size: 18px; font-weight: 700">บอร์ดที่พบในเครื่องนี้</span>
+<span style="font-size: 14px; color: #5A6377">{{ scanNote }}</span>
+<div style="flex-grow: 1"></div>
+<button type="button" class="cu-btn cu-raise cu-sec" onClick="{{ rescan }}" aria-disabled="{{ busy }}" style="height: 44px; padding: 0 16px; border: 2px solid #C6D6EA; border-bottom-width: 4px; border-radius: 12px; background: #FFFFFF; color: #1866C9; font-family: inherit; font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path></svg>ค้นหาอีกครั้ง</button>
+</div>
+
+<sc-if value="{{ hasBoards }}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; gap: 12px; flex-wrap: wrap">
+<sc-for list="{{ boards }}" as="r" hint-placeholder-count="1">
+<div style="{{ r.cardStyle }}">
+<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="{{ r.iconStyle }}"><rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="9" y="9" width="6" height="6"></rect><path d="M15 2v2M15 20v2M2 15h2M2 9h2M20 15h2M20 9h2M9 2v2M9 20v2"></path></svg>
+<span style="display: flex; flex-direction: column; line-height: 1.6"><span style="font-size: 18px; font-weight: 700">{{ r.name }}</span><span style="font-size: 14px; color: #5A6377">{{ r.sub }}</span></span>
+<sc-if value="{{ r.hasTag }}" hint-placeholder-val="{{ false }}"><span style="{{ r.tagStyle }}"><sc-if value="{{ r.tagCheck }}" hint-placeholder-val="{{ false }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></sc-if><sc-if value="{{ r.tagLost }}" hint-placeholder-val="{{ false }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m19 5 3-3"></path><path d="m2 22 3-3"></path><path d="M6.3 20.3a2.4 2.4 0 0 0 3.4 0L12 18l-6-6-2.3 2.3a2.4 2.4 0 0 0 0 3.4Z"></path><path d="m12 6 6 6 2.3-2.3a2.4 2.4 0 0 0 0-3.4l-2.6-2.6a2.4 2.4 0 0 0-3.4 0Z"></path></svg></sc-if>{{ r.tag }}</span></sc-if>
+<button type="button" class="cu-btn cu-sec" onClick="{{ r.pick }}" aria-disabled="{{ r.pickOff }}" aria-pressed="{{ r.on }}" style="{{ r.pickStyle }}">{{ r.pickLabel }}</button>
+</div>
+</sc-for>
+</div>
+<sc-if value="{{ showIdBtn }}" hint-placeholder-val="{{ false }}">
+<button type="button" class="cu-btn cu-raise cu-sec" onClick="{{ startId }}" aria-disabled="{{ busy }}" style="align-self: flex-start; height: 48px; padding: 0 16px; border: 2px solid #C6D6EA; border-bottom-width: 4px; border-radius: 12px; background: #FFFFFF; color: #1866C9; font-family: inherit; font-size: 16px; font-weight: 700; cursor: pointer">ไม่แน่ใจว่าตัวไหน? หาด้วยการถอดสาย</button>
+</sc-if>
+<sc-if value="{{ idActive }}" hint-placeholder-val="{{ false }}">
+<div role="status" class="cu-in" style="{{ idBoxStyle }}">
+<span style="{{ idNoStyle }}">{{ idStepNo }}</span>
+<div style="display: flex; flex-direction: column; flex-grow: 1">
+<span style="font-size: 18px; font-weight: 700">{{ idTitle }}</span>
+<span style="font-size: 16px">{{ idBody }}</span>
+</div>
+<sc-if value="{{ idActShow }}" hint-placeholder-val="{{ false }}"><button type="button" class="cu-btn cu-raise cu-sec" onClick="{{ idAct }}" style="height: 48px; padding: 0 16px; border: 2px solid #C6D6EA; border-bottom-width: 4px; border-radius: 12px; background: #FFFFFF; color: #1866C9; font-family: inherit; font-size: 16px; font-weight: 700; cursor: pointer; white-space: nowrap">{{ idActLabel }}</button></sc-if>
+<button type="button" class="cu-btn cu-raise cu-sec" onClick="{{ cancelId }}" style="height: 48px; padding: 0 16px; border: 2px solid #C6D6EA; border-bottom-width: 4px; border-radius: 12px; background: #FFFFFF; color: #14243D; font-family: inherit; font-size: 16px; font-weight: 600; cursor: pointer">{{ idCancelLabel }}</button>
+</div>
+</sc-if>
+<sc-if value="{{ idTipsShow }}" hint-placeholder-val="{{ false }}">
+<div class="cu-in" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
+<div style="background: #FFFFFF; border: 2px solid #DCE3EC; border-radius: 16px; padding: 12px; display: flex; gap: 12px; align-items: flex-start; font-size: 16px"><span style="width: 32px; height: 32px; border-radius: 999px; background: #F4F6F8; border: 2px solid #DCE3EC; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0">1</span><span>ดันหัวสายให้สุดทั้ง 2 ฝั่ง แล้วรอ 3 วินาที</span></div>
+<div style="background: #FFFFFF; border: 2px solid #DCE3EC; border-radius: 16px; padding: 12px; display: flex; gap: 12px; align-items: flex-start; font-size: 16px"><span style="width: 32px; height: 32px; border-radius: 999px; background: #F4F6F8; border: 2px solid #DCE3EC; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0">2</span><span>ลองเสียบช่อง USB อื่นของคอม แล้วกด “ค้นหาอีกครั้ง”</span></div>
+<div style="background: #FFFFFF; border: 2px solid #DCE3EC; border-radius: 16px; padding: 12px; display: flex; gap: 12px; align-items: flex-start; font-size: 16px"><span style="width: 32px; height: 32px; border-radius: 999px; background: #F4F6F8; border: 2px solid #DCE3EC; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0">3</span><span>เช็กสาย USB ไฟบนบอร์ดต้องติด ถ้าไม่ติด ลองสายเส้นอื่น</span></div>
+</div>
+</sc-if>
+</sc-if>
+
+<sc-if value="{{ noBoards }}" hint-placeholder-val="{{ false }}">
+<div style="height: 160px; flex-shrink: 0; border: 2px dashed #C6D6EA; border-radius: 16px; background: #FFFFFF; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px">
+<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#5A6377" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22v-5"></path><path d="M9 8V2"></path><path d="M15 8V2"></path><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"></path></svg>
+<span style="font-size: 24px; font-weight: 700; line-height: 1.3">{{ emptyTitle }}</span>
+<span style="font-size: 16px; color: #5A6377">ทำตามขั้นด้านล่างทีละข้อ แล้วกด “ค้นหาอีกครั้ง”</span>
+</div>
+</sc-if>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<button type="button" class="cu-btn" onClick="{{ toggleOthers }}" aria-expanded="{{ showOthers }}" style="align-self: flex-start; height: 44px; padding: 0 8px; border: none; border-radius: 8px; background: transparent; color: #5A6377; font-family: inherit; font-size: 16px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px"><sc-if value="{{ showOthers }}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></sc-if><sc-if value="{{ othersClosed }}" hint-placeholder-val="{{ true }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></sc-if>{{ othersLabel }}</button>
+<sc-if value="{{ showOthers }}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; gap: 12px; flex-wrap: wrap">
+<sc-for list="{{ others }}" as="o" hint-placeholder-count="2">
+<div style="{{ o.style }}">
+<span style="display: flex; flex-direction: column"><span style="font-size: 16px; font-weight: 600">{{ o.name }}</span><span style="font-size: 14px; color: #5A6377">พอร์ต {{ o.port }}</span></span>
+<button type="button" class="cu-btn cu-sec" onClick="{{ o.pick }}" aria-disabled="{{ o.pickOff }}" style="{{ o.pickStyle }}">{{ o.pickLabel }}</button>
+</div>
+</sc-for>
+</div>
+</sc-if>
+</div>
+
+<sc-if value="{{ hasError }}" hint-placeholder-val="{{ false }}">
+<div role="alert" class="cu-in" style="display: flex; flex-direction: column; gap: 12px; background: #FFFFFF; border: 2px solid #D32F2F; border-radius: 16px; padding: 16px 20px">
+<div style="display: flex; align-items: center; gap: 16px">
+<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D32F2F" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+<div style="display: flex; flex-direction: column; flex-grow: 1">
+<span style="font-size: 18px; font-weight: 700">{{ errTitle }}</span>
+<span style="font-size: 16px">{{ errBody }}</span>
+</div>
+<sc-if value="{{ showCode }}" hint-placeholder-val="{{ false }}"><span title="บอกโค้ดนี้กับครู ครูจะรู้สาเหตุทันที" style="display: flex; flex-direction: column; align-items: center; padding: 4px 12px; border-radius: 8px; background: #FFFFFF; border: 2px dashed #D32F2F"><span style="font-size: 12px; color: #5A6377">บอกครูด้วยโค้ดนี้</span><span style="font-family: Consolas, ui-monospace, monospace; font-size: 16px; font-weight: 700">{{ errCode }}</span></span></sc-if>
+<button type="button" class="cu-btn cu-raise" onClick="{{ connect }}" style="height: 48px; padding: 0 20px; border: none; border-bottom: 4px solid #0F4C99; border-radius: 12px; background: #1866C9; color: #FFFFFF; font-family: inherit; font-size: 16px; font-weight: 700; cursor: pointer; white-space: nowrap">ลองอีกครั้ง</button>
+</div>
+<sc-if value="{{ showDeep }}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 8px; border-top: 1px solid #DCE3EC; padding-top: 12px">
+<span style="font-size: 16px; font-weight: 700">ลองครั้งที่ {{ tries }} แล้วยังไม่ได้ · เช็กทีละข้อ ติ๊กเมื่อทำแล้ว</span>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{ deepSteps }}" as="d" hint-placeholder-count="4">
+<button type="button" class="cu-btn" onClick="{{ d.toggle }}" aria-pressed="{{ d.done }}" style="{{ d.style }}"><span style="{{ d.boxStyle }}"><sc-if value="{{ d.done }}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></sc-if><sc-if value="{{ d.todo }}" hint-placeholder-val="{{ true }}">{{ d.no }}</sc-if></span><span style="display: flex; flex-direction: column; text-align: left"><span style="font-size: 16px; font-weight: 700">{{ d.title }}</span><span style="font-size: 14px; color: #5A6377">{{ d.body }}</span></span></button>
+</sc-for>
+</div>
+</div>
+</sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ showHelp }}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 18px; font-weight: 700">{{ helpTitle }}</span>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px">
+<div style="background: #FFFFFF; border: 2px solid #DCE3EC; border-radius: 16px; padding: 16px; display: flex; gap: 12px; align-items: center"><span style="width: 32px; height: 32px; border-radius: 999px; background: #F4F6F8; border: 2px solid #DCE3EC; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0">1</span><span style="font-size: 16px">เสียบสาย USB ให้แน่นทั้งที่คอมและที่บอร์ด</span></div>
+<div style="background: #FFFFFF; border: 2px solid #DCE3EC; border-radius: 16px; padding: 16px; display: flex; gap: 12px; align-items: center"><span style="width: 32px; height: 32px; border-radius: 999px; background: #F4F6F8; border: 2px solid #DCE3EC; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0">2</span><span style="font-size: 16px">เช็กสาย USB แล้วดูว่าไฟบนบอร์ดติด</span></div>
+<div style="background: #FFFFFF; border: 2px solid #DCE3EC; border-radius: 16px; padding: 16px; display: flex; gap: 12px; align-items: center"><span style="width: 32px; height: 32px; border-radius: 999px; background: #F4F6F8; border: 2px solid #DCE3EC; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0">3</span><span style="font-size: 16px">ปิด Arm Lab ก่อน เพราะใช้บอร์ดพร้อมกันไม่ได้</span></div>
+</div>
+</div>
+</sc-if>
+</div>
+</main>
+
+<sc-if value="{{ hasHint }}" hint-placeholder-val="{{ false }}">
+<div role="status" class="cu-in" style="position: absolute; right: 120px; bottom: 112px; z-index: 50; max-width: 480px; padding: 12px 16px; border-radius: 12px; background: #14243D; color: #FFFFFF; font-size: 16px; box-shadow: 0 8px 20px rgba(20,36,61,.2)">{{ hint }}</div>
+</sc-if>
+
+<footer style="height: 96px; flex-shrink: 0; box-sizing: border-box; border-top: 2px solid #DCE3EC; background: #FFFFFF; padding: 0 48px; position: relative; z-index: 60">
+<div style="max-width: 1200px; height: 100%; margin: 0 auto; display: flex; align-items: center; gap: 16px">
+<div style="flex-grow: 1"></div>
+<sc-if value="{{ isNaming }}" hint-placeholder-val="{{ false }}">
+<div class="cu-in" style="display: flex; align-items: center; gap: 16px">
+<div style="display: flex; flex-direction: column">
+<span style="font-size: 20px; font-weight: 700; line-height: 1.3; color: #2E7D32">เจอกันแล้ว! ตั้งชื่อบอร์ดตัวนี้หน่อย</span>
+<span style="font-size: 14px; color: #5A6377">ครั้งหน้าจะเห็นชื่อนี้ในรายการ หาบอร์ดของกลุ่มเราได้ทันที</span>
+</div>
+<input type="text" class="cu-name" value="{{ nameDraft }}" onChange="{{ onName }}" onKeyDown="{{ onNameKey }}" autoFocus="{{ true }}" maxLength="20" placeholder="เช่น บอร์ดกลุ่ม 3" aria-label="ชื่อบอร์ด" style="height: 52px; width: 240px; box-sizing: border-box; border: 2px solid #C6D6EA; border-radius: 12px; padding: 0 12px; font-family: inherit; font-size: 18px; font-weight: 700; color: #14243D; background: #FFFFFF; line-height: 1.7">
+<button type="button" class="cu-btn cu-raise cu-sec" onClick="{{ skipName }}" style="height: 52px; padding: 0 16px; border: 2px solid #C6D6EA; border-bottom-width: 4px; border-radius: 12px; background: #FFFFFF; color: #14243D; font-family: inherit; font-size: 16px; font-weight: 600; cursor: pointer">ข้ามไปก่อน</button>
+<button type="button" class="cu-btn cu-raise" onClick="{{ saveName }}" aria-disabled="{{ nameEmpty }}" style="{{ saveNameStyle }}">บันทึกชื่อแล้วเริ่มใช้งาน</button>
+</div>
+</sc-if>
+<sc-if value="{{ isOk }}" hint-placeholder-val="{{ false }}">
+<span style="width: 48px; height: 48px; border-radius: 999px; border: 2px solid #2E7D32; color: #2E7D32; box-sizing: border-box; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></span>
+<div style="display: flex; flex-direction: column; gap: 4px; min-width: 360px">
+<span style="font-size: 20px; font-weight: 700; line-height: 1.3; color: #2E7D32">{{ okTitle }}</span>
+<span style="font-size: 14px; color: #5A6377">จะกลับไปหน้าต่อบล็อกเองใน 2 วินาที</span>
+<div style="height: 8px; border-radius: 999px; background: #DCE3EC; overflow: hidden"><div class="cu-bar" style="height: 100%; background: #2E7D32; border-radius: 999px"></div></div>
+</div>
+<a href="Main-A2.dc.html" data-go-a2="1" class="cu-btn cu-raise" style="height: 56px; padding: 0 32px; box-sizing: border-box; border-bottom: 4px solid #0F4C99; border-radius: 12px; background: #1866C9; color: #FFFFFF; font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 8px; text-decoration: none; margin-left: 16px">เริ่มใช้งานเลย<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></a>
+</sc-if>
+<sc-if value="{{ isConnecting }}" hint-placeholder-val="{{ false }}">
+<span role="status" style="display: inline-flex; align-items: center; gap: 12px; height: 56px; padding: 0 24px; box-sizing: border-box; border: 2px solid #C6D6EA; border-radius: 12px; background: #EAF2FD; color: #0F4C99; font-size: 18px; font-weight: 700"><svg class="cu-spin" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg>กำลังตรวจว่า {{ connectingName }} ตอบ…</span>
+<button type="button" class="cu-btn cu-raise cu-sec" onClick="{{ cancelConnect }}" style="height: 56px; padding: 0 20px; border: 2px solid #C6D6EA; border-bottom-width: 4px; border-radius: 12px; background: #FFFFFF; color: #14243D; font-family: inherit; font-size: 16px; font-weight: 600; cursor: pointer">ยกเลิก</button>
+</sc-if>
+<sc-if value="{{ lostWait }}" hint-placeholder-val="{{ false }}">
+<span role="status" style="display: inline-flex; align-items: center; gap: 12px; height: 56px; padding: 0 24px; box-sizing: border-box; border: 2px solid #DCE3EC; border-radius: 12px; background: #F4F6F8; color: #5A6377; font-size: 18px; font-weight: 700"><svg class="cu-spin" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg>รอบอร์ดกลับมา…</span>
+</sc-if>
+<sc-if value="{{ showConnectBtn }}" hint-placeholder-val="{{ true }}">
+<label title="{{ baudTip }}" style="display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 14px; font-weight: 600; color: #5A6377; display: inline-flex; align-items: center; gap: 4px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>Baud rate · ตั้งตามบอร์ดอัตโนมัติ</span>
+<select disabled="{{ true }}" aria-label="Baud rate ตั้งตามบอร์ดที่เลือก (เปลี่ยนไม่ได้)" style="height: 48px; min-width: 192px; box-sizing: border-box; padding: 0 12px; border: 2px solid #DCE3EC; border-radius: 12px; background: #F4F6F8; color: #5A6377; font-family: inherit; font-size: 16px; cursor: not-allowed">
+<sc-for list="{{ baudOpts }}" as="o" hint-placeholder-count="5"><option value="{{ o.v }}" selected="{{ o.sel }}">{{ o.t }}</option></sc-for>
+</select>
+</label>
+<button type="button" class="cu-btn cu-raise" onClick="{{ connect }}" aria-disabled="{{ noPick }}" style="{{ connectStyle }}">{{ connectLabel }}</button>
+</sc-if>
+</div>
+</footer>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"scenario":{"editor":"enum","options":["one","many","none","connecting","connected","lost","busy","noReply","fail2"],"default":"one","section":"สถานการณ์จำลอง (ยกจาก ConnectV3)"},"idOutcome":{"editor":"enum","options":["ok","two","timeout","portChanged"],"default":"ok","section":"สถานการณ์จำลอง (ยกจาก ConnectV3)"},"lostReturn":{"editor":"enum","options":["auto","never"],"default":"auto","section":"สถานการณ์จำลอง (ยกจาก ConnectV3)"},"os":{"editor":"enum","options":["win","mac"],"default":"win","section":"แถบหน้าต่าง"},"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  // A2 ข้อ 1.5: logic ยกจาก Arm Lab ConnectV3 (L297–608) · หุ่น → บอร์ด Uno · พอร์ตของเรา COM3 (ตรงกับ Main-A2) · ตัด: moving/stopAll/หยุดหุ่น · พับแขน · ท่าพัก · อัปโหลดก่อนตัด (OQ176)
+  constructor(props) { super(props); this.state = this.initState(props); }
+  initState(props) {
+    const sc = props.scenario || 'one';
+    const fail = sc === 'busy' || sc === 'noReply' || sc === 'fail2';
+    const named = !(sc === 'one' || sc === 'many');
+    return {
+      id: null, picked: (sc === 'many' || sc === 'none') ? null : 'COM3',
+      phase: sc === 'connecting' ? 'connecting' : 'idle',
+      err: sc === 'fail2' && fail ? 'noReply' : null,
+      tries: sc === 'fail2' ? 2 : (sc === 'connecting' ? 1 : 0), showOthers: sc === 'many', found: false,
+      names: named ? { COM3: 'บอร์ดกลุ่ม 3', COM5: 'บอร์ดกลุ่ม 5' } : {},
+      conn: (sc === 'connected' || sc === 'lost') ? 'COM3' : null, since: '10:02', disc: null, justDisc: null,
+      nameDraft: '', checks: {}, switchTo: null, port6: false, idTips: false,
+      lost: sc === 'lost' ? 'wait' : null, lostTips: false, hint: ''
+    };
+  }
+  componentDidMount() { this.armLost(); }
+  componentDidUpdate(prev) {
+    if (prev.scenario !== this.props.scenario || prev.lostReturn !== this.props.lostReturn) {
+      this.clearAll();
+      this.setState(this.initState(this.props), () => this.armLost());
+    }
+  }
+  componentWillUnmount() { this.clearAll(); }
+  clearAll() { clearTimeout(this.t); clearTimeout(this.it); clearTimeout(this.lt); clearTimeout(this.goT); clearTimeout(this.ht); }
+  armLost() {
+    clearTimeout(this.lt);
+    if (this.state.lost !== 'wait' || (this.props.lostReturn || 'auto') === 'never') return;
+    // บอร์ดไม่มีแขนค้างท่า (ตัดขั้นพาไปท่าพัก) → กลับมาแล้วเชื่อมเองเลย แจ้ง แล้วพากลับหน้าต่อบล็อก
+    this.lt = setTimeout(() => { if (this.state.lost === 'wait') { this.setState({ lost: 'back', lostTips: false, phase: 'ok' }); this.goLater(); } }, 4000);
+  }
+  goLater() { clearTimeout(this.goT); this.goT = setTimeout(() => { try { if (this.state.phase !== 'ok') return; const a = document.querySelector('[data-go-a2]'); if (a) a.click(); } catch (x) {} }, 2100); }
+  afterOk(key) {
+    if (!this.state.names[key]) { this.setState({ phase: 'naming', nameDraft: '' }); return; }
+    this.setState({ phase: 'ok' }); this.goLater();
+  }
+  hintMsg(msg) { clearTimeout(this.ht); this.setState({ hint: msg }); this.ht = setTimeout(() => this.setState({ hint: '' }), 2600); }
+  sc() { return this.props.scenario || 'one'; }
+  ports() {
+    const sc = this.sc(), S = this.state;
+    const r3 = { port: S.port6 ? 'COM6' : 'COM3', key: 'COM3' };
+    const r5 = { port: 'COM5', key: 'COM5' };
+    const bt = { port: 'COM1', name: 'Bluetooth' };
+    const usb = { port: 'COM4', name: 'อุปกรณ์ USB อื่น' };
+    if (sc === 'many') {
+      if (S.id === 'wait') return { boards: [r5], others: [bt, usb] };
+      if (S.id === 'unplug2') return { boards: this.props.idOutcome === 'two' ? [] : [r5], others: [bt, usb] };
+      return { boards: [r3, r5], others: [bt, usb] };
+    }
+    if (sc === 'connected' || sc === 'lost') return { boards: [r3, r5], others: [bt] };
+    if (sc === 'none' && !S.found) return { boards: [], others: [bt] };
+    return { boards: [r3], others: [bt] };
+  }
+  nameOf(key) { const n = this.state.names[key]; return n || 'บอร์ด Uno'; }
+  renderVals() {
+    const S = this.state, sc = this.sc(), outcome = this.props.idOutcome || 'ok';
+    const set = (o) => this.setState(o);
+    const P = this.ports();
+    const lostWait = S.lost === 'wait';
+    const busy = S.phase === 'scanning' || S.phase === 'connecting' || S.phase === 'ok' || S.phase === 'naming' || !!S.disc || lostWait;
+    const all = P.boards.map((r) => ({ port: r.port, key: r.key })).concat(P.others);
+    const pickedObj = all.find((x) => x.port === S.picked) || null;
+    const pickedIsBoard = pickedObj && P.boards.some((r) => r.port === pickedObj.port);
+    const pickedKey = pickedIsBoard ? P.boards.find((r) => r.port === pickedObj.port).key : null;
+    const pickedName = pickedObj ? (pickedIsBoard ? this.nameOf(pickedKey) + ' (' + pickedObj.port + ')' : 'พอร์ต ' + pickedObj.port) : '';
+    const PICK_BASE = 'height: 44px; padding: 0 16px; border-radius: 12px; font-family: inherit; font-size: 16px; font-weight: 600; white-space: nowrap; ';
+    const PICK_ON = 'border: 2px solid #C6D6EA; background: #FFFFFF; color: #14243D; cursor: pointer';
+    const PICK_OFF = 'border: 2px solid #DCE3EC; background: #F4F6F8; color: #5A6377; cursor: not-allowed';
+    const boards = P.boards.map((r) => {
+      const on = S.picked === r.port, inUse = (S.conn === r.key || S.conn === r.port) && !lostWait, isLost = lostWait && S.conn === r.key;
+      const wasDisc = S.justDisc === r.key && !S.conn;
+      const ours = S.id === 'found' && r.key === 'COM3';
+      const named = !!S.names[r.key];
+      let tag = '', tagColor = '', tagCheck = false, tagLost = false;
+      if (isLost) { tag = 'สายหลุด · รอเสียบกลับ'; tagColor = '#D32F2F'; tagLost = true; }
+      else if (inUse) { tag = 'กำลังใช้อยู่'; tagColor = '#2E7D32'; tagCheck = true; }
+      else if (wasDisc) { tag = 'ตัดแล้ว · กดเชื่อมต่อใหม่ได้'; tagColor = '#5A6377'; }
+      else if (ours) { tag = (S.port6 ? 'กลับมาที่ ' + r.port + ' · ' : '') + 'บอร์ดของเรา'; tagColor = '#2E7D32'; tagCheck = true; }
+      const off = busy || inUse || isLost;
+      return {
+        name: named ? S.names[r.key] : 'บอร์ด Uno', on,
+        sub: 'พอร์ต ' + r.port + (named ? '' : ' · ยังไม่ตั้งชื่อ'),
+        hasTag: !!tag, tag, tagCheck, tagLost,
+        tagStyle: 'display: inline-flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 700; border-radius: 999px; padding: 0 12px; height: 28px; box-sizing: border-box; background: #FFFFFF; border: 2px solid ' + tagColor + '; color: ' + tagColor,
+        iconStyle: 'flex-shrink: 0; color: ' + (isLost ? '#5A6377' : '#1866C9'),
+        cardStyle: 'display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 16px; box-sizing: border-box; min-width: 360px; ' + (isLost ? 'border: 2px dashed #D32F2F; background: #F4F6F8' : inUse ? 'border: 2px solid #2E7D32; background: #FFFFFF' : on ? 'border: 3px solid #1866C9; background: #EAF2FD' : 'border: 2px solid #DCE3EC; background: #FFFFFF'),
+        pickLabel: isLost ? 'รอเสียบกลับ' : inUse ? 'ใช้อยู่' : (on ? 'เลือกอยู่' : 'ใช้ตัวนี้'), pickOff: off,
+        pickStyle: PICK_BASE + (off ? PICK_OFF : PICK_ON),
+        pick: () => {
+          if (isLost) { this.hintMsg('รอให้บอร์ดกลับมาก่อน เสียบสาย USB กลับได้เลย'); return; }
+          if (inUse) { this.hintMsg('บอร์ดตัวนี้ต่ออยู่แล้ว'); return; }
+          if (busy) { this.hintMsg('รอให้ขั้นตอนตอนนี้เสร็จก่อน'); return; }
+          set({ picked: r.port, err: null, tries: 0, switchTo: S.conn ? r.port : null });
+        }
+      };
+    });
+    const others = P.others.map((o) => {
+      const on = S.picked === o.port;
+      return { name: o.name, port: o.port, pickLabel: on ? 'เลือกอยู่' : 'ใช้พอร์ตนี้', pickOff: busy,
+        pickStyle: PICK_BASE + (busy ? PICK_OFF : PICK_ON),
+        style: 'display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 12px; ' + (on ? 'border: 3px solid #1866C9; background: #EAF2FD' : 'border: 2px solid #DCE3EC; background: #FFFFFF'),
+        pick: () => { if (busy) { this.hintMsg('รอให้ขั้นตอนตอนนี้เสร็จก่อน'); return; } set({ picked: o.port, err: null, tries: 0 }); } };
+    });
+    const connect = () => {
+      if (!S.picked || S.phase === 'scanning') { this.hintMsg('แตะ ใช้ตัวนี้ บนการ์ดบอร์ดก่อน แล้วค่อยกดเชื่อมต่อ'); return; }
+      clearTimeout(this.t);
+      const tries = this.state.tries + 1;
+      this.setState({ phase: 'connecting', err: null, tries, conn: null, justDisc: null });
+      const isOther = P.others.some((x) => x.port === S.picked);
+      this.t = setTimeout(() => {
+        let err = null;
+        if (isOther) err = 'noReply';
+        else if (sc === 'busy' && tries < 2) err = 'busy';
+        else if ((sc === 'noReply' || sc === 'fail2') && tries < 3) err = 'noReply';
+        if (err) { this.setState({ phase: 'idle', err }); return; }
+        this.setState({ conn: pickedKey || S.picked, since: '10:' + String(2 + tries).padStart(2, '0'), switchTo: null, id: null, idTips: false });
+        this.afterOk(pickedKey || S.picked);
+      }, 1300);
+    };
+    // E-BUSY: บอร์ดถูกโปรแกรมอื่นจับพอร์ตไว้ = Arm Lab (ฝั่งตรงข้ามของ ConnectV3 ที่บอกให้ปิด Block Lab)
+    const ERR = {
+      busy: ['โปรแกรมอื่นใช้บอร์ดตัวนี้อยู่', 'ปิด Arm Lab (หรือโปรแกรมอื่นที่ต่อบอร์ดไว้) แล้วกดลองอีกครั้ง', 'E-BUSY'],
+      noReply: ['เจอสายแล้ว แต่บอร์ดไม่ตอบ', 'เช็กสาย USB ดูว่าไฟบนบอร์ดติดไหม แล้วกดลองอีกครั้ง', 'E-NOREPLY']
+    };
+    const DEEP = {
+      busy: [['ปิด Arm Lab ให้หมด', 'ดูที่แถบล่างของจอ ถ้ามีไอคอน Arm Lab ให้ปิด'], ['ปิดหน้าต่าง Block Lab อันอื่น', 'บางทีเปิดซ้ำ 2 หน้าต่างโดยไม่รู้ตัว'], ['ถอดสาย USB แล้วเสียบใหม่', 'รอ 3 วินาทีก่อนกดลองอีกครั้ง'], ['กดปุ่ม RESET บนบอร์ด', 'ปุ่มเล็กข้างช่องเสียบ USB']],
+      noReply: [['ไฟบนบอร์ดติดไหม?', 'ถ้าไม่ติด เช็กสาย USB ลองสายเส้นอื่น'], ['สายเป็นสายส่งข้อมูลไหม?', 'สายชาร์จบางเส้นส่งข้อมูลไม่ได้'], ['ลองช่อง USB อื่นของคอม', 'บางช่องจ่ายไฟไม่พอ'], ['เลือกพอร์ตถูกตัวไหม?', 'ต้องเป็นการ์ด “บอร์ด Uno” ไม่ใช่อุปกรณ์อื่น']]
+    };
+    const n = P.boards.length;
+    let sayTitle, saySub;
+    if (S.lost === 'wait') { sayTitle = 'สายบอร์ดหลุด ไม่เป็นไร'; saySub = 'เสียบสาย USB กลับ แล้วรอสักครู่ บอร์ดจะกลับมาเอง'; }
+    else if (S.lost === 'back') { sayTitle = 'บอร์ดกลับมาแล้ว!'; saySub = 'กำลังพากลับไปหน้าต่อบล็อก…'; }
+    else if (S.conn && S.phase === 'idle') { sayTitle = 'ต่อบอร์ดไว้แล้ว'; saySub = S.switchTo ? 'เลือกบอร์ดตัวอื่นอยู่ กดเชื่อมต่อด้านล่างเพื่อสลับบอร์ด' : 'กลับไปทำงานต่อได้เลย หรือตัดการเชื่อมต่อถ้าจะเปลี่ยนไปใช้ Arm Lab'; }
+    else if (S.phase === 'scanning') { sayTitle = 'กำลังค้นหาบอร์ด…'; saySub = 'รอสักครู่นะ'; }
+    else if (S.phase === 'connecting') { sayTitle = 'กำลังคุยกับบอร์ด…'; saySub = 'ตรวจว่าบอร์ดตอบกลับจริง อย่าเพิ่งถอดสาย'; }
+    else if (S.phase === 'naming') { sayTitle = 'เจอกันแล้ว!'; saySub = 'ตั้งชื่อบอร์ดที่แถบล่าง เช่น “บอร์ดกลุ่ม 3” ครั้งหน้าจะหาเจอง่าย'; }
+    else if (S.phase === 'ok') { sayTitle = 'เจอกันแล้ว!'; saySub = 'กำลังพากลับไปหน้าต่อบล็อก…'; }
+    else if (S.err && S.tries >= 2) { sayTitle = 'ยังไม่ได้ ไม่เป็นไร ลองเช็กทีละข้อ'; saySub = 'ทำตามรายการในกล่องสีแดง ติ๊กทีละข้อ แล้วกดลองอีกครั้ง'; }
+    else if (S.err) { sayTitle = 'ยังต่อไม่ได้ ไม่เป็นไร'; saySub = 'อ่านวิธีแก้ในกล่องสีแดง แล้วลองอีกครั้ง'; }
+    else if (S.justDisc) { sayTitle = 'ปล่อยบอร์ดแล้ว'; saySub = 'ไปใช้ Arm Lab ได้ หรือเชื่อมต่อใหม่ที่นี่ก็ได้'; }
+    else if (n === 0) { sayTitle = 'ยังไม่เจอบอร์ดเลย'; saySub = 'ลองเสียบสายแล้วกดค้นหาอีกครั้ง'; }
+    else if (S.id) { sayTitle = 'มาหาบอร์ดของเรากัน'; saySub = 'ทำตามกล่องสีฟ้าทีละขั้นนะ'; }
+    else if (n === 1) { sayTitle = 'เจอบอร์ด 1 ตัว'; saySub = 'คอมเครื่องนี้ต่อบอร์ดไว้ตัวเดียว กดเชื่อมต่อได้เลย'; }
+    else { sayTitle = 'เจอบอร์ด ' + n + ' ตัว ตัวไหนของเรา?'; saySub = 'ดูจากชื่อบอร์ดบนการ์ด ถ้ายังไม่ได้ตั้งชื่อ กด “หาด้วยการถอดสาย”'; }
+    const BTN = 'height: 56px; padding: 0 32px; border-radius: 12px; font-family: inherit; font-size: 18px; font-weight: 700; white-space: nowrap; display: inline-flex; align-items: center; gap: 8px; box-sizing: border-box; ';
+    const BLUE = 'border: none; border-bottom: 4px solid #0F4C99; background: #1866C9; color: #FFFFFF; cursor: pointer';
+    const OFF = 'border: 2px solid #DCE3EC; background: #F4F6F8; color: #5A6377; cursor: not-allowed';
+    const ID = {
+      unplug: ['ถอดสาย USB ของบอร์ดกลุ่มเรา ออกจากคอม', 'ถอดเส้นเดียว ระบบจะดูว่าการ์ดไหนหายไป', 1],
+      unplug2: outcome === 'two' ? ['การ์ดหายไป 2 ตัว ถอดเกินมา', 'เสียบสายกลับทั้งหมดก่อน แล้วกด “เริ่มใหม่” ถอดแค่เส้นของกลุ่มเรา', '!'] : ['การ์ดที่หายไปคือบอร์ดของเรา เสียบสายกลับได้เลย', 'เสียบช่องไหนก็ได้ ระบบจะดูว่าการ์ดไหนกลับมา', 2],
+      wait: ['ยังไม่เห็นบอร์ดกลับมา', 'เสียบสายแล้วหรือยัง? ถ้าเสียบแล้วแต่ไม่ขึ้น ลองดูวิธีด้านล่าง', '?'],
+      found: [S.port6 ? 'เจอแล้ว! บอร์ดกลับมาที่ COM6 (เปลี่ยนช่องได้ ไม่เป็นไร)' : 'เจอแล้ว! เลือกบอร์ดของกลุ่มเราให้แล้ว', 'กดเชื่อมต่อด้านล่างได้เลย', 3]
+    };
+    const idInfo = S.id ? ID[S.id] : null, warn = idInfo && (idInfo[2] === '!' || idInfo[2] === '?');
+    const runId = () => {
+      if (busy) { this.hintMsg('รอให้ขั้นตอนตอนนี้เสร็จก่อน'); return; }
+      clearTimeout(this.it);
+      set({ id: 'unplug', picked: null, err: null, port6: false, idTips: false });
+      this.it = setTimeout(() => {
+        this.setState({ id: 'unplug2' });
+        if (outcome === 'two') return;
+        this.it = setTimeout(() => {
+          if (outcome === 'timeout') { this.setState({ id: 'wait' }); return; }
+          const p6 = outcome === 'portChanged';
+          this.setState({ id: 'found', port6: p6, picked: p6 ? 'COM6' : 'COM3' });
+        }, 2600);
+      }, 2600);
+    };
+    const doDisconnect = () => this.setState({ conn: null, disc: null, justDisc: this.state.conn, picked: this.state.conn, phase: 'idle' });
+    const wbChip = lostWait ? 'lost' : (S.phase === 'connecting' ? 'connecting' : (S.conn ? 'connected' : 'disconnected'));
+    const portOf = (k) => (k === 'COM3' && S.port6 ? 'COM6' : k);
+    return {
+      os: this.props.os || 'win', yes: true,
+      wbChip, wbPort: S.conn ? portOf(S.conn) : (S.picked || 'COM3'),
+      onWbChange: () => this.hintMsg('อยู่หน้าเชื่อมบอร์ดแล้ว เลือกบอร์ดจากการ์ดด้านล่างได้เลย'),
+      onWbReconnect: () => { this.hintMsg('เสียบสาย USB กลับได้เลย โปรแกรมจะต่อให้เอง'); },
+      sayTitle, saySub,
+      lostWait, lostBack: S.lost === 'back', lostName: this.nameOf(S.conn || 'COM3'),
+      lostTips: S.lostTips, lostTipsLabel: S.lostTips ? 'ซ่อนวิธีแก้' : 'เสียบแล้วแต่ไม่ขึ้น?',
+      toggleLostTips: () => set({ lostTips: !S.lostTips }),
+      showConnBox: !!S.conn && !S.lost && (S.phase === 'idle' || !!S.disc), connName: S.conn ? this.nameOf(S.conn) + ' (' + portOf(S.conn) + ')' : '',
+      connSub: 'ต่อตั้งแต่ ' + S.since + ' น. · ต่อผ่าน USB ไม่ต้องใช้เน็ต',
+      connIdle: !!S.conn && !S.disc,
+      startDisc: () => set({ disc: 'ask' }),
+      discAsk: S.disc === 'ask',
+      cancelDisc: () => set({ disc: null }),
+      discNow: doDisconnect,
+      showDiscDone: !!S.justDisc && !S.conn && S.phase === 'idle' && !S.err,
+      discDoneTitle: 'ตัดการเชื่อมต่อ ' + (S.justDisc ? this.nameOf(S.justDisc) : '') + ' แล้ว',
+      scanNote: S.phase === 'scanning' ? 'กำลังค้นหา…' : 'อัปเดตเองเมื่อเสียบหรือถอดสาย',
+      rescan: () => {
+        if (busy) { this.hintMsg('รอให้ขั้นตอนตอนนี้เสร็จก่อน'); return; }
+        clearTimeout(this.t);
+        set({ phase: 'scanning', err: null });
+        this.t = setTimeout(() => {
+          const found = sc === 'none' ? true : this.state.found;
+          this.setState({ phase: 'idle', found, picked: (sc === 'none' && found && !this.state.picked) ? 'COM3' : this.state.picked, id: this.state.id === 'wait' ? null : this.state.id });
+        }, 1100);
+      },
+      busy, hasBoards: n > 0 || (S.id === 'unplug2'), noBoards: n === 0 && S.id !== 'unplug2',
+      showIdBtn: sc === 'many' && !S.id && S.phase === 'idle' && !S.conn,
+      idActive: !!S.id,
+      idStepNo: idInfo ? idInfo[2] : 1, idTitle: idInfo ? idInfo[0] : '', idBody: idInfo ? idInfo[1] : '',
+      idBoxStyle: 'display: flex; align-items: center; gap: 16px; border-radius: 16px; padding: 12px 20px; ' + (warn ? 'background: #FFF4CC; border: 2px solid #B07F00' : 'background: #EAF2FD; border: 2px solid #1866C9'),
+      idNoStyle: 'width: 36px; height: 36px; border-radius: 999px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; flex-shrink: 0; ' + (warn ? 'background: #FFFFFF; border: 2px solid #B07F00; color: #14243D' : 'background: #1866C9; color: #FFFFFF'),
+      idActShow: (S.id === 'unplug2' && outcome === 'two') || S.id === 'wait',
+      idActLabel: S.id === 'wait' ? (S.idTips ? 'ซ่อนวิธีแก้' : 'เสียบแล้วแต่ไม่ขึ้น?') : 'เริ่มใหม่',
+      idAct: () => { if (S.id === 'wait') set({ idTips: !S.idTips }); else runId(); },
+      idTipsShow: S.id === 'wait' && S.idTips,
+      idCancelLabel: S.id === 'found' ? 'ปิด' : 'ยกเลิก',
+      startId: runId,
+      cancelId: () => { clearTimeout(this.it); set({ id: null, idTips: false }); },
+      emptyTitle: S.phase === 'scanning' ? 'กำลังค้นหา…' : 'ยังไม่พบบอร์ดในเครื่องนี้',
+      boards, others, showOthers: S.showOthers, othersClosed: !S.showOthers,
+      othersLabel: 'อุปกรณ์อื่นที่ไม่น่าใช่บอร์ด (' + P.others.length + ') · ปกติไม่ต้องใช้',
+      toggleOthers: () => set({ showOthers: !S.showOthers }),
+      hasError: !!S.err && S.phase === 'idle',
+      errTitle: S.err ? ERR[S.err][0] : '', errBody: S.err ? ERR[S.err][1] : '',
+      showCode: !!S.err && S.tries >= 2, errCode: S.err ? ERR[S.err][2] + ' · ' + (S.picked || '') : '',
+      tries: S.tries, showDeep: !!S.err && S.tries >= 2,
+      deepSteps: S.err ? DEEP[S.err].map((d, i) => {
+        const done = !!S.checks[i];
+        return { title: d[0], body: d[1], done, todo: !done, no: String(i + 1),
+          toggle: () => { const c = Object.assign({}, this.state.checks); c[i] = !c[i]; set({ checks: c }); },
+          style: 'display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 8px 12px; border-radius: 12px; cursor: pointer; font-family: inherit; color: #14243D; ' + (done ? 'border: 2px solid #2E7D32; background: #FFFFFF' : 'border: 2px solid #DCE3EC; background: #FFFFFF'),
+          boxStyle: 'width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; ' + (done ? 'background: #2E7D32; color: #FFFFFF' : 'background: #F4F6F8; border: 2px solid #DCE3EC; color: #14243D') };
+      }) : [],
+      showHelp: (n === 0 || (!!S.err && S.tries < 2)) && !S.conn,
+      helpTitle: n === 0 ? 'ไม่เจอบอร์ดของเรา? ลองทีละข้อ' : 'เช็กเพิ่มเติม',
+      isNaming: S.phase === 'naming', nameDraft: S.nameDraft, nameEmpty: !S.nameDraft.trim(),
+      onName: (e) => set({ nameDraft: e.target.value }),
+      onNameKey: (e) => { if (e.key === 'Enter' && this.state.nameDraft.trim()) { const nm = Object.assign({}, this.state.names); nm[this.state.conn] = this.state.nameDraft.trim(); this.setState({ names: nm, phase: 'ok' }); this.goLater(); } },
+      saveName: () => { if (!S.nameDraft.trim()) { this.hintMsg('พิมพ์ชื่อบอร์ดก่อน หรือกด ข้ามไปก่อน'); return; } const nm = Object.assign({}, S.names); nm[S.conn] = S.nameDraft.trim(); set({ names: nm, phase: 'ok' }); this.goLater(); },
+      skipName: () => { set({ phase: 'ok' }); this.goLater(); },
+      saveNameStyle: 'height: 52px; padding: 0 24px; border-radius: 12px; font-family: inherit; font-size: 18px; font-weight: 700; box-sizing: border-box; ' + (S.nameDraft.trim() ? BLUE : OFF),
+      isOk: S.phase === 'ok', okTitle: 'เชื่อมต่อ ' + (S.conn ? this.nameOf(S.conn) : '') + ' แล้ว!',
+      isConnecting: S.phase === 'connecting', connectingName: pickedName || 'บอร์ด',
+      cancelConnect: () => { clearTimeout(this.t); set({ phase: 'idle', tries: Math.max(0, S.tries - 1) }); },
+      baudTip: pickedObj ? (pickedIsBoard ? 'ค่านี้ตั้งตามบอร์ดที่เลือก เปลี่ยนเองไม่ได้ · ถ้าไม่ตรงให้บอกครู' : 'พอร์ตนี้ไม่ใช่บอร์ด จึงไม่มีค่า baud rate') : 'เลือกบอร์ดก่อน แล้วค่า baud rate จะขึ้นเอง',
+      baudOpts: [{ v: '', t: pickedIsBoard ? '' : (pickedObj ? 'ไม่ระบุ' : 'เลือกบอร์ดก่อน') }].concat(['9600', '57600', '115200'].map((v) => ({ v, t: v + ' bps' }))).map((o) => Object.assign(o, { sel: o.v === (pickedIsBoard ? '115200' : '') })).filter((o) => o.v !== '' || !pickedIsBoard),
+      showConnectBtn: (S.phase === 'idle' || S.phase === 'scanning') && !S.disc && !S.lost && (!S.conn || !!S.switchTo),
+      noPick: !pickedObj || S.phase === 'scanning',
+      connectLabel: S.switchTo && S.conn ? 'ตัด ' + this.nameOf(S.conn) + ' แล้วต่อ ' + pickedName : (pickedObj ? 'เชื่อมต่อ ' + pickedName : 'เลือกบอร์ดก่อน'),
+      connectStyle: BTN + (pickedObj && S.phase !== 'scanning' ? BLUE : OFF),
+      connect,
+      hasHint: !!S.hint, hint: S.hint
+    };
+  }
+}
+</script>
+</body>
+</html>

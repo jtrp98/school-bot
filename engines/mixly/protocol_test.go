@@ -34,6 +34,10 @@ func TestInvalidProtocolAndPayloads(t *testing.T) {
 		{"source and XML", requestLine("program.compile", `{"board":"arduino_avr","source":"x","xml":"<xml/>"}`), "INVALID_INPUT"},
 		{"bad options", requestLine("program.compile", `{"board":"arduino_avr","source":"x","options":{"flags":"--evil"}}`), "INVALID_INPUT"},
 		{"bad serial data", requestLine("serial.exchange", `{"port":"COM-test","write_base64":"!"}`), "INVALID_INPUT"},
+		{"upload without USB IDs", requestLine("program.upload", `{"board":"arduino_avr","platform":"Arduino/Genuino Uno","source":"x","port":"COM3"}`), "INVALID_INPUT"},
+		{"malformed USB IDs", requestLine("program.upload", `{"board":"arduino_avr","platform":"Arduino/Genuino Uno","source":"x","port":"COM3","vid":"2341","pid":"43"}`), "INVALID_INPUT"},
+		{"USB IDs outside upload", requestLine("program.compile", `{"board":"arduino_avr","source":"x","vid":"2341","pid":"0043"}`), "INVALID_INPUT"},
+		{"line break in text", requestLine("program.generate", `{"board":"arduino_avr","blocks":[{"type":"text","fields":{"TEXT":"a\n#include <x>"}}]}`), "PROJECT_INVALID"},
 		{"read limit", requestLine("serial.exchange", `{"port":"COM-test","read_bytes":8193}`), "SAFETY_LIMIT"},
 	}
 	for _, check := range cases {
@@ -67,7 +71,7 @@ func TestOversizedLineDrainsBeforeNextRequest(t *testing.T) {
 }
 
 func TestDryRunNeverReportsHardwareSuccess(t *testing.T) {
-	compile := handleLine(requestLine("program.upload", `{"board":"arduino_avr","platform":"Arduino/Genuino Uno","source":"void setup(){} void loop(){}","port":"does-not-exist"}`))
+	compile := handleLine(requestLine("program.upload", `{"board":"arduino_avr","platform":"Arduino/Genuino Uno","source":"void setup(){} void loop(){}","port":"does-not-exist","vid":"2341","pid":"0043"}`))
 	var result BuildResult
 	if compile.Status != "success" || json.Unmarshal(compile.Data, &result) != nil || result.Compiled ||
 		result.Uploaded || result.Delivery != "dry-run" {

@@ -25,19 +25,6 @@ type SerialResult struct {
 	DeviceAck bool   `json:"device_acknowledged"`
 }
 
-type Devices struct {
-	Engine string   `json:"engine"`
-	Ports  []string `json:"ports"`
-}
-
-func listDevices() (Devices, error) {
-	ports, err := serial.GetPortsList()
-	if ports == nil {
-		ports = []string{}
-	}
-	return Devices{"mixly", ports}, err
-}
-
 func checkPort(name string) error {
 	devices, err := listDevices()
 	if err != nil {

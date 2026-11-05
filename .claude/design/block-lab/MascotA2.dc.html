@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>Mascot School Bot A2</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+</style>
+</helmet>
+<!-- รอบ 15 (2026-10-27): สำเนาของ Mascot สำหรับบอร์ด A2 (ไม่ผูกกับไฟล์ Mascot-ccpp หน้า Achive) · เนื้อหาเหมือนต้นฉบับทุกอย่าง (ไม่มีคลาส CSS) -->
+<div style="{{wrapStyle}}"><img src="/_blob/f7787b9ec0315b4d03a7bf7c07fc644c" alt="{{alt}}" style="{{imgStyle}}"></div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"pose":{"editor":"int","default":1,"min":1,"max":10},"h":{"editor":"int","default":144,"min":40,"max":150},"alt":{"editor":"text","default":""},"$preview":{"width":96,"height":144}}'>
+class Component extends DCLogic {
+  renderVals() {
+    // ตัดจากแผ่น 10 ท่า 1536x1024 ด้วย CSS (ชั่วคราว · ยังไม่ได้ตัดแยกไฟล์ DEL-09) [x, y, w, h]
+    const T = {
+      1: [0, 25, 330, 490], 2: [335, 45, 320, 470], 3: [660, 50, 305, 455], 4: [955, 55, 310, 470], 5: [1265, 50, 271, 470],
+      6: [25, 515, 330, 495], 7: [350, 555, 280, 455], 8: [655, 540, 290, 470], 9: [925, 545, 310, 455], 10: [1235, 535, 300, 480]
+    };
+    const n = Math.min(10, Math.max(1, Number(this.props.pose) || 1));
+    const h = Math.min(150, Math.max(40, Number(this.props.h) || 144));
+    const c = T[n];
+    const s = h / c[3];
+    return {
+      alt: this.props.alt ?? '',
+      wrapStyle: 'position:relative;flex-shrink:0;overflow:hidden;width:' + Math.round(c[2] * s) + 'px;height:' + h + 'px',
+      imgStyle: 'position:absolute;max-width:none;display:block;width:' + Math.round(1536 * s) + 'px;left:' + Math.round(-c[0] * s) + 'px;top:' + Math.round(-c[1] * s) + 'px'
+    };
+  }
+}
+</script>
+</body>
+</html>

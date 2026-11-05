@@ -14,31 +14,6 @@ import (
 	"unicode/utf8"
 )
 
-func TestTrustedEngineRegistry(t *testing.T) {
-	for mode, id := range map[string]string{"robot-control": "zide", "coding-adventure": "demo", "block-programming": "demo"} {
-		spec, err := engineForMode(mode)
-		if err != nil || spec.id != id || filepath.IsAbs(spec.relativePath) {
-			t.Fatalf("%s: %#v %v", mode, spec, err)
-		}
-	}
-	for _, mode := range []string{"zide", "../../evil", "", "Robot-Control"} {
-		if _, err := engineForMode(mode); err == nil {
-			t.Fatalf("accepted %q", mode)
-		}
-	}
-}
-
-func TestEveryModeHasActionAllowlist(t *testing.T) {
-	for _, mode := range []string{"robot-control", "coding-adventure", "block-programming"} {
-		if len(modeActions[mode]) == 0 {
-			t.Fatalf("%s has no action allowlist", mode)
-		}
-	}
-	if len(modeActions) != 3 {
-		t.Fatalf("allowlist modes differ from registry: %d", len(modeActions))
-	}
-}
-
 func TestActionAllowlist(t *testing.T) {
 	manager, started := helperManager(t)
 	rejected := []struct{ mode, action string }{
@@ -49,6 +24,11 @@ func TestActionAllowlist(t *testing.T) {
 		{"robot-control", "program.run"},
 		{"coding-adventure", "servo.set"},
 		{"block-programming", "robot.stop"},
+		{"block-programming", "firmware.flash"},
+		{"block-programming", "board.list"},
+		{"block-programming", "serial.exchange"},
+		{"block-programming", "program.run"},
+		{"coding-adventure", "program.upload"},
 		{"unknown-mode", "robot.stop"},
 		{"", "robot.stop"},
 	}
@@ -68,7 +48,8 @@ func TestActionAllowlist(t *testing.T) {
 		{"robot-control", "robot.stop"},
 		{"robot-control", "group.download"},
 		{"coding-adventure", "program.run"},
-		{"block-programming", "program.run"},
+		{"block-programming", "program.generate"},
+		{"block-programming", "project.validate"},
 	}
 	for _, c := range allowed {
 		if _, err := manager.Execute(c.mode, c.action, json.RawMessage(`{}`)); err != nil {
@@ -80,7 +61,7 @@ func TestActionAllowlist(t *testing.T) {
 
 func TestLocateEngineIgnoresWorkingDirectory(t *testing.T) {
 	t.Chdir(t.TempDir())
-	spec, _ := engineForMode("robot-control")
+	spec := zideEngine
 	name := spec.relativePath
 	if runtime.GOOS == "windows" {
 		name += ".exe"
@@ -119,9 +100,16 @@ func TestManagerHelperProcess(t *testing.T) {
 	if err := json.NewDecoder(os.Stdin).Decode(&req); err != nil {
 		os.Exit(2)
 	}
-	helper := struct{ Helper string }{}
+	helper := struct{ Helper, Port string }{}
 	_ = json.Unmarshal(req.Data, &helper)
 	response := Response{Protocol: Protocol, RequestID: req.RequestID, Status: "success"}
+	// Block Lab's upload takes no helper field, so its port picks how long it runs.
+	switch helper.Port {
+	case "COM8":
+		time.Sleep(300 * time.Millisecond)
+	case "COM9":
+		time.Sleep(30 * time.Second)
+	}
 	switch helper.Helper {
 	case "stop-wait":
 		time.Sleep(200 * time.Millisecond)
@@ -145,6 +133,8 @@ func TestManagerHelperProcess(t *testing.T) {
 		response.Error = &Error{Code: "MADE_UP", Message: "x"}
 	case "data-array":
 		response.Data = []int{1}
+	case "listed-com5", "listed-com7":
+		response.Data = map[string]any{"devices": []any{map[string]any{"port": "COM" + helper.Helper[len(helper.Helper)-1:]}}}
 	case "error-with-data":
 		response.Status = "error"
 		response.Error = &Error{Code: "INVALID_INPUT", Message: "x"}
@@ -305,6 +295,22 @@ func TestOversizedRequestIsRejectedBeforeStartingAnEngine(t *testing.T) {
 	select {
 	case <-started:
 		t.Fatal("oversized request started an engine process")
+	default:
+	}
+}
+
+// Raw C++ and blocks outside Block Lab's toolbox never reach arduino-cli.
+func TestBlockLabBuildRefusesSourceBeforeStartingAnEngine(t *testing.T) {
+	manager, started := helperManager(t)
+	for _, data := range []string{`{"blocks":[],"source":"void setup(){}"}`, `{"blocks":[{"type":"factory_include"}]}`} {
+		response, err := manager.Execute("block-programming", "program.compile", json.RawMessage(data))
+		if code := errorCode(t, response, err); code != CodeInvalidRequest {
+			t.Fatalf("%s: expected %s, got %s", data, CodeInvalidRequest, code)
+		}
+	}
+	select {
+	case <-started:
+		t.Fatal("refused build started an engine process")
 	default:
 	}
 }

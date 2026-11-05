@@ -65,7 +65,8 @@ $schoolBotBefore = @(Get-SchoolBotProjectSnapshot) -join "`n"
 $schoolBotPayloadFiles = @(
     'school-bot.exe','demo-engine.exe','engines/zide/zide-engine.exe','engines/zide/engine.json',
     'engines/zide/THIRD-PARTY-NOTICES.md','engines/zide/HIDAPI-LICENSE.txt',
-    'engines/zide/JSON-LICENSE.txt','engines/zide/zide-engine.exe.sha256'
+    'engines/zide/JSON-LICENSE.txt','engines/zide/zide-engine.exe.sha256',
+    'engines/mixly/libraries/U8g2/src/clib/u8g2_fonts.c','engines/mixly/libraries/ZLTech_dht/dht.h'
 )
 try {
     Invoke-SchoolBotMsi -MsiArguments @('/i',"`"$schoolBotSetup`"","INSTALLFOLDER=`"$schoolBotTestDir`"") `

@@ -13,7 +13,11 @@ Go DesktopService (thin Wails adapter)
   │                                       ↑
   │                               Infrastructure store adapter
   └── Engine Manager ──JSON Lines──┬── robot-control → C++ Zide
-                                  └── adventure / blocks → demo-engine
+                                  ├── adventure program.run → demo-engine
+                                  ├── blocks program.generate / project.validate / device.list /
+                                  │   program.compile / program.upload → mixly
+                                  └── blocks serial.open / read / write / close → mixly session
+                                      (one long-lived process outside the request slot)
 ```
 
 ## Boundaries
@@ -23,7 +27,9 @@ dependencies, build scripts, tests, docs and platform outputs. Root build-engine
 scripts only dispatch by ID. Shared manifest metadata lives in `contracts/engine/`.
 Mode and engine identity are separate; they are not a one-to-one mapping.
 See `engines/README.md` for the workspace convention. The host's trusted registry
-routes Robot Control to Zide and the two learning modes to the demo engine.
+routes Robot Control to Zide, Coding Adventure to the demo engine and Block Lab's code
+generation, port list (which opens no port), compile, on Windows upload, and the chosen
+board's Serial monitor (one long-lived engine process) to Mixly.
 
 Frontend modes never choose executable paths or access license credentials outside the call.
 `internal/engine` has no Wails imports. A replacement Host can reuse protocol/engine unchanged.
@@ -32,12 +38,27 @@ built-in binary paths only beside the running executable, including `engines/zid
 the working directory is never searched, so a development run must use the built
 executable in the build output directory. It never accepts frontend executable paths.
 
-`Run` creates a process per request, handles one response, and terminates on cancellation/5-second deadline.
+`Run` creates a process per request, handles one response, and terminates on cancellation or its
+route's deadline: five seconds, or two minutes for Block Lab's `program.compile` and
+`program.upload` (counted once the Serial session has let go of the port).
 Input capped at 64 KB, stdout at 1 MB, diagnostic output at 8 KB. No shell is used.
 Only one request can be active. No networking or filesystem API is exposed by the teaching DSL.
+Block Lab's Serial monitor is the one exception to a process per request: its
+`serial.open`/`read`/`write`/`close` go to one long-lived engine process outside that slot
+(`internal/engine/session.go`), five seconds per request, killed on a timeout or failure, and
+ended by `serial.close`, before an upload, after 15 seconds without a request, and by Cancel
+once the slot is free; it refuses `serial.open` while a compile or upload runs.
 Cancel waits until the current child exits and releases its slot. An already-active
 `robot.stop` is allowed to finish despite navigation/close cancellation; its five-second
-deadline remains in effect. `cmd.WaitDelay` bounds inherited-pipe draining to one second
+deadline remains in effect. So is a Block Lab `program.upload` (two-minute deadline): an upload
+stopped half way leaves the board without a whole program, so only `StopUpload`, Block Lab's
+confirmed stop, ends one, and a page that lost its own guard cannot cut it off. `StopUpload` ends
+an upload and nothing else, so a late stop cannot end the next request, and `UploadRunning` lets
+the close dialog say why closing waits. While an upload holds the slot, a Robot Control
+`robot.stop` gets `ENGINE_BUSY` and a Cancel waits, so a physical stop can wait up to about two
+minutes behind it. Block Lab keeps the child in Block Lab until its send ends, and the host
+refuses uploads to a port Robot Control used (`internal/engine/armports.go`).
+`cmd.WaitDelay` bounds inherited-pipe draining to one second
 after child exit or context cancellation. Robot Control
 then submits a separate physical `$DST!` request; cancellation alone is not a stop.
 Output beyond the caps is discarded without failing the child's writes, so a verbose engine is not
@@ -53,7 +74,8 @@ and reports transmission separately from measured position or verified board sto
 See `engines/zide/docs/INTEGRATION.md` for its supported operations and limits.
 
 This is **not a sandbox for arbitrary executable student code**. Child-tree cleanup, package verification,
-dynamic discovery, persistent sessions, event streaming and protocol capability negotiation are follow-ups.
+dynamic discovery, persistent sessions beyond the Serial monitor, event streaming and protocol
+capability negotiation are follow-ups.
 
 ## C# API
 

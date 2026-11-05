@@ -1,0 +1,874 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>เมนูคลิกขวา บล็อก A2</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'IBM Plex Sans Thai',system-ui,sans-serif}
+.cm-i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.cm-it{box-sizing:border-box;display:flex;align-items:center;gap:12px;width:100%;min-height:44px;margin:0;padding:8px 12px;border:0;border-radius:12px;background:transparent;color:#14243D;font-family:inherit;font-size:16px;font-weight:600;line-height:1.4;text-align:left;cursor:pointer}
+.cm-it:hover{background:#EAF2FD}
+.cm-it:focus-visible{outline:3px solid #1866C9;outline-offset:-3px;background:#EAF2FD}
+.cm-it[aria-disabled="true"]{color:#5A6377;cursor:default}
+.cm-it[aria-disabled="true"]:hover{background:#F4F6F8}
+.cm-it.cm-danger{color:#D32F2F}
+.cm-sub{display:block;font-size:14px;font-weight:500;color:#5A6377;line-height:1.4}
+.cm-kbd{margin-left:auto;padding-left:8px;font-size:12px;font-weight:700;color:#5A6377;white-space:nowrap}
+.cm-btn{position:relative;box-sizing:border-box;display:flex;align-items:center;justify-content:center;flex-shrink:0;width:44px;height:44px;margin:0;padding:0;border:0;border-radius:12px;background:transparent;color:#14243D;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer}
+.cm-btn:hover{background:#EAF2FD}
+.cm-btn:focus-visible,.cm-tb:focus-visible,.cm-pk:focus-visible,.cm-tx:focus-visible{outline:3px solid #1866C9;outline-offset:2px}
+.cm-btn[aria-disabled="true"]{color:#5A6377;cursor:default}
+.cm-gf:focus{outline:none}
+.cm-gf:focus-visible{outline:3px solid #1866C9;outline-offset:2px;box-shadow:0 0 0 2px #FFFFFF}
+.cm-sb:focus-within{border-color:#1866C9!important}
+.cm-ta:focus-visible{outline:none;border-color:#1866C9!important}
+.cm-chev{position:relative;box-sizing:border-box;display:flex;align-items:center;justify-content:center;flex-shrink:0;width:44px;height:44px;margin:0 0 0 -6px;padding:0;border:0;border-radius:12px;background:transparent;color:#14243D;cursor:pointer}
+.cm-chev:focus-visible{outline:none}
+.cm-chev:focus-visible>span{box-shadow:0 0 0 2px #FFFFFF,0 0 0 5px #1866C9}
+.cm-tip::after{content:attr(data-tip);display:none;position:absolute;left:12px;top:calc(100% + 6px);z-index:42;padding:4px 12px;border-radius:8px;background:#14243D;color:#FFFFFF;font-size:14px;font-weight:500;line-height:1.6;white-space:nowrap;pointer-events:none}
+.cm-tip:hover::after{display:block}
+.cm-ring-p{stroke-dasharray:201.06;stroke-dashoffset:201.06;animation:cmring 0.38s linear forwards}
+@keyframes cmring{to{stroke-dashoffset:0}}
+.cm-rm .cm-ring-p{animation:none;stroke-dashoffset:0}
+@media (prefers-reduced-motion:reduce){.cm-ring-p{animation:none;stroke-dashoffset:0}}
+.cm-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+</helmet>
+<!-- ContextMenuA2 · R21 (2026-10-30 · OQ210–OQ216) · ต้นแบบใช้งานได้ ของเมนูคลิกขวา/กดค้าง 3 แบบ + ไอคอนเฟือง ? ทึบ + สถานะบล็อกใหม่ (ย่อ · ปิดใช้ · คอมเมนต์) + แถบค้นหา + กระเป๋า + กล่องยืนยัน
+     ข้อจำกัดตรงไปตรงมา: ไฟล์นี้เป็นต้นแบบแยก (โมเดลบล็อกจำลอง 12 บล็อก · วาดด้วย BlockA2) ยังไม่ได้เดินสายเข้า BlocksPaneA2 (โมเดลจริง 3,700 บรรทัด) · dev ใช้ D1 §R21 เป็นสัญญา · ยังไม่ได้ render ตรวจ · ตรวจไวยากรณ์ด้วยตาอย่างเดียว -->
+<div id="cm-root" class="{{rootCls}}" onKeyDown="{{rootKey}}" onPointerDownCapture="{{rootDownCap}}" style="position:relative;width:1280px;height:800px;overflow:hidden;background:#F4F7FB;color:#14243D;font-family:'IBM Plex Sans Thai',system-ui,sans-serif">
+  <div style="position:absolute;left:24px;top:8px;right:24px;height:48px;display:flex;align-items:center;gap:16px">
+    <div style="font-size:20px;font-weight:700;line-height:1.3;white-space:nowrap">R21 · เมนูคลิกขวา / กดค้าง</div>
+    <div style="flex:1;min-width:0;font-size:14px;font-weight:500;line-height:1.4;color:#5A6377">{{hint}}</div>
+  </div>
+  <div id="cm-ws" tabindex="0" role="group" aria-label="{{wsAria}}" data-bg="1" onContextMenu="{{wsCtx}}" onPointerDown="{{wsDown}}" onPointerMove="{{wsMove}}" onPointerUp="{{wsUp}}" onPointerCancel="{{wsUp}}" style="position:absolute;left:0;top:60px;width:1280px;height:740px;overflow:hidden;background-color:#FFFFFF;background-image:radial-gradient(#DCE3EC 1.3px,transparent 1.3px);background-size:24px 24px;touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;border-top:1px solid #DCE3EC;box-sizing:border-box">
+    <div aria-hidden="true" style="position:absolute;right:16px;bottom:16px;width:60px;height:314px;box-sizing:border-box;border:2px dashed #C6D6EA;border-radius:16px;display:flex;align-items:center;justify-content:center;pointer-events:none"><span style="writing-mode:vertical-rl;font-size:14px;font-weight:600;color:#5A6377;white-space:nowrap">ชุดปุ่มซูม (ตำแหน่งจริง D1 §1.6)</span></div>
+
+    <sc-for list="{{notes}}" as="nt" hint-placeholder-count="0">
+      <div style="{{nt.st}}">
+        <div style="display:flex;align-items:center;gap:4px;padding:0 0 0 12px;min-height:44px"><span style="flex:1;font-size:14px;font-weight:700;color:#5A6377">{{nt.title}}</span><button type="button" class="cm-btn" aria-label="{{nt.delAria}}" onClick="{{nt.del}}"><svg class="cm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"></path></svg></button></div>
+        <textarea class="cm-ta" maxlength="200" aria-label="{{nt.title}}" placeholder="{{nt.ph}}" onInput="{{nt.input}}" style="display:block;box-sizing:border-box;width:100%;height:96px;margin:0;padding:8px 12px;border:2px solid #DCE3EC;border-radius:0 0 12px 12px;border-top:1px solid #DCE3EC;resize:none;font:500 16px/1.5 'IBM Plex Sans Thai',system-ui,sans-serif;color:#14243D;user-select:text;-webkit-user-select:text">{{nt.t}}</textarea>
+      </div>
+    </sc-for>
+
+    <sc-for list="{{draws}}" as="d" hint-placeholder-count="0">
+      <div data-bid="{{d.id}}" class="{{d.cls}}" data-tip="{{d.tip}}" onPointerDown="{{d.down}}" onContextMenu="{{d.ctx}}" style="{{d.wst}}">
+        <sc-if value="{{d.isBlock}}" hint-placeholder-val="{{true}}">
+          <dc-import name="BlockA2" kind="{{d.kind}}" cat="{{d.cat}}" state="{{d.state}}" w="{{d.w}}" h="{{d.h}}" bars="{{d.bars}}" mouths="{{d.mouths}}" tab="{{d.tab}}" hd="{{d.hd}}" items="{{d.items}}" down="{{noop}}" decor="no" hint-size="150px,44px"></dc-import>
+        </sc-if>
+        <sc-if value="{{d.isBar}}" hint-placeholder-val="{{false}}">
+          <div role="group" aria-label="{{d.barAria}}" style="{{d.barSt}}">
+            <button type="button" class="cm-chev" aria-expanded="false" aria-label="{{d.expAria}}" onClick="{{d.expand}}" onPointerDown="{{noop}}"><span style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%"><svg class="cm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></span></button>
+            <span style="flex:1;min-width:0;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:16px;font-weight:700;line-height:20px"><sc-for list="{{d.parts}}" as="p" hint-placeholder-count="0"><sc-if value="{{p.isBlank}}" hint-placeholder-val="{{false}}"><span aria-hidden="true" style="display:inline-block;vertical-align:middle;width:22px;height:14px;box-sizing:border-box;border:2px dashed #14243D;border-radius:999px;background:rgba(255,255,255,0.6);margin:0 6px 0 0"></span></sc-if><sc-if value="{{p.isTxt}}" hint-placeholder-val="{{true}}"><span>{{p.t}}</span></sc-if></sc-for></span>
+            <sc-if value="{{d.hasKids}}" hint-placeholder-val="{{false}}"><span style="flex-shrink:0;padding:2px 10px;border-radius:999px;background:rgba(255,255,255,0.7);border:2px solid #14243D;font-size:14px;font-weight:700;line-height:18px">{{d.kidsT}}</span></sc-if>
+            <sc-if value="{{d.hasWarn}}" hint-placeholder-val="{{false}}"><span style="flex-shrink:0;display:flex;align-items:center;gap:4px;padding:2px 10px 2px 6px;border-radius:999px;background:#FFF4CC;border:2px dashed #B07F00;font-size:14px;font-weight:700;line-height:18px"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:16px;height:16px;fill:none;stroke:#B07F00;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4M12 17h.01"></path></svg>{{d.warnT}}</span></sc-if>
+          </div>
+        </sc-if>
+      </div>
+    </sc-for>
+
+    <sc-for list="{{groups}}" as="g" hint-placeholder-count="0">
+      <div id="{{g.eid}}" class="cm-gf" tabindex="0" role="group" aria-label="{{g.aria}}" data-gid="{{g.id}}" style="{{g.st}}"></div>
+    </sc-for>
+    <sc-for list="{{hls}}" as="h" hint-placeholder-count="0">
+      <div aria-hidden="true" style="{{h.st}}"></div>
+    </sc-for>
+
+    <sc-if value="{{hasBubble}}" hint-placeholder-val="{{false}}">
+      <div role="dialog" aria-label="{{bub.title}}" style="{{bub.st}}">
+        <div aria-hidden="true" style="position:absolute;left:14px;top:-8px;width:14px;height:14px;background:#FFFFFF;border-left:2px solid #C6D6EA;border-top:2px solid #C6D6EA;transform:rotate(45deg)"></div>
+        <textarea id="cm-cmt" class="cm-ta" maxlength="200" aria-label="{{bub.title}}" placeholder="{{bub.ph}}" onInput="{{bub.input}}" style="display:block;box-sizing:border-box;width:100%;height:96px;margin:0;padding:8px 12px;border:2px solid #DCE3EC;border-radius:12px;resize:none;font:500 16px/1.5 'IBM Plex Sans Thai',system-ui,sans-serif;color:#14243D;user-select:text;-webkit-user-select:text">{{bub.t}}</textarea>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:4px"><span style="flex:1;min-width:0;font-size:14px;font-weight:500;line-height:1.4;color:#5A6377">{{bub.foot}} · 200</span><button type="button" class="cm-tx cm-btn" style="width:auto;padding:0 12px" onClick="{{bub.close}}">{{bub.closeT}}</button></div>
+      </div>
+    </sc-if>
+
+    <div style="position:absolute;left:24px;right:16px;top:12px;display:flex;justify-content:flex-end;align-items:center;gap:8px;pointer-events:none;z-index:25">
+      <sc-if value="{{sOpen}}" hint-placeholder-val="{{false}}">
+        <div role="search" class="cm-sb" style="pointer-events:auto;box-sizing:border-box;flex:0 1 400px;min-width:0;display:flex;align-items:center;gap:2px;padding:4px 4px 4px 12px;background:#FFFFFF;border:2px solid #DCE3EC;border-radius:16px;box-shadow:0 8px 20px rgba(20,36,61,0.2)">
+          <svg class="cm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3"></path></svg>
+          <input id="cm-q" type="text" value="{{q}}" onInput="{{qIn}}" onKeyDown="{{qKey}}" placeholder="{{qPh}}" aria-label="{{qPh}}" style="flex:1;min-width:0;height:44px;margin:0 0 0 8px;padding:0;border:0;outline:none;background:transparent;color:#14243D;font:600 16px 'IBM Plex Sans Thai',system-ui,sans-serif;user-select:text;-webkit-user-select:text">
+          <span role="status" aria-live="polite" style="flex-shrink:0;padding:0 6px;font-size:14px;font-weight:600;color:#5A6377;white-space:nowrap">{{qCount}}</span>
+          <button type="button" class="cm-btn" aria-label="{{qPrevT}}" onClick="{{qPrev}}"><svg class="cm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m18 15-6-6-6 6"></path></svg></button>
+          <button type="button" class="cm-btn" aria-label="{{qNextT}}" onClick="{{qNext}}"><svg class="cm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button>
+          <button type="button" class="cm-btn" aria-label="{{closeT}}" onClick="{{qClose}}"><svg class="cm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
+        </div>
+      </sc-if>
+      <sc-if value="{{badge}}" hint-placeholder-val="{{false}}">
+        <div style="pointer-events:auto;flex-shrink:0;box-sizing:border-box;height:44px;display:flex;align-items:center;gap:8px;padding:0 16px;border-radius:999px;background:#EAF2FD;border:2px solid #1866C9;color:#0F4C99;font-size:16px;font-weight:700;white-space:nowrap">กำลังจำลอง (ตัวบอก R10 ตัวอย่าง)</div>
+      </sc-if>
+      <div style="pointer-events:auto;flex-shrink:0;box-sizing:border-box;padding:4px;background:#FFFFFF;border:2px solid #DCE3EC;border-radius:16px;box-shadow:0 8px 20px rgba(20,36,61,0.2);display:flex">
+        <button type="button" class="cm-btn cm-tb" aria-pressed="{{packOpen}}" aria-label="{{packBtnAria}}" onClick="{{togglePack}}" style="width:auto;min-width:44px;gap:4px;padding:0 10px"><svg class="cm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zM9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M8 21v-5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v5M8 10h8"></path></svg><span style="font-size:16px;font-weight:700">{{packCount}}</span></button>
+      </div>
+    </div>
+
+    <sc-if value="{{packOpen}}" hint-placeholder-val="{{false}}">
+      <div id="cm-pack" role="region" aria-label="{{packTitle}}" style="position:absolute;right:16px;top:72px;width:280px;max-height:338px;box-sizing:border-box;display:flex;flex-direction:column;background:#FFFFFF;border:1px solid #DCE3EC;border-radius:16px;box-shadow:0 8px 20px rgba(20,36,61,0.2);z-index:28">
+        <div style="display:flex;align-items:center;gap:8px;padding:8px 8px 4px 16px"><span style="flex:1;font-size:18px;font-weight:700">{{packTitle}}</span><button type="button" class="cm-btn" aria-label="{{closeT}}" onClick="{{togglePack}}"><svg class="cm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"></path></svg></button></div>
+        <div style="flex:1;min-height:0;overflow-y:auto;padding:4px 8px 8px">
+          <sc-if value="{{packEmpty}}" hint-placeholder-val="{{false}}"><div style="padding:8px;font-size:16px;font-weight:500;line-height:1.6;color:#5A6377">{{packEmptyT}}</div></sc-if>
+          <sc-for list="{{packItems}}" as="pi" hint-placeholder-count="0">
+            <div style="display:flex;align-items:center;gap:0">
+              <button type="button" class="cm-it cm-pk" onClick="{{pi.use}}" style="flex:1;min-width:0;min-height:56px"><span aria-hidden="true" style="{{pi.dot}}"></span><span style="flex:1;min-width:0"><span style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{pi.label}}</span><span class="cm-sub">{{pi.sub}}</span></span></button>
+              <button type="button" class="cm-btn" aria-label="{{pi.delAria}}" onClick="{{pi.del}}"><svg class="cm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"></path></svg></button>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{menuOpen}}" hint-placeholder-val="{{false}}">
+      <div id="cm-menu" role="menu" aria-label="{{menuAria}}" style="{{menuSt}}">
+        <sc-for list="{{menuItems}}" as="m" hint-placeholder-count="0">
+          <sc-if value="{{m.isSep}}" hint-placeholder-val="{{false}}"><div role="separator" style="height:1px;margin:4px 8px;background:#DCE3EC"></div></sc-if>
+          <sc-if value="{{m.isItem}}" hint-placeholder-val="{{true}}"><button type="button" id="{{m.eid}}" role="menuitem" class="{{m.cls}}" aria-disabled="{{m.ad}}" tabindex="{{m.ti}}" onClick="{{m.click}}"><svg class="cm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="{{m.icon}}"></path></svg><span style="flex:1;min-width:0"><span style="display:block">{{m.label}}</span><sc-if value="{{m.hasSub}}" hint-placeholder-val="{{false}}"><span class="cm-sub">{{m.sub}}</span></sc-if></span><sc-if value="{{m.hasKbd}}" hint-placeholder-val="{{false}}"><span class="cm-kbd">{{m.kbd}}</span></sc-if></button></sc-if>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{hasHelp}}" hint-placeholder-val="{{false}}">
+      <div id="cm-help" role="dialog" aria-label="{{helpC.title}}" style="{{helpC.st}}">
+        <div style="font-size:16px;font-weight:700;line-height:1.5">{{helpC.title}}</div>
+        <div style="margin-top:4px;font-size:16px;font-weight:500;line-height:1.6;color:#14243D">{{helpC.body}}</div>
+        <div style="display:flex;justify-content:flex-end;margin-top:4px"><button type="button" class="cm-tx cm-btn" style="width:auto;padding:0 12px" onClick="{{helpC.close}}">{{closeT}}</button></div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{hasRing}}" hint-placeholder-val="{{false}}">
+      <svg width="80" height="80" viewBox="0 0 80 80" aria-hidden="true" style="{{ringSt}}"><circle cx="40" cy="40" r="32" fill="none" stroke="#FFFFFF" stroke-opacity="0.9" stroke-width="11"></circle><circle cx="40" cy="40" r="32" fill="none" stroke="#14243D" stroke-width="6" stroke-opacity="0.25"></circle><circle class="cm-ring-p" cx="40" cy="40" r="32" fill="none" stroke="#14243D" stroke-width="6" stroke-linecap="round" transform="rotate(-90 40 40)"></circle></svg>
+    </sc-if>
+
+    <sc-if value="{{hasToast}}" hint-placeholder-val="{{false}}">
+      <div role="status" aria-live="polite" style="position:absolute;left:24px;bottom:16px;max-width:560px;box-sizing:border-box;display:flex;align-items:center;gap:8px;padding:4px 4px 4px 16px;border-radius:12px;background:#14243D;color:#FFFFFF;font-size:16px;font-weight:600;line-height:1.5;box-shadow:0 8px 20px rgba(20,36,61,0.2);z-index:45"><span style="padding:8px 0">{{toastT}}</span><sc-if value="{{toastUndo}}" hint-placeholder-val="{{false}}"><button type="button" class="cm-btn cm-tx" style="width:auto;padding:0 14px;color:#FFFFFF;border:2px solid #FFFFFF" onClick="{{doUndoBtn}}">{{undoT}}</button></sc-if></div>
+    </sc-if>
+
+    <sc-if value="{{dlg}}" hint-placeholder-val="{{false}}">
+      <div style="position:absolute;left:0;top:0;width:1280px;height:740px;background:rgba(20,36,61,0.35);z-index:50;display:flex;align-items:center;justify-content:center">
+        <div role="alertdialog" aria-modal="true" aria-labelledby="cm-dlg-t" aria-describedby="cm-dlg-b" style="box-sizing:border-box;width:520px;max-width:100%;padding:24px;background:#FFFFFF;border-radius:16px;box-shadow:0 16px 40px rgba(20,36,61,0.3);display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:center;gap:12px"><span aria-hidden="true" style="flex-shrink:0;width:40px;height:40px;border-radius:12px;background:#FFF4CC;color:#B07F00;display:flex;align-items:center;justify-content:center"><svg class="cm-i" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4M12 17h.01"></path></svg></span><div id="cm-dlg-t" style="font-size:24px;font-weight:700;line-height:1.3">{{dlgT}}</div></div>
+          <div id="cm-dlg-b" style="font-size:16px;font-weight:500;line-height:1.6">{{dlgB}}</div>
+          <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:4px">
+            <button type="button" id="cm-dlg-no" class="cm-tx" onClick="{{dlgNo}}" style="box-sizing:border-box;height:48px;padding:0 20px;border-radius:12px;border:2px solid #C6D6EA;border-bottom-width:4px;background:#FFFFFF;color:#1866C9;font:700 16px 'IBM Plex Sans Thai',system-ui,sans-serif;cursor:pointer">{{dlgNoT}}</button>
+            <button type="button" id="cm-dlg-yes" class="cm-tx" onClick="{{dlgYes}}" style="box-sizing:border-box;height:48px;padding:0 20px;border-radius:12px;border:0;border-bottom:4px solid #8E1B1B;background:#D32F2F;color:#FFFFFF;font:700 16px 'IBM Plex Sans Thai',system-ui,sans-serif;cursor:pointer">{{dlgYesT}}</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+  <div role="status" aria-live="polite" class="cm-sr">{{ann}}</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"lang":{"editor":"enum","default":"th","options":["th","en","zh"],"section":"ต้นแบบ"},"os":{"editor":"enum","default":"win","options":["win","mac"],"section":"ต้นแบบ"},"open":{"editor":"enum","default":"none","options":["none","block","setup","hat","ws","ring","bubble","search","backpack","confirm"],"section":"เปิดตัวอย่างค้างไว้"},"mouseHold":{"editor":"boolean","default":false,"section":"ต้นแบบ"},"badge":{"editor":"boolean","default":false,"section":"ต้นแบบ"},"reduce":{"editor":"boolean","default":false,"section":"ต้นแบบ"},"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  gp(name) {
+    const P = this.props || {};
+    const kebab = name.replace(/[A-Z]/g, (m) => '-' + m.toLowerCase());
+    if (P[name] !== undefined) return P[name];
+    if (P[name.toLowerCase()] !== undefined) return P[name.toLowerCase()];
+    if (P[kebab] !== undefined) return P[kebab];
+    return undefined;
+  }
+  componentDidMount() {
+    const re = () => { try { this._tc = {}; this.forceUpdate(); } catch (e) {} };
+    try {
+      if (document.fonts && document.fonts.load) { document.fonts.load("700 16px 'IBM Plex Sans Thai'", 'กขคเริ่มต้น').then(re, () => {}); document.fonts.load("600 16px 'IBM Plex Sans Thai'", 'กขคเริ่มต้น').then(re, () => {}); }
+    } catch (e) {}
+  }
+  componentDidUpdate() {
+    const S = this.S; if (!S || !S.need) return;
+    const need = S.need; S.need = null;
+    const f = (id) => { try { const el = document.getElementById(id); if (el && el.focus) el.focus(); } catch (e) {} };
+    if (need === 'menu') f('cm-it-' + S.mfocus);
+    else if (need === 'ret') { try { f(document.getElementById(S.ret || 'cm-ws') ? (S.ret || 'cm-ws') : 'cm-ws'); } catch (e) {} }
+    else if (need === 'search') f('cm-q');
+    else if (need === 'bubble') f('cm-cmt');
+    else if (need === 'dlg') f('cm-dlg-no');
+    else if (need === 'help') f('cm-help');
+  }
+  up() { try { this.forceUpdate(); } catch (e) {} }
+
+  /* ---------- ข้อความ 3 ภาษา (OQ212 · crayon กำหนดคำ · ไทยก่อน · en/zh ย่อให้พอดีเมนู ≤ 280) ---------- */
+  D() {
+    return {
+      th: {
+        dup: 'ทำสำเนา', xcopy: 'คัดลอกข้ามงาน', cmAdd: 'เพิ่มคอมเมนต์', cmDel: 'ลบคอมเมนต์', inlOff: 'แยกช่องค่าเป็นบรรทัดใหม่', inlOn: 'รวมช่องค่าไว้แถวเดียว', col: 'ย่อบล็อก', exp: 'ขยายบล็อก', dis: 'ปิดใช้บล็อก', ena: 'เปิดใช้บล็อก',
+        del: (n) => 'ลบ ' + n + ' บล็อก', help: 'ช่วยเหลือ', pack: 'ใส่กระเป๋า', mkCall: (s) => 'สร้างบล็อกเรียก “' + s + '”', mkVal: (s) => 'สร้างค่า “' + s + '”',
+        paste: 'วางข้ามงาน', undo: 'เลิกทำ', redo: 'ทำซ้ำ', arrange: 'จัดเรียงบล็อก', colAll: 'ย่อบล็อกทั้งหมด', expAll: 'ขยายบล็อกทั้งหมด', selAll: 'เลือกทั้งหมด', delAll: (n) => 'ลบบล็อกทั้งหมด ' + n + ' บล็อก', wsNote: 'เพิ่มคอมเมนต์พื้นที่',
+        packAll: 'ใส่ทั้งหมดในกระเป๋า', unpack: (n) => 'วางทั้งหมดจากกระเป๋า (' + n + ')', find: 'ค้นหาบล็อก', shot: 'บันทึกภาพหน้าจอ',
+        rOne: 'มีได้อย่างละ 1', rOrph: 'ยังไม่ได้ต่อ ไม่ทำงานอยู่แล้ว', rPar: 'ตัวแม่ปิดใช้อยู่ ไปเปิดที่ตัวแม่', rClip: 'ยังไม่มีอะไรให้วาง ต้องคัดลอกข้ามงานก่อน', rUndo: 'ยังไม่มีอะไรให้เลิกทำ', rRedo: 'ยังไม่มีอะไรให้ทำซ้ำ', rNoBlk: 'ยังไม่มีบล็อก', rNoPack: 'กระเป๋ายังว่าง',
+        mBlk: (s) => 'เมนูของบล็อก ' + s, mWs: 'เมนูของพื้นที่ต่อบล็อก',
+        qPh: 'ค้นหาบล็อก', qNone: 'ไม่พบ', qPrev: 'ผลก่อนหน้า', qNext: 'ผลถัดไป', close: 'ปิด', packT: 'กระเป๋า', packE: 'กระเป๋าว่างอยู่ คลิกขวาที่บล็อก แล้วเลือก “ใส่กระเป๋า”', packTap: 'แตะเพื่อวางลงพื้นที่', packDel: 'เอาออกจากกระเป๋า', packBtn: 'กระเป๋า',
+        cmPh: 'เขียนโน้ตไว้ดูเอง', cmFoot: 'ไม่มีผลกับการทำงานของบอร์ด', cmT: 'คอมเมนต์ของบล็อก', noteT: 'คอมเมนต์พื้นที่', noteDel: 'ลบคอมเมนต์พื้นที่',
+        dlgT: (n) => 'ลบบล็อกทั้งหมด ' + n + ' บล็อกไหม?', dlgB: 'ถ้าลบผิด กดเลิกทำเพื่อเอาคืนได้', dlgNo: 'ไม่ลบ', dlgYes: 'ลบทั้งหมด',
+        tDel: (n) => 'ลบ ' + n + ' บล็อกแล้ว', tDup: 'ทำสำเนาแล้ว', tCopy: 'คัดลอกแล้ว ไปงานอื่นแล้วเลือก “วางข้ามงาน”', tPack: (n) => 'ใส่กระเป๋าแล้ว ' + n + ' ชุด', tSkip: (s) => 'ข้าม “' + s + '” เพราะมีได้อย่างละ 1', tPaste: 'วางแล้ว', tShot: 'ต้นแบบนี้ยังไม่ได้บันทึกไฟล์จริง', tGear: 'กล่องเฟืองไม่มีเมนูคลิกขวา · กดค้างบล็อกที่วางแล้วเพื่อ “ลบค่านี้” (D1 ข้อ 1.8)', tNone: 'ไม่มีอะไรเปลี่ยน', undoB: 'เลิกทำ',
+        inside: (n) => 'ข้างใน ' + n, blank: 'ช่องว่าง', tipDis: 'ปิดใช้อยู่ ไม่ทำงาน · คลิกขวาแล้วเลือก “เปิดใช้บล็อก”', tipOrph: 'ยังไม่ได้ต่อ ไม่ทำงาน · ต่อไว้ใต้ “เริ่มต้น” หรือ “วนซ้ำ”', stDis: 'ปิดใช้อยู่', stOrph: 'ยังไม่ได้ต่อ', stSel: 'เลือกอยู่',
+        wsA: 'พื้นที่ต่อบล็อก กด Alt+M เพื่อเปิดเมนู', grpA: 'กด Alt+M เพื่อเปิดเมนู', expA: 'ขยายบล็อก', cmIcon: 'คอมเมนต์ของบล็อก (กดเพื่อเปิด/ปิด)', gearA: 'ตั้งค่าฟังก์ชัน', selN: (n) => 'เลือก ' + n + ' ชุด', mAnn: (n) => 'เมนู ' + n + ' รายการ · ลูกศรขึ้นลงเลือก · Enter ทำ · Esc ปิด',
+        kbHint: (os) => 'เปิดเมนู: คลิกขวา · จอสัมผัสกดค้าง 0.5 วินาที · คีย์บอร์ด ' + (os === 'mac' ? 'Option+M' : 'Alt+M') + ' หรือ Shift+F10 หรือปุ่ม Menu'
+      },
+      en: {
+        dup: 'Duplicate', xcopy: 'Copy to another project', cmAdd: 'Add comment', cmDel: 'Remove comment', inlOff: 'Put values on separate lines', inlOn: 'Put values in one row', col: 'Collapse block', exp: 'Expand block', dis: 'Disable block', ena: 'Enable block',
+        del: (n) => 'Delete ' + n + (n === 1 ? ' block' : ' blocks'), help: 'Help', pack: 'Add to backpack', mkCall: (s) => 'Create call “' + s + '”', mkVal: (s) => 'Create value “' + s + '”',
+        paste: 'Paste from another project', undo: 'Undo', redo: 'Redo', arrange: 'Arrange blocks', colAll: 'Collapse all blocks', expAll: 'Expand all blocks', selAll: 'Select all', delAll: (n) => 'Delete all ' + n + ' blocks', wsNote: 'Add workspace comment',
+        packAll: 'Add all to backpack', unpack: (n) => 'Paste all from backpack (' + n + ')', find: 'Find blocks', shot: 'Save screenshot',
+        rOne: 'Only one allowed', rOrph: 'Not connected, so it does not run', rPar: 'Parent is disabled. Enable it there', rClip: 'Nothing to paste yet. Copy to another project first', rUndo: 'Nothing to undo', rRedo: 'Nothing to redo', rNoBlk: 'No blocks yet', rNoPack: 'Backpack is empty',
+        mBlk: (s) => 'Block menu ' + s, mWs: 'Workspace menu',
+        qPh: 'Find blocks', qNone: 'None found', qPrev: 'Previous result', qNext: 'Next result', close: 'Close', packT: 'Backpack', packE: 'Backpack is empty. Right-click a block and choose “Add to backpack”', packTap: 'Tap to place on workspace', packDel: 'Remove from backpack', packBtn: 'Backpack',
+        cmPh: 'Write a note for yourself', cmFoot: 'Does not affect the board', cmT: 'Block comment', noteT: 'Workspace comment', noteDel: 'Delete workspace comment',
+        dlgT: (n) => 'Delete all ' + n + ' blocks?', dlgB: 'If this is a mistake, press Undo to get them back', dlgNo: 'Keep them', dlgYes: 'Delete all',
+        tDel: (n) => 'Deleted ' + n + ' blocks', tDup: 'Duplicated', tCopy: 'Copied. In another project choose “Paste from another project”', tPack: (n) => 'Added ' + n + ' to backpack', tSkip: (s) => 'Skipped “' + s + '” (only one allowed)', tPaste: 'Pasted', tShot: 'This prototype does not save a real file', tGear: 'Gear box has no right-click menu. Long-press a placed block to “Delete this value” (D1 1.8)', tNone: 'Nothing changed', undoB: 'Undo',
+        inside: (n) => 'Inside ' + n, blank: 'Empty slot', tipDis: 'Disabled, does not run. Right-click and choose “Enable block”', tipOrph: 'Not connected, does not run. Attach under “Start” or “Loop”', stDis: 'Disabled', stOrph: 'Not connected', stSel: 'Selected',
+        wsA: 'Block workspace. Press Alt+M for the menu', grpA: 'Press Alt+M for the menu', expA: 'Expand block', cmIcon: 'Block comment (toggle)', gearA: 'Function settings', selN: (n) => n + ' selected', mAnn: (n) => 'Menu, ' + n + ' items. Up and down to choose, Enter to run, Esc to close',
+        kbHint: (os) => 'Open menu: right-click · touch screen long-press 0.5 s · keyboard ' + (os === 'mac' ? 'Option+M' : 'Alt+M') + ' or Shift+F10 or Menu key'
+      },
+      zh: {
+        dup: '复制', xcopy: '复制到其他作品', cmAdd: '添加注释', cmDel: '删除注释', inlOff: '值输入分行', inlOn: '值输入同行', col: '折叠方块', exp: '展开方块', dis: '禁用方块', ena: '启用方块',
+        del: (n) => '删除 ' + n + ' 个方块', help: '帮助', pack: '放入背包', mkCall: (s) => '创建调用“' + s + '”', mkVal: (s) => '创建值“' + s + '”',
+        paste: '从其他作品粘贴', undo: '撤销', redo: '重做', arrange: '整理方块', colAll: '全部折叠', expAll: '全部展开', selAll: '全选', delAll: (n) => '删除全部 ' + n + ' 个方块', wsNote: '添加工作区注释',
+        packAll: '全部放入背包', unpack: (n) => '从背包全部粘贴（' + n + '）', find: '查找方块', shot: '保存截图',
+        rOne: '只能有一个', rOrph: '尚未连接，本来就不运行', rPar: '父方块已禁用，请在父方块启用', rClip: '暂无可粘贴内容，请先复制', rUndo: '没有可撤销的操作', rRedo: '没有可重做的操作', rNoBlk: '还没有方块', rNoPack: '背包是空的',
+        mBlk: (s) => '方块菜单 ' + s, mWs: '工作区菜单',
+        qPh: '查找方块', qNone: '未找到', qPrev: '上一个结果', qNext: '下一个结果', close: '关闭', packT: '背包', packE: '背包是空的。右键方块，选择“放入背包”', packTap: '点按放到工作区', packDel: '从背包移除', packBtn: '背包',
+        cmPh: '写个备忘给自己', cmFoot: '不影响开发板运行', cmT: '方块注释', noteT: '工作区注释', noteDel: '删除工作区注释',
+        dlgT: (n) => '删除全部 ' + n + ' 个方块吗？', dlgB: '删错了可以点撤销找回', dlgNo: '不删除', dlgYes: '全部删除',
+        tDel: (n) => '已删除 ' + n + ' 个方块', tDup: '已复制', tCopy: '已复制，到其他作品选择“从其他作品粘贴”', tPack: (n) => '已放入背包 ' + n + ' 组', tSkip: (s) => '跳过“' + s + '”（只能有一个）', tPaste: '已粘贴', tShot: '此原型不会保存真实文件', tGear: '齿轮框没有右键菜单。长按已放入的方块可“删除此值”（D1 1.8）', tNone: '没有变化', undoB: '撤销',
+        inside: (n) => '内含 ' + n, blank: '空位', tipDis: '已禁用，不运行。右键选择“启用方块”', tipOrph: '尚未连接，不运行。请接在“开始”或“循环”下面', stDis: '已禁用', stOrph: '尚未连接', stSel: '已选中',
+        wsA: '方块工作区，按 Alt+M 打开菜单', grpA: '按 Alt+M 打开菜单', expA: '展开方块', cmIcon: '方块注释（点按开关）', gearA: '函数设置', selN: (n) => '选中 ' + n + ' 组', mAnn: (n) => '菜单，共 ' + n + ' 项。上下键选择，回车执行，Esc 关闭',
+        kbHint: (os) => '打开菜单：右键 · 触屏长按 0.5 秒 · 键盘 ' + (os === 'mac' ? 'Option+M' : 'Alt+M') + ' 或 Shift+F10 或菜单键'
+      }
+    };
+  }
+  tr(k, a) {
+    const L = this.gp('lang'); const D = this.D();
+    const lg = D[L] ? L : 'th';
+    let v = D[lg][k]; if (v === undefined) v = D.th[k];
+    return typeof v === 'function' ? v(a) : v;
+  }
+
+  /* ---------- ไอคอน Lucide (เส้น 2.4 · brand §6) ---------- */
+  IC() {
+    return {
+      copy: 'M10 8h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2zM4 16a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2',
+      clip: 'M8 4h8v4H8zM16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2',
+      cmAdd: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2zM12 7v6M9 10h6',
+      cmDel: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2zM9.5 7.5l5 5M14.5 7.5l-5 5',
+      rows: 'M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01',
+      row1: 'M3 12h18M7 8l-4 4 4 4M17 8l4 4-4 4',
+      col: 'm7 20 5-5 5 5M7 4l5 5 5-5',
+      exp: 'm7 15 5 5 5-5M7 9l5-5 5 5',
+      ban: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM4.9 4.9l14.2 14.2',
+      ok: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM9 12l2 2 4-4',
+      trash: 'M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6',
+      help: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01',
+      pack: 'M4 10a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zM9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M8 21v-5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v5M8 10h8',
+      call: 'M15 10l5 5-5 5M4 4v7a4 4 0 0 0 4 4h12',
+      plus: 'M5 12h14M12 5v14',
+      paste: 'M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1zM8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2M12 11v6M9 14l3 3 3-3',
+      undo: 'M9 14L4 9l5-5M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5 5.5 5.5 0 0 1-5.5 5.5H11',
+      redo: 'M15 14l5-5-5-5M20 9H9.5A5.5 5.5 0 0 0 4 14.5 5.5 5.5 0 0 0 9.5 20H13',
+      arrange: 'M4 4v16M8 6h12v4H8zM8 14h8v4H8z',
+      sel: 'M5 3a2 2 0 0 0-2 2M19 3a2 2 0 0 1 2 2M21 19a2 2 0 0 1-2 2M5 21a2 2 0 0 1-2-2M9 3h1M9 21h1M14 3h1M14 21h1M3 9v1M21 9v1M3 14v1M21 14v1',
+      note: 'M15.5 3H5a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3zM15 3v6h6',
+      search: 'M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3',
+      shot: 'M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z'
+    };
+  }
+  K() { return { PX: 12, IG: 8, A: 18, HD: 22 }; }
+  tw(t, wt) {
+    this._tc = this._tc || {};
+    const w0 = wt || 700, s = String(t), key = w0 + '|' + s;
+    if (this._tc[key] !== undefined) return this._tc[key];
+    let w = s.length * 9;
+    try {
+      if (!this._cx) this._cx = document.createElement('canvas').getContext('2d');
+      this._cx.font = w0 + " 16px 'IBM Plex Sans Thai', system-ui, sans-serif";
+      w = this._cx.measureText(s).width;
+    } catch (e) {}
+    this._tc[key] = Math.ceil(w);
+    return this._tc[key];
+  }
+
+  /* ---------- โมเดลจำลอง 12 บล็อก (ตั้งใจให้เห็นทุกสถานะ: ปกติ · ปิดใช้ผู้ใช้ตั้ง · กำพร้า · ย่อ+เตือน · คอมเมนต์ · hat setup/loop/ฟังก์ชัน) ---------- */
+  seed() {
+    const N = {};
+    const mk = (id, o) => { N[id] = Object.assign({ id: id, kids: [], dis: false, col: false, cm: null, ext: false, role: null, warn: false, desc: '' }, o); };
+    const X = (v) => ['x', v], S = (v) => ['slot', v];
+    mk('setup', { kind: 'hat', cat: 1, role: 'setup', tokens: [['i', 'flag'], X('เริ่มต้น')], kids: ['s1'], x: 40, y: 36, desc: 'ทำครั้งเดียวตอนเปิดบอร์ด ใส่คำสั่งตั้งต้นไว้ข้างใน' });
+    mk('s1', { kind: 'stack', cat: 6, tokens: [X('ตั้ง'), S('x'), X('เป็น'), S('0')], desc: 'ใส่ค่าให้ตัวแปร เช่น ตั้ง x เป็น 0' });
+    mk('loop', { kind: 'hat', cat: 1, role: 'loop', tokens: [['i', 'loop'], X('วนซ้ำ')], kids: ['l1', 'l2', 'l3'], x: 40, y: 204, desc: 'ทำคำสั่งข้างในวนไปเรื่อย ๆ' });
+    mk('l1', { kind: 'stack', cat: 6, tokens: [X('เพิ่ม'), S('x'), X('ทีละ'), S('1')], cm: 'นับรอบที่ทำไปแล้ว', desc: 'เพิ่มค่าให้ตัวแปรทีละเท่าที่ใส่' });
+    mk('l2', { kind: 'stack', cat: 2, tokens: [X('รอ'), S('500'), X('ms')], dis: true, desc: 'รอตามเวลาที่ใส่ หน่วยเป็นมิลลิวินาที (1000 = 1 วินาที)' });
+    mk('l3', { kind: 'stack', cat: 14, tokens: [X('พิมพ์'), S('สวัสดี')], desc: 'ส่งข้อความไปแสดงที่แผง Output' });
+    mk('orph', { kind: 'stack', cat: 14, tokens: [X('พิมพ์'), S('ลาก่อน')], x: 40, y: 468, desc: 'ส่งข้อความไปแสดงที่แผง Output' });
+    mk('fn', { kind: 'hat', cat: 8, role: 'fn', params: ['ค่า1', 'ค่า2'], tokens: [['name', 'ฟังก์ชัน1'], X('รับค่า: ค่า1, ค่า2')], kids: ['f1', 'f2'], x: 420, y: 36, desc: 'ชุดคำสั่งที่ตั้งชื่อไว้ เรียกใช้ซ้ำได้จากบล็อก “เรียก”' });
+    mk('f1', { kind: 'stack', cat: 6, tokens: [X('ตั้ง'), S('ค่า1'), X('เป็น'), S('0')], desc: 'ใส่ค่าให้ตัวแปร' });
+    mk('f2', { kind: 'c', cat: 3, tokens: [X('ถ้า'), ['hole']], kids: ['f2a', 'f2b'], col: true, warn: true, desc: 'ถ้าเงื่อนไขเป็นจริง ก็ทำคำสั่งข้างใน' });
+    mk('f2a', { kind: 'stack', cat: 2, tokens: [X('รอ'), S('200'), X('ms')], desc: 'รอตามเวลาที่ใส่' });
+    mk('f2b', { kind: 'stack', cat: 14, tokens: [X('พิมพ์'), S('ผ่าน')], desc: 'ส่งข้อความไปแสดงที่แผง Output' });
+    return { nodes: N, tops: ['setup', 'loop', 'orph', 'fn'], notes: [] };
+  }
+  ini() {
+    if (this.S) return;
+    this.S = { m: this.seed(), hist: [], redo: [], clip: null, pack: [], sel: [], menu: null, mfocus: 0, ring: null, help: null, search: { open: false, q: '', cur: 0 }, packOpen: false, cmOpen: {}, toast: null, dlg: false, ann: '', need: null, ret: null, seq: 100, press: null, firedAt: 0 };
+    this._noop = () => {};
+  }
+  applyOpen() {
+    const o = this.gp('open') || 'none';
+    if (o === this._lo) return;
+    this._lo = o;
+    const S = this.S;
+    S.menu = null; S.ring = null; S.help = null; S.dlg = false; S.packOpen = false; S.search = { open: false, q: '', cur: 0 }; S.cmOpen = {}; S.sel = [];
+    if (o === 'block') S.menu = { type: 'block', id: 'l2', x: 270, y: 330, src: 'mouse' };
+    else if (o === 'setup') S.menu = { type: 'block', id: 'setup', x: 250, y: 70, src: 'mouse' };
+    else if (o === 'hat') S.menu = { type: 'block', id: 'fn', x: 640, y: 110, src: 'mouse' };
+    else if (o === 'ws') S.menu = { type: 'ws', id: null, x: 760, y: 150, src: 'mouse' };
+    else if (o === 'ring') S.ring = { x: 230, y: 380, held: true };
+    else if (o === 'bubble') S.cmOpen = { l1: true };
+    else if (o === 'search') S.search = { open: true, q: 'ตั้ง', cur: 0 };
+    else if (o === 'backpack') { S.packOpen = true; S.pack = [this.snapOf(S.m, 'l1'), this.snapOf(S.m, 'fn')]; }
+    else if (o === 'confirm') S.dlg = true;
+    S.mfocus = 0;
+  }
+
+  /* ---------- ตัวช่วยโมเดล ---------- */
+  parentMap(m) { const p = {}; Object.keys(m.nodes).forEach((k) => m.nodes[k].kids.forEach((c) => { p[c] = k; })); return p; }
+  rootOf(m, id) { const p = this.parentMap(m); let c = id; while (p[c]) c = p[c]; return c; }
+  cnt(m, id) { const n = m.nodes[id]; let c = 1; n.kids.forEach((k) => { c += this.cnt(m, k); }); return c; }
+  summaryParts(n) {
+    const parts = [];
+    (n.tokens || []).forEach((tk) => {
+      if (tk[0] === 'x' || tk[0] === 'name') parts.push({ isTxt: true, isBlank: false, t: tk[1] + ' ' });
+      else if (tk[0] === 'slot') { if (tk[1] === '') parts.push({ isTxt: false, isBlank: true, t: '' }); else parts.push({ isTxt: true, isBlank: false, t: tk[1] + ' ' }); }
+      else if (tk[0] === 'hole') parts.push({ isTxt: false, isBlank: true, t: '' });
+    });
+    return parts;
+  }
+  summaryText(n) {
+    const bl = this.tr('blank');
+    return (n.tokens || []).map((tk) => (tk[0] === 'hole' || (tk[0] === 'slot' && tk[1] === '')) ? bl : (tk[0] === 'i' ? '' : tk[1])).filter((s) => s).join(' ');
+  }
+  isHatKind(n) { return n.kind === 'hat'; }
+  effDis(m, id, par) {
+    let c = id;
+    while (c) { if (m.nodes[c].dis) return true; if (!par[c]) { return !this.isHatKind(m.nodes[c]); } c = par[c]; }
+    return false;
+  }
+  snapOf(m, id) {
+    const nodes = {}; const walk = (i) => { nodes[i] = JSON.parse(JSON.stringify(m.nodes[i])); m.nodes[i].kids.forEach(walk); };
+    walk(id);
+    return { root: id, nodes: nodes, n: this.cnt(m, id), label: this.summaryText(m.nodes[id]), cat: m.nodes[id].cat };
+  }
+  uniqFn(m) {
+    const names = {}; Object.keys(m.nodes).forEach((k) => { const n = m.nodes[k]; if (n.role === 'fn') (n.tokens || []).forEach((t) => { if (t[0] === 'name') names[t[1]] = 1; }); });
+    let i = 1; while (names['ฟังก์ชัน' + i]) i++;
+    return 'ฟังก์ชัน' + i;
+  }
+  hasRole(m, role) { return Object.keys(m.nodes).some((k) => m.nodes[k].role === role && m.tops.indexOf(k) >= 0); }
+  insSnap(m, sn, x, y) {
+    const rn = sn.nodes[sn.root];
+    if ((rn.role === 'setup' || rn.role === 'loop') && this.hasRole(m, rn.role)) return null;
+    const map = {};
+    const cp = (i) => { const o = JSON.parse(JSON.stringify(sn.nodes[i])); const ni = 'n' + (++this.S.seq); map[i] = ni; o.id = ni; o.kids = o.kids.map(cp); m.nodes[ni] = o; return ni; };
+    const r = cp(sn.root); const n = m.nodes[r];
+    n.x = Math.max(8, Math.min(1000, x)); n.y = Math.max(8, Math.min(640, y));
+    if (n.role === 'fn') n.tokens = n.tokens.map((t) => (t[0] === 'name' ? ['name', this.uniqFn(m)] : t));
+    m.tops.push(r);
+    return r;
+  }
+  delNode(m, id) {
+    const par = this.parentMap(m);
+    const rm = (i) => { m.nodes[i].kids.slice().forEach(rm); delete m.nodes[i]; };
+    if (par[id]) { const p = m.nodes[par[id]]; p.kids = p.kids.filter((k) => k !== id); } else m.tops = m.tops.filter((k) => k !== id);
+    rm(id);
+    this.S.sel = this.S.sel.filter((s) => m.nodes[s]);
+  }
+  mut(fn) {
+    const S = this.S;
+    S.hist.push(JSON.stringify(S.m));
+    if (S.hist.length > 60) S.hist.shift();
+    S.redo = [];
+    fn(S.m);
+    this.up();
+  }
+  doUndo() { const S = this.S; if (!S.hist.length) return; S.redo.push(JSON.stringify(S.m)); S.m = JSON.parse(S.hist.pop()); S.sel = S.sel.filter((s) => S.m.nodes[s]); S.ann = this.tr('undo'); this.up(); }
+  doRedo() { const S = this.S; if (!S.redo.length) return; S.hist.push(JSON.stringify(S.m)); S.m = JSON.parse(S.redo.pop()); S.ann = this.tr('redo'); this.up(); }
+  toast(text, undo) {
+    const S = this.S; S.toast = { t: text, undo: !!undo }; S.ann = text;
+    try { if (this._tt) clearTimeout(this._tt); } catch (e) {}
+    this._tt = setTimeout(() => { this._tt = null; if (this.S) { this.S.toast = null; this.up(); } }, 8000);
+  }
+
+  /* ---------- เรขาคณิตบล็อก (ไฟล์นี้วัดเอง · BlockA2 เป็นเจ้าของหน้าตา) ---------- */
+  row(n, cy, toks, ctl) {
+    const K = this.K(); const S = this.S; let ix = K.PX; const items = [];
+    const FLAG = 'M5 21V4M5 4h11l-2 4 2 4H5', LOOP = 'M17 2l4 4-4 4M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4M21 13v2a3 3 0 0 1-3 3H3';
+    if (ctl) {
+      if (n.role === 'fn') { items.push({ t: 'ctl', gear: true, live: true, x: ix - 8, y: cy - 22, aria: this.tr('gearA') + ' · ' + this.summaryText(n), click: () => { this.toast(this.tr('tGear')); this.up(); }, exp: false }); ix += 40; }
+      if (n.cm !== null && n.cm !== undefined) { const open = !!S.cmOpen[n.id]; items.push({ t: 'ctl', k: 'help', live: true, x: ix - 8, y: cy - 22, aria: this.tr('cmIcon'), click: () => { S.cmOpen[n.id] = !S.cmOpen[n.id]; S.need = S.cmOpen[n.id] ? 'bubble' : null; this.up(); }, exp: open }); ix += 40; }
+    }
+    toks.forEach((tk) => {
+      let w = 0, it = null;
+      if (tk[0] === 'x') { w = this.tw(tk[1], 700); it = { t: 'x', text: tk[1], x: ix, y: cy - 10, w: w, h: 20 }; }
+      else if (tk[0] === 'i') { w = 20; it = { t: 'i', d: tk[1] === 'loop' ? LOOP : FLAG, x: ix, y: cy - 10, w: 20, h: 20 }; }
+      else if (tk[0] === 'slot') { w = tk[1] === '' ? 46 : Math.max(36, this.tw(tk[1], 600) + 24); it = { t: 'slot', value: tk[1], empty: tk[1] === '', x: ix, y: cy - 14, w: w, h: 28 }; }
+      else if (tk[0] === 'name') { w = Math.max(60, this.tw(tk[1], 600) + 28); it = { t: 'slot', value: tk[1], empty: false, x: ix, y: cy - 14, w: w, h: 28 }; }
+      else if (tk[0] === 'hole') { w = 48; it = { t: 'hole', x: ix, y: cy - 14, w: 48, h: 28 }; }
+      if (it) { items.push(it); ix += w + K.IG; }
+    });
+    return { items: items, w: ix - K.IG + K.PX };
+  }
+  lay(id) {
+    this._L = this._L || {};
+    if (this._L[id]) return this._L[id];
+    const m = this.S.m, n = m.nodes[id], K = this.K();
+    let L;
+    if (n.col) {
+      const parts = this.summaryParts(n);
+      const full = this.summaryText(n);
+      const sum = parts.map((p) => (p.isBlank ? 'xxxx' : p.t)).join('');
+      const kids = this.cnt(m, id) - 1;
+      const kidsT = kids > 0 ? this.tr('inside', kids) : '';
+      const warnT = n.warn ? this.tr('blank') : '';
+      let w = 44 + Math.min(300, this.tw(sum, 700)) + 14;
+      if (kids > 0) w += this.tw(kidsT, 700) + 34;
+      if (n.warn) w += this.tw(warnT, 700) + 56;
+      L = { isBar: true, w: Math.max(150, Math.min(420, w)), h: 44, parts: parts, full: full, kids: kids, kidsT: kidsT, warnT: warnT };
+    } else if (n.kind === 'hat' || n.kind === 'c') {
+      const hat = n.kind === 'hat', b0 = (hat ? K.HD : 0) + 44, cy = hat ? K.HD + 22 : 22;
+      const r = this.row(n, cy, n.tokens, true);
+      const kl = n.kids.map((k) => this.lay(k));
+      let mh = 0; kl.forEach((l) => { mh += l.h; }); if (!kl.length) mh = 30;
+      let w = Math.max(hat ? 200 : 150, r.w + 12);
+      let y = b0; const kidPos = [];
+      n.kids.forEach((k, i) => { kidPos.push({ id: k, x: K.A, y: y }); y += kl[i].h; w = Math.max(w, K.A + kl[i].w + 12); });
+      L = { w: w, h: b0 + mh + 26, kind: n.kind, bars: [b0, 26], mouths: [mh], items: r.items, kidPos: kidPos, hat: hat };
+    } else if (n.kind === 'value') {
+      const r = this.row(n, 17, n.tokens, true);
+      L = { w: Math.max(70, r.w), h: 34, kind: 'value', items: r.items };
+    } else {
+      const lines = [[]];
+      if (n.ext) { n.tokens.forEach((tk) => { lines[lines.length - 1].push(tk); if (tk[0] === 'slot') lines.push([]); }); if (!lines[lines.length - 1].length) lines.pop(); } else lines[0] = n.tokens;
+      const items = []; let w = 70;
+      lines.forEach((ln, i) => { const cy = n.ext ? 24 + i * 38 : 22; const r = this.row(n, cy, ln, i === 0); r.items.forEach((it) => items.push(it)); w = Math.max(w, r.w); });
+      L = { w: w, h: n.ext ? lines.length * 38 + 10 : 44, kind: 'stack', items: items };
+    }
+    this._L[id] = L;
+    return L;
+  }
+
+  /* ---------- พิกัดบนพื้นที่ · การกด ---------- */
+  wp(e) {
+    try {
+      const ws = document.getElementById('cm-ws'); const r = ws.getBoundingClientRect();
+      const s = ws.offsetWidth / (r.width || 1);
+      return { x: (e.clientX - r.left) * s, y: (e.clientY - r.top) * s };
+    } catch (x) { return { x: 100, y: 100 }; }
+  }
+  inField(e) { try { const t = e.target; return !!(t && t.closest && t.closest('button,input,textarea,[data-nopress]')); } catch (x) { return false; } }
+  cancelPress() {
+    const S = this.S, p = S.press; if (!p) return;
+    try { clearTimeout(p.t1); clearTimeout(p.t2); } catch (x) {}
+    S.press = null;
+    if (S.ring && !S.ring.held) { S.ring = null; this.up(); }
+  }
+  startPress(id, e) {
+    const S = this.S;
+    const pt = e.pointerType;
+    const ok = pt === 'touch' || pt === 'pen' || (pt === 'mouse' && this.gp('mouseHold') && e.button === 0);
+    if (!ok || this.inField(e)) return;
+    this.cancelPress();
+    const p = this.wp(e);
+    const press = { id: id, x0: e.clientX, y0: e.clientY, x: p.x, y: p.y, pt: pt };
+    press.t1 = setTimeout(() => { if (this.S.press === press) { this.S.ring = { x: press.x, y: press.y, held: false }; this.up(); } }, 120);
+    press.t2 = setTimeout(() => {
+      if (this.S.press !== press) return;
+      this.S.press = null; this.S.ring = null; this.S.firedAt = Date.now();
+      this.openMenu(id ? 'block' : 'ws', id, press.x, press.y, 'touch');
+    }, 500);
+    S.press = press;
+  }
+  onMove(e) {
+    const p = this.S.press; if (!p) return;
+    const dx = e.clientX - p.x0, dy = e.clientY - p.y0;
+    if (dx * dx + dy * dy > 100) this.cancelPress();
+  }
+
+  /* ---------- เมนู ---------- */
+  openMenu(type, id, x, y, src) {
+    const S = this.S;
+    if (S.menu && Date.now() - (S.firedAt || 0) < 700) return;
+    S.menu = { type: type, id: id, x: x, y: y, src: src };
+    S.help = null; S.mfocus = 0; S.need = 'menu'; S.needFirst = true; S.menuAnnFor = null;
+    this.up();
+  }
+  closeMenu(restore) {
+    const S = this.S; if (!S.menu) return;
+    const M = S.menu; S.menu = null;
+    if (restore) { S.ret = M.id ? 'cm-g-' + this.rootOf(S.m, M.id) : 'cm-ws'; S.need = 'ret'; }
+    this.up();
+  }
+  targets(id) { const S = this.S; const r = this.rootOf(S.m, id); return (S.sel.length > 1 && S.sel.indexOf(r) >= 0) ? S.sel.slice() : [id]; }
+  buildMenu() {
+    const S = this.S, M = S.menu, m = S.m, IC = this.IC(), out = [];
+    const T = (k, a) => this.tr(k, a);
+    const sep = () => { if (out.length && !out[out.length - 1].isSep) out.push({ isSep: true }); };
+    const add = (key, icon, label, o) => out.push(Object.assign({ isItem: true, key: key, icon: icon, label: label, sub: '', disabled: false, danger: false, kbd: '', run: null }, o || {}));
+    const mac = this.gp('os') === 'mac';
+    const par = this.parentMap(m);
+    const anyBlocks = m.tops.length > 0;
+    if (M.type === 'ws') {
+      const canPaste = !!S.clip;
+      add('paste', IC.paste, T('paste'), { disabled: !canPaste, sub: canPaste ? '' : T('rClip'), run: () => this.insSnapRun(S.clip, M.x, M.y) });
+      sep();
+      add('undo', IC.undo, T('undo'), { disabled: !S.hist.length, sub: S.hist.length ? '' : T('rUndo'), kbd: mac ? 'Cmd+Z' : 'Ctrl+Z', run: () => this.doUndo() });
+      add('redo', IC.redo, T('redo'), { disabled: !S.redo.length, sub: S.redo.length ? '' : T('rRedo'), kbd: mac ? 'Shift+Cmd+Z' : 'Ctrl+Y', run: () => this.doRedo() });
+      sep();
+      add('arrange', IC.arrange, T('arrange'), { disabled: !anyBlocks, sub: anyBlocks ? '' : T('rNoBlk'), run: () => this.mut((mm) => { let y = 36; mm.tops.slice().sort((a, b) => (mm.nodes[a].y - mm.nodes[b].y) || (mm.nodes[a].x - mm.nodes[b].x)).forEach((r) => { this._L = {}; mm.nodes[r].x = 40; mm.nodes[r].y = y; const sv = S.m; S.m = mm; const L = this.lay(r); S.m = sv; y += L.h + 28; }); this._L = {}; }) });
+      add('colAll', IC.col, T('colAll'), { disabled: !anyBlocks, sub: anyBlocks ? '' : T('rNoBlk'), run: () => this.mut((mm) => { mm.tops.forEach((r) => { mm.nodes[r].col = true; }); }) });
+      add('expAll', IC.exp, T('expAll'), { disabled: !anyBlocks, sub: anyBlocks ? '' : T('rNoBlk'), run: () => this.mut((mm) => { Object.keys(mm.nodes).forEach((k) => { mm.nodes[k].col = false; }); }) });
+      add('selAll', IC.sel, T('selAll'), { disabled: !anyBlocks, sub: anyBlocks ? '' : T('rNoBlk'), run: () => { S.sel = m.tops.slice(); S.ann = T('selN', S.sel.length); this.up(); } });
+      sep();
+      const total = Object.keys(m.nodes).length;
+      add('delAll', IC.trash, T('delAll', total), { disabled: !anyBlocks, sub: anyBlocks ? '' : T('rNoBlk'), danger: true, run: () => { S.dlg = true; S.need = 'dlg'; this.up(); } });
+      sep();
+      add('wsNote', IC.note, T('wsNote'), { run: () => this.mut((mm) => { mm.notes.push({ id: 'w' + (++S.seq), x: Math.max(8, Math.min(1000, M.x)), y: Math.max(8, Math.min(560, M.y)), t: '' }); }) });
+      const packable = m.tops.filter((r) => m.nodes[r].role !== 'setup' && m.nodes[r].role !== 'loop');
+      add('packAll', IC.pack, T('packAll'), { disabled: !anyBlocks, sub: anyBlocks ? '' : T('rNoBlk'), run: () => { packable.forEach((r) => S.pack.push(this.snapOf(m, r))); S.packOpen = true; this.toast(T('tPack', packable.length)); this.up(); } });
+      add('unpack', IC.pack, T('unpack', S.pack.length), { disabled: !S.pack.length, sub: S.pack.length ? '' : T('rNoPack'), run: () => { this.unpackAll(M.x, M.y); } });
+      sep();
+      add('find', IC.search, T('find'), { run: () => { S.search = { open: true, q: S.search.q || '', cur: 0 }; S.need = 'search'; this.up(); } });
+      add('shot', IC.shot, T('shot'), { run: () => { this.toast(T('tShot')); this.up(); } });
+    } else {
+      const ids = this.targets(M.id); const multi = ids.length > 1;
+      const n = m.nodes[M.id];
+      const single = (nn) => nn.role === 'setup' || nn.role === 'loop';
+      const canDup = ids.some((i) => !single(m.nodes[i]));
+      if (!multi && n.role === 'fn') {
+        const nm = (n.tokens.filter((t) => t[0] === 'name')[0] || ['', 'ฟังก์ชัน'])[1];
+        add('mkcall', IC.call, T('mkCall', nm), { run: () => this.mkCall(M.id) });
+        (n.params || []).forEach((p, i) => add('mkval' + i, IC.plus, T('mkVal', p), { run: () => this.mkVal(M.id, p, i) }));
+        sep();
+      }
+      add('dup', IC.copy, T('dup'), { disabled: !canDup, sub: canDup ? '' : T('rOne'), run: () => this.dupIds(ids) });
+      add('xcopy', IC.clip, T('xcopy'), { disabled: !canDup, sub: canDup ? '' : T('rOne'), run: () => { S.clip = this.snapOf(m, ids.filter((i) => !single(m.nodes[i]))[0]); this.toast(T('tCopy')); this.up(); } });
+      sep();
+      if (!multi && !n.col) {
+        const has = n.cm !== null && n.cm !== undefined;
+        add('cm', has ? IC.cmDel : IC.cmAdd, has ? T('cmDel') : T('cmAdd'), { run: () => this.mut((mm) => { const nn = mm.nodes[M.id]; if (nn.cm === null || nn.cm === undefined) { nn.cm = ''; S.cmOpen[M.id] = true; S.need = 'bubble'; } else { nn.cm = null; S.cmOpen[M.id] = false; } }) });
+        if (n.kind === 'stack' && n.tokens.some((t) => t[0] === 'slot')) add('inl', n.ext ? IC.row1 : IC.rows, n.ext ? T('inlOn') : T('inlOff'), { run: () => this.mut((mm) => { mm.nodes[M.id].ext = !mm.nodes[M.id].ext; this._L = {}; }) });
+      }
+      add('col', n.col ? IC.exp : IC.col, n.col ? T('exp') : T('col'), { run: () => this.mut((mm) => { const v = !mm.nodes[M.id].col; ids.forEach((i) => { mm.nodes[i].col = v; }); this._L = {}; }) });
+      // OQ214 ข: เทาจากผู้ใช้ตั้ง (flag dis) ≠ เทาเพราะกำพร้า (คำนวณ) · ตัวลูกของตัวที่ปิดใช้ = เทาตาม ไม่เก็บ flag ที่ลูก
+      const pid = par[M.id];
+      const ancDis = pid ? this.chainDis(m, pid, par) : false;
+      const inherited = !n.dis && (ancDis || !this.isHatKind(m.nodes[this.rootOf(m, M.id)]));
+      add('dis', n.dis ? IC.ok : IC.ban, n.dis ? T('ena') : T('dis'), { disabled: inherited, sub: inherited ? (ancDis ? T('rPar') : T('rOrph')) : '', run: () => this.mut((mm) => { const v = !mm.nodes[M.id].dis; ids.forEach((i) => { mm.nodes[i].dis = v; }); }) });
+      sep();
+      let total = 0; ids.forEach((i) => { total += this.cnt(m, i); });
+      add('del', IC.trash, T('del', total), { danger: true, run: () => { const sd = total; this.mut((mm) => { ids.forEach((i) => { if (mm.nodes[i]) this.delNode(mm, i); }); }); this.toast(T('tDel', sd), true); this.up(); } });
+      sep();
+      if (!multi && n.desc) add('help', IC.help, T('help'), { run: () => { S.help = { id: M.id, x: M.x, y: M.y }; S.need = 'help'; this.up(); } });
+      add('pack', IC.pack, T('pack'), { disabled: !canDup, sub: canDup ? '' : T('rOne'), run: () => { const ok = ids.filter((i) => !single(m.nodes[i])); ok.forEach((i) => S.pack.push(this.snapOf(m, i))); S.packOpen = true; this.toast(T('tPack', ok.length)); this.up(); } });
+    }
+    while (out.length && out[out.length - 1].isSep) out.pop();
+    let k = 0; out.forEach((o) => { if (o.isItem) o.idx = k++; });
+    return out;
+  }
+  chainDis(m, id, par) { let c = id; while (c) { if (m.nodes[c].dis) return true; c = par[c]; } return false; }
+  insSnapRun(sn, x, y) {
+    if (!sn) return;
+    let r = null;
+    this.mut((mm) => { r = this.insSnap(mm, sn, x, y); });
+    this.toast(r ? this.tr('tPaste') : this.tr('tSkip', sn.label)); this.up();
+  }
+  unpackAll(x, y) {
+    const S = this.S; let skipped = '';
+    this.mut((mm) => { S.pack.forEach((sn, i) => { const r = this.insSnap(mm, sn, x + i * 28, y + i * 28); if (!r) skipped = sn.label; }); });
+    this.toast(skipped ? this.tr('tSkip', skipped) : this.tr('tPaste')); this.up();
+  }
+  dupIds(ids) {
+    const S = this.S, abs = this._abs || {};
+    this.mut((mm) => {
+      ids.forEach((i) => {
+        const nn = mm.nodes[i]; if (!nn || nn.role === 'setup' || nn.role === 'loop') return;
+        const a = abs[i] || { x: 60, y: 60 };
+        this.insSnap(mm, this.snapOf(mm, i), a.x + 28, a.y + 28);
+      });
+    });
+    this.toast(this.tr('tDup')); this.up();
+  }
+  mkCall(hid) {
+    const S = this.S, a = (this._abs || {})[hid] || { x: 420, y: 36, w: 340 };
+    this.mut((mm) => {
+      const h = mm.nodes[hid];
+      const nm = (h.tokens.filter((t) => t[0] === 'name')[0] || ['', 'ฟังก์ชัน'])[1];
+      const id = 'n' + (++S.seq);
+      const tk = [['x', 'เรียก'], ['name', nm]]; (h.params || []).forEach(() => tk.push(['slot', '0']));
+      mm.nodes[id] = { id: id, kind: 'stack', cat: 8, tokens: tk, kids: [], dis: false, col: false, cm: null, ext: false, role: null, warn: false, desc: 'เรียกใช้ฟังก์ชันที่ตั้งชื่อไว้', x: Math.min(1000, a.x + a.w + 40), y: a.y + 8 };
+      mm.tops.push(id);
+    });
+    this.toast(this.tr('tPaste')); this.up();
+  }
+  mkVal(hid, pname, i) {
+    const S = this.S, a = (this._abs || {})[hid] || { x: 420, y: 36, w: 340 };
+    this.mut((mm) => {
+      const id = 'n' + (++S.seq);
+      mm.nodes[id] = { id: id, kind: 'value', cat: 8, tokens: [['x', 'ค่าที่รับ'], ['name', pname]], kids: [], dis: false, col: false, cm: null, ext: false, role: null, warn: false, desc: 'ค่าที่ส่งเข้ามาให้ฟังก์ชัน', x: Math.min(1000, a.x + a.w + 40), y: a.y + 76 + i * 52 };
+      mm.tops.push(id);
+    });
+    this.toast(this.tr('tPaste')); this.up();
+  }
+
+  /* ---------- renderVals ---------- */
+  renderVals() {
+    this.ini(); this.applyOpen();
+    const S = this.S, m = S.m, IC = this.IC();
+    this._L = {};
+    const par = this.parentMap(m);
+    const draws = [], groups = [], abs = {};
+    const T = (k, a) => this.tr(k, a);
+    const mkDown = (id) => (e) => { try { e.stopPropagation(); } catch (x) {} this.startPress(id, e); };
+    const mkCtx = (id) => (e) => {
+      try { e.preventDefault(); e.stopPropagation(); } catch (x) {}
+      if (Date.now() - (S.firedAt || 0) < 700) return;
+      const p = this.wp(e);
+      this.openMenu('block', id, p.x, p.y, 'mouse');
+    };
+    const place = (id, ax, ay, rootId) => {
+      const n = m.nodes[id], L = this.lay(id);
+      abs[id] = { x: ax, y: ay, w: L.w, h: L.h };
+      const dis = this.effDis(m, id, par);
+      const orphanRoot = !this.isHatKind(m.nodes[rootId]);
+      const own = this.chainDis(m, id, par);
+      const state = dis ? 'disabled' : (n.warn ? 'warn' : 'normal');
+      const tip = dis ? (own ? T('tipDis') : (orphanRoot ? T('tipOrph') : T('tipDis'))) : '';
+      const d = { id: id, cls: dis ? 'cm-tip' : '', tip: tip, down: mkDown(id), ctx: mkCtx(id), isBlock: false, isBar: false };
+      if (L.isBar) {
+        d.isBar = true;
+        d.wst = 'position:absolute;left:' + ax + 'px;top:' + ay + 'px;width:' + Math.ceil(L.w) + 'px;height:' + L.h + 'px;pointer-events:auto;z-index:1';
+        const CAT = this.catColors(n.cat);
+        d.barSt = 'box-sizing:border-box;width:100%;height:100%;display:flex;align-items:center;gap:6px;padding:0 8px 0 4px;border-radius:12px;overflow:hidden;' + (dis ? 'background:#F4F6F8;border:2px dashed #5A6377;color:#5A6377' : 'background:' + CAT[0] + ';border:1.5px solid ' + CAT[1] + ';color:#14243D');
+        d.parts = L.parts; d.hasKids = L.kids > 0; d.kidsT = L.kidsT; d.hasWarn = !!n.warn; d.warnT = L.warnT;
+        d.barAria = T('col') + ': ' + L.full + (L.kids > 0 ? ' · ' + L.kidsT : '') + (n.warn ? ' · ' + L.warnT : '') + (dis ? ' · ' + (own ? T('stDis') : T('stOrph')) : '');
+        d.expAria = T('expA') + ': ' + L.full;
+        d.expand = () => { this.mut((mm) => { mm.nodes[id].col = false; }); this._L = {}; };
+      } else {
+        d.isBlock = true;
+        d.wst = 'position:absolute;left:' + ax + 'px;top:' + ay + 'px;width:' + Math.ceil(L.w) + 'px;height:' + (L.h + 5) + 'px;pointer-events:none;z-index:1';
+        d.kind = L.kind; d.cat = n.cat; d.state = state; d.w = Math.ceil(L.w); d.h = L.h; d.items = L.items;
+        d.bars = L.bars || null; d.mouths = L.mouths || null; d.tab = L.kind === 'hat' || L.kind === 'value' ? 'no' : 'yes'; d.hd = 22;
+      }
+      draws.push(d);
+      if (!L.isBar && L.kidPos) L.kidPos.forEach((k) => place(k.id, ax + k.x, ay + k.y, rootId));
+    };
+    m.tops.forEach((r) => {
+      const n = m.nodes[r]; place(r, n.x, n.y, r);
+      const L = this.lay(r);
+      const dis = this.effDis(m, r, par), sel = S.sel.indexOf(r) >= 0;
+      const st = (!this.isHatKind(n) && !n.dis) ? T('stOrph') : (n.dis ? T('stDis') : '');
+      groups.push({
+        id: r, eid: 'cm-g-' + r,
+        aria: this.summaryText(n) + (st ? ' · ' + st : '') + (sel ? ' · ' + T('stSel') : '') + ' · ' + T('grpA'),
+        st: 'position:absolute;left:' + (n.x - 4) + 'px;top:' + (n.y - 4) + 'px;width:' + (Math.ceil(L.w) + 8) + 'px;height:' + (L.h + (L.isBar ? 0 : 5) + 8) + 'px;border-radius:12px;box-sizing:border-box;z-index:5;pointer-events:none;' + (sel ? 'border:2px dashed #1866C9;background:rgba(24,102,201,0.06)' : '')
+      });
+    });
+    this._abs = abs;
+
+    // ค้นหา
+    const q = (S.search.q || '').trim().toLowerCase();
+    const matches = [];
+    if (S.search.open && q) {
+      const walk = (id) => { const n = m.nodes[id]; const hay = (this.summaryText(n) + ' ' + (n.cm || '')).toLowerCase(); if (hay.indexOf(q) >= 0) matches.push(id); n.kids.forEach(walk); };
+      m.tops.forEach(walk);
+    }
+    if (S.search.cur >= matches.length) S.search.cur = 0;
+    const hls = [];
+    const hlDone = {};
+    matches.forEach((id, i) => {
+      // ผลที่ซ่อนอยู่ในตัวย่อ = ไฮไลต์ที่แถบย่อของตัวแม่ที่มองเห็น (ไม่ขยายเอง · ต่างจาก R17 "พาไปจุดที่ผิด" ที่ขยายอัตโนมัติ)
+      let vid = id; while (vid && !abs[vid]) vid = par[vid];
+      const a = vid ? abs[vid] : null; if (!a) return;
+      const cur = i === S.search.cur;
+      const key = vid + (cur ? ':c' : '');
+      if (hlDone[key]) return; hlDone[key] = 1;
+      hls.push({ st: 'position:absolute;left:' + (a.x - 4) + 'px;top:' + (a.y - 4) + 'px;width:' + (Math.ceil(a.w) + 8) + 'px;height:' + (a.h + 13) + 'px;border-radius:12px;box-sizing:border-box;z-index:6;pointer-events:none;' + (cur ? 'border:3px solid #1866C9;box-shadow:0 0 0 2px #FFFFFF' : 'border:2px dashed #1866C9') });
+    });
+    let qCount = '';
+    if (S.search.open) qCount = q ? (matches.length ? (S.search.cur + 1) + ' / ' + matches.length : T('qNone')) : '';
+
+    // บับเบิลคอมเมนต์
+    let bub = null;
+    Object.keys(S.cmOpen).forEach((id) => {
+      if (!S.cmOpen[id] || !m.nodes[id] || m.nodes[id].cm === null || m.nodes[id].cm === undefined || m.nodes[id].col || !abs[id]) return;
+      const a = abs[id], n = m.nodes[id], hat = this.isHatKind(n);
+      const bx = Math.max(8, Math.min(1280 - 304, a.x + (n.role === 'fn' ? 44 : 4) + 8));
+      const by = a.y + (hat ? 66 : (n.ext ? a.h : 44)) + 10;
+      bub = { title: T('cmT'), ph: T('cmPh'), foot: T('cmFoot'), closeT: T('close'), t: n.cm || '', st: 'position:absolute;left:' + bx + 'px;top:' + by + 'px;width:284px;box-sizing:border-box;padding:8px;background:#FFFFFF;border:2px solid #C6D6EA;border-radius:16px;box-shadow:0 8px 20px rgba(20,36,61,0.2);z-index:20', input: (e) => { try { S.m.nodes[id].cm = e.target.value; } catch (x) {} }, close: () => { S.cmOpen[id] = false; S.ret = 'cm-g-' + this.rootOf(m, id); S.need = 'ret'; this.up(); } };
+    });
+
+    // โน้ตพื้นที่
+    const notes = m.notes.map((nt) => ({ st: 'position:absolute;left:' + nt.x + 'px;top:' + nt.y + 'px;width:240px;background:#FFFFFF;border:2px solid #C6D6EA;border-radius:14px;box-shadow:0 8px 20px rgba(20,36,61,0.15);z-index:3', title: T('noteT'), delAria: T('noteDel'), ph: T('cmPh'), t: nt.t || '', del: () => this.mut((mm) => { mm.notes = mm.notes.filter((x) => x.id !== nt.id); }), input: (e) => { try { const o = S.m.notes.filter((x) => x.id === nt.id)[0]; if (o) o.t = e.target.value; } catch (x) {} } }));
+
+    // เมนู
+    let menuItems = [], menuSt = '', menuAria = '', menuOpen = false;
+    if (S.menu) {
+      menuOpen = true;
+      const list = this.buildMenu();
+      let first = -1; list.forEach((it) => { if (it.isItem && !it.disabled && first < 0) first = it.idx; });
+      if (S.needFirst) { S.mfocus = first >= 0 ? first : 0; S.needFirst = false; }
+      let h = 16, nItems = 0;
+      list.forEach((it) => { if (it.isSep) h += 9; else { h += it.sub ? 64 : 44; nItems++; } });
+      if (S.menuAnnFor !== S.menu) { S.menuAnnFor = S.menu; S.ann = T('mAnn', nItems); }
+      const wsH = 740, W = 280, M = S.menu;
+      let x = M.x + 4, y = M.y + 4;
+      if (M.src === 'touch') { x = M.x - 40; y = (M.y - h - 28 >= 8) ? M.y - h - 28 : M.y + 36; }
+      else if (M.src === 'kb') { x = M.x; y = M.y; }
+      x = Math.max(8, Math.min(1280 - W - 8, x));
+      const maxH = wsH - 16;
+      if (y + h > wsH - 8) y = Math.max(8, wsH - 8 - h);
+      menuSt = 'position:absolute;left:' + x + 'px;top:' + y + 'px;width:' + W + 'px;max-height:' + maxH + 'px;overflow-y:auto;box-sizing:border-box;padding:8px;background:#FFFFFF;border:1px solid #DCE3EC;border-radius:16px;box-shadow:0 8px 20px rgba(20,36,61,0.2);z-index:40';
+      const nm = M.type === 'ws' ? T('mWs') : T('mBlk', this.summaryText(m.nodes[M.id] || { tokens: [] }));
+      menuAria = nm;
+      this._menuN = nItems;
+      menuItems = list.map((it) => {
+        if (it.isSep) return { isSep: true, isItem: false };
+        return {
+          isSep: false, isItem: true, idx: it.idx, eid: 'cm-it-' + it.idx, icon: it.icon, label: it.label, sub: it.sub, hasSub: !!it.sub, kbd: it.kbd, hasKbd: !!it.kbd,
+          cls: 'cm-it' + (it.danger && !it.disabled ? ' cm-danger' : ''), ad: it.disabled ? 'true' : 'false', ti: it.idx === S.mfocus ? '0' : '-1',
+          click: () => { if (!this.S.menu) return; if (it.disabled) { this.S.ann = it.label + ' · ' + it.sub; this.up(); return; } this.runItem(it); }
+        };
+      });
+      this._menuList = list;
+    }
+
+    // วงแหวนกดค้าง
+    let ringSt = '';
+    if (S.ring) ringSt = 'position:absolute;left:' + (S.ring.x - 40) + 'px;top:' + (S.ring.y - 40) + 'px;pointer-events:none;z-index:46';
+
+    // การ์ดช่วยเหลือ
+    let helpC = null;
+    if (S.help && m.nodes[S.help.id]) {
+      const n = m.nodes[S.help.id];
+      helpC = { title: this.summaryText(n), body: n.desc, st: 'position:absolute;left:' + Math.max(8, Math.min(1280 - 328, S.help.x + 8)) + 'px;top:' + Math.max(8, Math.min(740 - 180, S.help.y + 8)) + 'px;width:320px;box-sizing:border-box;padding:12px 16px;background:#FFFFFF;border:1px solid #DCE3EC;border-radius:16px;box-shadow:0 8px 20px rgba(20,36,61,0.2);z-index:41', close: () => { S.help = null; S.ret = 'cm-ws'; S.need = 'ret'; this.up(); } };
+    }
+
+    // กระเป๋า
+    const packItems = S.pack.map((sn, i) => {
+      const C = this.catColors(sn.cat);
+      return { label: sn.label, sub: sn.n + ' · ' + T('packTap'), dot: 'flex-shrink:0;width:24px;height:24px;box-sizing:border-box;border-radius:8px;background:' + C[0] + ';border:2px solid ' + C[1], delAria: T('packDel') + ': ' + sn.label,
+        use: () => { this.mut((mm) => { const r = this.insSnap(mm, sn, 760 - 0, 120 + i * 16); if (!r) S.skipMsg = sn.label; }); this.toast(S.skipMsg ? T('tSkip', S.skipMsg) : T('tPaste')); S.skipMsg = ''; this.up(); },
+        del: () => { S.pack.splice(i, 1); this.up(); } };
+    });
+
+    const mac = this.gp('os') === 'mac';
+    const dlgN = Object.keys(m.nodes).length;
+    return {
+      rootCls: this.gp('reduce') ? 'cm-rm' : '',
+      hint: T('kbHint', this.gp('os')),
+      wsAria: T('wsA'),
+      noop: this._noop,
+      notes: notes, draws: draws, groups: groups, hls: hls,
+      hasBubble: !!bub, bub: bub || { title: '', st: '', input: this._noop, close: this._noop, t: '', ph: '', foot: '', closeT: '' },
+      sOpen: S.search.open, q: S.search.q, qPh: T('qPh'), qCount: qCount, qPrevT: T('qPrev'), qNextT: T('qNext'), closeT: T('close'),
+      qIn: (e) => { try { S.search.q = e.target.value; S.search.cur = 0; this.up(); } catch (x) {} },
+      qKey: (e) => { if (e.key === 'Enter') { e.preventDefault(); this.stepSearch(e.shiftKey ? -1 : 1, matches.length); } },
+      qPrev: () => this.stepSearch(-1, matches.length), qNext: () => this.stepSearch(1, matches.length),
+      qClose: () => { S.search.open = false; S.ret = 'cm-ws'; S.need = 'ret'; this.up(); },
+      badge: !!this.gp('badge'),
+      packOpen: S.packOpen, packCount: String(S.pack.length), packBtnAria: T('packBtn') + ' (' + S.pack.length + ')', packTitle: T('packT'), packEmpty: !S.pack.length, packEmptyT: T('packE'), packItems: packItems,
+      togglePack: () => { S.packOpen = !S.packOpen; this.up(); },
+      menuOpen: menuOpen, menuItems: menuItems, menuSt: menuSt, menuAria: menuAria,
+      hasHelp: !!helpC, helpC: helpC || { title: '', body: '', st: '', close: this._noop },
+      hasRing: !!S.ring, ringSt: ringSt,
+      hasToast: !!S.toast, toastT: S.toast ? S.toast.t : '', toastUndo: S.toast ? S.toast.undo : false, undoT: T('undoB'),
+      doUndoBtn: () => { this.doUndo(); S.toast = null; this.up(); },
+      dlg: S.dlg, dlgT: T('dlgT', dlgN), dlgB: T('dlgB'), dlgNoT: T('dlgNo'), dlgYesT: T('dlgYes'),
+      dlgNo: () => { S.dlg = false; S.ret = 'cm-ws'; S.need = 'ret'; this.up(); },
+      dlgYes: () => { S.dlg = false; const n0 = Object.keys(S.m.nodes).length; this.mut((mm) => { mm.nodes = {}; mm.tops = []; }); S.sel = []; this.toast(T('tDel', n0), true); S.ret = 'cm-ws'; S.need = 'ret'; this.up(); },
+      ann: S.ann,
+      wsCtx: (e) => { try { const t = e.target; if (t && t.getAttribute && t.getAttribute('data-bg') === '1') { e.preventDefault(); if (Date.now() - (S.firedAt || 0) < 700) return; const p = this.wp(e); this.openMenu('ws', null, p.x, p.y, 'mouse'); } } catch (x) {} },
+      wsDown: (e) => { try { const t = e.target; if (t && t.getAttribute && t.getAttribute('data-bg') === '1') { if (S.sel.length) { S.sel = []; this.up(); } this.startPress(null, e); } } catch (x) {} },
+      wsMove: (e) => this.onMove(e),
+      wsUp: () => this.cancelPress(),
+      rootDownCap: (e) => {
+        try {
+          const t = e.target;
+          if (S.menu && !(t.closest && t.closest('#cm-menu'))) { S.menu = null; this.up(); }
+          if (S.help && !(t.closest && t.closest('#cm-help'))) { S.help = null; this.up(); }
+        } catch (x) {}
+      },
+      rootKey: (e) => this.rootKey(e, matches.length)
+    };
+  }
+  catColors(cat) {
+    const C = [['#FFD23F', '#9C7A00'], ['#FFAB3D', '#A8610A'], ['#62D4C8', '#137A70'], ['#6CCB5F', '#2F7A26'], ['#B79CFF', '#5F3FC2'], ['#FF8F70', '#B03A1C'], ['#FF86A8', '#B02C57'], ['#F08AD3', '#9A2F85'], ['#C9E04A', '#6E7F0B'], ['#D58CF2', '#8239A8'], ['#5BAEFF', '#1D63B8'], ['#5CCBEA', '#17789A'], ['#7FE0A8', '#1F8050'], ['#8FA6FF', '#3D4FC0'], ['#D2A679', '#7A4E1F'], ['#FFBE94', '#A4521C']];
+    return C[Math.min(16, Math.max(1, cat)) - 1];
+  }
+  stepSearch(d, n) { const S = this.S; if (!n) return; S.search.cur = (S.search.cur + d + n) % n; S.ann = (S.search.cur + 1) + ' / ' + n; this.up(); }
+  runItem(it) {
+    const S = this.S; const M = S.menu;
+    S.menu = null; S.need = null; S.ret = M && M.id ? 'cm-g-' + this.rootOf(S.m, M.id) : 'cm-ws';
+    this._L = {};
+    try { it.run(); } catch (x) {}
+    if (!S.need) S.need = 'ret';
+    this.up();
+  }
+  rootKey(e, nMatch) {
+    const S = this.S, k = e.key;
+    const tgt = e.target;
+    if (S.dlg) {
+      if (k === 'Escape') { e.preventDefault(); S.dlg = false; S.ret = 'cm-ws'; S.need = 'ret'; this.up(); }
+      else if (k === 'Tab') { e.preventDefault(); const a = document.activeElement; const id = (a && a.id === 'cm-dlg-no') ? 'cm-dlg-yes' : 'cm-dlg-no'; try { document.getElementById(id).focus(); } catch (x) {} }
+      return;
+    }
+    if (S.menu) {
+      const n = this._menuN || 0; let f = S.mfocus;
+      if (k === 'ArrowDown') { e.preventDefault(); S.mfocus = (f + 1) % n; S.need = 'menu'; this.up(); }
+      else if (k === 'ArrowUp') { e.preventDefault(); S.mfocus = (f - 1 + n) % n; S.need = 'menu'; this.up(); }
+      else if (k === 'Home') { e.preventDefault(); S.mfocus = 0; S.need = 'menu'; this.up(); }
+      else if (k === 'End') { e.preventDefault(); S.mfocus = n - 1; S.need = 'menu'; this.up(); }
+      else if (k === 'Escape') { e.preventDefault(); this.closeMenu(true); }
+      else if (k === 'Tab') { this.closeMenu(false); }
+      else if (k === 'Enter' || k === ' ') {
+        e.preventDefault();
+        const it = (this._menuList || []).filter((x) => x.isItem && x.idx === f)[0];
+        if (it) { if (it.disabled) { S.ann = it.label + ' · ' + it.sub; this.up(); } else this.runItem(it); }
+      }
+      return;
+    }
+    const isMenuKey = k === 'ContextMenu' || (e.shiftKey && k === 'F10') || (e.altKey && e.code === 'KeyM' && !e.ctrlKey && !e.metaKey);
+    if (isMenuKey) {
+      try {
+        const t = tgt; let id = null;
+        const g = t.closest && t.closest('[data-gid]'); const b = t.closest && t.closest('[data-bid]');
+        if (g) id = g.getAttribute('data-gid'); else if (b) id = b.getAttribute('data-bid');
+        const inChrome = t.closest && (t.closest('[role="search"]') || t.closest('#cm-pack') || t.closest('#cm-cmt'));
+        if (inChrome) return;
+        e.preventDefault();
+        const a = id && this._abs ? this._abs[id] : null;
+        if (id && a) this.openMenu('block', id, a.x + 16, a.y + Math.min(a.h, 60) + 6, 'kb');
+        else this.openMenu('ws', null, 40, 40, 'kb');
+      } catch (x) {}
+      return;
+    }
+    if (k === 'Escape') {
+      if (S.cmOpen && Object.keys(S.cmOpen).some((i) => S.cmOpen[i]) && tgt && tgt.id === 'cm-cmt') { e.preventDefault(); Object.keys(S.cmOpen).forEach((i) => { if (S.cmOpen[i]) { S.cmOpen[i] = false; S.ret = 'cm-g-' + this.rootOf(S.m, i); } }); S.need = 'ret'; this.up(); return; }
+      if (S.search.open && (tgt && tgt.closest && tgt.closest('[role="search"]'))) { e.preventDefault(); S.search.open = false; S.ret = 'cm-ws'; S.need = 'ret'; this.up(); return; }
+      if (S.help) { e.preventDefault(); S.help = null; S.ret = 'cm-ws'; S.need = 'ret'; this.up(); return; }
+      if (S.sel.length) { e.preventDefault(); S.sel = []; this.up(); return; }
+    }
+    const typing = tgt && (tgt.tagName === 'INPUT' || tgt.tagName === 'TEXTAREA');
+    if (!typing && (e.ctrlKey || e.metaKey) && !e.altKey) {
+      const lk = String(k).toLowerCase();
+      if (lk === 'z') { e.preventDefault(); if (e.shiftKey) this.doRedo(); else this.doUndo(); }
+      else if (lk === 'y') { e.preventDefault(); this.doRedo(); }
+    }
+  }
+}
+</script>
+</body>
+</html>

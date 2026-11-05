@@ -16,7 +16,13 @@ func TestToolSubprocessHelper(t *testing.T) {
 	if os.Getenv("MIXLY_TEST_SLEEP") == "1" {
 		time.Sleep(10 * time.Second)
 	}
+	if os.Getenv("MIXLY_TEST_STDERR") == "1" {
+		_, _ = os.Stderr.WriteString("a notice")
+	}
 	_, _ = os.Stdout.WriteString("tool-output")
+	if os.Getenv("MIXLY_TEST_EXIT") == "1" {
+		os.Exit(1)
+	}
 	os.Exit(0)
 }
 

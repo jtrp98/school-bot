@@ -106,6 +106,11 @@ func (s *DesktopService) Run(mode, action, data string) (engine.Response, error)
 }
 func (s *DesktopService) CancelRun() { s.manager.Cancel() }
 
+// StopUpload is only for Block Lab's confirmed stop; CancelRun lets an upload finish.
+func (s *DesktopService) StopUpload() { s.manager.StopUpload() }
+
+func (s *DesktopService) UploadRunning() bool { return s.manager.UploadRunning() }
+
 func (s *DesktopService) CheckUpdates() (string, error) {
 	query := url.Values{
 		"version":  {appVersion},

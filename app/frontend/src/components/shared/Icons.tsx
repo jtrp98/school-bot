@@ -82,6 +82,8 @@ import {
   MdWaves,
   MdWifi,
   MdWorkspacePremium,
+  MdPowerOff,
+  MdFileCopy,
 } from "react-icons/md";
 import { LuCrown } from "react-icons/lu";
 
@@ -175,6 +177,8 @@ const icons = {
   chip: MdMemory,
   caret: MdKeyboardArrowDown,
   homeArm: MdHome,
+  unplug: MdPowerOff,
+  fileCopy: MdFileCopy,
 } satisfies Record<string, IconType>;
 
 export type IconName = keyof typeof icons;

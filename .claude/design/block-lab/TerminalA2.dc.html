@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>Output terminal A2</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'IBM Plex Sans Thai',system-ui,sans-serif}
+button{font-family:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid #1866C9;outline-offset:2px}
+/* รอบ 14 (R8 · OQ143 · ชุดที่ 6 ข้อ C): แท็บ Output ทำหน้าที่เหมือน terminal ที่พิมพ์ได้ (brand §11.16 แนวทาง A) · คลาส/id/keyframes ทุกตัวขึ้นต้น tm- (helmet ทุกชิ้นส่วนรวมเป็น CSS เดียวกันทั้งหน้า · ห้ามใช้ชื่อกลางอย่าง .tip .sb .ln .i) */
+.tm-i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.tm-mono{font-family:Consolas,ui-monospace,SFMono-Regular,Menlo,monospace}
+.tm-sb{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 12px;border-radius:12px;border:2px solid #C6D6EA;background:#fff;color:#14243D;font-size:16px;font-weight:600;line-height:1.6}
+.tm-log{overflow-y:auto;overflow-x:hidden;user-select:text;-webkit-user-select:text}
+.tm-log.kb:focus-visible{outline:3px solid #1866C9;outline-offset:-3px}
+.tm-in{flex:1 1 auto;min-width:0;box-sizing:border-box;height:44px;margin:0;padding:0 8px;border:0;border-radius:0;outline:none;background:transparent;color:#14243D;font-size:16px;line-height:24px;user-select:text;-webkit-user-select:text}
+.tm-in::placeholder{color:#5A6377;opacity:1}
+.tm-in.kb:focus{outline:none;box-shadow:inset 0 0 0 2px #1866C9,inset 0 0 0 5px #D0EBFD}
+.tm-send{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:8px;flex-shrink:0;box-sizing:border-box;height:44px;padding:0 20px;border:0;font-size:16px;font-weight:700;line-height:1.6;white-space:nowrap}
+.tm-send:focus-visible{outline:3px solid #1866C9;outline-offset:2px}
+.tm-tip{display:none;position:absolute;right:8px;bottom:calc(100% + 8px);z-index:40;width:max-content;max-width:340px;box-sizing:border-box;padding:4px 12px;border-radius:8px;background:#14243D;color:#FFFFFF;font-size:14px;font-weight:500;line-height:1.6;text-align:left;white-space:normal;pointer-events:none}
+.tm-send:hover .tm-tip,.tm-send:focus-visible .tm-tip{display:block}
+.tm-sp{animation:tm-spin .8s linear infinite}
+@keyframes tm-spin{to{transform:rotate(360deg)}}
+@keyframes tm-pop{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.tm-pop{animation:tm-pop .2s cubic-bezier(.2,.8,.2,1)}
+@media (prefers-reduced-motion:reduce){.tm-sp{animation:none}.tm-pop{animation:none}}
+.tm-sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+</style>
+</helmet>
+<!-- Output = terminal ที่พิมพ์ได้ (R8 · OQ143): ส่งข้อความเข้า Serial ของบอร์ด/ตัวจำลอง (ไม่มีคำสั่งระบบ) · พิมพ์แล้ว Enter (หรือกด ส่ง) · ข้อความที่ส่งแสดงในบันทึก: ส่งไป = ลูกศรขาออก + text-primary · จากบอร์ด = ลูกศรขาเข้า + text-secondary · error = ไอคอน + danger · เก็บล่าสุด 200 บรรทัด บอกเมื่อตัด · role=log aria-live=polite · monospace 16px (DSG-15 Proposed ยังไม่ approve) · คง "เลื่อนตาม" และ "ล้าง" ที่หัวแท็บ · บอร์ดไม่ได้เชื่อม/ไม่ได้จำลอง → ช่องพิมพ์ aria-disabled (readOnly) + ข้อความอธิบาย (D-03) · ยังไม่มีตัวรับจริง: ข้อความที่ส่งแสดงในบันทึกอย่างเดียว ไม่มีตัวตอบจำลอง -->
+<div onPointerDownCapture="{{mPtr}}" onKeyDownCapture="{{mKey}}" style="position:relative;width:{{rootW}}px;height:{{rootH}}px;background:#fff;color:#14243D;overflow:hidden">
+
+  <!-- หัวแท็บ 48: ชื่อ + ป้ายแหล่ง · ขวา: เลื่อนตาม · ล้าง (คงไว้ตามที่ผู้ใช้สั่ง) -->
+  <div style="display:flex;align-items:center;gap:8px;height:48px;padding:0 12px;box-sizing:border-box;border-bottom:1px solid #DCE3EC">
+    <span style="font-size:16px;font-weight:700;white-space:nowrap">ข้อความจากบอร์ด</span>
+    <sc-if value="{{hasBadge}}" hint-placeholder-val="{{true}}">
+      <span style="{{badgeStyle}}"><svg class="tm-i" viewBox="0 0 24 24" style="width:16px;height:16px" aria-hidden="true"><path d="{{badgeIcon}}"></path></svg>{{badgeText}}</span>
+    </sc-if>
+    <div style="flex:1"></div>
+    <button type="button" class="tm-sb" aria-pressed="{{autoOn}}" onClick="{{toggleAuto}}" style="{{autoStyle}}"><svg class="tm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17V3M6 11l6 6 6-6M19 21H5"></path></svg><span>{{autoLabel}}</span></button>
+    <button type="button" class="tm-sb" aria-label="ล้างข้อความ" onClick="{{clearAll}}"><svg class="tm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"></path></svg><span>ล้าง</span></button>
+  </div>
+
+  <!-- บันทึก (log) -->
+  <div style="position:relative;height:{{logH}}px">
+    <sc-if value="{{showLog}}" hint-placeholder-val="{{true}}">
+      <div class="{{logCls}}" onFocus="{{logFocus}}" ref="{{logRef}}" role="log" aria-live="polite" aria-relevant="additions" aria-label="ข้อความจากบอร์ดและข้อความที่ส่งไป" tabIndex="0" style="height:{{logH}}px;box-sizing:border-box;padding:4px 12px">
+        <sc-if value="{{cut}}" hint-placeholder-val="{{false}}">
+          <div role="note" style="display:flex;gap:8px;align-items:center;min-height:32px;margin-bottom:4px;padding:0 8px;border-radius:8px;background:#F4F6F8;border:1px solid #DCE3EC;font-size:14px;line-height:1.7;color:#5A6377"><svg class="tm-i" viewBox="0 0 24 24" style="width:16px;height:16px" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 16v-4M12 8h.01"></path></svg>ตัดข้อความเก่าออกแล้ว · เก็บ 200 บรรทัดล่าสุด</div>
+        </sc-if>
+        <sc-for list="{{rows}}" as="r" hint-placeholder-count="5">
+          <div style="display:flex;gap:8px;align-items:flex-start;min-height:24px;font-size:16px;line-height:24px">
+            <span style="width:44px;flex-shrink:0;font-size:14px;line-height:24px;color:#5A6377">{{r.t}}</span>
+            <svg class="tm-i" viewBox="0 0 24 24" style="width:16px;height:16px;margin-top:4px;color:{{r.col}}" aria-hidden="true"><path d="{{r.icon}}"></path></svg>
+            <span class="tm-mono" style="{{r.vstyle}}"><span class="tm-sr">{{r.sr}}</span>{{r.v}}<sc-if value="{{r.hasCode}}" hint-placeholder-val="{{false}}"><span style="margin-left:8px;font-family:'IBM Plex Sans Thai',system-ui,sans-serif;font-size:14px;font-weight:500;color:#5A6377">{{r.code}}</span></sc-if></span>
+            <!-- ข้อ 2.2 (OQ161): ข้อความแปลงโค้ดไม่ผ่าน กดไปที่บรรทัดในตัวแก้โค้ดได้ -->
+            <sc-if value="{{r.hasGo}}" hint-placeholder-val="{{false}}"><button type="button" class="tm-sb" aria-label="{{r.goAria}}" onClick="{{r.go}}" style="flex-shrink:0;min-height:44px;margin:-10px 0 0 4px;font-family:'IBM Plex Sans Thai',system-ui,sans-serif">{{r.goLabel}}</button></sc-if>
+          </div>
+        </sc-for>
+      </div>
+      <sc-if value="{{showNew}}" hint-placeholder-val="{{false}}">
+        <button type="button" class="tm-sb" onClick="{{goBottom}}" style="position:absolute;right:12px;bottom:8px;background:#EAF2FD;border-color:#1866C9;color:#0F4C99;box-shadow:0 8px 20px rgba(20,36,61,.2)"><svg class="tm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"></path></svg><span>{{newText}}</span></button>
+      </sc-if>
+    </sc-if>
+
+    <!-- ยังไม่มีข้อความ -->
+    <sc-if value="{{showEmpty}}" hint-placeholder-val="{{false}}">
+      <div style="display:flex;align-items:center;gap:14px;height:{{logH}}px;box-sizing:border-box;padding:0 20px">
+        <svg class="tm-i" viewBox="0 0 24 24" style="width:32px;height:32px;color:#5A6377" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        <div style="font-size:16px;line-height:1.6"><div style="font-weight:700">ยังไม่มีข้อความ</div><div style="color:#5A6377">ใช้บล็อก "Serial print" ในหมวด สื่อสาร แล้วข้อความจะขึ้นที่นี่ · หรือพิมพ์ข้อความด้านล่างเพื่อส่งเข้าบอร์ด</div></div>
+      </div>
+    </sc-if>
+
+    <!-- Uno จริง: ต้องกดเปิดอ่าน (OQ2 แบบ B) -->
+    <sc-if value="{{showManual}}" hint-placeholder-val="{{false}}">
+      <div style="display:flex;align-items:center;gap:16px;height:{{logH}}px;box-sizing:border-box;padding:0 20px">
+        <button type="button" class="tm-sb" onClick="{{startRead}}" style="min-height:48px;background:#1866C9;color:#fff;border-color:#1866C9;border-bottom:4px solid #0F4C99;padding:0 18px;font-size:18px"><svg class="tm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2v6M15 2v6M6 8h12v4a6 6 0 0 1-12 0zM12 18v4"></path></svg><span>เปิดอ่านข้อความจากบอร์ด</span></button>
+        <div style="font-size:16px;line-height:1.6;color:#5A6377">ตอนนี้ยังไม่ได้อ่าน<br>กดเพื่อเริ่มอ่าน (โปรแกรมบนบอร์ดอาจเริ่มใหม่)</div>
+      </div>
+    </sc-if>
+
+    <!-- อ่านไม่ได้ (ST-44) -->
+    <sc-if value="{{showUnread}}" hint-placeholder-val="{{false}}">
+      <div style="display:flex;align-items:center;gap:14px;height:{{logH}}px;box-sizing:border-box;padding:0 16px;background:#FFF4CC">
+        <svg class="tm-i" viewBox="0 0 24 24" style="width:28px;height:28px;color:#B07F00" aria-hidden="true"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01"></path></svg>
+        <div style="flex:1;min-width:0;font-size:16px;line-height:1.6"><div style="font-weight:700">อ่านข้อความจากบอร์ดไม่ได้ <span style="font-size:14px;font-weight:500;color:#5A6377">E-USB</span></div><div>สาย USB หลุด หรือมีโปรแกรมอื่นใช้พอร์ตอยู่ · เสียบสายใหม่ แล้วลองอีกครั้ง</div></div>
+        <button type="button" class="tm-sb" onClick="{{startRead}}" style="border-color:#B07F00;min-height:44px">ลองอีกครั้ง</button>
+      </div>
+    </sc-if>
+  </div>
+
+  <!-- ช่องพิมพ์ (ติดล่าง สูง 44): prompt chevron-right · ช่องพิมพ์ monospace 16px · ปุ่ม ส่ง -->
+  <div style="{{rowStyle}}">
+    <span aria-hidden="true" style="display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;flex-shrink:0;color:{{promptColor}}"><svg class="tm-i" viewBox="0 0 24 24" style="width:24px;height:24px"><path d="M9 18l6-6-6-6"></path></svg></span>
+    <input type="text" class="{{inCls}}" onFocus="{{inFocus}}" ref="{{inRef}}" value="{{draft}}" onChange="{{onDraft}}" onKeyDown="{{onKey}}" maxLength="60" autoComplete="off" spellCheck="false" readOnly="{{inReadOnly}}" aria-disabled="{{inDis}}" aria-label="พิมพ์ข้อความส่งเข้าบอร์ด แล้วกด Enter" aria-describedby="tm-help" placeholder="{{placeholder}}">
+    <button type="button" class="tm-send" onClick="{{doSend}}" aria-disabled="{{sendDis}}" aria-label="{{sendAria}}" style="{{sendStyle}}"><svg class="tm-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"></path></svg><span>ส่ง</span><sc-if value="{{hasTip}}" hint-placeholder-val="{{false}}"><span class="tm-tip" role="tooltip">{{sendTip}}</span></sc-if></button>
+  </div>
+  <span id="tm-help" class="tm-sr">{{helpText}}</span>
+  <span class="tm-sr" role="status" aria-live="polite">{{liveMsg}}</span>
+
+  <!-- คำอธิบายตอนส่งไม่ได้ (D-03 · popover CI §11.9): แตะ ส่ง หรือกด Enter ตอนยังไม่ได้เชื่อม/ไม่ได้จำลอง · ปิดด้วย Esc / เข้าใจแล้ว / เริ่มพิมพ์ -->
+  <sc-if value="{{showExplain}}" hint-placeholder-val="{{false}}">
+    <div class="tm-pop" role="status" style="position:absolute;left:12px;bottom:52px;z-index:30;width:440px;max-width:calc(100% - 24px);box-sizing:border-box;padding:16px;border-radius:16px;background:#fff;border:1px solid #DCE3EC;box-shadow:0 8px 20px rgba(20,36,61,.2);text-align:left;display:flex;flex-direction:column;gap:8px">
+      <span style="font-size:18px;font-weight:700;line-height:1.6">ส่งข้อความไม่ได้ตอนนี้</span>
+      <span style="font-size:16px;line-height:1.6">{{explainBody}}</span>
+      <button type="button" class="tm-sb" onClick="{{closeExplain}}" style="align-self:flex-start;border-bottom-width:4px">เข้าใจแล้ว</button>
+    </div>
+  </sc-if>
+
+  <!-- ตัวบอกวินิจฉัย (Tweak debug · ปิดเป็นค่าเริ่มต้น · ไม่รับเมาส์) -->
+  <sc-if value="{{dbgOn}}" hint-placeholder-val="{{false}}">
+    <div ref="{{dbgRef}}" aria-hidden="true" style="position:absolute;right:8px;top:52px;z-index:100;pointer-events:none;box-sizing:border-box;max-width:560px;padding:6px 10px;border-radius:8px;background:rgba(20,36,61,.94);color:#FFFFFF;font:12px/1.45 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap"></div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;w&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:1392,&quot;min&quot;:480,&quot;max&quot;:1440,&quot;section&quot;:&quot;Output terminal&quot;},&quot;h&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:223,&quot;min&quot;:150,&quot;max&quot;:400,&quot;section&quot;:&quot;Output terminal&quot;},&quot;source&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;sim&quot;,&quot;options&quot;:[&quot;empty&quot;,&quot;sim&quot;,&quot;uno&quot;,&quot;uno-manual&quot;,&quot;unreadable&quot;],&quot;section&quot;:&quot;Output terminal&quot;},&quot;conn&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;ok&quot;,&quot;options&quot;:[&quot;ok&quot;,&quot;off&quot;,&quot;fail&quot;],&quot;section&quot;:&quot;สถานะการส่ง (ปกติ / ยังไม่เชื่อมต่อ / ส่งไม่สำเร็จ)&quot;},&quot;paused&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;no&quot;,&quot;options&quot;:[&quot;no&quot;,&quot;yes&quot;],&quot;section&quot;:&quot;Output terminal&quot;},&quot;fill&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:0,&quot;min&quot;:0,&quot;max&quot;:400,&quot;section&quot;:&quot;ทดสอบตัด 200 บรรทัด (เติมบรรทัดจำลองก่อน)&quot;},&quot;debug&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;off&quot;,&quot;options&quot;:[&quot;off&quot;,&quot;on&quot;],&quot;section&quot;:&quot;วินิจฉัย (ปิดเป็นค่าเริ่มต้น)&quot;},&quot;onAuto&quot;:{&quot;editor&quot;:null},&quot;onBottom&quot;:{&quot;editor&quot;:null},&quot;onClear&quot;:{&quot;editor&quot;:null},&quot;onRead&quot;:{&quot;editor&quot;:null},&quot;onLog&quot;:{&quot;editor&quot;:null},&quot;sys&quot;:{&quot;editor&quot;:null},&quot;onGoLine&quot;:{&quot;editor&quot;:null},&quot;$preview&quot;:{&quot;width&quot;:1392,&quot;height&quot;:223}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    const src = this.gp('source') || 'sim';
+    const fl = Number(this.gp('fill')) || 0;
+    const cp = this.cap(this.initialLines(src, fl));
+    this.state = { lines: cp.lines, cut: cp.cut, draft: '', explain: false, hist: [], hi: -1, newN: this.gp('paused') === 'yes' ? 3 : 0, live: '' };
+    this._src = src;
+    this._fill = fl;
+    this._sysTick = (this.gp('sys') || {}).tick;
+    this._t0 = Date.now();
+    this._dbg = { key: 0, chg: 0, enter: 0, send: 0, btn: 0, last: '-' };
+    this.logRef = (el) => { this._log = el; };
+    this.inRef = (el) => { this._in = el; };
+    this.dbgRef = (el) => { this._dbgEl = el; this.paintDbg(); };
+  }
+  componentDidMount() { this.syncScroll(); this.paintDbg(); }
+  componentDidUpdate(pp) {
+    // แหล่งข้อความ (Tweak serial / ปุ่ม ล้าง / ปุ่มเปิดอ่าน) หรือ fill เปลี่ยน = เริ่มบันทึกใหม่ตามแหล่งนั้น (ข้อความที่ส่งไปหายด้วย)
+    const src = this.gp('source') || 'sim';
+    const fl = Number(this.gp('fill')) || 0;
+    if (src !== this._src || fl !== this._fill) {
+      this._src = src;
+      this._fill = fl;
+      const cp = this.cap(this.initialLines(src, fl));
+      this._sn = undefined;
+      this.setState({ lines: cp.lines, cut: cp.cut, newN: this.gp('paused') === 'yes' ? 3 : 0 });
+      return;
+    }
+    // ข้อ 2.2: ข้อความจากระบบ (ผลแปลงโค้ด) · prop sys = {tick, lines:[{k, v, code, line}]} · เพิ่มเมื่อ tick เปลี่ยน
+    const sy = this.gp('sys');
+    if (sy && sy.tick !== this._sysTick) {
+      this._sysTick = sy.tick;
+      const t0 = this.nowT();
+      const add = (sy.lines || []).map((l) => ({ k: l.k || 'sys', t: t0, v: l.v, code: l.code, line: l.line }));
+      if (add.length) { this.addLines(add, { live: 'แปลงโค้ดไม่ผ่าน ดูรายละเอียดใน Output' }); return; }
+    }
+    this.syncScroll();
+    // บอกพ่อ (ข้อความล่าสุด/จำนวนบรรทัด ใช้เป็นตัวอย่างข้อความตอนลิ้นชักยุบ) เฉพาะเมื่อเปลี่ยน
+    const ls = this.state.lines;
+    const last = ls.length ? ls[ls.length - 1].v : '';
+    if (!this._lg || this._lg.n !== ls.length || this._lg.last !== last) {
+      this._lg = { n: ls.length, last: last };
+      const f = this.gp('onLog');
+      if (typeof f === 'function') setTimeout(() => { try { f(ls.length, last); } catch (e) {} }, 0);
+    }
+    this.paintDbg();
+  }
+  gp(name) {
+    const P = this.props || {};
+    const kebab = name.replace(/[A-Z]/g, (m) => '-' + m.toLowerCase());
+    if (P[name] !== undefined) return P[name];
+    if (P[name.toLowerCase()] !== undefined) return P[name.toLowerCase()];
+    if (P[kebab] !== undefined) return P[kebab];
+    return undefined;
+  }
+  emit(name, a, b) {
+    const f = this.gp(name);
+    if (typeof f === 'function') { try { f(a, b); } catch (e) {} }
+  }
+  follow() { return this.gp('paused') !== 'yes'; }
+  conn() { const c = this.gp('conn'); return (c === 'off' || c === 'fail') ? c : 'ok'; }
+
+  /* ---------- ข้อมูลบันทึก ---------- */
+  tf(sec) { return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'); }
+  nowT() { return this.tf(15 + Math.floor((Date.now() - this._t0) / 1000)); }
+  // ข้อความตัวอย่างจากบอร์ด (12 บรรทัด · ของเดิมใน SerialPane) · fill = เติมบรรทัดจำลองก่อน เพื่อทดสอบการตัด 200 บรรทัด
+  initialLines(src, fill) {
+    if (src !== 'sim' && src !== 'uno') return [];
+    const base = [['0:01', 'กดแล้ว'], ['0:02', 'กดแล้ว'], ['0:04', 'กดแล้ว'], ['0:05', 'ลูกบิด = 340'], ['0:06', 'ลูกบิด = 512'], ['0:08', 'กดแล้ว'], ['0:09', 'กดแล้ว'], ['0:11', 'ลูกบิด = 128'], ['0:12', 'กดแล้ว'], ['0:13', 'กดแล้ว'], ['0:14', 'ลูกบิด = 700'], ['0:15', 'กดแล้ว']];
+    const out = [];
+    const f = Math.max(0, Math.min(400, Number(fill) || 0));
+    for (let i = 0; i < f; i++) out.push({ k: 'in', t: this.tf(i % 600), v: 'ลูกบิด = ' + ((i * 37) % 1024) });
+    base.forEach((b) => out.push({ k: 'in', t: b[0], v: b[1] }));
+    return out;
+  }
+  // เก็บล่าสุด 200 บรรทัด · เกินแล้วตัดบรรทัดเก่าออกและบอกที่หัวบันทึก
+  cap(lines) {
+    if (lines.length > 200) return { lines: lines.slice(lines.length - 200), cut: true };
+    return { lines: lines, cut: false };
+  }
+  addLines(add, extra) {
+    const cur = this.state.lines || [];
+    const cp = this.cap(cur.concat(add));
+    this.setState(Object.assign({ lines: cp.lines, cut: cp.cut || !!this.state.cut }, extra || {}));
+  }
+  toBottom() { try { const el = this._log; if (el) el.scrollTop = el.scrollHeight; } catch (e) {} }
+  syncScroll() {
+    try {
+      const el = this._log;
+      if (!el) return;
+      const n = this.state.lines.length;
+      const last = n ? this.state.lines[n - 1] : null;
+      if (this._sn === undefined) {
+        this._sn = n;
+        // เริ่ม: ตามท้ายบันทึก · ถ้าหยุดเลื่อนอยู่ (ตัวอย่าง) เริ่มที่บรรทัดที่ 3 และมีปุ่ม "ไปล่างสุด"
+        if (this.follow() || (last && last.k !== 'in')) el.scrollTop = el.scrollHeight; else el.scrollTop = 48;
+        return;
+      }
+      if (this._sn !== n) {
+        const grew = n > this._sn;
+        this._sn = n;
+        // ข้อความที่ผู้ใช้ส่งเอง (ส่งไป/error) เลื่อนลงล่างเสมอ · ข้อความจากบอร์ดเลื่อนตามเมื่อเปิด "เลื่อนตาม"
+        if (this.follow() || (grew && last && last.k !== 'in')) el.scrollTop = el.scrollHeight;
+      }
+    } catch (e) {}
+  }
+
+  /* ---------- ตัวบอกวินิจฉัย ---------- */
+  dbg(k, extra) {
+    try {
+      const D = this._dbg;
+      if (k === 'key') D.key += 1; else if (k === 'chg') D.chg += 1; else if (k === 'enter') D.enter += 1; else if (k === 'send') D.send += 1; else if (k === 'btn') D.btn += 1;
+      D.last = k + (extra ? ' ' + extra : '');
+      this.paintDbg();
+    } catch (e) {}
+  }
+  paintDbg() {
+    try {
+      const el = this._dbgEl;
+      if (!el) return;
+      const D = this._dbg, S = this.state || {}, inp = this._in;
+      el.textContent =
+        'วินิจฉัย TerminalA2 (Tweak debug)\n' +
+        'keydown ' + D.key + ' · change ' + D.chg + ' · Enter ' + D.enter + ' · กดปุ่มส่ง ' + D.btn + ' · ส่งเข้าบันทึก ' + D.send + '\n' +
+        'ล่าสุด: ' + D.last + '\n' +
+        'input: ' + (inp ? 'มี · value="' + String(inp.value).slice(0, 24) + '" · readOnly=' + inp.readOnly + ' · focus=' + (inp.ownerDocument && inp.ownerDocument.activeElement === inp) : 'ไม่พบ') + '\n' +
+        'state: conn=' + this.conn() + ' · บรรทัด ' + (S.lines ? S.lines.length : 0) + ' · cut=' + S.cut + ' · draft ยาว ' + (S.draft ? S.draft.length : 0) + ' · follow=' + this.follow() + ' · newN=' + S.newN;
+    } catch (e) {}
+  }
+
+  renderVals() {
+    const S = this.state || {};
+    const W = Math.max(480, Number(this.gp('w')) || 1392);
+    const H = Math.max(150, Number(this.gp('h')) || 223);
+    const logH = H - 48 - 45;
+    const src = this.gp('source') || 'sim';
+    const conn = this.conn();
+    const lines = S.lines || [];
+    const follow = this.follow();
+    const draft = String(S.draft || '');
+    const hasText = draft.trim() !== '';
+
+    // ป้ายแหล่งข้อความ (เหมือน SerialPane เดิม)
+    const badgeBase = 'display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 10px;border-radius:999px;font-size:14px;font-weight:600;white-space:nowrap;border:2px solid ';
+    let hasBadge = true, badgeText = 'จากตัวจำลอง', badgeIcon = 'M3 4h18v12H3zM8 21h8M12 16v5', badgeStyle = badgeBase + '#C6D6EA;background:#EAF2FD;color:#14243D';
+    if (src === 'uno' || src === 'uno-manual') { badgeText = 'จากบอร์ด Uno'; badgeIcon = 'M9 2v6M15 2v6M6 8h12v4a6 6 0 0 1-12 0zM12 18v4'; badgeStyle = badgeBase + '#14243D;background:#fff;color:#14243D'; }
+    if (src === 'unreadable') { badgeText = 'อ่านไม่ได้'; badgeIcon = 'M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01'; badgeStyle = badgeBase + '#B07F00;background:#FFF4CC;color:#14243D'; }
+    if (src === 'empty' && lines.length === 0) hasBadge = false;
+
+    // แถวบันทึก: ส่งไป = ลูกศรขาออก + text-primary · จากบอร์ด = ลูกศรขาเข้า + text-secondary · error = ไอคอน + danger
+    const IN = 'M17 7L7 17M17 17H7V7', OUT = 'M7 7h10v10M7 17L17 7', ERR = 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 8v4M12 16h.01';
+    const KIND = {
+      in: { col: '#5A6377', icon: IN, sr: 'จากบอร์ด: ', st: 'color:#5A6377;font-weight:400' },
+      out: { col: '#14243D', icon: OUT, sr: 'ส่งไป: ', st: 'color:#14243D;font-weight:600' },
+      err: { col: '#D32F2F', icon: ERR, sr: 'ผิดพลาด: ', st: 'color:#D32F2F;font-weight:700' },
+      // ข้อ 2.2: ข้อความจากระบบ (แปลงโค้ด/ส่งลงบอร์ด) · ไอคอน info + text-primary
+      sys: { col: '#14243D', icon: 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 16v-4M12 8h.01', sr: 'ระบบ: ', st: 'color:#14243D;font-weight:600' }
+    };
+    const rows = lines.map((l) => {
+      const k = KIND[l.k] || KIND.in;
+      return { t: l.t, v: l.v, col: k.col, icon: k.icon, sr: k.sr, vstyle: 'flex:1 1 auto;min-width:0;white-space:pre-wrap;word-break:break-word;font-size:16px;line-height:24px;' + k.st, hasCode: !!l.code, code: l.code || '', hasGo: l.line > 0, goLabel: 'ไปที่บรรทัด ' + l.line, goAria: 'ไปที่บรรทัด ' + l.line + ' ในโค้ด', go: () => this.emit('onGoLine', l.line) };
+    });
+    const showManual = rows.length === 0 && src === 'uno-manual';
+    const showUnread = rows.length === 0 && src === 'unreadable';
+    const showEmpty = rows.length === 0 && !showManual && !showUnread;
+
+    // ช่องพิมพ์ + ปุ่มส่ง · off = aria-disabled + readOnly + ข้อความอธิบาย (D-03) · ว่าง = ปุ่มส่ง aria-disabled บอกว่าต้องพิมพ์ก่อน
+    const off = conn === 'off';
+    const sendMode = off ? 'off' : (hasText ? 'ready' : 'empty');
+    const OFFST = 'background:#F4F6F8;color:#5A6377;border-left:1px solid #DCE3EC';
+    const sendStyle = sendMode === 'ready' ? 'background:#1866C9;color:#FFFFFF;cursor:pointer' : OFFST + ';cursor:not-allowed';
+    const sendTip = sendMode === 'off' ? 'ส่งไม่ได้ ยังไม่ได้เชื่อมบอร์ดและยังไม่ได้เริ่มจำลอง' : (sendMode === 'empty' ? 'พิมพ์ข้อความก่อน แล้วค่อยกดส่ง' : '');
+    const sendAria = sendMode === 'ready' ? 'ส่งข้อความเข้าบอร์ด' : 'ส่ง (ใช้ไม่ได้ ' + (sendMode === 'off' ? 'ยังไม่ได้เชื่อมบอร์ดและยังไม่ได้เริ่มจำลอง' : 'ต้องพิมพ์ข้อความก่อน') + ')';
+    const placeholder = off ? 'ส่งไม่ได้ · ยังไม่ได้เชื่อมบอร์ดหรือเริ่มจำลอง' : 'พิมพ์ข้อความ แล้วกด Enter เพื่อส่งเข้าบอร์ด';
+    const EXPLAIN = 'ยังไม่ได้เชื่อมบอร์ด Uno และยังไม่ได้เริ่มจำลอง ข้อความเลยยังไม่มีที่ไป · เสียบสาย USB ของบอร์ด หรือกด เริ่มจำลอง แล้วลองส่งอีกครั้ง';
+
+    const doSend = () => {
+      const st = this.state || {};
+      const text = String(st.draft || '').trim();
+      const c = this.conn();
+      this.dbg('btn');
+      if (c === 'off') { this.setState({ explain: true, live: 'ส่งไม่ได้ ยังไม่ได้เชื่อมบอร์ดและยังไม่ได้เริ่มจำลอง' }); return; }
+      if (!text) { this.setState({ live: 'พิมพ์ข้อความก่อน แล้วค่อยกดส่ง' }); try { if (this._in) this._in.focus(); } catch (e) {} return; }
+      const t = this.nowT();
+      this.dbg('send', text);
+      if (c === 'fail') {
+        // ส่งไม่สำเร็จ: บอกในบันทึก (danger + ไอคอน + รหัส) · คงข้อความที่พิมพ์ไว้ให้ลองส่งอีกครั้ง
+        this.addLines([{ k: 'err', t: t, v: 'ส่ง “' + text + '” ไม่สำเร็จ สาย USB อาจหลุด ลองส่งอีกครั้ง', code: 'E-USB' }], { live: 'ส่งไม่สำเร็จ ลองส่งอีกครั้ง', explain: false });
+        return;
+      }
+      const hist = (st.hist || []).concat([text]).slice(-20);
+      this.addLines([{ k: 'out', t: t, v: text }], { draft: '', hist: hist, hi: -1, explain: false, live: 'ส่งแล้ว ' + text });
+    };
+
+    // ข้อ 1.11 (แก้รอบ 2 2026-10-28): ค่าเริ่มต้น = ไม่มีวง (ถือว่าเมาส์) · มีวงเฉพาะเมื่อมี keydown นำทาง (Tab/Enter/Space/ลูกศร) ก่อน focus ภายใน 1 วินาที และหลัง pointerdown ล่าสุด · ธงอยู่ใน instance ของ component (this._md) ฟังที่ window ของเอกสารตัวเอง (capture) · pointerdown ล้างธงและล้างวงทุกครั้ง
+    if (!this._md) {
+      const md = this._md = { k: 0, p: 0 };
+      const navK = { Tab: 1, Enter: 1, ' ': 1, ArrowUp: 1, ArrowDown: 1, ArrowLeft: 1, ArrowRight: 1, Home: 1, End: 1 };
+      // แก้รอบ 3: key ที่กดในช่องพิมพ์ (ยกเว้น Tab) ไม่นับเป็นการนำทาง · เริ่มพิมพ์ (ตัวอักษร/Backspace/Delete/input) = ล้างวงช่องพิมพ์ทันที
+      md.nav = (e) => { if (!e || !navK[e.key]) return false; const t = e.target; const ed = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable); return !ed || e.key === 'Tab'; };
+      md.typ = (e) => { if (!e) return; const t = e.target; const ed = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable); if (!ed) return; if (e.type === 'input' || (e.key && (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Delete'))) { md.k = 0; if ((this.state || {}).kbIn) this.setState({ kbIn: false }); } };
+      try {
+        window.addEventListener('keydown', (e) => { if (md.nav(e)) md.k = Date.now(); md.typ(e); }, true);
+        window.addEventListener('input', (e) => md.typ(e), true);
+        window.addEventListener('pointerdown', () => { md.p = Date.now(); md.k = 0; const s = this.state || {}; if (s.kbIn || s.kbLog) this.setState({ kbIn: false, kbLog: false }); }, true);
+      } catch (e) {}
+    }
+    const kbIn = () => { const md = this._md; return md.k > md.p && Date.now() - md.k < 1000; };
+    return {
+      mPtr: () => { const md = this._md; md.p = Date.now(); md.k = 0; const s = this.state || {}; if (s.kbIn || s.kbLog) this.setState({ kbIn: false, kbLog: false }); },
+      mKey: (e) => { if (this._md.nav(e)) this._md.k = Date.now(); this._md.typ(e); },
+      inCls: 'tm-in tm-mono' + (S.kbIn ? ' kb' : ''), logCls: 'tm-log' + (S.kbLog ? ' kb' : ''),
+      inFocus: () => { const k = kbIn(); if (!!(this.state || {}).kbIn !== k) this.setState({ kbIn: k }); },
+      logFocus: () => { const k = kbIn(); if (!!(this.state || {}).kbLog !== k) this.setState({ kbLog: k }); },
+      rootW: String(W), rootH: String(H), logH: logH,
+      hasBadge, badgeText, badgeIcon, badgeStyle,
+      autoOn: follow, autoLabel: follow ? 'เลื่อนตาม' : 'หยุดเลื่อน',
+      autoStyle: follow ? 'background:#EAF2FD;border-color:#1866C9' : 'background:#FFF4CC;border-color:#B07F00',
+      toggleAuto: () => { this.dbg('auto'); this.emit('onAuto'); this.setState({ newN: 0 }); },
+      goBottom: () => { this.emit('onBottom'); this.setState({ newN: 0 }); this.toBottom(); },
+      clearAll: () => { this.emit('onClear'); this.setState({ lines: [], cut: false, newN: 0, explain: false, live: 'ล้างข้อความแล้ว' }); this._sn = 0; },
+      startRead: () => { this.emit('onRead'); },
+      logRef: this.logRef, inRef: this.inRef, dbgRef: this.dbgRef,
+      showLog: rows.length > 0, rows, cut: !!S.cut,
+      showNew: !follow && (S.newN || 0) > 0 && rows.length > 0, newText: 'มีข้อความใหม่ ' + (S.newN || 0) + ' บรรทัด · ไปล่างสุด',
+      showEmpty, showManual, showUnread,
+      rowStyle: 'position:absolute;left:0;bottom:0;width:100%;height:45px;box-sizing:border-box;display:flex;align-items:center;border-top:1px solid #DCE3EC;background:' + (off ? '#F4F6F8' : '#FFFFFF'),
+      promptColor: off ? '#5A6377' : '#1866C9',
+      draft: draft, placeholder: placeholder,
+      inReadOnly: off, inDis: off,
+      sendStyle, sendDis: sendMode !== 'ready', sendAria, sendTip, hasTip: sendTip !== '',
+      doSend,
+      onDraft: (e) => { this.dbg('chg'); if (e && e.target) this.setState({ draft: e.target.value, hi: -1, explain: false }); },
+      // Enter = ส่ง (ไม่ส่งตอนพิมพ์ด้วย IME) · Esc ปิดคำอธิบาย · ลูกศรขึ้น/ลง = เรียกข้อความที่เคยส่ง
+      onKey: (e) => {
+        try {
+          if (!e) return;
+          this.dbg('key', e.key);
+          const k = e.key;
+          if (k === 'Enter') {
+            if (e.nativeEvent && e.nativeEvent.isComposing) return;
+            e.preventDefault();
+            this.dbg('enter');
+            doSend();
+          } else if (k === 'Escape') {
+            if ((this.state || {}).explain) { this.setState({ explain: false }); }
+          } else if (k === 'ArrowUp' || k === 'ArrowDown') {
+            const st = this.state || {}, h = st.hist || [];
+            if (!h.length) return;
+            let hi = st.hi;
+            if (k === 'ArrowUp') hi = hi < 0 ? h.length - 1 : Math.max(0, hi - 1);
+            else { if (hi < 0) return; hi = hi + 1 >= h.length ? -1 : hi + 1; }
+            e.preventDefault();
+            this.setState({ hi: hi, draft: hi < 0 ? '' : h[hi] });
+          }
+        } catch (er) {}
+      },
+      showExplain: !!S.explain && off, explainBody: EXPLAIN,
+      closeExplain: () => { this.setState({ explain: false }); try { if (this._in) this._in.focus(); } catch (e) {} },
+      helpText: off ? 'ช่องพิมพ์ใช้ไม่ได้ตอนนี้ ' + EXPLAIN : 'พิมพ์ข้อความแล้วกด Enter เพื่อส่งเข้า Serial ของบอร์ดหรือตัวจำลอง ลูกศรขึ้นเรียกข้อความที่เคยส่ง',
+      liveMsg: S.live || '',
+      dbgOn: String(this.gp('debug')) === 'on'
+    };
+  }
+}
+</script>
+</body>
+</html>
