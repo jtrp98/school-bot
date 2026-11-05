@@ -1,0 +1,100 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #FFFFFF;
+  color: #1F2A33;
+}
+
+::selection {
+  background: #C9E9FA;
+  color: #0B2045;
+}
+
+/* visible keyboard focus everywhere */
+a:focus-visible,
+button:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid #68C8F2;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.hour-bar {
+  display: flex;
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #F5EFE4;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .home-hero-ring {
+    animation: hero-ring-arrive 700ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  }
+
+  .home-hero-robot {
+    animation: hero-robot-arrive 800ms cubic-bezier(0.16, 1, 0.3, 1) 90ms backwards;
+    transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .home-hero-stage:hover .home-hero-robot {
+    transform: translateY(-6px) rotate(-1deg);
+  }
+
+  @keyframes hero-ring-arrive {
+    from {
+      opacity: 0.65;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes hero-robot-arrive {
+    from {
+      opacity: 0.65;
+      transform: translateY(22px) rotate(-3deg);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) rotate(0);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .float-a {
+    animation: float-a 5s ease-in-out infinite;
+  }
+
+  .float-b {
+    animation: float-b 6.5s ease-in-out infinite;
+  }
+
+  @keyframes float-a {
+    0%, 100% { transform: translateY(0) rotate(0); }
+    50% { transform: translateY(-12px) rotate(8deg); }
+  }
+
+  @keyframes float-b {
+    0%, 100% { transform: translateY(0) rotate(12deg); }
+    50% { transform: translateY(10px) rotate(-6deg); }
+  }
+}
