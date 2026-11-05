@@ -45,21 +45,21 @@ jobs:
       - name: Build Windows Desktop setup EXE and MSI
         if: runner.os == 'Windows'
         shell: pwsh
-        run: ./scripts/package-desktop.ps1 -SkipBuild
+        run: ./scripts/desktop/package.ps1 -SkipBuild
       - name: Verify installer payload and render UI without installing (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
           $version = (Get-Content app/frontend/package.json -Raw | ConvertFrom-Json).version
-          ./scripts/build-installer-shell.ps1 -InstallerPath "dist/installers/school-bot-$version-windows-amd64.msi" -BrandDirectory .tools/installer-brand/th -OutputDirectory .tools/installer-shell-preview -Preview
+          ./scripts/installer/build-shell.ps1 -InstallerPath "dist/installers/school-bot-$version-windows-amd64.msi" -BrandDirectory .tools/installer-brand/th -OutputDirectory .tools/installer-shell-preview -Preview
       - name: Install, repair and uninstall MSI (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
-        run: ./scripts/test-installer.ps1
+        run: ./scripts/installer/test-installation.ps1
       - name: Build universal macOS Desktop installer
         if: matrix.platform == 'darwin-arm64'
         shell: bash
-        run: bash scripts/package-desktop.sh --skip-install
+        run: bash scripts/desktop/package.sh --skip-install
       - name: Verify universal package payload (macOS)
         if: matrix.platform == 'darwin-arm64'
         shell: bash

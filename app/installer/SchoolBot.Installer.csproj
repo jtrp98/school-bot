@@ -34,7 +34,7 @@
     <EmbeddedResource Include="$(RuntimeNotices)" LogicalName="Setup.Notices" />
   </ItemGroup>
   <Target Name="RequirePackageInputs" BeforeTargets="PrepareForBuild">
-    <Error Condition="!Exists('$(InstallerPackage)')" Text="Build with scripts/package-desktop.ps1: InstallerPackage is required." />
+    <Error Condition="!Exists('$(InstallerPackage)')" Text="Build with scripts/desktop/package.ps1: InstallerPackage is required." />
     <Error Condition="!Exists('$(RuntimeNotices)')" Text="RuntimeNotices must include the redistributed runtime licenses." />
   </Target>
 </Project>

@@ -21,6 +21,8 @@ const (
 	ErrClockUntrusted        = "CLOCK_UNTRUSTED"
 	ErrDeviceNotActivated    = "DEVICE_NOT_ACTIVATED"
 	ErrDeviceProofInvalid    = "DEVICE_PROOF_INVALID"
+	ErrDeviceLimit           = "DEVICE_LIMIT"
+	ErrChallengeExpired      = "CHALLENGE_EXPIRED"
 	ErrLicenseInvalid        = "LICENSE_INVALID"
 	ErrLicenseInactive       = "LICENSE_INACTIVE"
 	ErrBindingRevoked        = "BINDING_REVOKED"
@@ -53,9 +55,9 @@ type EntitlementClaims struct {
 	Issuer           string       `json:"iss"`
 	Audience         string       `json:"aud"`
 	JTI              string       `json:"jti"`
-	LicenseID        string       `json:"license_id"`
-	SchoolID         string       `json:"school_id"`
-	BindingID        string       `json:"binding_id"`
+	LicenseID        int          `json:"license_id"`
+	SchoolID         int          `json:"school_id"`
+	BindingID        int          `json:"binding_id"`
 	BindingEpoch     int64        `json:"binding_epoch"`
 	Confirmation     Confirmation `json:"cnf"`
 	Modes            []string     `json:"modes"`

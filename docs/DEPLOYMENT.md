@@ -6,7 +6,7 @@ Go Host ส่ง License Key และ installation Device ID ไป C# API เ
 
 ## Development
 
-เปิด `scripts/start-api.ps1` (Windows) หรือ `bash scripts/start-api.sh` (Mac)
+เปิด `scripts/api/run.ps1` (Windows) หรือ `bash scripts/api/run.sh` (Mac)
 API bind ที่ `127.0.0.1:8080` ตามค่าเริ่มต้น และ Desktop เรียก `http://localhost:8080`
 ไม่มีการกำหนด Domain ถาวรใน Mode หรือ Frontend
 
@@ -19,11 +19,11 @@ API bind ที่ `127.0.0.1:8080` ตามค่าเริ่มต้น �
 
 ```powershell
 $env:SCHOOL_BOT_BUILD_API_URL = 'https://api.example.com'
-./scripts/build-desktop.ps1
+./scripts/desktop/build.ps1
 ```
 
 ```bash
-SCHOOL_BOT_BUILD_API_URL=https://api.example.com bash scripts/build-desktop.sh
+SCHOOL_BOT_BUILD_API_URL=https://api.example.com bash scripts/desktop/build.sh
 ```
 
 Host รองรับ URL prefix แต่ต้องใช้ Gateway route ที่ยืนยันและทดสอบ mapping แล้ว; การตัด prefix แล้ว HTTP proxy ไป B ไม่ใช่ service transport เป้าหมาย. Domain ตัวอย่างข้างบนไม่ใช่ค่าที่ deploy แล้ว
@@ -41,7 +41,7 @@ Runtime override เหมาะกับนักพัฒนาที่รั
 Build จากโฟลเดอร์ `web`:
 
 ```powershell
-dotnet publish src/SchoolBot.Api -c Release -o ../dist/api
+dotnet publish src/ServiceSchoolBot.API -c Release -o ../dist/api
 ```
 
 ตั้ง `ASPNETCORE_ENVIRONMENT=Production`, `SCHOOL_BOT_ADMIN_KEY` (Secret อย่างน้อย 32 ตัวอักษร;
@@ -56,7 +56,7 @@ Rate limiter นับตาม client IP จาก `X-Forwarded-For` และ�
 ถ้า proxy อยู่คนละเครื่องหรือเป็น container network, API จะไม่เชื่อ header และทุก client จะใช้โควต้าร่วมกัน
 ต้องเพิ่ม trusted proxy ในโค้ดก่อนใช้รูปแบบนั้น
 เป้าหมาย production ให้ client ติดต่อ HTTP Gateway และ Gateway ติดต่อ B ด้วย gRPC; host/port/health exposure ยังต้องระบุจาก deployment จริง. `GET /healthz` ของ HTTP local ไม่ยืนยัน readiness ของ Gateway/gRPC และไม่ใช่เงื่อนไขเพียงพอสำหรับแจก Desktop
-Body ใหญ่กว่า 64 KB ถูกปฏิเสธ (413) และโควต้า 30 request/นาที/IP สำหรับ `/v1/licenses/*`, 60 สำหรับ `/v1/updates/check`;
+Body ใหญ่กว่า 64 KB ถูกปฏิเสธ (413) และโควต้า 30 request/นาที/IP สำหรับ `/api/service-school-bot/licenses/*`, 60 สำหรับ `/api/service-school-bot/updates/check`;
 ตัวเลขที่เหลือและรูปแบบ response อยู่ใน `docs/API.md`
 ไม่ส่ง Admin Key ไป Desktop; License activation ไม่ต้องใช้ Admin Key
 
@@ -64,3 +64,23 @@ Starter ใช้ Memory Store: License และ Release หายเมื่�
 ก่อนใช้งานจริง ระบบปัจจุบันทดลอง online activation/device quota ได้ แต่ยังไม่มี signed activation token
 ที่เก็บข้ามการเปิดแอป หรือการบังคับสิทธิ์แบบ Word/Excel เต็มรูปแบบ ต้องทำส่วนนี้ต่อใน Desktop Core/API
 พร้อมกำหนดอายุ token และนโยบายตรวจซ้ำเมื่อออนไลน์
+
+## Kubernetes / Gateway -> gRPC Deployment Pack (`BE-023`)
+
+ไฟล์คอนฟิกและสคริปต์เตรียมความพร้อมสำหรับ Deploy บน Kubernetes (Kustomize) แบบ `HTTP Gateway (G) -> gRPC SchoolBot (B)` โดยแยก Process ของ Grade Export Worker ตาม `SEC001-002`:
+
+- `deploy/base/school-bot-grpc.yaml` และ `deploy/base/kustomization.yaml`:
+  - `Deployment/service-school-bot`: รับ internal gRPC (`h2c`) ที่พอร์ต `8080` และ HTTP/1.1 health probe (`/healthz`) ที่พอร์ต `8081` โดยถือเฉพาะ Connection String ของ `SchoolBot`, `Master`, `School` และ `Logs` (ไม่มี `PGGRADE_DB_CONNECTION_STRING`)
+  - `Deployment/school-bot-grade-worker`: Isolated worker ที่ถือ `SCHOOL_BOT_DB_CONNECTION_STRING` และ `PGGRADE_DB_CONNECTION_STRING` ตาม `SEC001-002` / `BE-038`
+  - `Service/service-school-bot`: Headless ClusterIP (`clusterIP: None`, `appProtocol: kubernetes.io/h2c`) สำหรับ gRPC client-side load balancing จาก `sb-api-gateway` (`dns:///service-school-bot.schoolbright.svc.cluster.local:8080`)
+  - `NetworkPolicy/service-school-bot-ingress`: จำกัดการเข้าถึงพอร์ต `8080` เฉพาะ Pod ของ `api-gateway` เท่านั้น (ไม่มีการเปิด B ออกสู่สาธารณะโดยตรง)
+- `deploy/overlays/dev/kustomization.yaml` และ `deploy/overlays/prod/kustomization.yaml`: Overlays แยกสภาพแวดล้อม Dev และ Prod
+- สคริปต์ตรวจสอบความพร้อมก่อน Deploy และสคริปต์สำรอง/กู้คืนฐานข้อมูล (`SchoolBot` DB เท่านั้น):
+
+```powershell
+# ตรวจสอบ Manifests, การแยกสิทธิ์ SEC001-002, ความสอดคล้องของ .proto กับ sb-api-gateway และลำดับ Rollout/Rollback (ไม่รันคำสั่ง Deploy จริง):
+./scripts/api/deploy-preflight.ps1 -ReportPath "reports/phase6/be-023-deploy-preflight.json"
+
+# ตรวจสอบโครงสร้างคำสั่ง Backup/Restore สำหรับ SchoolBot DB เท่านั้น (ห้ามแตะ 4 Legacy DBs):
+./scripts/api/backup-restore.ps1 -Action Validate
+```

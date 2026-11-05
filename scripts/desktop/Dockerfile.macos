@@ -1,0 +1,43 @@
+FROM golang:1.24-bookworm
+
+ARG TARGETARCH
+
+# Install build dependencies: llvm (for llvm-lipo), clang, zip, curl, xz-utils
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl xz-utils python3 pkg-config clang llvm zip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Zig 0.14.0 for C/C++ cross-compilation (resolves Go cgo Darwin Mach-O symbol linking)
+ARG ZIG_VERSION=0.14.0
+RUN ZIG_ARCH=$(case "${TARGETARCH}" in arm64) echo "aarch64" ;; *) echo "x86_64" ;; esac) && \
+    curl -fsSL "https://ziglang.org/download/${ZIG_VERSION}/zig-linux-${ZIG_ARCH}-${ZIG_VERSION}.tar.xz" \
+    | tar -xJ -C /opt && \
+    ln -s /opt/zig-linux-${ZIG_ARCH}-${ZIG_VERSION}/zig /usr/local/bin/zig && \
+    ln -sf /usr/bin/llvm-strip-14 /usr/local/bin/strip && \
+    ln -sf /usr/bin/llvm-lipo-14 /usr/local/bin/lipo && \
+    ln -sf /usr/bin/llvm-lipo-14 /usr/local/bin/llvm-lipo
+
+# Download macOS SDK
+ARG MACOS_SDK_VERSION=14.5
+RUN curl -fsSL "https://github.com/joseluisq/macosx-sdks/releases/download/${MACOS_SDK_VERSION}/MacOSX${MACOS_SDK_VERSION}.sdk.tar.xz" \
+    | tar -xJ -C /opt \
+    && mv /opt/MacOSX${MACOS_SDK_VERSION}.sdk /opt/macos-sdk
+
+ENV MACOS_SDK_PATH=/opt/macos-sdk
+
+# Install rcodesign for cross-platform Apple code signing
+RUN curl -fsSL "https://github.com/indygreg/apple-platform-rs/releases/download/apple-codesign/0.29.0/apple-codesign-0.29.0-x86_64-unknown-linux-musl.tar.gz" \
+    | tar -xz -C /usr/local/bin --strip-components=1 apple-codesign-0.29.0-x86_64-unknown-linux-musl/rcodesign \
+    && chmod +x /usr/local/bin/rcodesign
+
+# Create Zig wrappers for darwin amd64 and arm64
+RUN printf '#!/bin/sh\nexec zig cc -fno-sanitize=all -target aarch64-macos-none -isysroot /opt/macos-sdk -I/opt/macos-sdk/usr/include -L/opt/macos-sdk/usr/lib -F/opt/macos-sdk/System/Library/Frameworks -w "$@"\n' > /usr/local/bin/zcc-darwin-arm64 && \
+    chmod +x /usr/local/bin/zcc-darwin-arm64 && \
+    printf '#!/bin/sh\nexec zig cc -fno-sanitize=all -target x86_64-macos-none -isysroot /opt/macos-sdk -I/opt/macos-sdk/usr/include -L/opt/macos-sdk/usr/lib -F/opt/macos-sdk/System/Library/Frameworks -w "$@"\n' > /usr/local/bin/zcc-darwin-amd64 && \
+    chmod +x /usr/local/bin/zcc-darwin-amd64 && \
+    printf '#!/bin/sh\nexec zig c++ -fno-sanitize=all -target aarch64-macos-none -isysroot /opt/macos-sdk -I/opt/macos-sdk/usr/include -L/opt/macos-sdk/usr/lib -F/opt/macos-sdk/System/Library/Frameworks -w "$@"\n' > /usr/local/bin/zcxx-darwin-arm64 && \
+    chmod +x /usr/local/bin/zcxx-darwin-arm64 && \
+    printf '#!/bin/sh\nexec zig c++ -fno-sanitize=all -target x86_64-macos-none -isysroot /opt/macos-sdk -I/opt/macos-sdk/usr/include -L/opt/macos-sdk/usr/lib -F/opt/macos-sdk/System/Library/Frameworks -w "$@"\n' > /usr/local/bin/zcxx-darwin-amd64 && \
+    chmod +x /usr/local/bin/zcxx-darwin-amd64
+
+WORKDIR /workspace

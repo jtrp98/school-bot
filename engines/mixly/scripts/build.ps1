@@ -1,7 +1,7 @@
 param([string]$OutputDirectory, [switch]$Test)
 $ErrorActionPreference = 'Stop'
 $mixlySource = Split-Path $PSScriptRoot -Parent
-. "$mixlySource/../../scripts/common.ps1"
+. "$mixlySource/../../scripts/lib/common.ps1"
 Assert-SchoolBotGo
 $mixlyPreviousWorkspace = $env:GOWORK
 $env:GOWORK = 'off'

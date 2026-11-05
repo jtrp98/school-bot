@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+option csharp_namespace = "SchoolBot.Infrastructure.Protos";
+
+package ServiceSchoolBot;
+
+// Error trailers of every SchoolBot RPC: sb-error-bin (ErrorDetail) and schoolbot-error-bin (SchoolBotError).
+message SchoolBotError {
+  string code = 1;
+  string message = 2;
+  string request_id = 3;
+  ErrorDetails details = 4;
+  optional int32 http_status = 5;
+}
+message ErrorDetails {
+  optional string field = 1;
+  optional string current_etag = 2;
+  optional int32 retry_after_seconds = 3;
+  optional int32 resource_id = 4;
+  optional int32 source_position = 5;
+  optional string source_row_key = 6;
+  // Curriculum import row error: details carry source_position, source_row_key (either may be null) and field.
+  bool import_row = 7;
+}
+message ErrorDetail {
+  string code = 1;
+  string message = 2;
+  string message_th = 3;
+  repeated FieldViolation field_violations = 4;
+}
+message FieldViolation {
+  string field = 1;
+  string description = 2;
+  string description_th = 3;
+}

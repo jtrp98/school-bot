@@ -1,5 +1,5 @@
 param([switch]$SkipInstall, [string]$OutputDirectory)
-. "$PSScriptRoot/common.ps1"
+. "$PSScriptRoot/lib/common.ps1"
 Assert-SchoolBotGo
 if ($IsMacOS -and $OutputDirectory) { throw 'OutputDirectory is currently supported by the Windows verification only.' }
 $schoolBotOutput = if ($OutputDirectory) {
@@ -9,7 +9,7 @@ $schoolBotOutput = if ($OutputDirectory) {
 }
 $schoolBotBuildArguments = @{ SkipInstall = $SkipInstall }
 if ($OutputDirectory) { $schoolBotBuildArguments.OutputDirectory = $schoolBotOutput }
-& "$PSScriptRoot/build-desktop.ps1" @schoolBotBuildArguments
+& "$PSScriptRoot/desktop/build.ps1" @schoolBotBuildArguments
 $schoolBotSuffix = if ($env:OS -eq 'Windows_NT') { '.exe' } else { '' }
 $schoolBotEngine = Join-Path $schoolBotOutput "demo-engine$schoolBotSuffix"
 $schoolBotZide = Join-Path $schoolBotOutput "engines/zide/zide-engine$schoolBotSuffix"
@@ -28,20 +28,20 @@ if ($IsMacOS) {
     # The bundled engine is already signed, so the unit tests build into a throwaway directory.
     $schoolBotEngineTestOutput = Join-Path ([IO.Path]::GetTempPath()) "school-bot-zide-$([guid]::NewGuid())"
     try {
-        Invoke-SchoolBotCommand 'bash' @("$PSScriptRoot/build-engine.sh",'zide',$schoolBotEngineTestOutput,'--test')
+        Invoke-SchoolBotCommand 'bash' @("$PSScriptRoot/engines/build.sh",'zide',$schoolBotEngineTestOutput,'--test')
     } finally { Remove-Item -LiteralPath $schoolBotEngineTestOutput -Recurse -Force -ErrorAction SilentlyContinue }
 } else {
     $schoolBotEngineOutput = Join-Path $schoolBotOutput 'engines/zide'
-    & "$PSScriptRoot/build-engine.ps1" -Engine zide -Test -OutputDirectory $schoolBotEngineOutput
+    & "$PSScriptRoot/engines/build.ps1" -Engine zide -Test -OutputDirectory $schoolBotEngineOutput
 }
 if ($IsMacOS) {
     # Same as Zide: the bundled engine is signed, so its tests build into a throwaway directory.
     $schoolBotMixlyTestOutput = Join-Path ([IO.Path]::GetTempPath()) "school-bot-mixly-$([guid]::NewGuid())"
     try {
-        Invoke-SchoolBotCommand 'bash' @("$PSScriptRoot/build-engine.sh",'mixly',$schoolBotMixlyTestOutput,'--test')
+        Invoke-SchoolBotCommand 'bash' @("$PSScriptRoot/engines/build.sh",'mixly',$schoolBotMixlyTestOutput,'--test')
     } finally { Remove-Item -LiteralPath $schoolBotMixlyTestOutput -Recurse -Force -ErrorAction SilentlyContinue }
 } else {
-    & "$PSScriptRoot/build-engine.ps1" -Engine mixly -Test -OutputDirectory (Join-Path $schoolBotOutput 'engines/mixly')
+    & "$PSScriptRoot/engines/build.ps1" -Engine mixly -Test -OutputDirectory (Join-Path $schoolBotOutput 'engines/mixly')
 }
 $schoolBotPreviousZide = $env:ZIDE_ENGINE
 $schoolBotPreviousMixly = $env:MIXLY_ENGINE
@@ -54,6 +54,7 @@ try {
             '--test',
             'app/frontend/tests/frontend-adapter.test.mjs',
             'app/frontend/tests/frontend-workspace.test.mjs',
+            'app/frontend/tests/phase4-simulator.test.mjs',
             'app/frontend/tests/block-lab-blocks.test.mjs',
             'app/frontend/tests/block-lab-boards.test.mjs',
             'app/frontend/tests/block-lab-serial.test.mjs',
@@ -88,6 +89,6 @@ if ($LASTEXITCODE -ne 0 -or $schoolBotResult.status -ne 'success' -or $schoolBot
     $schoolBotResult.data.delivery -ne 'dry-run') {
     throw 'C++ Zide dry-run smoke test failed.'
 }
-Push-Location (Join-Path $SchoolBotRoot 'web')
-try { Invoke-SchoolBotCommand 'dotnet' @('test','SchoolBot.slnx','--disable-build-servers','-m:1','--nologo','-v','minimal') } finally { Pop-Location }
+Push-Location (Join-Path $SchoolBotRoot 'backend')
+try { Invoke-SchoolBotCommand 'dotnet' @('test','ServiceSchoolBot.slnx','--disable-build-servers','-m:1','--nologo','-v','minimal') } finally { Pop-Location }
 Write-Host 'Frontend, i18n, native desktop build, Go checks, Zide IPC, JSON Lines and C# API tests passed.'

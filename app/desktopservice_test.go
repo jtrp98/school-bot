@@ -23,34 +23,77 @@ func TestAPIEndpointPolicy(t *testing.T) {
 	}
 }
 
-func TestOnlineActivationContractWithoutPersistingKey(t *testing.T) {
-	calls := 0
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		calls++
-		var body map[string]string
-		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-			t.Error(err)
-		}
-		if r.Method != http.MethodPost || r.URL.Path != "/v1/licenses/activate" || r.URL.RawQuery != "" || body["key"] != "SBOT-test" || body["device_id"] != "test-device" {
-			t.Error("activation must POST key and device ID in JSON")
-		}
-		_, _ = w.Write([]byte(`{"valid":true,"license_id":"test-license","school":"Demo school","expires_at":"2027-10-16T00:00:00Z","offline_entitlement":false}`))
-	}))
-	defer server.Close()
-	s := &DesktopService{apiURL: server.URL, deviceID: "test-device", dataDir: t.TempDir()}
-	if _, err := s.ActivateLicense(" \t"); err == nil {
-		t.Fatal("empty key accepted")
+func TestEnvironmentManagement(t *testing.T) {
+	tempDir := t.TempDir()
+	s := &DesktopService{
+		apiURL:  "http://localhost:8080",
+		dataDir: tempDir,
 	}
-	result, err := s.ActivateLicense(" SBOT-test ")
-	if err != nil || !strings.Contains(result, `"valid":true`) || calls != 1 {
-		t.Fatalf("online activation failed: %s, calls %d, %v", result, calls, err)
+
+	env := s.GetEnvironment()
+	if env.ActiveEnv != "local" || env.CurrentURL != "http://localhost:8080" {
+		t.Fatalf("expected initial local environment, got %+v", env)
 	}
-	files, err := os.ReadDir(s.dataDir)
-	if err != nil || len(files) != 0 {
-		t.Fatal("activation must not persist the raw key", err)
+
+	// Switch to dev preset
+	info, err := s.SetEnvironment("dev", "")
+	if err != nil {
+		t.Fatalf("SetEnvironment dev failed: %v", err)
+	}
+	if info.APIURL != EnvironmentPresets["dev"] {
+		t.Fatalf("expected APIURL to match dev preset, got %s", info.APIURL)
+	}
+	if s.GetEnvironment().ActiveEnv != "dev" {
+		t.Fatalf("expected active env dev, got %s", s.GetEnvironment().ActiveEnv)
+	}
+
+	// Verify persistence in environment.json
+	restoredURL := readSavedEnvironment(tempDir)
+	if restoredURL != EnvironmentPresets["dev"] {
+		t.Fatalf("expected saved environment to be %s, got %s", EnvironmentPresets["dev"], restoredURL)
+	}
+
+	// Switch to custom URL
+	custom := "https://staging.schoolbright.co/api"
+	info, err = s.SetEnvironment("custom", custom)
+	if err != nil {
+		t.Fatalf("SetEnvironment custom failed: %v", err)
+	}
+	if info.APIURL != custom {
+		t.Fatalf("expected custom APIURL, got %s", info.APIURL)
+	}
+	if s.GetEnvironment().ActiveEnv != "custom" {
+		t.Fatalf("expected active env custom, got %s", s.GetEnvironment().ActiveEnv)
+	}
+
+	// Unsafe custom URL must fail
+	if _, err := s.SetEnvironment("custom", "http://insecure.example.com"); err == nil {
+		t.Fatal("expected insecure custom HTTP to fail")
+	}
+
+	// Reset to default
+	info, err = s.ResetEnvironment()
+	if err != nil {
+		t.Fatalf("ResetEnvironment failed: %v", err)
+	}
+	if info.APIURL != defaultAPIURL {
+		t.Fatalf("expected defaultAPIURL %s, got %s", defaultAPIURL, info.APIURL)
+	}
+	if restored := readSavedEnvironment(tempDir); restored != "" {
+		t.Fatalf("expected environment.json to be cleared on reset, got %s", restored)
 	}
 }
 
+func TestActivationRequiresConfiguredEntitlementHost(t *testing.T) {
+	service := &DesktopService{dataDir: t.TempDir()}
+	if _, err := service.ActivateLicense("SBOT-test"); err == nil {
+		t.Fatal("activation without a configured entitlement host must fail closed")
+	}
+	files, err := os.ReadDir(service.dataDir)
+	if err != nil || len(files) != 0 {
+		t.Fatal("unconfigured activation wrote credentials")
+	}
+}
 func TestRenamePreservesLegacyProjectsAndDeviceID(t *testing.T) {
 	root := t.TempDir()
 	legacy := filepath.Join(root, "ArmStudioPoC")
@@ -131,7 +174,7 @@ func TestAppVersionMatchesManifest(t *testing.T) {
 
 func TestHostAPIContractAndOfflineFailure(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/v1/updates/check" || r.URL.Query().Get("version") != appVersion {
+		if r.URL.Path != "/api/service-school-bot/updates/check" || r.URL.Query().Get("version") != appVersion {
 			t.Error("update contract mismatch")
 		}
 		_, _ = w.Write([]byte(`{"available":false,"release":null,"install_supported":false}`))

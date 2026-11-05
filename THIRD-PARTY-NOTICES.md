@@ -9,7 +9,7 @@ application: the Go host built with `-tags production` for Windows (amd64) and m
 engine under `engines/mixly`.
 The inventory below is derived from `go list -deps`, `app/go.mod`, `app/frontend/package-lock.json`
 (production `dependencies` and their runtime dependencies only), the built bundle, and `engines/zide/third_party`.
-`scripts/check-notices.mjs` fails the release when a delivered Go module or npm package is missing from this inventory.
+`scripts/checks/third-party-notices.mjs` fails the release when a delivered Go module or npm package is missing from this inventory.
 License texts are copied from the pinned package or module files; they are not summarised from memory.
 
 ## Inventory

@@ -23,20 +23,20 @@ contracts/engine/
   manifest.schema.json      # shared engine metadata structure
   request.schema.json       # common envelope; actions belong to each engine
   response.schema.json
-scripts/
-  build-engine.ps1          # selects an engine by ID, then delegates to its script
-  build-engine.sh
+scripts/engines/
+  build.ps1                 # selects an engine by ID, then delegates to its script
+  build.sh
 ```
 
 ## Build one engine
 
 ```powershell
-./scripts/build-engine.ps1 -Engine zide -Test
+./scripts/engines/build.ps1 -Engine zide -Test
 node --test engines/zide/tests/ipc.test.mjs
 ```
 
 ```bash
-bash scripts/build-engine.sh zide --test
+bash scripts/engines/build.sh zide --test
 # Engine-specific direct build and test:
 bash engines/zide/scripts/build.sh /tmp/zide-output --test
 ```
@@ -84,7 +84,7 @@ Engines:
   code generation, port list, compile and (Windows only) upload, routed and bundled by the desktop.
 
 ```powershell
-./scripts/build-engine.ps1 -Engine mixly -Test
+./scripts/engines/build.ps1 -Engine mixly -Test
 ```
 
 Release source/symbol handling and its limits are described in

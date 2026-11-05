@@ -38,10 +38,9 @@ type Manager struct {
 	command  func(context.Context, string) *exec.Cmd
 	arm      armPorts
 	session  engineSession
-	// A compile or upload holds the slot; a Serial monitor must not take the board's port then.
 	building bool
-	// An upload stopped half way leaves the board without a whole program, so only StopUpload ends one.
 	uploading bool
+	simulator *hardwareSimulator
 }
 
 func locateEngine(spec engineSpec) (string, error) {
@@ -64,7 +63,7 @@ func locateEngine(spec engineSpec) (string, error) {
 }
 
 func NewManager() *Manager {
-	return &Manager{
+	manager := &Manager{
 		slots:   make(chan struct{}, 1),
 		timeout: requestTimeout,
 		resolve: locateEngine,
@@ -72,6 +71,10 @@ func NewManager() *Manager {
 			return exec.CommandContext(ctx, path)
 		},
 	}
+	if os.Getenv("SCHOOL_BOT_HARDWARE_SIMULATOR") == "1" {
+		manager.simulator = newHardwareSimulator(os.Getenv("SCHOOL_BOT_SIMULATOR_SCENARIO"))
+	}
+	return manager
 }
 
 // Cancel is what leaving a mode and closing the window ask for. It lets a robot.stop and a
@@ -171,6 +174,9 @@ func (m *Manager) Execute(mode, action string, data json.RawMessage) (Response, 
 		close(done)
 		m.mu.Unlock()
 	}()
+	if mode == "robot-control" && m.simulator != nil {
+		return m.simulator.execute(ctx, action, data), nil
+	}
 	// avrdude needs the board's port, which an open Serial monitor holds. Closing it only once
 	// this upload has the slot keeps a busy refusal from ending the session for nothing.
 	if action == "program.upload" {

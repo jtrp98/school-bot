@@ -2,20 +2,28 @@
 
 Starter สำหรับแบ่งทีมพัฒนา 3 Mode ไม่ใช่ Production Release
 
-- `app/` — **Go + Wails v3 + React + TypeScript**, Desktop ทั้งหมด
+- `app/` — **Go + Wails v3 + React + TypeScript**, Desktop ทั้งหมด (รวม Desktop UI ใน `app/frontend/`)
+- `frontend/` — **Next.js 14 + Tailwind CSS + TypeScript**, Teacher Web (คู่มือครู RoboX, แผนการสอน ป.1–6, คอร์สปรับพื้นฐาน, และระบบประเมินผล/ส่งเกรด)
+- `backend/` — **C# / ASP.NET Core .NET 10**, Backend API แบบ **Clean Architecture**; ดู [database-first scaffold และคำสั่ง re-scaffold](backend/README.md#ef-core-database-first-scaffold)
 - `contracts/` — Engine JSON contract ที่ทุกทีมใช้ร่วมกัน
 - `engines/` — Engine แยกตาม ID แต่ละตัวมี source, dependencies, tests และ build ของตัวเอง; ดู `engines/README.md`
 - `docs/` — Architecture, การติดตั้ง/Deploy, การเตรียมเครื่องครู และการปกป้องโค้ด
 
-C# API (`web/`) ไม่ได้อยู่ใน repository นี้ Desktop ใช้สาม Mode ได้โดยไม่ต้องเปิด API
-
 Engine `mixly` อยู่ใน `engines/mixly/` และ build แยกด้วย
-`./scripts/build-engine.ps1 -Engine mixly -Test` รองรับตัวสร้างโค้ดจากต้นฉบับ Mixly;
+`./scripts/engines/build.ps1 -Engine mixly -Test` รองรับตัวสร้างโค้ดจากต้นฉบับ Mixly;
 host route การสร้างโค้ด (`program.generate`, `project.validate`), รายการพอร์ต (`device.list` ไม่เปิดพอร์ต)
 และการแปลงโค้ด/ส่งลงบอร์ด (`program.compile`, `program.upload` รับเฉพาะบล็อกของ Block Lab ไม่รับโค้ด C++ ดิบ
 field ที่ generator แปะลง C++ ต้องเป็นค่าที่บล็อกมีให้เลือก ส่งลงบอร์ดได้เฉพาะ Windows) และ Serial ของบอร์ดที่เลือก
 (`serial.open`/`read`/`write`/`close` เปิดพอร์ตค้างใน engine process เดียว) ของ Block Lab มาที่ engine นี้ Desktop/Installer รวม engine และ Arduino library
 ที่บล็อกใช้ไว้แล้ว ส่วน arduino-cli + AVR core ต้องติดตั้งแยกผ่าน Arduino IDE 2.2 ขึ้นไป ดูขอบเขตที่ `engines/mixly/README.md`
+
+## Labs Hardware Simulator
+
+Run `npm run dev -- --port 5181` from `app/frontend`, then open
+`http://127.0.0.1:5181/?simulator=1&view=robot-control&screen=connect` and choose Guest.
+The explicit simulator supports HID/Serial profiles, poses, queues, upload/readback,
+emergency torque cutoff and fault injection entirely in memory. Code/Block Labs
+produce bounded visual traces. See [Phase 4 verification and remaining acceptance](docs/PHASE4-LABS.md).
 
 ## Quick start (Windows / PowerShell)
 
@@ -27,38 +35,46 @@ Wails Go module และ JS runtime ล็อกไว้ที่ **v3.0.0-bet
 
 ```powershell
 # รันจาก repository root: ติดตั้ง dependencies และ build Desktop
-./scripts/build-desktop.ps1
+./scripts/desktop/build.ps1
 
-# เปิด Desktop ที่ build แล้ว
-./scripts/start-desktop.ps1 -SkipBuild
+# เปิด Desktop ที่ build แล้ว (ไม่ต้องเปิด API ก็ใช้สาม Mode ได้)
+./scripts/desktop/run.ps1 -SkipBuild
 
-# ตรวจ frontend, i18n, Go, JSON IPC (smoke + ipc.test.mjs), Zide C++ tests และ Mixly engine tests
-# ขั้นสุดท้ายของสคริปต์รัน dotnet test ใน web/ ซึ่งไม่มีใน repository นี้ จึงล้มที่ขั้นนั้น ขั้นก่อนหน้าผ่านแล้วถือว่าใช้ได้
+# อีก terminal: เปิด SchoolBot gRPC ที่ 127.0.0.1:8080 และ health HTTP ที่ 127.0.0.1:8081
+./scripts/api/run.ps1
+
+# ตรวจ frontend, i18n, Go, JSON IPC (smoke + ipc.test.mjs), Zide C++ tests, Mixly engine tests, C# integration และ architecture tests
 ./scripts/verify.ps1 -SkipInstall
 
 # ถ้า app/bin มีแอปที่กำลังเปิดอยู่ ให้ build และตรวจในโฟลเดอร์แยก (Windows)
 ./scripts/verify.ps1 -SkipInstall -OutputDirectory "$env:TEMP\school-bot-verify"
 
 # Build อย่างเดียวในโฟลเดอร์แยก (ไม่แตะ app/bin ที่เปิดอยู่)
-./scripts/build-desktop.ps1 -SkipInstall -OutputDirectory "$env:TEMP\school-bot-build"
+./scripts/desktop/build.ps1 -SkipInstall -OutputDirectory "$env:TEMP\school-bot-build"
 ```
 
 Build ได้ `school-bot-<version>.exe` (เวอร์ชันจาก `app/frontend/package.json`) และสำเนา `school-bot.exe` ที่ installer/start script ใช้;
-Windows build ฝังไอคอน `app/build/windows/appicon.ico` และ version resource ผ่าน `scripts/windows-resources` แล้วตรวจ `-verify` ให้อัตโนมัติ; สร้างไอคอนใหม่จากโลโก้ด้วย `scripts/create-windows-icon.ps1`
+Windows build ฝังไอคอน `app/build/windows/appicon.ico` และ version resource ผ่าน `scripts/assets/windows-resources` แล้วตรวจ `-verify` ให้อัตโนมัติ; สร้างไอคอนใหม่จากโลโก้ด้วย `scripts/assets/create-windows-icon.ps1`
+
+ดูคำสั่งและหมวดหมู่ทั้งหมดที่ [scripts/README.md](scripts/README.md)
 
 ถ้าเครื่องมีนโยบายห้ามรัน PowerShell scripts ให้ใช้คำสั่งด้านล่าง หรือให้ IT ใช้นโยบายที่อนุมัติแล้ว ไม่จำเป็นต้องปิดระบบรักษาความปลอดภัย
-คำสั่งนี้เป็นขั้นต่ำเพื่อลองรัน ไม่ได้ฝังไอคอน/version resource และไม่ได้ตั้ง `-X main.appVersion` ใช้ `scripts/build-desktop.ps1` เมื่อจะส่งมอบ
+คำสั่งนี้เป็นขั้นต่ำเพื่อลองรัน ไม่ได้ฝังไอคอน/version resource และไม่ได้ตั้ง `-X main.appVersion` ใช้ `scripts/desktop/build.ps1` เมื่อจะส่งมอบ
 
 ```powershell
 cd app/frontend
 npm ci
 npm run build
 cd ..
-../scripts/build-engine.ps1 -Engine zide -OutputDirectory ./bin/engines/zide
-../scripts/build-engine.ps1 -Engine mixly -OutputDirectory "$PWD/bin/engines/mixly"
+../scripts/engines/build.ps1 -Engine zide -OutputDirectory ./bin/engines/zide
+../scripts/engines/build.ps1 -Engine mixly -OutputDirectory "$PWD/bin/engines/mixly"
 go build -trimpath -ldflags '-s -w' -o bin/demo-engine.exe ./cmd/demo-engine
 go build -trimpath -tags production -ldflags '-s -w -H windowsgui' -o bin/school-bot.exe .
 ./bin/school-bot.exe
+
+# อีก terminal
+cd backend
+dotnet run --project src/ServiceSchoolBot.API --no-launch-profile
 ```
 
 ## macOS (Intel / Apple Silicon)
@@ -68,8 +84,11 @@ go build -trimpath -tags production -ldflags '-s -w -H windowsgui' -o bin/school
 
 ```bash
 # รันจาก repository root บน Mac ไม่ต้องติดตั้ง PowerShell
-bash scripts/build-desktop.sh
-bash scripts/start-desktop.sh --skip-build
+bash scripts/desktop/build.sh
+bash scripts/desktop/run.sh --skip-build
+
+# อีก Terminal หากต้องการเปิด C# API
+bash scripts/api/run.sh
 ```
 
 - Apple Silicon → `app/bin/darwin-arm64/School Bot.app`
@@ -80,7 +99,7 @@ bash scripts/start-desktop.sh --skip-build
 - ใช้ WKWebView ของ macOS ไม่ต้องติดตั้ง WebView2
 - Build Script ใช้ ad-hoc signing สำหรับพัฒนาในเครื่อง **ยังไม่ใช่ Developer ID / notarized release**
   ก่อนแจกนอกทีมต้องทำ signing/notarization ตามคู่มือ `docs/INSTALLERS.md`
-- PowerShell 7 บน Mac ยังใช้ `scripts/build-desktop.ps1` และ `scripts/verify.ps1` ได้
+- PowerShell 7 บน Mac ยังใช้ `scripts/desktop/build.ps1` และ `scripts/verify.ps1` ได้
 
 ## สิ่งที่ทดลองได้
 
@@ -97,16 +116,33 @@ Block Lab ส่งลงบอร์ดจริงเมื่อเลือ�
 
 ## API / License
 
-C# API อยู่นอก repository นี้ Desktop ส่ง License Key ไป Activate แต่ **ไม่บันทึก Key**
-ใน PoC ไม่มี Offline License Token หรือ License Enforcement และ Local Learning ไม่ถูกปิดเมื่อ API ล่ม
+SchoolBot ให้บริการ **gRPC เท่านั้น** สำหรับ Projects, Licenses, Curricula, Assessments และ Releases
+HTTP เหลือ `/healthz`; ค่าปริยายคือ gRPC h2c `127.0.0.1:8080` และ health HTTP `127.0.0.1:8081`
+เส้นทางของ client คือ Desktop/Web → HTTP Gateway → gRPC SchoolBot โดย browser ผ่าน same-origin BFF
+สัญญา HTTP อยู่ที่ [docs/API.md](docs/API.md) และใช้ prefix `/api/service-school-bot/` โดยไม่มี v1/v2
 
-Desktop ต่ออินเทอร์เน็ตได้สำหรับ Activate License และตรวจอัปเดต ส่วนสาม Mode ทำงานในเครื่อง
-ระหว่างพัฒนา API รันที่ `http://localhost:8080` ตามเดิม. เป้าหมายใช้งานจริงคือ Desktop/Web→HTTP Gateway→gRPC SchoolBot โดยเว็บผ่าน same-origin BFF; ไม่เปิด B เป็น public fallback. B ปัจจุบันยังเป็น HTTP; ต้องทำ RPC/HTTP mapping และ trusted tenant/opaque-session boundary ก่อนใช้งานผ่าน Gateway. ตัวอย่าง Build ด้านล่างสาธิตการฝัง URL เท่านั้น ไม่ยืนยันว่า Gateway integration พร้อม
+Login ใช้ `POST /api/auth/login` ของ Gateway และส่ง `Authorization: Bearer <Gateway JWT>`
+สำหรับผู้ใช้ที่ login เต็มรูป (`AccessLevel=1`); desktop ส่ง `X-Device-Entitlement` เพิ่มเมื่อเรียกข้อมูลของผู้ใช้
+TAdmin (`admin_id`) เป็น staff ส่วนกลาง ส่วน `IsAdmin` เป็นแอดมินโรงเรียน
+SchoolBot ไม่มี admin key, logout หรือ web-session exchange ของตัวเองแล้ว
+Device challenge, activate/validate และ update check เป็น anonymous ที่ Gateway แต่ device licensing ยังตรวจ key และ signed proof
+
+ค่าเริ่มต้นใช้ Memory Store: **ข้อมูลหายเมื่อ restart**; file store มีไว้สำหรับการทดสอบ persistence ตามข้อจำกัดใน [backend/README.md](backend/README.md)
+License key สุ่มด้วย cryptographic RNG และเก็บ hash; การสร้างคืน key และรองรับ replay ตามสัญญา idempotency
+Device activation คืน signed entitlement ของ stub ซึ่งยังต้องมี production signing/key management
+Publish release เปิดเผย metadata เท่านั้น ไม่ดาวน์โหลด ติดตั้ง หรือตรวจ artifact signature ให้
+
+Gateway มี module/mapping แล้ว แต่ **ยังไม่ต่อเข้า Program ของ Gateway** และยังไม่ผ่าน H5/G-AUTH
+SchoolBot ใช้ `DenyAllGatewayPeerVerifier` และ Gateway ใช้ `ProductionSchoolBotTransportValidator` ที่ปฏิเสธเมื่อยังไม่มี trusted transport
+จึงยังเปิดใช้ production ไม่ได้ และไม่มี HTTP fallback ที่ SchoolBot
+
+Desktop ใน `app/` ยังใช้ URL/path HTTP เดิม ต้องย้ายให้ชี้ Gateway พร้อม JWT และ entitlement ก่อนใช้ flow นี้จริง
+การตั้ง base URL อย่างเดียวไม่เปลี่ยน path เดิม ตัวอย่าง Build ด้านล่างสาธิตการฝัง URL เท่านั้น
 
 ```powershell
 # สำหรับ Build แจกทีม: ฝัง public API URL ใน executable (ตัวอย่าง Domain เท่านั้น)
 $env:SCHOOL_BOT_BUILD_API_URL = 'https://api.example.com'
-./scripts/build-desktop.ps1 -SkipInstall
+./scripts/desktop/build.ps1 -SkipInstall
 ```
 
 ผู้รับแอปไม่ต้องตั้ง URL เอง ส่วนผู้พัฒนายัง Override ตอนเปิดด้วย `$env:SCHOOL_BOT_API_URL` ได้
@@ -121,6 +157,7 @@ $env:SCHOOL_BOT_BUILD_API_URL = 'https://api.example.com'
 | Mode 2 Adventure | `app/frontend/src/modes/coding-adventure/`, `app/frontend/src/components/coding-adventure/` |
 | Mode 3 Block Lab | `app/frontend/src/modes/block-programming/`, `engines/mixly/` |
 | Desktop Core | `app/desktopservice.go`, `app/internal/engine/`, `app/frontend/src/core/` |
+| API | `backend/ServiceSchoolBot.slnx` และ 4 layers ใน `backend/src/` |
 
 อ่าน `docs/ARCHITECTURE.md` และ `engines/README.md` ก่อนแก้ shared contract
 Mode ใช้ `app/frontend/src/core/client.ts` ร่วมกัน; การเพิ่ม Action ต้องปรับ contract, engine และ frontend types ให้ตรงกัน
@@ -151,16 +188,16 @@ Block Lab ใน preview: `?preview=1&view=block-programming` · หน้าเ
 
 ```powershell
 # Windows: Build แอปและสร้าง setup EXE พร้อม MSI สำหรับ IT
-./scripts/package-desktop.ps1
+./scripts/desktop/package.ps1
 # ถ้า Build แอปล่าสุดไว้แล้ว
-./scripts/package-desktop.ps1 -SkipBuild
+./scripts/desktop/package.ps1 -SkipBuild
 # เมื่อ app/bin มีแอปที่เปิดอยู่ ให้ build และแพ็กจากโฟลเดอร์แยก
-./scripts/package-desktop.ps1 -PayloadDirectory "$env:TEMP\school-bot-payload"
+./scripts/desktop/package.ps1 -PayloadDirectory "$env:TEMP\school-bot-payload"
 ```
 
 ```bash
 # macOS: สร้าง .pkg ไฟล์เดียวสำหรับ Intel + Apple Silicon (ต้องรันบน Mac)
-bash scripts/package-desktop.sh
+bash scripts/desktop/package.sh
 ```
 
 Installer อยู่ใน `dist/installers/` พร้อมไฟล์ SHA256 ดูขั้นตอนติดตั้งใน `docs/INSTALLERS.md`
@@ -171,7 +208,7 @@ Setup EXE วาดหน้าต่างไร้กรอบ มุมโค
 หากเครื่องไม่มี WebView2 แอปจะขอให้ติดตั้งผ่านอินเทอร์เน็ตตอนเปิดครั้งแรก
 Mac Installer ลง `School Bot.app` ใน `/Applications`
 Installer นี้ยังเป็น development build ที่ไม่ลงนาม ต้องทำ Windows signing / Mac Developer ID + notarization ก่อนแจกภายนอก
-C# API Deploy แยกบน Server ไม่รวมใน Desktop Installer
+API ใน `backend/` Deploy แยกบน Server ไม่รวมใน Desktop Installer
 
 ส่ง Source พร้อม `go.mod`, `go.sum` และ `package-lock.json` ทั้งชุด
 สร้าง ZIP สำหรับส่งให้ทีมด้วย `./scripts/package-source.ps1` จะได้ `dist/school-bot-team-starter.zip`
@@ -190,7 +227,7 @@ macOS มี `.app`/ZIP สำหรับพัฒนาและ Universal `.p
 
 การเปลี่ยนชื่อจะคัดลอก Project/Device ID เดิมจาก `ArmStudioPoC` ไป `SchoolBotPoC` เมื่อไฟล์ใหม่ยังไม่มี
 ไม่แก้ไฟล์เดิมและไม่ทับ Project ใหม่ Device ID เดิมช่วยไม่ให้ใช้ License seat เพิ่ม
-ใช้ `SCHOOL_BOT_API_URL` / `SCHOOL_BOT_ADMIN_KEY` สำหรับตั้งค่าใหม่ โดยยังอ่าน `ARM_API_URL` / `ARM_ADMIN_KEY` เดิมเป็น fallback ได้
+Host ยังอ่าน `SCHOOL_BOT_API_URL` และ fallback `ARM_API_URL`; ค่าปริยายและ path เดิมของ desktop ยังต้องย้ายตามสัญญา Gateway ข้างต้น
 
 ## Verification / limits
 

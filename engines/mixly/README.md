@@ -29,15 +29,15 @@ Node.js to run the IPC tests. `go.mod`/`go.sum` pin the engine's dependencies.
 
 ```powershell
 # From the repository root:
-./scripts/build-engine.ps1 -Engine mixly -Test
+./scripts/engines/build.ps1 -Engine mixly -Test
 # Use an isolated output if another build is running:
-./scripts/build-engine.ps1 -Engine mixly -Test -OutputDirectory ./engines/mixly/bin/check
+./scripts/engines/build.ps1 -Engine mixly -Test -OutputDirectory ./engines/mixly/bin/check
 ```
 
 ```bash
-bash scripts/build-engine.sh mixly --test
+bash scripts/engines/build.sh mixly --test
 # Cross-compile a standalone Mac binary (run tests on the matching platform):
-ENGINE_ARCH=arm64 bash scripts/build-engine.sh mixly /tmp/mixly-arm64
+ENGINE_ARCH=arm64 bash scripts/engines/build.sh mixly /tmp/mixly-arm64
 ```
 
 Default output: `bin/<os>-<arch>/mixly-engine[.exe]`, manifest, executable SHA256,
@@ -132,7 +132,7 @@ OS serial write completion does not verify device acknowledgement or motion.
 
 ```powershell
 ./engines/mixly/scripts/import-source.ps1 -SourceDirectory C:/path/to/sb-app-mixly
-./scripts/build-engine.ps1 -Engine mixly -Test
+./scripts/engines/build.ps1 -Engine mixly -Test
 ```
 
 The importer selects generator dependencies, board profiles/configuration and

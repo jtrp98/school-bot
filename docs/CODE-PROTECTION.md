@@ -52,7 +52,7 @@ Run these on Windows; each must pass before a release payload is packaged:
 - `npm run build` in `app/frontend` runs `scripts/check-release-assets.mjs`, which fails when
   original source files, PDBs, source maps, map references or development directories are
   in the embedded assets.
-- `scripts/build-engine.ps1 -Engine zide -Test` and
+- `scripts/engines/build.ps1 -Engine zide -Test` and
   `node --test engines/zide/tests/ipc.test.mjs` run protocol and IPC tests in dry-run only;
   no hardware command is sent.
 - Inspect the PE headers of the built executables: the C++ engine has no export table and no

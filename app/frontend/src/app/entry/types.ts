@@ -16,7 +16,7 @@ export interface PublicEntitlement {
   canUseOffline?: boolean;
 }
 
-export type LoginResult = "success" | "invalid_credentials" | "network" | "unavailable";
+export type LoginResult = "success" | "invalid_credentials" | "network" | "unavailable" | "verification_required" | "password_reset_required";
 export type EntryFeedback = Exclude<LoginResult, "success"> | "operation_failed" | "recovery_failed";
 
 export interface EntryActions {
@@ -25,6 +25,7 @@ export interface EntryActions {
   useOffline?: () => Promise<void>;
   guest: () => Promise<void>;
   login?: (username: string, password: string) => Promise<LoginResult>;
+  logout?: () => Promise<void>;
   saveAndRequestStop?: () => Promise<void>;
 }
 

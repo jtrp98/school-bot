@@ -3,8 +3,6 @@ package main
 import (
 	"bytes"
 	"context"
-	"crypto/rand"
-	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -15,7 +13,11 @@ import (
 	"path/filepath"
 	"runtime"
 	"schoolbot.local/app/internal/engine"
+	"schoolbot.local/app/internal/license"
+	"schoolbot.local/app/internal/project"
+	"schoolbot.local/app/internal/updater"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -28,12 +30,69 @@ const unreleasedVersion = "0.0.0"
 // This URL is embedded in distributed binaries, so it must not contain secrets.
 var defaultAPIURL = "http://localhost:8080"
 
+var EnvironmentPresets = map[string]string{
+	"local": "http://localhost:8080",
+	"dev":   "https://api-dev.schoolbright.co",
+	"prod":  "https://api.schoolbright.co",
+}
+
+type EnvironmentInfo struct {
+	CurrentURL string            `json:"current_url"`
+	ActiveEnv  string            `json:"active_env"`
+	Presets    map[string]string `json:"presets"`
+}
+
+type savedEnvironment struct {
+	ActiveEnv string `json:"active_env"`
+	CustomURL string `json:"custom_url,omitempty"`
+}
+
+func determineActiveEnv(currentURL string) string {
+	clean := strings.TrimRight(currentURL, "/")
+	for env, url := range EnvironmentPresets {
+		if clean == strings.TrimRight(url, "/") {
+			return env
+		}
+	}
+	return "custom"
+}
+
+func readSavedEnvironment(dir string) string {
+	path := filepath.Join(dir, "environment.json")
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return ""
+	}
+	var saved savedEnvironment
+	if err := json.Unmarshal(data, &saved); err != nil {
+		return ""
+	}
+	if saved.ActiveEnv == "custom" && saved.CustomURL != "" {
+		if err := validateAPIURL(saved.CustomURL); err == nil {
+			return saved.CustomURL
+		}
+	} else if url, ok := EnvironmentPresets[saved.ActiveEnv]; ok {
+		return url
+	}
+	return ""
+}
+
+type DesktopSession struct {
+	Username  string `json:"username"`
+	Token     string `json:"token,omitempty"`
+	ExpiresAt string `json:"expires_at,omitempty"`
+}
+
 type DesktopService struct {
-	manager     *engine.Manager
-	apiURL      string
-	dataDir     string
-	deviceID    string
-	closeWindow func()
+	mu           sync.Mutex
+	manager      *engine.Manager
+	entitlement  *license.Host
+	projectStore *project.LocalStore
+	updater      *updater.Client
+	session      *DesktopSession
+	apiURL       string
+	dataDir      string
+	closeWindow  func()
 }
 
 func (s *DesktopService) CloseWindow() error {
@@ -52,38 +111,109 @@ type AppInfo struct {
 }
 
 func NewDesktopService() (*DesktopService, error) {
-	base := os.Getenv("SCHOOL_BOT_API_URL")
-	if base == "" {
-		base = os.Getenv("ARM_API_URL")
-	}
-	if base == "" {
-		base = defaultAPIURL
-	}
 	config, err := os.UserConfigDir()
 	if err != nil {
-		config = os.TempDir()
+		return nil, err
 	}
 	dir, err := prepareDataDirectory(config)
 	if err != nil {
 		return nil, err
 	}
-	deviceFile := filepath.Join(dir, "device-id")
-	device, err := readBoundedFile(deviceFile, 32)
-	if err != nil || !validDeviceID(device) {
-		value := make([]byte, 16)
-		if _, err := rand.Read(value); err != nil {
-			return nil, err
-		}
-		device = []byte(hex.EncodeToString(value))
-		if err := os.WriteFile(deviceFile, device, 0600); err != nil {
-			return nil, err
-		}
+	base := os.Getenv("SCHOOL_BOT_API_URL")
+	if base == "" {
+		base = os.Getenv("ARM_API_URL")
 	}
-	return &DesktopService{
-		manager:  engine.NewManager(),
-		apiURL:   strings.TrimRight(base, "/"),
-		dataDir:  dir,
-		deviceID: string(device),
+	if base == "" {
+		base = readSavedEnvironment(dir)
+	}
+	if base == "" {
+		base = defaultAPIURL
+	}
+	entitlement := license.NewHost(
+		base, &http.Client{}, license.NewSystemClock(), &license.ES256Verifier{},
+		&license.ProtectedStore{Path: filepath.Join(dir, "entitlement.dat")},
+	)
+	svc := &DesktopService{
+		manager:     engine.NewManager(),
+		entitlement: entitlement,
+		apiURL:      strings.TrimRight(base, "/"),
+		dataDir:     dir,
+	}
+	if store, err := svc.ensureProjectStore(); err == nil {
+		_, _ = project.MigrateLegacyProjects(config, store)
+	}
+	return svc, nil
+}
+
+func (s *DesktopService) GetEnvironment() EnvironmentInfo {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return EnvironmentInfo{
+		CurrentURL: s.apiURL,
+		ActiveEnv:  determineActiveEnv(s.apiURL),
+		Presets:    EnvironmentPresets,
+	}
+}
+
+func (s *DesktopService) SetEnvironment(env string, customURL string) (AppInfo, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	var targetURL string
+	if env == "custom" {
+		targetURL = strings.TrimSpace(customURL)
+	} else if preset, ok := EnvironmentPresets[env]; ok {
+		targetURL = preset
+	} else {
+		return AppInfo{}, fmt.Errorf("unknown environment preset: %s", env)
+	}
+
+	targetURL = strings.TrimRight(targetURL, "/")
+	if err := validateAPIURL(targetURL); err != nil {
+		return AppInfo{}, err
+	}
+
+	s.apiURL = targetURL
+	s.entitlement = license.NewHost(
+		targetURL, &http.Client{}, license.NewSystemClock(), &license.ES256Verifier{},
+		&license.ProtectedStore{Path: filepath.Join(s.dataDir, "entitlement.dat")},
+	)
+	s.updater = nil
+
+	saved := savedEnvironment{
+		ActiveEnv: env,
+		CustomURL: customURL,
+	}
+	if data, err := json.MarshalIndent(saved, "", "  "); err == nil {
+		_ = os.WriteFile(filepath.Join(s.dataDir, "environment.json"), data, 0600)
+	}
+
+	return AppInfo{
+		Version:  appVersion,
+		Platform: runtime.GOOS + "-" + runtime.GOARCH,
+		APIURL:   s.apiURL,
+		Runtime:  "Wails v3 · native engine IPC",
+	}, nil
+}
+
+func (s *DesktopService) ResetEnvironment() (AppInfo, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	_ = os.Remove(filepath.Join(s.dataDir, "environment.json"))
+	base := defaultAPIURL
+	s.apiURL = strings.TrimRight(base, "/")
+	s.entitlement = license.NewHost(
+		base, &http.Client{}, license.NewSystemClock(), &license.ES256Verifier{},
+		&license.ProtectedStore{Path: filepath.Join(s.dataDir, "entitlement.dat")},
+	)
+	s.updater = nil
+
+	return AppInfo{
+		Version:  appVersion,
+		Platform: runtime.GOOS + "-" + runtime.GOARCH,
+		APIURL:   s.apiURL,
+		Runtime:  "Wails v3 · native engine IPC",
 	}, nil
 }
 
@@ -102,6 +232,12 @@ func (s *DesktopService) Run(mode, action, data string) (engine.Response, error)
 	if !json.Valid([]byte(data)) {
 		return engine.Response{}, errors.New("invalid engine JSON")
 	}
+	if s.entitlement == nil {
+		return engine.Response{}, &license.LicenseError{Code: license.ErrDeviceNotActivated, Message: "connect online to activate this device"}
+	}
+	if err := s.entitlement.Authorize(context.Background(), mode); err != nil {
+		return engine.Response{}, err
+	}
 	return s.manager.Execute(mode, action, json.RawMessage(data))
 }
 func (s *DesktopService) CancelRun() { s.manager.Cancel() }
@@ -117,15 +253,158 @@ func (s *DesktopService) CheckUpdates() (string, error) {
 		"channel":  {"stable"},
 		"platform": {runtime.GOOS + "-" + runtime.GOARCH},
 	}
-	return s.api("GET", "/v1/updates/check?"+query.Encode(), nil)
+	return s.api("GET", "/api/service-school-bot/updates/check?"+query.Encode(), nil)
 }
 
 func (s *DesktopService) ActivateLicense(key string) (string, error) {
-	key = strings.TrimSpace(key)
-	if key == "" || len(key) > 256 {
-		return "", errors.New("invalid key")
+	return s.checkLicense(key, false)
+}
+
+func (s *DesktopService) ValidateLicense(keys ...string) (string, error) {
+	key := ""
+	if len(keys) > 0 {
+		key = keys[0]
 	}
-	return s.api("POST", "/v1/licenses/activate", map[string]string{"key": key, "device_id": s.deviceID})
+	if strings.TrimSpace(key) == "" && s.entitlement != nil {
+		if saved, err := s.entitlement.SavedKey(context.Background()); err == nil && saved != "" {
+			key = saved
+		}
+	}
+	return s.checkLicense(key, true)
+}
+
+func (s *DesktopService) LoginSession(username, password string) (string, error) {
+	username = strings.TrimSpace(username)
+	if username == "" || password == "" {
+		return "invalid_credentials", nil
+	}
+	projection, err := s.LicenseStatus()
+	if err != nil || projection.Status != license.StatusValid {
+		return "unavailable", nil
+	}
+	schoolID, deviceID, err := s.entitlement.LoginContext(context.Background())
+	if err != nil {
+		return "unavailable", nil
+	}
+	resp, err := s.api("POST", "/api/auth/login", map[string]any{
+		"user": username, "password": password, "schoolId": schoolID, "imei": deviceID,
+	})
+	if err != nil {
+		msg := err.Error()
+		if strings.HasPrefix(msg, "API 401:") || strings.HasPrefix(msg, "API 403:") {
+			return "invalid_credentials", nil
+		}
+		if strings.HasPrefix(msg, "API unavailable") {
+			return "network", nil
+		}
+		return "unavailable", nil
+	}
+	session, status := parseGatewayLogin(resp, username, schoolID, time.Now().UTC())
+	if session == nil {
+		return status, nil
+	}
+	s.mu.Lock()
+	s.session = session
+	s.mu.Unlock()
+	return "success", nil
+}
+
+func (s *DesktopService) LogoutSession() error {
+	s.mu.Lock()
+	s.session = nil
+	s.mu.Unlock()
+	return nil
+}
+func (s *DesktopService) CurrentSession() *DesktopSession {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.session == nil {
+		return nil
+	}
+	if s.session.ExpiresAt != "" {
+		if exp, err := time.Parse(time.RFC3339, s.session.ExpiresAt); err == nil && !time.Now().UTC().Before(exp) {
+			s.session = nil
+			return nil
+		}
+	}
+	copySession := *s.session
+	copySession.Token = ""
+	return &copySession
+}
+
+func (s *DesktopService) CheckUpdatesV2() (updater.UpdateCheckResponse, error) {
+	return s.ensureUpdater().CheckUpdates(context.Background())
+}
+
+func (s *DesktopService) PrepareUpdateV2(manifestJWS string) (*updater.PreparedUpdate, error) {
+	return s.ensureUpdater().PrepareUpdate(context.Background(), manifestJWS)
+}
+
+func (s *DesktopService) CancelPrepareUpdateV2() {
+	s.ensureUpdater().CancelPrepare()
+}
+
+func (s *DesktopService) InstallPreparedUpdateV2(version string, hasActiveWork bool, userConfirmed bool) (*updater.InstallResult, error) {
+	return s.ensureUpdater().InstallPreparedUpdate(context.Background(), version, hasActiveWork, userConfirmed)
+}
+
+func (s *DesktopService) ensureUpdater() *updater.Client {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.updater != nil {
+		return s.updater
+	}
+	local := strings.HasPrefix(s.apiURL, "http://127.0.0.1") ||
+		strings.HasPrefix(s.apiURL, "http://localhost") ||
+		strings.HasPrefix(s.apiURL, "http://[::1]")
+	platform := runtime.GOOS + "-" + runtime.GOARCH
+	s.updater = updater.NewClient(updater.Config{
+		BaseURL:        s.apiURL,
+		DataDir:        s.dataDir,
+		CurrentVersion: appVersion,
+		Channel:        "stable",
+		Platform:       platform,
+		ExpectedPub:    "SchoolBright",
+		AllowLocalHTTP: local,
+		Applier: &updater.OSInstallerApplier{
+			DataDir:        s.dataDir,
+			InstallDir:     resolveInstallDirectory(),
+			CurrentVersion: appVersion,
+			Platform:       platform,
+		},
+	})
+	return s.updater
+}
+
+func resolveInstallDirectory() string {
+	exe, err := os.Executable()
+	if err != nil {
+		return ""
+	}
+	dir := filepath.Dir(exe)
+	if runtime.GOOS == "darwin" && filepath.Base(dir) == "MacOS" && filepath.Base(filepath.Dir(dir)) == "Contents" {
+		return filepath.Dir(filepath.Dir(dir))
+	}
+	return dir
+}
+
+func (s *DesktopService) LicenseStatus() (license.EntitlementProjection, error) {
+	if s.entitlement == nil {
+		return license.EntitlementProjection{Status: license.StatusUnactivated}, nil
+	}
+	return s.entitlement.Evaluate(context.Background())
+}
+
+func (s *DesktopService) checkLicense(key string, validate bool) (string, error) {
+	if s.entitlement == nil {
+		return "", &license.LicenseError{Code: license.ErrConfigUnavailable, Message: "license host unavailable; connect online to recover"}
+	}
+	projection, err := s.entitlement.Check(context.Background(), key, validate)
+	if err != nil {
+		return "", err
+	}
+	data, err := json.Marshal(projection)
+	return string(data), err
 }
 func (s *DesktopService) api(method, path string, body any) (string, error) {
 	if err := validateAPIURL(s.apiURL); err != nil {

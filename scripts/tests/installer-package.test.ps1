@@ -1,5 +1,5 @@
 param([string]$InstallerPath)
-. "$PSScriptRoot/../common.ps1"
+. "$PSScriptRoot/../lib/common.ps1"
 if (-not $InstallerPath) {
     $version = (Get-Content -LiteralPath "$SchoolBotRoot/app/frontend/package.json" -Raw | ConvertFrom-Json).version
     $InstallerPath = Join-Path $SchoolBotRoot "dist/installers/school-bot-$version-windows-amd64.msi"
@@ -53,6 +53,12 @@ try {
     $success = Read-MsiRows 'SELECT `Sequence` FROM `InstallUISequence` WHERE `Action` = ''SchoolBotComplete''' @('Sequence')
     Assert-Installer ($success.Sequence -eq '-1') 'The completion dialog must only appear after success.'
 
+    $injectSeq = @(Read-MsiRows 'SELECT `Action`, `Condition`, `Sequence` FROM `InstallExecuteSequence` WHERE `Action` = ''InjectMidUpdateFailure''' @('Action','Condition','Sequence'))
+    Assert-Installer ($injectSeq.Count -eq 1) 'AC-030-07 fault-injection action must be scheduled in InstallExecuteSequence.'
+    $installFilesSeq = Read-MsiRows 'SELECT `Sequence` FROM `InstallExecuteSequence` WHERE `Action` = ''InstallFiles''' @('Sequence')
+    $installFinalizeSeq = Read-MsiRows 'SELECT `Sequence` FROM `InstallExecuteSequence` WHERE `Action` = ''InstallFinalize''' @('Sequence')
+    Assert-Installer ([int]$injectSeq[0].Sequence -gt [int]$installFilesSeq.Sequence -and [int]$injectSeq[0].Sequence -lt [int]$installFinalizeSeq.Sequence) 'InjectMidUpdateFailure must run inside the deferred transaction between InstallFiles and InstallFinalize.'
+
     # A safe session can evaluate the real MSI conditions without changing the machine or running actions.
     $session = $installer.OpenPackage($InstallerPath, 1)
     try {
@@ -73,6 +79,12 @@ try {
             }
             Assert-Installer ($session.EvaluateCondition($launch[0].Condition) -eq $case.Expected) "Incorrect launch behavior: $($case.Name)"
         }
+        $session.GetType().InvokeMember('Property', [Reflection.BindingFlags]::SetProperty, $null,
+            $session, @('SCHOOLBOT_INJECT_FAIL', '')) | Out-Null
+        Assert-Installer ($session.EvaluateCondition($injectSeq[0].Condition) -eq 0) 'Fault injection must be inactive during normal installation.'
+        $session.GetType().InvokeMember('Property', [Reflection.BindingFlags]::SetProperty, $null,
+            $session, @('SCHOOLBOT_INJECT_FAIL', '1')) | Out-Null
+        Assert-Installer ($session.EvaluateCondition($injectSeq[0].Condition) -eq 1) 'Fault injection must activate when SCHOOLBOT_INJECT_FAIL=1.'
     } finally { [void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($session) }
 
     foreach ($dialog in @('SchoolBotWelcome','SchoolBotComplete')) {

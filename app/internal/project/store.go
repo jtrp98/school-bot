@@ -9,18 +9,24 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"time"
 )
 
 // LocalStore manages local v2 project documents with concurrency control and durability.
 type LocalStore struct {
 	dataDir     string
 	projectsDir string
+	trashDir    string
+	importsDir  string
 	receiptsDir string
 	locksDir    string
 	entitlement EntitlementChecker
 
-	mu    sync.RWMutex
-	index map[string]ProjectMetadata
+	mu              sync.RWMutex
+	index           map[string]ProjectMetadata
+	nowFunc         func() time.Time
+	lastTrustedUTC  time.Time
+	lastTrustedFunc func() (time.Time, bool)
 }
 
 // NewLocalStore initializes the project storage directory and rebuilds the derived index.
@@ -34,6 +40,8 @@ func NewLocalStore(dataDir string, entitlement EntitlementChecker) (*LocalStore,
 
 	cleanDir := filepath.Clean(dataDir)
 	projectsDir := filepath.Join(cleanDir, "projects")
+	trashDir := filepath.Join(cleanDir, "trash")
+	importsDir := filepath.Join(cleanDir, "imports")
 	receiptsDir := filepath.Join(cleanDir, "receipts")
 	locksDir := filepath.Join(cleanDir, "locks")
 
@@ -41,6 +49,12 @@ func NewLocalStore(dataDir string, entitlement EntitlementChecker) (*LocalStore,
 		return nil, err
 	}
 	if err := ensureSafeDir(projectsDir); err != nil {
+		return nil, err
+	}
+	if err := ensureSafeDir(trashDir); err != nil {
+		return nil, err
+	}
+	if err := ensureSafeDir(importsDir); err != nil {
 		return nil, err
 	}
 	if err := ensureSafeDir(receiptsDir); err != nil {
@@ -53,10 +67,13 @@ func NewLocalStore(dataDir string, entitlement EntitlementChecker) (*LocalStore,
 	store := &LocalStore{
 		dataDir:     cleanDir,
 		projectsDir: projectsDir,
+		trashDir:    trashDir,
+		importsDir:  importsDir,
 		receiptsDir: receiptsDir,
 		locksDir:    locksDir,
 		entitlement: entitlement,
 		index:       make(map[string]ProjectMetadata),
+		nowFunc:     func() time.Time { return time.Now().UTC() },
 	}
 
 	if err := store.rebuildIndex(); err != nil {
@@ -64,6 +81,68 @@ func NewLocalStore(dataDir string, entitlement EntitlementChecker) (*LocalStore,
 	}
 
 	return store, nil
+}
+
+// SetNowFunc overrides the clock source used by the store (for deterministic testing).
+func (s *LocalStore) SetNowFunc(fn func() time.Time) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if fn == nil {
+		s.nowFunc = func() time.Time { return time.Now().UTC() }
+	} else {
+		s.nowFunc = fn
+	}
+}
+
+// SetLastTrustedUTC configures the persisted monotonic/time anchor used for clock trust checks.
+func (s *LocalStore) SetLastTrustedUTC(t time.Time) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.lastTrustedUTC = t.UTC()
+}
+
+// SetLastTrustedFunc configures a dynamic provider for the persisted time anchor.
+func (s *LocalStore) SetLastTrustedFunc(fn func() (time.Time, bool)) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.lastTrustedFunc = fn
+}
+
+func (s *LocalStore) now() time.Time {
+	s.mu.RLock()
+	fn := s.nowFunc
+	s.mu.RUnlock()
+	if fn == nil {
+		return time.Now().UTC()
+	}
+	return fn().UTC()
+}
+
+func (s *LocalStore) checkClockTrust(now time.Time) error {
+	s.mu.RLock()
+	fn := s.lastTrustedFunc
+	anchor := s.lastTrustedUTC
+	s.mu.RUnlock()
+
+	if fn != nil {
+		if t, ok := fn(); ok && !t.IsZero() {
+			anchor = t.UTC()
+		}
+	}
+	if !anchor.IsZero() && now.Before(anchor.Add(-5*time.Minute)) {
+		return &StoreError{
+			Code:    ErrClockUntrusted,
+			Message: "system clock is behind last trusted timestamp",
+		}
+	}
+	if now.After(anchor) {
+		s.mu.Lock()
+		if now.After(s.lastTrustedUTC) {
+			s.lastTrustedUTC = now
+		}
+		s.mu.Unlock()
+	}
+	return nil
 }
 
 // DataDir returns the base data directory.

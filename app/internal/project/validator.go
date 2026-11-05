@@ -126,6 +126,9 @@ func validateBlockContent(c *ProjectContent) error {
 	if totalBlocks > 1000 {
 		return &StoreError{Code: ErrProjectTooLarge, Message: fmt.Sprintf("block count exceeds limit of 1000 (got %d)", totalBlocks)}
 	}
+	if fuel := CalculateCompilationFuel(c.Stacks); fuel > 1000 {
+		return &StoreError{Code: ErrProjectTooLarge, Message: fmt.Sprintf("block compilation fuel exceeds limit of 1000 (got %d)", fuel)}
+	}
 	return nil
 }
 

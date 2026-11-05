@@ -1,5 +1,7 @@
+import { useRef } from "react";
 import { titles } from "./appData";
 import { CloseDialog } from "./CloseDialog";
+import { DevEnvironmentDialog } from "./DevEnvironmentDialog";
 import { t as translate } from "../i18n";
 
 import { client, preview } from "../core/client";
@@ -32,7 +34,7 @@ const settingsMsgClass =
   "[&.error]:border-err-line sh-settings-msg m-0";
 
 type Props = { v: Pick<Parameters<typeof AppView>[0]["v"],
-  "info" | "message" | "cloudBusy" | "settings" | "setSettings" | "pending" | "setPending"
+  "info" | "setInfo" | "message" | "cloudBusy" | "settings" | "setSettings" | "devMenu" | "setDevMenu" | "pending" | "setPending"
   | "closeRequested" | "setCloseRequested" | "closeBusy" | "closeError" | "closeErrorReason"
   | "closeWindow" | "closePhase" | "closeNote" | "closeSaveAvailable" | "closeSaveRequested"
   | "cloud" | "confirmSwitch">;  };
@@ -45,9 +47,27 @@ function formatVersion(version?: string): string {
 
 export function AppDialogs({ v }: Props) {
  const {
-   info, message, cloudBusy, settings, setSettings, pending, setPending, closeRequested,
+   info, setInfo, message, cloudBusy, settings, setSettings, devMenu, setDevMenu, pending, setPending, closeRequested,
    cloud, confirmSwitch,
  } = v;
+
+ const clickCountRef = useRef(0);
+ const lastClickTimeRef = useRef(0);
+
+ const handleSecretClick = () => {
+   const now = Date.now();
+   if (now - lastClickTimeRef.current > 2000) {
+     clickCountRef.current = 1;
+   } else {
+     clickCountRef.current += 1;
+   }
+   lastClickTimeRef.current = now;
+
+   if (clickCountRef.current >= 5) {
+     clickCountRef.current = 0;
+     setDevMenu(true);
+   }
+ };
  return (<>
 {settings && (
           <Modal
@@ -69,10 +89,10 @@ export function AppDialogs({ v }: Props) {
                   {translate("shell.messages.browserPreviewUsesAUiSimulatorNativeJsonIpc")}
                 </Banner>
               )}
-              <p className={bodyPlainClass}>
+              <p className={`${bodyPlainClass} cursor-pointer select-none`} onClick={handleSecretClick}>
                 {info?.runtime} · {info?.platform} · {formatVersion(info?.version)}
               </p>
-              <p className={hintClass}>
+              <p className={`${hintClass} cursor-pointer select-none`} onClick={handleSecretClick}>
                 {translate("shell.messages.apiAddressOffline", {
     api: info?.api_url ?? translate("common.messages.notConnected"),
   })}
@@ -121,5 +141,12 @@ export function AppDialogs({ v }: Props) {
           </Modal>
         )}
 {closeRequested && <CloseDialog {...v} />}
+{devMenu && (
+  <DevEnvironmentDialog
+    open={devMenu}
+    onClose={() => setDevMenu(false)}
+    onUpdateInfo={setInfo}
+  />
+)}
 </>);
 }

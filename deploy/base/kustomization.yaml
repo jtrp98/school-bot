@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - school-bot-grpc.yaml
+configMapGenerator:
+  - name: service-school-bot-config
+    literals:
+      - SchoolBot__Storage=PostgreSQL
+      - Kestrel__Endpoints__Grpc__Url=http://0.0.0.0:8080
+      - Kestrel__Endpoints__Grpc__Protocols=Http2
+      - Kestrel__Endpoints__Health__Url=http://0.0.0.0:8081
+      - Kestrel__Endpoints__Health__Protocols=Http1

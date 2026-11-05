@@ -1,0 +1,209 @@
+syntax = "proto3";
+
+option csharp_namespace = "SchoolBot.Infrastructure.Protos";
+
+package ServiceSchoolBot;
+
+// Gateway /api/service-school-bot: curricula and admin/curricula. Keys are UUID text; times are
+// ISO 8601 round-trip text so client-supplied offsets come back unchanged.
+service CurriculumService {
+  rpc ListPublishedCurricula (ListPublishedCurriculaRequest) returns (CurriculumListResponse);
+  rpc GetPublishedCurriculum (GetCurriculumRequest) returns (CurriculumDraftResponse);
+  rpc ListAdminCurricula (ListAdminCurriculaRequest) returns (CurriculumListResponse);
+  rpc GetAdminCurriculum (GetCurriculumRequest) returns (CurriculumAdminResponse);
+  rpc CreateCurriculum (CreateCurriculumRequest) returns (CurriculumMutationResponse);
+  rpc UpdateCurriculumMetadata (UpdateCurriculumMetadataRequest) returns (CurriculumMutationResponse);
+  rpc UpdateCurriculumContent (UpdateCurriculumContentRequest) returns (CurriculumMutationResponse);
+  rpc PublishCurriculum (PublishCurriculumRequest) returns (CurriculumMutationResponse);
+  rpc ImportCurriculum (ImportCurriculumRequest) returns (CurriculumImportResponse);
+}
+
+message CurriculumSubjectItem {
+  string subject_key = 1;
+  string code = 2;
+  string title = 3;
+}
+message CriteriaItem {
+  int32 revision = 1;
+  string rules = 2;
+  string source_ref = 3;
+  optional string approved_by = 4;
+  optional string approved_at = 5;
+}
+message MissionItem {
+  string mission_key = 1;
+  int32 ordinal = 2;
+  string title = 3;
+  string instructions = 4;
+  string method = 5;
+  CriteriaItem criteria = 6;
+}
+message ActivityItem {
+  string activity_key = 1;
+  int32 ordinal = 2;
+  string title = 3;
+  string type = 4;
+  optional string mode = 5;
+  optional string indicators = 6;
+  optional string config = 7;
+}
+message LessonItem {
+  string lesson_key = 1;
+  int32 ordinal = 2;
+  string title = 3;
+  string objective = 4;
+  string instructions = 5;
+  repeated MissionItem missions = 6;
+  repeated ActivityItem activities = 7;
+}
+message LessonImportSourceItem {
+  string source_ref = 1;
+  string source_row_key = 2;
+  optional bool source_approved = 3;
+  string row_hash = 4;
+}
+message AdminLessonItem {
+  LessonItem lesson = 1;
+  optional LessonImportSourceItem import_source = 2;
+}
+message CurriculumApprovalItem {
+  string actor = 1;
+  string approved_at = 2;
+  string approval_ref = 3;
+}
+message CurriculumSummaryItem {
+  int32 id = 1;
+  string curriculum_key = 2;
+  int32 revision = 3;
+  int32 level_id = 4;
+  string title = 5;
+  string lifecycle = 6;
+  string source_ref = 7;
+  optional string published_at = 8;
+  string update_date = 9;
+}
+
+message ListPublishedCurriculaRequest {
+  reserved 1;
+  reserved "authorization";
+  optional int32 level_id = 2;
+  optional string recommended_grade = 3;
+  optional string subject_key = 4;
+  optional string mode = 5;
+  optional int32 limit = 6;
+  optional string cursor = 7;
+}
+message ListAdminCurriculaRequest {
+  reserved 1;
+  reserved "authorization";
+  optional string lifecycle = 2;
+  optional int32 level_id = 3;
+  optional int32 limit = 4;
+  optional string cursor = 5;
+}
+message CurriculumListResponse {
+  repeated CurriculumSummaryItem items = 1;
+  optional string next_cursor = 2;
+}
+message GetCurriculumRequest {
+  reserved 1;
+  reserved "authorization";
+  int32 id = 2;
+}
+message CurriculumDraftResponse {
+  CurriculumSummaryItem summary = 1;
+  repeated string recommended_grades = 2;
+  repeated CurriculumSubjectItem subjects = 3;
+  repeated LessonItem lessons = 4;
+  optional CurriculumApprovalItem approval = 5;
+  string etag = 6;
+}
+message CurriculumAdminResponse {
+  CurriculumSummaryItem summary = 1;
+  repeated string recommended_grades = 2;
+  repeated CurriculumSubjectItem subjects = 3;
+  repeated AdminLessonItem lessons = 4;
+  optional CurriculumApprovalItem approval = 5;
+  string etag = 6;
+}
+
+message CreateCurriculumRequest {
+  reserved 1;
+  reserved "authorization";
+  optional string idempotency_key = 2;
+  string curriculum_key = 3;
+  int32 revision = 4;
+  int32 level_id = 5;
+  string title = 6;
+  string source_ref = 7;
+  repeated string recommended_grades = 8;
+  repeated CurriculumSubjectItem subjects = 9;
+}
+message UpdateCurriculumMetadataRequest {
+  reserved 1;
+  reserved "authorization";
+  optional string if_match = 2;
+  optional string idempotency_key = 3;
+  int32 id = 4;
+  int32 level_id = 5;
+  string title = 6;
+  string source_ref = 7;
+  repeated string recommended_grades = 8;
+  repeated CurriculumSubjectItem subjects = 9;
+}
+message UpdateCurriculumContentRequest {
+  reserved 1;
+  reserved "authorization";
+  optional string if_match = 2;
+  optional string idempotency_key = 3;
+  int32 id = 4;
+  repeated LessonItem lessons = 5;
+}
+message PublishCurriculumRequest {
+  reserved 1;
+  reserved "authorization";
+  optional string if_match = 2;
+  optional string idempotency_key = 3;
+  int32 id = 4;
+  optional string approval_ref = 5;
+}
+message CurriculumMutationResponse {
+  int32 id = 1;
+  string update_date = 2;
+  optional string published_at = 3;
+  string etag = 4;
+}
+
+// The import route authenticates before it inspects the body, so the Gateway reports how the body bound
+// and SchoolBot rejects it in its original order.
+enum CurriculumImportBody {
+  CURRICULUM_IMPORT_BODY_VALID = 0;
+  CURRICULUM_IMPORT_BODY_NOT_JSON = 1;
+  CURRICULUM_IMPORT_BODY_MALFORMED = 2;
+}
+message CurriculumImportRowItem {
+  string source_row_key = 1;
+  int32 source_position = 2;
+  optional bool source_approved = 3;
+  LessonItem lesson = 4;
+}
+message ImportCurriculumRequest {
+  reserved 1;
+  reserved "authorization";
+  optional string idempotency_key = 2;
+  int32 id = 3;
+  CurriculumImportBody body = 4;
+  string source_ref = 5;
+  repeated CurriculumImportRowItem rows = 6;
+}
+message CurriculumImportLessonResultItem {
+  string source_row_key = 1;
+  int32 lesson_id = 2;
+  string outcome = 3;
+}
+message CurriculumImportResponse {
+  int32 id = 1;
+  string update_date = 2;
+  repeated CurriculumImportLessonResultItem lessons = 3;
+  string etag = 4;
+}

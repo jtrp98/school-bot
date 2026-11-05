@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+option csharp_namespace = "SchoolBot.Infrastructure.Protos";
+
+package ServiceSchoolBot;
+
+// Gateway /api/service-school-bot: updates/check (desktop, no sign-in) and admin/releases (central staff).
+service ReleaseService {
+  rpc CheckUpdate (CheckUpdateRequest) returns (CheckUpdateResponse);
+  rpc ListReleases (ListReleasesRequest) returns (ListReleasesResponse);
+  rpc CreateRelease (CreateReleaseRequest) returns (ReleaseItem);
+  rpc PublishRelease (PublishReleaseRequest) returns (ReleaseItem);
+}
+
+message ReleaseItem {
+  string id = 1;
+  string version = 2;
+  string channel = 3;
+  string platform = 4;
+  string url = 5;
+  string sha256 = 6;
+  string signature = 7;
+  bool published = 8;
+}
+
+message CheckUpdateRequest {
+  string version = 1;
+  string channel = 2;
+  string platform = 3;
+}
+message CheckUpdateResponse {
+  optional ReleaseItem release = 1;
+}
+
+message ListReleasesRequest {
+}
+message ListReleasesResponse {
+  repeated ReleaseItem items = 1;
+}
+
+message CreateReleaseRequest {
+  string version = 1;
+  string channel = 2;
+  string platform = 3;
+  string url = 4;
+  string sha256 = 5;
+  string signature = 6;
+}
+message PublishReleaseRequest {
+  string id = 1;
+}

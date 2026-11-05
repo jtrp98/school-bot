@@ -1,9 +1,9 @@
 $ErrorActionPreference = 'Stop'
 $schoolBotRepository = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $schoolBotFixture = Join-Path ([IO.Path]::GetTempPath()) "school-bot-source-test-$([guid]::NewGuid())"
-New-Item -ItemType Directory -Path "$schoolBotFixture/scripts","$schoolBotFixture/app" -Force | Out-Null
+New-Item -ItemType Directory -Path "$schoolBotFixture/scripts/lib","$schoolBotFixture/app" -Force | Out-Null
 try {
-    foreach ($schoolBotName in @('common.ps1','package-source.ps1')) {
+    foreach ($schoolBotName in @('lib/common.ps1','package-source.ps1')) {
         Copy-Item -LiteralPath (Join-Path $schoolBotRepository "scripts/$schoolBotName") `
             -Destination (Join-Path $schoolBotFixture "scripts/$schoolBotName")
     }
@@ -18,7 +18,8 @@ try {
         [IO.File]::WriteAllText((Join-Path $schoolBotFixture "app/$schoolBotName"), 'excluded fixture')
     }
     foreach ($schoolBotDirectory in @(
-        'app/node_modules','app/bin','app/.build','app/frontend/public/blockly-media','web/data'
+        'app/node_modules','app/bin','app/.build','app/frontend/public/blockly-media','backend/data',
+        'app/.tmp','app/.vs','app/.idea','app/.cache','app/__pycache__','backend/reports'
     )) {
         New-Item -ItemType Directory -Path (Join-Path $schoolBotFixture $schoolBotDirectory) -Force | Out-Null
         [IO.File]::WriteAllText((Join-Path $schoolBotFixture "$schoolBotDirectory/excluded.txt"), 'excluded fixture')
@@ -33,7 +34,7 @@ try {
     try {
         $schoolBotNames = @($schoolBotArchive.Entries.FullName | Sort-Object)
         $schoolBotExpected = @(
-            'AGENTS.md','CLAUDE.md','README.md','app/source.go','scripts/common.ps1','scripts/package-source.ps1'
+            'AGENTS.md','CLAUDE.md','README.md','app/source.go','scripts/lib/common.ps1','scripts/package-source.ps1'
         ) | Sort-Object
         if (Compare-Object $schoolBotExpected $schoolBotNames) {
             throw "Unexpected archive entries: $($schoolBotNames -join ', ')"

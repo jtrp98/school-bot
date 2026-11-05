@@ -27,6 +27,7 @@ export function useEntryForm(props: EntryScreenProps) {
     if (disabled || !validKey) return;
     const submitted = key;
     setKey("");
+    setActivating(true);
     await props.onActivate(submitted);
   }
   async function login() {

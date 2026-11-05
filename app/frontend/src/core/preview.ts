@@ -44,10 +44,20 @@ export function runPreview(
   }
   const data = input as {
     source?: string;
+    commands?: Command[];
     servo?: number;
     angle?: number;
   };
-  let commands: Command[] | undefined;
+  if (!data || typeof data !== "object" || new TextEncoder().encode(JSON.stringify(data)).length > 32768)
+    throw new Error("Invalid or oversized program");
+  if (mode === "coding-adventure" && action !== "program.run")
+    throw new Error("Unknown mode/action");
+  if (mode === "block-programming" && action !== "program.run")
+    throw new Error("Unknown mode/action");
+  if (mode === "coding-adventure" && (typeof data.source !== "string" || new TextEncoder().encode(data.source).length > 16384))
+    throw new Error("Source exceeds 16384 bytes");
+
+  let commands: Command[] | undefined = data.commands;
   if (mode === "coding-adventure") {
     commands = [];
     for (const [index, line] of (data.source ?? "").split("\n").entries()) {
@@ -71,6 +81,7 @@ export function runPreview(
     if (!commands.length || commands.length > 64)
       throw new Error("Use 1–64 commands.");
     for (const command of commands) {
+      if (!command || typeof command !== "object") throw new Error("Invalid command");
       if (!["move_right", "move_left", "jump"].includes(command.op))
         throw new Error("Unsupported command");
       if (
@@ -90,6 +101,8 @@ export function runPreview(
       data: { commands, steps, simulated: true },
     };
   }
+  if (["coding-adventure", "block-programming"].includes(mode))
+    throw new Error("Program commands required");
   if (mode !== "robot-control" || !["servo.set", "robot.stop"].includes(action))
     throw new Error("Unknown mode/action");
   if (

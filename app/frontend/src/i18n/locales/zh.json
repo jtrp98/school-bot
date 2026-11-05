@@ -1,4 +1,51 @@
 {
+  "learning": {
+    "title": "课程",
+    "online": "已连接",
+    "offline": "离线 — 可继续查看已保存的课程",
+    "back": "选择模式",
+    "curriculum": "教学课程",
+    "choose": "选择",
+    "sync": "同步（{{count}} 项待处理）",
+    "noCourses": "暂无课程。请联网并登录以下载课程。",
+    "activities": "学习活动",
+    "program": "程序",
+    "move_right": "向右移动",
+    "move_left": "向左移动",
+    "jump": "跳跃",
+    "clear": "清空",
+    "savedProjects": "加载已保存的项目",
+    "project": "机械臂项目",
+    "submit": "提交评估",
+    "queue": "保存并等待同步",
+    "examOnline": "请联网开始或继续考试。",
+    "chooseActivity": "请选择学习活动。",
+    "results": "评估结果",
+    "error": "请求未完成。待提交的作业已保留。请检查网络和账户后重试。",
+    "state": {
+      "queued": "等待评估",
+      "grading": "评估中",
+      "awaiting_teacher": "等待教师评估",
+      "evaluated": "已评估",
+      "error": "评估暂不可用"
+    },
+    "outcome": {
+      "passed": "通过",
+      "not_yet": "需要更多练习"
+    },
+    "startExam": "开始考试",
+    "saveAnswers": "保存答案",
+    "submitExam": "提交考试",
+    "timeLeft": "剩余 {{seconds}} 秒",
+    "examResult": "得分：{{earned}} / {{max}}",
+    "resultsHidden": "评估结束后可查看结果。",
+    "run": "课程班次",
+    "teacher": "教师评估",
+    "feedback": "反馈",
+    "passed": "通过",
+    "notYet": "需要更多练习",
+    "review": "保存评估"
+  },
   "installer": {
     "windowTitle": "安装 School Bot",
     "welcomeTitle": "全新创意，\n从这里开始。",
@@ -85,6 +132,22 @@
   "settings": {
     "title": "设置"
   },
+  "devEnv": {
+    "title": "开发者环境设置",
+    "description": "选择用于测试的 API 后端环境",
+    "warning": "仅限内部测试使用。切换环境会影响网络目标和许可证。",
+    "active": "当前处于: {{env}}",
+    "local": "本地环境 (localhost:8080)",
+    "dev": "开发环境 (api-dev)",
+    "prod": "生产环境 (api)",
+    "custom": "自定义 URL",
+    "customPlaceholder": "https://custom-gateway.example.com",
+    "apply": "保存并切换",
+    "reset": "重置为默认",
+    "close": "关闭",
+    "success": "已切换环境至 {{url}}",
+    "error": "切换环境失败: {{error}}"
+  },
   "robot": {
     "errors": {
       "engineBusy": "机器人仍在处理上一条指令，请稍候或按停止。",
@@ -108,7 +171,8 @@
       "deviceNotConfirmed": "设备尚未确认真实连接。",
       "robotNotSelected": "尚未选择机器人并确认配置。",
       "connectionSuperseded": "上一次连接已取消，请重新连接。",
-      "deviceNotFound": "找不到所选设备。请检查USB线并重新连接。"
+      "deviceNotFound": "找不到所选设备。请检查USB线并重新连接。",
+      "torqueOff": "扭矩已关闭。请在运动前明确启用扭矩。"
     },
     "teacher": {
       "title": "教师菜单",
@@ -1322,6 +1386,18 @@
       "wristRotate": "腕部旋转",
       "gripper": "夹爪",
       "bend": "弯曲"
+    },
+    "hardwareSimulator": {
+      "title": "硬件模拟器 · 无实际设备或测量",
+      "open": "打开硬件模拟器",
+      "ready": "准备就绪",
+      "stop": "紧急停止 / 关闭扭矩",
+      "halted": "已停止并关闭扭矩。运动前须明确启用扭矩。",
+      "disconnect": "模拟断线",
+      "timeout": "模拟超时",
+      "restore": "恢复连接",
+      "restored": "连接已恢复。请重新连接并启用扭矩。",
+      "rearm": "启用模拟器扭矩"
     }
   },
   "common": {
@@ -1783,6 +1859,8 @@
       "useOffline": "使用本机权限继续"
     },
     "feedback": {
+      "verification_required": "请先通过学校账户系统验证此设备，再登录。",
+      "password_reset_required": "请先通过学校账户系统重置密码，再登录。",
       "invalid_credentials": "用户名或密码不正确，请重试。",
       "network": "无法连接系统。请检查网络，或在 License 有效期间以访客身份继续。",
       "unavailable": "登录服务尚未配置。请联系管理员，或在 License 有效期间以访客身份继续。",

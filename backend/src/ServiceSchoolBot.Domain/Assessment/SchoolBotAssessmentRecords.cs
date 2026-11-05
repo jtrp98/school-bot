@@ -1,0 +1,70 @@
+namespace ServiceSchoolBot.Domain.Assessment;
+
+public sealed record SchoolBotQuestionBankRecord(
+    int SchoolBotQuestionBankId,
+    Guid BankKey,
+    int Revision,
+    string Title,
+    IReadOnlyList<QuestionBankQuestion> Questions,
+    string SourceRef,
+    string Lifecycle,
+    DateTimeOffset? PublishedAt,
+    bool IsDelete,
+    int? CreateBy,
+    DateTimeOffset? CreateDate,
+    int? UpdateBy,
+    DateTimeOffset? UpdateDate,
+    int? SchoolId = null);
+
+public sealed record SchoolBotCourseRunRecord(
+    int SchoolBotCourseRunId,
+    int CurriculumId,
+    int ClassroomId,
+    int NYear,
+    string NTerm,
+    IReadOnlyList<int> PlanCourseIds,
+    int? CurrentPolicyId,
+    int? PreviousRunId,
+    DateTimeOffset EffectiveAt,
+    string Lifecycle,
+    bool IsDelete,
+    int? CreateBy,
+    DateTimeOffset? CreateDate,
+    int? UpdateBy,
+    DateTimeOffset? UpdateDate,
+    int SchoolId);
+
+public sealed record SchoolBotCourseRunActivityRecord(
+    int SchoolBotCourseRunActivityId,
+    int CourseRunId,
+    int ActivityId,
+    DateTimeOffset? OpensAt,
+    DateTimeOffset? ClosesAt,
+    string? PolicyOverride,
+    bool IsDelete,
+    int? CreateBy,
+    DateTimeOffset? CreateDate,
+    int? UpdateBy,
+    DateTimeOffset? UpdateDate,
+    int SchoolId);
+
+public sealed record SchoolBotAttemptRecord(
+    int SchoolBotAttemptId,
+    int CourseRunId,
+    int ActivityId,
+    int LearnerId,
+    int Sequence,
+    string State,
+    DateTimeOffset StartedAt,
+    DateTimeOffset? DeadlineAt,
+    DateTimeOffset? SubmittedAt,
+    string Snapshot,
+    string Answers,
+    decimal? EarnedScore,
+    decimal MaxScore,
+    bool IsDelete,
+    int? CreateBy,
+    DateTimeOffset? CreateDate,
+    int? UpdateBy,
+    DateTimeOffset? UpdateDate,
+    int SchoolId);

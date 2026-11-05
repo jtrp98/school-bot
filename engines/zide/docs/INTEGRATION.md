@@ -9,7 +9,7 @@ React Robot Control
   → Go DesktopService
   → trusted Engine Manager routing
   → engines/zide/zide-engine[.exe]
-  → Windows HID or Serial
+  → Windows / Darwin HID or Serial
 ```
 
 Adventure routes to the existing demo engine, and Block Lab code generation, port list,
@@ -22,12 +22,13 @@ and rejects any other action before starting an engine.
 
 ## Use and configuration
 
-Build the desktop with `scripts/build-desktop.ps1 -SkipInstall` on Windows when
+Build the desktop with `scripts/desktop/build.ps1 -SkipInstall` on Windows when
 dependencies are installed. The script builds and places the C++ engine plus its
 manifest, hash and notices in `app/bin/engines/zide/`. The same folder is installed
 under the application's installation directory by the MSI. macOS builds include
-the engine in `Contents/MacOS/engines/zide/` but native hardware transport remains
-Windows-only. Installer signing remains the existing release-pipeline responsibility.
+the engine in `Contents/MacOS/engines/zide/`. Darwin มี native source สำหรับ HID/Serial แล้ว
+แต่ยังต้องตรวจ build/runtime บน Intel และ Apple Silicon; ไม่ใช้ simulator แทน hardware acceptance
+Installer signing remains the existing release-pipeline responsibility.
 
 Open Arm Lab → connect → choose an enumerated HID/Serial target. Configure the six
 servo IDs and the PWM value at each end of each UI range. Reversed PWM endpoints
@@ -42,6 +43,41 @@ verified selected target; each engine request opens/closes its own device. Idle
 discovery checks detect an unplugged target; operation errors also surface loss.
 
 ## Supported operations
+
+### Hardware Simulator / Virtual Port ผ่าน host
+
+เปิดเฉพาะ development session โดยตั้ง `SCHOOL_BOT_HARDWARE_SIMULATOR=1` ก่อนเปิดแอป
+แล้วใช้ `core/client.ts` → `DesktopService.Run` ตามเดิม ไม่เพิ่ม action หรือ executable selector
+โหมดนี้แทน robot routing ทั้ง session: `device.list` คืนเฉพาะ HID/Serial จำลอง
+token `simulator:school-bot` และไม่มีการ enumerate/open native device แม้ caller ส่ง target จริงมา
+ไม่เปลี่ยน License authorization ของ DesktopService และไม่ใช่ browser preview
+
+ตั้ง `SCHOOL_BOT_SIMULATOR_SCENARIO` ก่อนเปิดแอปเป็น `normal` (ค่าปริยาย), `disconnect`,
+`timeout` หรือ `stop-error` เพื่อจำลองเป้าหมายหาย, DEVICE_TIMEOUT หรือ stop ส่งไม่สำเร็จ
+fault ที่เกิดระหว่างคำสั่งจะล้าง upload session; reconnect ไม่ replay ท่าหรือ upload
+test harness ปรับ scenario และ clock ของ instance ได้โดยไม่ใช้ timer หรือ hardware
+
+โปรไฟล์ fixture ใช้ ID 0–5, PWM 500–2500 เริ่มที่ 1500; หนึ่ง pose ต้องครบหก ID ไม่ซ้ำ
+upload รับครั้งละ 1–4 groups โดย index 0–9999; run ต้องอ้างช่วงที่ upload ครบและ times 1–9999
+กำหนดเวลาจบจากผลรวมระยะท่าคูณจำนวนรอบโดยไม่สร้าง queue ตามจำนวน repetitions
+read คืนค่าจำลองใน session เท่านั้น การ stop ไม่ล็อก torque เอง ต้องมี explicit enabled=true
+เมื่อปลด torque จะปฏิเสธ move/upload/run จนผู้ใช้ขอล็อก
+
+สำหรับ frontend: ใช้ device shape/payload เดิม ผลทุก action เป็น `simulated:true` และ device commands
+มี `delivery:"dry-run"`, `acknowledged:false`; แม้มี exchange/ตำแหน่งก็เป็นข้อมูลจำลอง
+ต้องติดป้าย Hardware Simulator แยกจาก native connection และ measured telemetry
+probe guard ปัจจุบันที่ต้องการ simulated=false ต้องเพิ่มเส้นทาง simulator แบบ explicit ในหน้า simulator
+ห้ามลด guard ของ production probe หรือแปลง simulated=true เป็น false
+browser simulator ของ frontend เป็นคนละ backend; หากต้องตรวจ Go host ต้องไม่ intercept `client.run`
+ก่อนถึง Wails และต้องใช้ licensed development session ตามกฎเดิม
+
+Darwin discovery คืน `darwin-hid:<registry-id>` / `darwin-serial:<registry-id>` เป็น opaque token
+ใช้ token ใน device/port ตาม transport เดิม ห้ามให้ผู้ใช้พิมพ์ `/dev` path
+Serial backend resolve callout จาก IOKit ใหม่ก่อน open, ตรวจ character device/identity และเปิด exclusive
+HID คง CHECK_FW ก่อน TRAN_DATA และไม่ retry movement เมื่อ write/timeout ล้มเหลว
+API framing/deadline อ้าง [Apple IOHIDDeviceSetReportWithCallback](https://developer.apple.com/documentation/iokit/1588661-iohiddevicesetreportwithcallback)
+
+### Native workspace
 
 - Send a pose through `group.execute`; only start the visual prediction after the
   engine reports successful OS transmission. The picture is not measured telemetry.
@@ -111,7 +147,7 @@ assumptions without physical evidence.
 ```powershell
 node --test app/frontend/tests/frontend-adapter.test.mjs app/frontend/tests/frontend-workspace.test.mjs
 ./scripts/verify.ps1 -SkipInstall
-./scripts/package-desktop.ps1 -SkipBuild
+./scripts/desktop/package.ps1 -SkipBuild
 ```
 
 MSI install/repair/uninstall testing belongs on a disposable Windows account/CI;

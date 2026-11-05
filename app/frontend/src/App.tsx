@@ -1,8 +1,11 @@
+import { simulatorEnabled } from "./core/robotSimulator";
+import { simulatorEntryAdapter } from "./app/entry/simulatorEntry";
+import { hostEntryAdapter } from "./app/entry/hostEntry";
 import { AppView } from "./app/AppView";
 import { initialView, syncUrl } from "./app/appData";
 import { t as translate, languages as langs } from "./i18n";
 import { useTranslation } from "react-i18next";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { client, preview } from "./core/client";
 import { param } from "./core/debugParams";
 import type { AppInfo } from "./core/types";
@@ -10,6 +13,8 @@ import { Seg } from "./components/shared";
 
 import { prepareWindowClose } from "./core/windowLifecycle";
 import { useWindowClose, type CloseActions } from "./app/useWindowClose";
+import { useEntry } from "./app/entry/useEntry";
+import { unavailableEntryAdapter, type EntryAdapter } from "./app/entry/types";
 import { SAMPLE_STARS, STUDENT_CLASS, WEEK_STARS, useSampleData, type Lang, type ShellApi, type View } from "./shell";
 
 const langSegClass = [
@@ -17,7 +22,22 @@ const langSegClass = [
   "[&_.sb-seg_button]:px-[8px]",
 ].join(" ");
 
-export function useAppScreen(closeActions?: CloseActions) {
+export function useAppScreen(
+  entryAdapter: EntryAdapter = simulatorEnabled ? simulatorEntryAdapter : preview ? unavailableEntryAdapter : hostEntryAdapter,
+  closeActions?: CloseActions,
+) {
+  const entry = useEntry(entryAdapter);
+  const licenseBar = useRef<HTMLDivElement>(null);
+  const [licenseBarHeight, setLicenseBarHeight] = useState(0);
+  useLayoutEffect(() => {
+    const bar = licenseBar.current;
+    if (!entry.entered || !bar) return;
+    const measure = () => setLicenseBarHeight(bar.getBoundingClientRect().height);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(bar);
+    return () => observer.disconnect();
+  }, [entry.entered]);
   const [view, setView] = useState<View>(initialView);
   const [nonce, setNonce] = useState(0);
 
@@ -26,6 +46,7 @@ export function useAppScreen(closeActions?: CloseActions) {
   const [message, setMessage] = useState("");
   const [cloudBusy, setCloudBusy] = useState(false);
   const [settings, setSettings] = useState(false);
+  const [devMenu, setDevMenu] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [profile, setProfile] = useState(false);
   const { i18n } = useTranslation();
@@ -74,12 +95,18 @@ export function useAppScreen(closeActions?: CloseActions) {
   }, [lang]);
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
+      if ((event.ctrlKey || event.metaKey) && event.shiftKey && (event.key === "D" || event.code === "KeyD")) {
+        event.preventDefault();
+        setDevMenu((open) => !open);
+        return;
+      }
       if (event.key !== "Escape") return;
-      if (!(closeRequested || settings || pending || profile || menuOpen)) return;
+      if (!(closeRequested || settings || pending || profile || menuOpen || devMenu)) return;
       // App overlays own this Escape; do not pass it to a mode's stop shortcut.
       event.preventDefault();
       event.stopImmediatePropagation();
-      if (closeRequested) {
+      if (devMenu) setDevMenu(false);
+      else if (closeRequested) {
         if (!closeBusy) setCloseRequested(false);
       }
       else if (settings) setSettings(false);
@@ -89,7 +116,7 @@ export function useAppScreen(closeActions?: CloseActions) {
     }
     window.addEventListener("keydown", onKey, true);
     return () => window.removeEventListener("keydown", onKey, true);
-  }, [settings, profile, pending, menuOpen, closeRequested, closeBusy]);
+  }, [settings, profile, pending, menuOpen, closeRequested, closeBusy, devMenu]);
 
   useEffect(() => {
     if (!desktop) return;
@@ -187,11 +214,14 @@ export function useAppScreen(closeActions?: CloseActions) {
     view,
     nonce,
     info,
+    setInfo,
     message,
     setMessage,
     cloudBusy,
     settings,
     setSettings,
+    devMenu,
+    setDevMenu,
     menuOpen,
     setMenuOpen,
     profile,
@@ -209,9 +239,13 @@ export function useAppScreen(closeActions?: CloseActions) {
     langName,
     langSeg,
     full,
+    entry,
+    entryAdapter,
+    licenseBar,
+    licenseBarHeight,
   };
 }
 
-export default function App(props: { closeActions?: CloseActions }) {
-  return <AppView v={useAppScreen(props.closeActions)} />;
+export default function App(props: { entryAdapter?: EntryAdapter; closeActions?: CloseActions }) {
+  return <AppView v={useAppScreen(props.entryAdapter, props.closeActions)} />;
 }

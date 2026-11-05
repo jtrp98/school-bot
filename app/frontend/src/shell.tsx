@@ -1,3 +1,4 @@
+import { simulatorEnabled } from "./core/robotSimulator";
 import { createContext, useContext } from "react";
 import type { ModeID } from "./core/types";
 import { preview } from "./core/client";
@@ -21,7 +22,7 @@ export const SAMPLE_WORK_NAME_ROOM2 = "แขนหยิบกล่อง ห�
 export const SAMPLE_STARS = 9;
 
 /** sample data is allowed only for the browser preview or an explicit ?scenario= deep link */
-export const useSampleData = () => preview || !!param("scenario");
+export const useSampleData = () => !simulatorEnabled && (preview || !!param("scenario"));
 
 export type ShellApi = {
 

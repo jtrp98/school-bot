@@ -1,0 +1,212 @@
+# =====================================================================
+# service-school-bot — Kustomize BASE (BE-023: Gateway HTTP G -> gRPC B)
+# - Internal gRPC (h2c) on 8080; HTTP/1.1 health probe on 8081 (/healthz)
+# - Headless ClusterIP Service for gRPC client-side DNS load balancing (dns:///...:8080)
+# - Separate school-bot-grade-worker Deployment isolating PGGRADE_DB_CONNECTION_STRING (SEC001-002)
+# - NetworkPolicy restricting 8080 ingress strictly to api-gateway pods (no direct public HTTP/gRPC fallback)
+# =====================================================================
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: service-school-bot
+  labels:
+    app.kubernetes.io/name: service-school-bot
+    app.kubernetes.io/part-of: schoolbright
+    app.kubernetes.io/component: microservice
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-school-bot
+  labels:
+    app.kubernetes.io/name: service-school-bot
+    app.kubernetes.io/part-of: schoolbright
+    app.kubernetes.io/component: microservice
+    app.kubernetes.io/version: "0.1.5"
+    schoolbright.co/domain: school-bot
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels: { app.kubernetes.io/name: service-school-bot }
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: { maxSurge: 1, maxUnavailable: 0 }
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: service-school-bot
+        app.kubernetes.io/part-of: schoolbright
+        app.kubernetes.io/component: microservice
+        schoolbright.co/domain: school-bot
+    spec:
+      serviceAccountName: service-school-bot
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1654
+        runAsGroup: 1654
+        fsGroup: 1654
+        seccompProfile: { type: RuntimeDefault }
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector: { matchLabels: { app.kubernetes.io/name: service-school-bot } }
+      containers:
+        - name: service-school-bot
+          image: swr.ap-southeast-2.myhuaweicloud.com/schoolbright/service-school-bot:0.1.5-placeholder
+          imagePullPolicy: IfNotPresent
+          ports:
+            - { name: grpc,   containerPort: 8080, protocol: TCP }
+            - { name: health, containerPort: 8081, protocol: TCP }
+          env:
+            - { name: ASPNETCORE_ENVIRONMENT, value: "Production" }
+            - { name: TZ,                     value: "Asia/Bangkok" }
+            - { name: DOTNET_gcServer,        value: "0" }
+            # SEC001-002: Public/RPC API process holds SchoolBot, Master, School (narrowest read), and Logs DBs only.
+            # PGGRADE_DB_CONNECTION_STRING is strictly isolated to school-bot-grade-worker below.
+            - name: SCHOOL_BOT_DB_CONNECTION_STRING
+              valueFrom: { secretKeyRef: { name: service-school-bot-secrets, key: SCHOOL_BOT_DB_CONNECTION_STRING } }
+            - name: MASTER_DB_CONNECTION_STRING
+              valueFrom: { secretKeyRef: { name: service-school-bot-secrets, key: MASTER_DB_CONNECTION_STRING } }
+            - name: SCHOOL_DB_CONNECTION_STRING
+              valueFrom: { secretKeyRef: { name: service-school-bot-secrets, key: SCHOOL_DB_CONNECTION_STRING } }
+            - name: LOGS_DB_CONNECTION_STRING
+              valueFrom: { secretKeyRef: { name: service-school-bot-secrets, key: LOGS_DB_CONNECTION_STRING } }
+            - name: SchoolBot__StaffBootstrapPrincipalIds
+              valueFrom: { secretKeyRef: { name: service-school-bot-secrets, key: STAFF_BOOTSTRAP_PRINCIPAL_IDS, optional: true } }
+          envFrom:
+            - configMapRef: { name: service-school-bot-config }
+          resources:
+            requests: { cpu: 200m, memory: 256Mi }
+            limits:   { cpu: 1000m, memory: 512Mi }
+          startupProbe:
+            httpGet: { path: /healthz, port: health }
+            periodSeconds: 5
+            failureThreshold: 24
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet: { path: /healthz, port: health }
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 2
+          readinessProbe:
+            httpGet: { path: /healthz, port: health }
+            periodSeconds: 5
+            failureThreshold: 2
+            timeoutSeconds: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: ["ALL"] }
+          volumeMounts:
+            - { name: tmp, mountPath: /tmp }
+      volumes:
+        - name: tmp
+          emptyDir: { sizeLimit: 128Mi }
+---
+# SEC001-002 / BE-038: Isolated Grade Export Outbox Worker holding PGGRADE_DB_CONNECTION_STRING
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: school-bot-grade-worker
+  labels:
+    app.kubernetes.io/name: school-bot-grade-worker
+    app.kubernetes.io/part-of: schoolbright
+    app.kubernetes.io/component: worker
+    app.kubernetes.io/version: "0.1.5"
+    schoolbright.co/domain: school-bot
+spec:
+  replicas: 1
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels: { app.kubernetes.io/name: school-bot-grade-worker }
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: school-bot-grade-worker
+        app.kubernetes.io/part-of: schoolbright
+        app.kubernetes.io/component: worker
+        schoolbright.co/domain: school-bot
+    spec:
+      serviceAccountName: service-school-bot
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1654
+        runAsGroup: 1654
+        fsGroup: 1654
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: school-bot-grade-worker
+          image: swr.ap-southeast-2.myhuaweicloud.com/schoolbright/service-school-bot:0.1.5-placeholder
+          imagePullPolicy: IfNotPresent
+          env:
+            - { name: ASPNETCORE_ENVIRONMENT, value: "Production" }
+            - { name: SCHOOL_BOT_WORKER_MODE, value: "GradeExportOutbox" }
+            - name: SCHOOL_BOT_DB_CONNECTION_STRING
+              valueFrom: { secretKeyRef: { name: service-school-bot-secrets, key: SCHOOL_BOT_DB_CONNECTION_STRING } }
+            - name: PGGRADE_DB_CONNECTION_STRING
+              valueFrom: { secretKeyRef: { name: service-school-bot-grade-secrets, key: PGGRADE_DB_CONNECTION_STRING } }
+          envFrom:
+            - configMapRef: { name: service-school-bot-config }
+          resources:
+            requests: { cpu: 100m, memory: 192Mi }
+            limits:   { cpu: 500m, memory: 384Mi }
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: ["ALL"] }
+          volumeMounts:
+            - { name: tmp, mountPath: /tmp }
+      volumes:
+        - name: tmp
+          emptyDir: { sizeLimit: 64Mi }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-school-bot
+  labels:
+    app.kubernetes.io/name: service-school-bot
+    app.kubernetes.io/part-of: schoolbright
+    app.kubernetes.io/component: microservice
+spec:
+  clusterIP: None
+  selector: { app.kubernetes.io/name: service-school-bot }
+  ports:
+    - { name: grpc,   port: 8080, targetPort: grpc,   appProtocol: kubernetes.io/h2c }
+    - { name: health, port: 8081, targetPort: health, appProtocol: http }
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: service-school-bot-ingress
+  labels:
+    app.kubernetes.io/name: service-school-bot
+    app.kubernetes.io/part-of: schoolbright
+spec:
+  podSelector:
+    matchLabels: { app.kubernetes.io/name: service-school-bot }
+  policyTypes: ["Ingress"]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels: { app.kubernetes.io/name: api-gateway }
+      ports:
+        - { protocol: TCP, port: 8080 }
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: service-school-bot
+  labels:
+    app.kubernetes.io/name: service-school-bot
+    app.kubernetes.io/part-of: schoolbright
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels: { app.kubernetes.io/name: service-school-bot }

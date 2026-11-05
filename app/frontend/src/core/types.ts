@@ -21,3 +21,9 @@ export type AppInfo = {
   api_url: string;
   runtime: string;
 };
+
+export type EnvironmentInfo = {
+  current_url: string;
+  active_env: "local" | "dev" | "prod" | "custom";
+  presets: Record<string, string>;
+};

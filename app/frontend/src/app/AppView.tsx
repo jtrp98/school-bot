@@ -1,9 +1,11 @@
 import { AppDialogs } from "./AppDialogs";
+import { EntryGate } from "./entry/EntryGate";
+import { LicenseStatus } from "./entry/LicenseStatus";
 import { AppNavigation } from "./AppNavigation";
 import { Robot, Lessons, CodeLab, Blocks, titles, titleIcons, avatarLetter, ModeBoundary } from "./appData";
 import { t as translate } from "../i18n";
 
-import { Suspense } from "react";
+import { Suspense, type CSSProperties } from "react";
 import { preview } from "../core/client";
 
 import { Icon } from "../components/shared/Icons";
@@ -158,19 +160,51 @@ const msgPreClass =
 export function AppView({ v }: Props) {
   const {
     view, nonce, message, setMessage, settings, menuOpen, setMenuOpen, profile, setProfile,
-    pending, closeRequested, desktop, classLine, requestClose,
-    go, shell, langName, langSeg, full,
+    pending, closeRequested, closeBusy, closeWindow, desktop, classLine, requestClose,
+    go, shell, langName, langSeg, full, entry, entryAdapter, licenseBar, licenseBarHeight,
   } = v;
   return (
     <ShellContext.Provider value={shell}>
       <WindowChromeProvider
         desktop={desktop}
         preview={preview}
-        escapeBlocked={settings || !!pending || profile || menuOpen || closeRequested}
-        onClose={requestClose}
+        escapeBlocked={!entry.entered || settings || !!pending || profile || menuOpen || closeRequested || v.devMenu}
+        onClose={() => {
+          if (closeBusy) return;
+          if (!entry.entered) void closeWindow();
+          else requestClose();
+        }}
       >
-      <div className={`${windowLayoutClass} ${(desktop || preview) ? windowChromeClass : ""}`}>
-      <div className="app-shell relative flex h-[var(--app-viewport-height,_100vh)] overflow-hidden">
+      <div className={`${windowLayoutClass} ${(desktop || preview) ? windowChromeClass : ""} ${entry.entered
+        ? "grid grid-rows-[auto_minmax(0,1fr)]" : ""}`}
+        style={entry.entered ? {
+          "--app-viewport-height": `calc(100vh - ${licenseBarHeight}px)`,
+        } as CSSProperties : undefined}
+      >
+      {!entry.entered && (
+        <EntryGate
+          entry={entry}
+          adapter={entryAdapter}
+          language={langSeg}
+          preview={preview}
+          onSecretTrigger={() => v.setDevMenu(true)}
+        />
+      )}
+      {entry.entered && (
+        <div ref={licenseBar} className="min-w-0 [overflow-wrap:anywhere]">
+          <LicenseStatus status={entry.status} />
+          <div className="bg-surface px-[16px] py-[8px] font-body text-[14px] leading-[28px]">
+            {entry.account
+              ? translate("entry.choice.account", { username: entry.account })
+              : translate("entry.choice.guestTitle")}
+          </div>
+        </div>
+      )}
+      {entry.hasEntered && (
+      <div
+        inert={!entry.entered}
+        className={`app-shell relative h-[var(--app-viewport-height,_100vh)] overflow-hidden ${entry.entered ? "flex" : "hidden"}`}
+      >
 
         {!full && (
           <nav
@@ -379,11 +413,9 @@ export function AppView({ v }: Props) {
           </div>
         )}
 
-        <AppDialogs v={v} />
-
-
-
       </div>
+      )}
+      <AppDialogs v={v} />
       </div>
       </WindowChromeProvider>
     </ShellContext.Provider>

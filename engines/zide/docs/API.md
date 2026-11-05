@@ -17,7 +17,7 @@ so release CPU requirements do not depend on the build machine's detected CPU.
 The CMake/MSVC path keeps its own toolchain defaults and needs separate validation.
 
 ```powershell
-./scripts/build-engine.ps1 -Engine zide -Test
+./scripts/engines/build.ps1 -Engine zide -Test
 node --test engines/zide/tests/ipc.test.mjs
 ```
 
@@ -25,10 +25,11 @@ Output: `engines/zide/bin/windows-amd64/zide-engine.exe`. No Qt installation, wi
 HID DLL is needed. `-OutputDirectory <path>` changes the output location.
 `CMakeLists.txt` is also provided for conventional C++ builds and CTest.
 
-On macOS/Linux, `bash scripts/build-engine.sh zide` builds dry-run/compilation support.
-Pass an output directory and `--test` to run protocol tests. Native HID/serial
-transport in this extraction is Windows-only; other platforms return a clear error.
-Those OS builds are not covered by the Windows tests.
+บน macOS/Linux ใช้ `bash scripts/engines/build.sh zide` และส่ง output directory กับ `--test`
+เมื่อต้องการตรวจ protocol/transport loop โดยไม่เปิด hardware
+Native HID/serial transport มี source สำหรับ Windows และ Darwin; ระบบอื่นคืน error
+Darwin ใช้ IOKit HID และ POSIX/termios Serial ต้องตรวจ build/runtime บน Intel และ Apple Silicon แยกกัน
+Windows tests และ simulator ไม่ยืนยัน Darwin hardware acceptance
 
 ## JSON Lines contract
 
@@ -80,7 +81,7 @@ Every device command accepts:
 |---|---|
 | `transport` | `dry-run` (default), `hid`, or `serial` |
 | `device` | Exact HID path returned by `device.list`; optional only if exactly one Zide board exists |
-| `port` | Serial COM1–COM9999; required for serial |
+| `port` | Windows: COM1–COM9999; Darwin: opaque callout identity จาก device.list; required for serial |
 | `baud` | Default 115200; one of 9600, 19200, 38400, 57600, 115200, 128000, 230400, 256000, 460800, 512000, 921600 |
 | `read_ms` | Response collection window 1–1500 ms; default 1000 |
 
@@ -164,9 +165,9 @@ stop that execution. A physical stop requires an explicit `robot.stop` request t
 the same device; loss of communication may prevent it from arriving. No physical
 emergency-stop or hardware safety certification is claimed.
 
-Firmware erase/write/upgrade, persistent sessions/events, completion acknowledgements,
-macOS hardware transport are outside this extraction. Native frontend integration
-is provided for Windows HID/serial; macOS retains explicit simulation.
+ไม่รองรับ firmware erase/write/upgrade, persistent sessions/events หรือ completion acknowledgements
+hardware acceptance บน macOS ยังต้องตรวจต่างหาก Native Darwin source ไม่ใช่ผลการทดสอบอุปกรณ์จริง
+ดูโหมด Hardware Simulator / Virtual Port และข้อจำกัดการต่อ UI ใน [INTEGRATION.md](INTEGRATION.md)
 
 ## Source lineage and validation
 
@@ -183,7 +184,7 @@ Protocol golden tests and executable IPC tests run without sending any hardware
 commands. Real USB/serial motion, unplug/replug behavior, stopping a real moving
 arm and calibration still require device acceptance testing.
 
-`scripts/build-engine.ps1 -Engine zide -Test` and `node --test engines/zide/tests/ipc.test.mjs`
+`scripts/engines/build.ps1 -Engine zide -Test` and `node --test engines/zide/tests/ipc.test.mjs`
 must both pass. Tests cover all command builders, HID boundaries, INI roundtrips, JSON input
 rejection, multi-request recovery and the request size bound. The build refuses a locked/in-use output with an instruction to use `-OutputDirectory`;
 it does not stop the running engine. The build writes the binary,

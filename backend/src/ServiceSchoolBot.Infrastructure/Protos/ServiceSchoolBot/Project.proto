@@ -1,0 +1,108 @@
+syntax = "proto3";
+
+option csharp_namespace = "SchoolBot.Infrastructure.Protos";
+
+package ServiceSchoolBot;
+import "google/protobuf/timestamp.proto";
+
+// Projects of a desktop user. content_json is the project document exactly as the client sent it.
+service ProjectService {
+  rpc ListProjects (ListProjectsRequest) returns (ListProjectsResponse);
+  rpc CreateProject (CreateProjectRequest) returns (ProjectDocumentResponse);
+  rpc GetProject (GetProjectRequest) returns (ProjectDocumentResponse);
+  rpc UpdateProject (UpdateProjectRequest) returns (ProjectDocumentResponse);
+  rpc DeleteProject (DeleteProjectRequest) returns (DeleteProjectResponse);
+  rpc CopyProject (CopyProjectRequest) returns (ProjectDocumentResponse);
+  rpc ImportProject (ImportProjectRequest) returns (ImportProjectResponse);
+}
+
+message ListProjectsRequest {
+  reserved 1;
+  reserved "authorization";
+  optional string mode = 2;
+  optional int32 limit = 3;
+  optional string cursor = 4;
+}
+message ProjectItem {
+  int32 id = 1;
+  int32 project_id = 2;
+  string mode = 3;
+  string name = 4;
+  int32 revision = 5;
+  google.protobuf.Timestamp update_date = 6;
+}
+message ListProjectsResponse {
+  repeated ProjectItem items = 1;
+  optional string next_cursor = 2;
+}
+
+message CreateProjectRequest {
+  reserved 1;
+  reserved "authorization";
+  optional string idempotency_key = 2;
+  string mode = 3;
+  string name = 4;
+  string content_json = 5;
+}
+message GetProjectRequest {
+  reserved 1;
+  reserved "authorization";
+  int32 id = 2;
+}
+message UpdateProjectRequest {
+  reserved 1;
+  reserved "authorization";
+  optional string if_match = 2;
+  int32 id = 3;
+  string name = 4;
+  string content_json = 5;
+}
+message DeleteProjectRequest {
+  reserved 1;
+  reserved "authorization";
+  optional string if_match = 2;
+  int32 id = 3;
+}
+message CopyProjectRequest {
+  reserved 1;
+  reserved "authorization";
+  optional string if_match = 2;
+  optional string idempotency_key = 3;
+  int32 id = 4;
+  string name = 5;
+  int32 source_project_revision_id = 6;
+}
+
+message ProjectDocumentItem {
+  int32 schema = 1;
+  int32 project_id = 2;
+  int32 project_revision_id = 3;
+  string mode = 4;
+  string name = 5;
+  int32 revision = 6;
+  google.protobuf.Timestamp update_date = 7;
+  string content_json = 8;
+}
+message ProjectDocumentResponse {
+  ProjectDocumentItem document = 1;
+  string etag = 2;
+}
+message DeleteProjectResponse {
+  int32 project_id = 1;
+  bool deleted = 2;
+  google.protobuf.Timestamp update_date = 3;
+  string etag = 4;
+}
+message ImportProjectRequest {
+  optional string idempotency_key = 1;
+  string local_project_id = 2;
+  string mode = 3;
+  string name = 4;
+  int32 local_revision = 5;
+  string content_json = 6;
+}
+message ImportProjectResponse {
+  ProjectDocumentItem document = 1;
+  string etag = 2;
+  bool replayed = 3;
+}

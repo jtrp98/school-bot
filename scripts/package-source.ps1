@@ -1,5 +1,5 @@
 param([string]$OutputDirectory)
-. "$PSScriptRoot/common.ps1"
+. "$PSScriptRoot/lib/common.ps1"
 Add-Type -AssemblyName System.IO.Compression
 $schoolBotOutputDir = if ($OutputDirectory) {
     $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputDirectory)
@@ -11,13 +11,16 @@ $schoolBotOutput = Join-Path $schoolBotOutputDir 'school-bot-team-starter.zip'
 $schoolBotFiles = [Collections.Generic.List[IO.FileInfo]]::new()
 $schoolBotPending = [Collections.Generic.Stack[string]]::new()
 $schoolBotExcludedDirectories = @(
-    'node_modules','bin','obj','dist','TestResults','.tools','.build','.git','.agents','.codex'
+    'node_modules','bin','obj','dist','TestResults','.tools','.build','.git','.agents','.codex',
+    '.tmp','reports','.vs','.idea','.cache','__pycache__','coverage'
 )
 $schoolBotExcludedExtensions = @(
     '.log','.exe','.syso','.pfx','.pem','.key','.p12','.snk','.pdb','.map','.test',
-    '.cer','.crt','.der','.jks','.keystore','.msi','.pkg','.zip'
+    '.cer','.crt','.der','.jks','.keystore','.msi','.pkg','.zip',
+    '.suo','.user','.userosscache','.docstates','.tsbuildinfo','.trx','.coverage','.coveragexml','.pyc','.pyo',
+    '.nupkg','.snupkg'
 )
-foreach ($schoolBotDirectory in @('app','engines','web','contracts','docs','scripts','.github')) {
+foreach ($schoolBotDirectory in @('app','frontend','backend','engines','contracts','docs','scripts','.github')) {
     $schoolBotPath = Join-Path $SchoolBotRoot $schoolBotDirectory
     if (Test-Path -LiteralPath $schoolBotPath -PathType Container) {
         $schoolBotPending.Push($schoolBotPath)
@@ -32,7 +35,7 @@ while ($schoolBotPending.Count -gt 0) {
         $schoolBotRelative = $schoolBotItem.FullName.Substring($SchoolBotRoot.Length + 1).Replace('\','/')
         if ($schoolBotItem.PSIsContainer) {
             if ($schoolBotItem.Name -in $schoolBotExcludedDirectories) { continue }
-            if ($schoolBotRelative -in @('app/frontend/public/blockly-media','web/data')) { continue }
+            if ($schoolBotRelative -in @('app/frontend/public/blockly-media','backend/data','frontend/.next','frontend/node_modules')) { continue }
             $schoolBotPending.Push($schoolBotItem.FullName)
         } elseif (
             $schoolBotItem.Name -notlike '.env*' -and

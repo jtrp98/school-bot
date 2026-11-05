@@ -101,7 +101,7 @@ export class ZideTransport {
     if (this.stopTask) throw new AdapterError("ROBOT_STOPPING");
     // Probe with board.info because it requires an actual controller response.
     const data = await this.request("board.info", { ...transportData(device), read_ms: 1000 }) as { simulated?: boolean };
-    if (data?.simulated !== false) throw new AdapterError("DEVICE_NOT_CONFIRMED");
+    if (data?.simulated !== false && !(device.path === `sim://${device.transport}` && data?.simulated === true)) throw new AdapterError("DEVICE_NOT_CONFIRMED");
   }
   async command(device: RobotDevice, action: string, data: Record<string, unknown> = {}) {
     if (this.stopTask) throw new AdapterError("ROBOT_STOPPING");

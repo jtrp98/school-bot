@@ -19,7 +19,7 @@ C# API ไม่รวมใน Installer. เป้าหมาย online ค�
 ปุ่มหน้าต่างรวมอยู่ใน header เดิมของแต่ละหน้า โดยไม่มีแถวชื่อ/โลโก้แยกด้านบน
 นอกโหมดเต็มจอลากบริเวณชื่อแอปเพื่อย้ายหน้าต่าง
 EXE, Desktop/Start Menu Shortcut และรายการแอปที่ติดตั้งใช้รูปหุ่นจากโลโก้ School Bot
-(`app/build/windows/appicon.ico`; สร้างใหม่ด้วย `scripts/create-windows-icon.ps1`)
+(`app/build/windows/appicon.ico`; สร้างใหม่ด้วย `scripts/assets/create-windows-icon.ps1`)
 ปิดเวอร์ชันเดิมก่อนติดตั้งตัวใหม่เพื่ออัปเกรด
 
 Setup EXE ใช้หน้าต่าง WPF ที่วาดเอง ไม่มี native title bar ใช้มุมโค้ง โลโก้ มาสคอต
@@ -47,28 +47,28 @@ Repair, ถอนการติดตั้ง, silent/basic UI และกา
 # Developer terminal ที่ repository root
 # ตั้งค่านี้เมื่อมี Domain แล้ว (example.com เป็นเพียงตัวอย่าง)
 # $env:SCHOOL_BOT_BUILD_API_URL = 'https://api.example.com'
-./scripts/package-desktop.ps1
+./scripts/desktop/package.ps1
 
 # ภาษา installer: ค่าเริ่มต้นเป็นไทย เปลี่ยนเป็น en หรือ zh ได้ (ไม่เปลี่ยนภาษาที่บันทึกไว้ในแอป)
-./scripts/package-desktop.ps1 -Language en
+./scripts/desktop/package.ps1 -Language en
 
 # ถ้าแอปล่าสุด Build ไว้แล้ว ไม่เปลี่ยนโค้ด/URL
-./scripts/package-desktop.ps1 -SkipBuild
+./scripts/desktop/package.ps1 -SkipBuild
 
 # Build และแพ็กจากโฟลเดอร์แยก เมื่อ app/bin มีแอปที่กำลังเปิดอยู่
-./scripts/package-desktop.ps1 -PayloadDirectory "$env:TEMP\school-bot-payload"
+./scripts/desktop/package.ps1 -PayloadDirectory "$env:TEMP\school-bot-payload"
 
 # Build อย่างเดียวในโฟลเดอร์แยก แล้วแพ็กโดยไม่ build ซ้ำ
-./scripts/build-desktop.ps1 -OutputDirectory "$env:TEMP\school-bot-payload"
-./scripts/package-desktop.ps1 -SkipBuild -PayloadDirectory "$env:TEMP\school-bot-payload"
+./scripts/desktop/build.ps1 -OutputDirectory "$env:TEMP\school-bot-payload"
+./scripts/desktop/package.ps1 -SkipBuild -PayloadDirectory "$env:TEMP\school-bot-payload"
 ```
 
-`build-desktop.ps1` สร้าง `school-bot-<version>.exe` กับสำเนา `school-bot.exe` และฝังไอคอน/version resource จาก `scripts/windows-resources`
+`scripts/desktop/build.ps1` สร้าง `school-bot-<version>.exe` กับสำเนา `school-bot.exe` และฝังไอคอน/version resource จาก `scripts/assets/windows-resources`
 (สั่งด้วยมือตามขั้นตอนใน `README.md` จะไม่ผ่านขั้นตอนนี้) ทั้งสองคำสั่งรองรับ Windows เท่านั้นสำหรับตัวเลือกโฟลเดอร์แยก
 
 ก่อนแพ็ก Script ตรวจว่า `school-bot.exe` ใน payload ตรงกับ `school-bot-<version>.exe` (hash) และ version resource ของ exe ตรงกับ `package.json`; ถ้าไม่ตรงจะหยุดแทนการส่ง exe เก่า
 
-ก่อนแพ็กทั้ง Windows และ macOS `scripts/check-notices.mjs` เทียบ Go module (`go list -deps -tags production`), npm package ที่ฝังใน dist (จาก `package-lock.json`) และไฟล์ vendored ของ Zide กับ `THIRD-PARTY-NOTICES.md` และ `engines/zide/THIRD-PARTY-NOTICES.md` แล้วหยุดแพ็กเมื่อมี dependency ที่ส่งมอบแต่ไม่อยู่ใน notices เมื่อเพิ่มหรืออัปเดต dependency ที่ส่งมอบ ต้องเพิ่มแถวใน inventory และข้อความ license จากไฟล์ของ package ที่ pin ก่อน
+ก่อนแพ็กทั้ง Windows และ macOS `scripts/checks/third-party-notices.mjs` เทียบ Go module (`go list -deps -tags production`), npm package ที่ฝังใน dist (จาก `package-lock.json`) และไฟล์ vendored ของ Zide กับ `THIRD-PARTY-NOTICES.md` และ `engines/zide/THIRD-PARTY-NOTICES.md` แล้วหยุดแพ็กเมื่อมี dependency ที่ส่งมอบแต่ไม่อยู่ใน notices เมื่อเพิ่มหรืออัปเดต dependency ที่ส่งมอบ ต้องเพิ่มแถวใน inventory และข้อความ license จากไฟล์ของ package ที่ pin ก่อน
 
 Build machine ต้องมี Go/Node, .NET 10 SDK และ C++17 toolchain (Visual Studio C++ + Windows SDK/CMake หรือ Zig); Script เตรียม WiX 5.0.2/WixUI ที่ล็อกเวอร์ชันไว้ใน `.tools`
 และตรวจ Microsoft Authenticode ของ WebView2 Bootstrapper ก่อนบรรจุใน MSI
@@ -93,11 +93,11 @@ Installer ใช้ [WiX 5.0.2](https://github.com/wixtoolset/wix/releases/tag/v
 MSI ที่เปิดโดยตรงยังใช้ native WixUI dialogs สำหรับความคืบหน้า Repair และถอนการติดตั้ง
 และ Runtime deployment ตาม [Microsoft WebView2 documentation](https://learn.microsoft.com/en-us/microsoft-edge/webview2/concepts/distribution)
 
-`scripts/prepare-installer-brand.ps1` สร้าง bitmap จากโลโก้และมาสคอตเดิมก่อนแพ็ก
+`scripts/installer/prepare-brand.ps1` สร้าง bitmap จากโลโก้และมาสคอตเดิมก่อนแพ็ก
 และสร้าง WiX localization จากหมวด `installer` ใน catalogs `th.json`, `en.json`, `zh.json`
 จึงใช้คำแปลแหล่งเดียวกับแอป โดยข้อความมาตรฐานของ WixUI ใช้ภาษาที่เลือกตอนแพ็ก
 ไฟล์ `app/build/windows/installer/hero-robot.png` เป็นสำเนา PNG ของ `hero-robot.webp` เดิมสำหรับ GDI+/Windows Installer
-`scripts/build-installer-shell.ps1` อ่านเวอร์ชันจาก manifest เดิม ฝัง MSI/hash/catalog/assets
+`scripts/installer/build-shell.ps1` อ่านเวอร์ชันจาก manifest เดิม ฝัง MSI/hash/catalog/assets
 และ publish EXE แบบ self-contained single-file โดยไม่มี source หรือ debug symbols
 ข้อความ license ของ runtime/fonts ฝังใน EXE และแจกไฟล์ `.NOTICES.txt` ข้างตัวติดตั้ง
 
@@ -126,7 +126,7 @@ Starter ไม่ใช้ default EULA ตัวอย่างของ WiX; �
 # ตรวจ hash/font/progress/cancel result และเรนเดอร์ 7 สถานะ/2 ขนาด พร้อม 30 animation frames
 # ไม่ติดตั้งจริง ไม่เปิดแอป และไม่มี listener; ภาพอยู่ใน dist/installer-preview/
 $version = (Get-Content app/frontend/package.json -Raw | ConvertFrom-Json).version
-./scripts/build-installer-shell.ps1 -InstallerPath "dist/installers/school-bot-$version-windows-amd64.msi" -BrandDirectory .tools/installer-brand/th -OutputDirectory .tools/installer-shell-preview -Preview
+./scripts/installer/build-shell.ps1 -InstallerPath "dist/installers/school-bot-$version-windows-amd64.msi" -BrandDirectory .tools/installer-brand/th -OutputDirectory .tools/installer-shell-preview -Preview
 ```
 
 Preview/check entry points คอมไพล์เฉพาะเมื่อกำหนด `SETUP_PREVIEW`; ไม่อยู่ใน setup EXE ที่แจก
@@ -136,9 +136,17 @@ Smoke test สำหรับ clean Windows account/CI ให้เปิด Pow
 (สคริปต์จะหยุดก่อนติดตั้งหากไม่ได้ยกระดับสิทธิ์ และไม่รันทับ School Bot ที่ติดตั้งอยู่แล้ว):
 
 ```powershell
-./scripts/test-installer.ps1
+./scripts/installer/test-installation.ps1
 # ถ้าแพ็กจากโฟลเดอร์แยก ให้ชี้ payload เดียวกัน
-./scripts/test-installer.ps1 -PayloadDirectory "$env:TEMP\school-bot-payload"
+./scripts/installer/test-installation.ps1 -PayloadDirectory "$env:TEMP\school-bot-payload"
+
+# ทดสอบวงจรชีวิต MSI แบบแยก namespace (Install 0.1.4 -> Upgrade 0.1.5 -> Downgrade Block -> Repair /fa -> AC-030-07 Mid-Update Failure Rollback SCHOOLBOT_INJECT_FAIL=1 -> Uninstall /x)
+./scripts/installer/test-msi-rollback-recovery.ps1 -PayloadDirectory "dist/payload-0.1.5-rc" -ReportPath "reports/phase6/msi-lifecycle-and-rollback-report.json"
+
+# ตรวจสอบ Code Signing, Payload Cleanliness, Third-Party Notices และสร้าง release-manifest.json (BE-022)
+./scripts/installer/sign-and-manifest.ps1 -PayloadDirectory "dist/payload-0.1.5-rc" -InstallerDirectory "dist/installers"
+# บังคับตรวจลายเซ็นจริงก่อนปล่อย Production (Fail-Closed):
+./scripts/installer/sign-and-manifest.ps1 -PayloadDirectory "dist/payload-0.1.5-rc" -InstallerDirectory "dist/installers" -RequireSigned
 ```
 
 ทดสอบ Silent Install ลง path ที่มีช่องว่างใน workspace, checksum ของ payload, Shortcut,
@@ -154,15 +162,21 @@ Wails v3 รองรับ Docker cross-compilation แต่ repository นี
 
 ```bash
 # ต้องรันบน Mac ที่มี Go, Node และ Xcode Command Line Tools
-# SCHOOL_BOT_BUILD_API_URL=https://api.example.com bash scripts/package-desktop.sh
-bash scripts/package-desktop.sh
+# SCHOOL_BOT_BUILD_API_URL=https://api.example.com bash scripts/desktop/package.sh
+bash scripts/desktop/package.sh
+
+# บังคับ Developer ID Application/Installer signing + Notarization/Stapling (Fail-Closed):
+bash scripts/desktop/package.sh --require-signed
+
+# ทดสอบ Universal PKG lifecycle และการกู้คืนเมื่ออัปเดตล้มเหลวกลางคันตาม AC-030-07 (BE-021):
+bash scripts/installer/test-macos-pkg-recovery.sh --pkg "dist/installers/school-bot-0.1.5-macos-universal.pkg" --report "reports/phase6/macos-pkg-recovery-report.json"
 ```
 
 Script Build สอง architecture ด้วย Go/Clang แล้วใช้ `lipo` รวมทั้ง main executable และ Engine
 เป็น Universal binary ใน `app/bin/darwin-universal/School Bot.app`
 จากนั้นใช้ Apple `productbuild` ทำ `.pkg` ติดตั้งลง `/Applications` และจำกัด macOS 15 ขึ้นไป
 ไม่เพิ่ม daemon, service หรือ post-install script
-เมื่อมี Universal bundle ล่าสุดแล้วใช้ `bash scripts/package-desktop.sh --skip-build` ได้
+เมื่อมี Universal bundle ล่าสุดแล้วใช้ `bash scripts/desktop/package.sh --skip-build` ได้
 `.pkg` รองรับ Intel และ Apple Silicon ในไฟล์เดียว ไม่ต้องให้ผู้ใช้เลือก architecture
 ถอนแอปโดยย้าย `/Applications/School Bot.app` ไป Trash; Projects ใน Application Support ยังคงอยู่
 

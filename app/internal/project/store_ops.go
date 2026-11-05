@@ -31,7 +31,7 @@ func (s *LocalStore) CreateProject(ctx context.Context, input CreateProjectInput
 		Mode:          input.Mode,
 		Name:          input.Name,
 		LocalRevision: 1,
-		UpdatedAt:     time.Now().UTC().Format(time.RFC3339),
+		UpdatedAt:     s.now().Format(time.RFC3339),
 		Content:       input.Content,
 	}
 
@@ -154,7 +154,7 @@ func (s *LocalStore) SaveProject(ctx context.Context, input SaveProjectInput) (*
 		Mode:          existing.Mode,
 		Name:          input.Name,
 		LocalRevision: existing.LocalRevision + 1,
-		UpdatedAt:     time.Now().UTC().Format(time.RFC3339),
+		UpdatedAt:     s.now().Format(time.RFC3339),
 		Content:       input.Content,
 	}
 
@@ -221,7 +221,7 @@ func (s *LocalStore) CopyProject(ctx context.Context, input CopyProjectInput) (*
 		Mode:          source.Mode,
 		Name:          input.Name,
 		LocalRevision: 1,
-		UpdatedAt:     time.Now().UTC().Format(time.RFC3339),
+		UpdatedAt:     s.now().Format(time.RFC3339),
 		Content:       source.Content,
 	}
 

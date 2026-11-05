@@ -1,0 +1,13 @@
+using System;
+using System.Collections.Generic;
+
+namespace ServiceSchoolBot.Infrastructure.Entities.JabjaiMasterSingleDB;
+
+public partial class TmasterType
+{
+    public int MasterTypeId { get; set; }
+
+    public string? MasterTypeNameTh { get; set; }
+
+    public string? MasterTypeNameEn { get; set; }
+}

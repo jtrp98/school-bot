@@ -44,7 +44,8 @@ if ($zideZig) {
     ))
     $zideObjects = @($zideProtocol,$zideHid)
     foreach ($zideUnit in @(
-        'transport','transport_hid','transport_serial','discovery','actions','request','line_reader'
+        'transport','transport_hid','transport_serial','discovery','actions','request','line_reader',
+        'transport_io','discovery_darwin','transport_darwin_hid','transport_darwin_serial'
     )) {
         $zideObject = Join-Path $zideBuild "$zideUnit.o"
         Invoke-ZideCompiler $zideZig (@('c++','-std=c++17') + $zideCommon + @(
@@ -62,6 +63,12 @@ if ($zideZig) {
         ))
         & "$zideBuild/zide-protocol-tests.exe"
         if ($LASTEXITCODE -ne 0) { throw 'Zide protocol tests failed.' }
+        Invoke-ZideCompiler $zideZig (@('c++','-std=c++17') + $zideCommon + @(
+            "$zideSource/tests/transport_test.cpp",$zideProtocol,
+            "$zideBuild/transport_io.o",'-o',"$zideBuild/zide-transport-tests.exe"
+        ))
+        & "$zideBuild/zide-transport-tests.exe"
+        if ($LASTEXITCODE -ne 0) { throw 'Zide transport tests failed.' }
     }
 } else {
     $zideCmake = Get-Command cmake -ErrorAction SilentlyContinue
@@ -75,6 +82,8 @@ if ($zideZig) {
     if ($Test) {
         & "$zideBuild/Release/zide-protocol-tests.exe"
         if ($LASTEXITCODE -ne 0) { throw 'Zide protocol tests failed.' }
+        & "$zideBuild/Release/zide-transport-tests.exe"
+        if ($LASTEXITCODE -ne 0) { throw 'Zide transport tests failed.' }
     }
 }
 Copy-Item -LiteralPath "$zideSource/THIRD-PARTY-NOTICES.md" `

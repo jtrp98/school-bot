@@ -1,6 +1,7 @@
 package project
 
 import (
+	"context"
 	"fmt"
 )
 
@@ -25,6 +26,9 @@ const (
 	ErrEntitlementRequired  = "LICENSE_REQUIRED"
 	ErrLicenseRequired      = "LICENSE_REQUIRED"
 	ErrMigrationUnsupported = "MIGRATION_UNSUPPORTED"
+	ErrClockUntrusted       = "CLOCK_UNTRUSTED"
+	ErrTrashExpired         = "TRASH_EXPIRED"
+	ErrIdempotencyConflict  = "IDEMPOTENCY_CONFLICT"
 )
 
 // StoreError represents a controlled local store error.
@@ -156,3 +160,89 @@ type CopyProjectInput struct {
 	ExpectedLocalRevision int64
 	Name                  string
 }
+
+// TrashEnvelope wraps a soft-deleted local project in trash/<project_id>.json.
+type TrashEnvelope struct {
+	Schema    int                   `json:"schema"`
+	Project   *LocalProjectDocument `json:"project"`
+	DeletedAt string                `json:"deleted_at"`
+	ExpiresAt string                `json:"expires_at"`
+}
+
+// TrashMetadata summarizes a soft-deleted project in the 30-day trash.
+type TrashMetadata struct {
+	ProjectID     string `json:"project_id"`
+	Mode          string `json:"mode"`
+	Name          string `json:"name"`
+	LocalRevision int64  `json:"local_revision"`
+	UpdatedAt     string `json:"updated_at"`
+	DeletedAt     string `json:"deleted_at"`
+	ExpiresAt     string `json:"expires_at"`
+}
+
+// ExportedProjectEnvelope is the portable .schoolbot-project.json format.
+type ExportedProjectEnvelope struct {
+	Schema     int             `json:"schema"`
+	ExportedAt string          `json:"exported_at"`
+	Mode       string          `json:"mode"`
+	Name       string          `json:"name"`
+	Content    *ProjectContent `json:"content"`
+}
+
+// ImportDestination identifies the authenticated cloud destination for a guest import.
+type ImportDestination struct {
+	APIOrigin string `json:"api_origin"`
+	SchoolID  int    `json:"school_id"`
+	OwnerKind string `json:"owner_kind"`
+	OwnerID   int    `json:"owner_id"`
+}
+
+// ImportSnapshot captures the local project revision and content digest at import time.
+type ImportSnapshot struct {
+	Mode          string `json:"mode"`
+	Name          string `json:"name"`
+	LocalRevision int64  `json:"local_revision"`
+	ContentSHA256 string `json:"content_sha256"`
+}
+
+// ImportReceipt records a pending or committed guest-to-cloud project import.
+type ImportReceipt struct {
+	Schema                 int               `json:"schema"`
+	LocalProjectID         string            `json:"local_project_id"`
+	Destination            ImportDestination `json:"destination"`
+	RequestKey             string            `json:"request_key"`
+	RequestHash            string            `json:"request_hash"`
+	Snapshot               ImportSnapshot    `json:"snapshot"`
+	State                  string            `json:"state"`
+	CloudProjectID         *int              `json:"cloud_project_id"`
+	CloudProjectRevisionID *int              `json:"cloud_project_revision_id"`
+	CommittedAt            *string           `json:"committed_at"`
+}
+
+// CloudImportRequest is the payload sent to the cloud import endpoint.
+type CloudImportRequest struct {
+	IdempotencyKey string          `json:"idempotency_key"`
+	LocalProjectID string          `json:"local_project_id"`
+	Mode           string          `json:"mode"`
+	Name           string          `json:"name"`
+	LocalRevision  int64           `json:"local_revision"`
+	Content        *ProjectContent `json:"content"`
+	RequestHash    string          `json:"request_hash"`
+}
+
+// CloudImportResponse is the response returned from the cloud import endpoint.
+type CloudImportResponse struct {
+	Schema            int             `json:"schema"`
+	ProjectID         int             `json:"project_id"`
+	ProjectRevisionID int             `json:"project_revision_id"`
+	Mode              string          `json:"mode"`
+	Name              string          `json:"name"`
+	Revision          int             `json:"revision"`
+	UpdateDate        string          `json:"update_date"`
+	Content           *ProjectContent `json:"content"`
+	ETag              string          `json:"etag,omitempty"`
+	Replayed          bool            `json:"replayed,omitempty"`
+}
+
+// CloudImportFunc performs the network call to import a guest project into the cloud.
+type CloudImportFunc func(ctx context.Context, dest ImportDestination, req CloudImportRequest) (*CloudImportResponse, error)

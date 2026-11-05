@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ServiceSchoolBot.Domain/ServiceSchoolBot.Domain.csproj" />
+    <Project Path="src/ServiceSchoolBot.Application/ServiceSchoolBot.Application.csproj" />
+    <Project Path="src/ServiceSchoolBot.Infrastructure/ServiceSchoolBot.Infrastructure.csproj" />
+    <Project Path="src/ServiceSchoolBot.API/ServiceSchoolBot.API.csproj" />
+  </Folder>
+  <Folder Name="/tests/"><Project Path="tests/ServiceSchoolBot.Tests/ServiceSchoolBot.Tests.csproj" /></Folder>
+</Solution>
