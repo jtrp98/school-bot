@@ -1,85 +1,141 @@
-# Architecture
+# SchoolBot — System Architecture Documentation
 
-```text
-React UI (one active mode)
-  ├── Robot Simulator
-  ├── Phaser Game
-  └── Blockly
-       │ core/client.ts
-       ▼
-Go DesktopService (thin Wails adapter)
-  ├── local project store
-  ├── HTTP API client (local PoC) → C# Api → Application → Domain
-  │                                       ↑
-  │                               Infrastructure store adapter
-  └── Engine Manager ──JSON Lines──┬── robot-control → C++ Zide
-                                  └── adventure / blocks → demo-engine
+> Release: SchoolBot v1.0 (Phase 7 Final Handover Package)  
+> Workspace: `target/school-bot/` · Date: 2026-11-05 · Status: Verified
+
+---
+
+## 1. High-Level Architecture Overview
+
+SchoolBot is a hybrid desktop and cloud learning platform designed for coding education and physical robotic arm manipulation across primary and secondary schools.
+
+```mermaid
+flowchart TB
+    subgraph ClientLayer["Desktop Client Tier (Windows / macOS)"]
+        subgraph Frontend["React 18 Frontend UI"]
+            Shell["App Shell & Navigation"]
+            BlockLab["Block Lab (Blockly)"]
+            ArmLab["Arm Lab (3D Robot Simulator & Pose Editor)"]
+            CodeLab["Code Lab (Python Adventure)"]
+            QuizView["Quiz / Examination Engine"]
+        end
+        
+        subgraph Host["Go Host & DesktopService (Wails v3)"]
+            LocalStore["Local Project Store (JSON + Sync)"]
+            GuestStore["Guest Project & History Engine"]
+            Updater["Background Updater & Atomic Applier"]
+            EngineMgr["Engine Manager (JSON Lines Subprocess)"]
+        end
+
+        subgraph Engines["Isolated Native Execution Engines"]
+            ZideCpp["Zide C++ Engine (6-Axis Servo & USB Transport)"]
+            DemoEngine["Demo Python Engine (Bounded DSL)"]
+        end
+    end
+
+    subgraph EdgeLayer["Edge / API Gateway Tier"]
+        Gateway["sb-api-gateway (HTTP API Gateway)"]
+    end
+
+    subgraph BackendLayer["Core Backend Tier (Kubernetes Private Network)"]
+        GRPCService["ServiceSchoolBot.API (C# .NET 10 gRPC :8080)"]
+        GradeWorker["school-bot-grade-worker (Isolated DB Worker)"]
+    end
+
+    subgraph DataLayer["Persistence Tier (PostgreSQL 15.19)"]
+        SchoolBotDB[("SchoolBotDB (32 Core Tables)")]
+        LegacyMaster[("JabjaiMasterSingleDB")]
+        LegacySchool[("JabjaiSchoolSingleDB")]
+        LegacyLogs[("JabjaiSchoolLogs")]
+        LegacyPGGrade[("PGGradeDB (Grading Records)")]
+    end
+
+    Frontend --> Host
+    EngineMgr -->|"JSON Lines IPC<br/>(stdin/stdout, 64KB max)"| Engines
+    Host -->|"HTTPS REST / JWT"| Gateway
+    Gateway -->|"h2c gRPC (:8080)<br/>Validated Peer Metadata"| GRPCService
+    GRPCService --> SchoolBotDB
+    GRPCService --> LegacyMaster
+    GRPCService --> LegacySchool
+    GRPCService --> LegacyLogs
+    GradeWorker --> SchoolBotDB
+    GradeWorker -->|"Least-Privilege Write (CAS)"| LegacyPGGrade
 ```
 
-## Boundaries
+---
 
-Standalone engine sources live in `engines/<engine-id>/`; each owns its language,
-dependencies, build scripts, tests, docs and platform outputs. The `scripts/engines/build.*`
-scripts only dispatch by ID. Shared manifest metadata lives in `contracts/engine/`.
-Mode and engine identity are separate; they are not a one-to-one mapping.
-See `engines/README.md` for the workspace convention. The host's trusted registry
-routes Robot Control to Zide and the two learning modes to the demo engine.
+## 2. Desktop Client Architecture
 
-Frontend modes never choose executable paths or access license credentials outside the call.
-`internal/engine` has no Wails imports. A replacement Host can reuse protocol/engine unchanged.
-Mode ownership is separate from engine implementation language. The manager locates
-built-in binary paths only beside the running executable, including `engines/zide`;
-the working directory is never searched, so a development run must use the built
-executable in the build output directory. It never accepts frontend executable paths.
+### 2.1 Separation of Concerns
+1. **Frontend UI Layer (`app/frontend/`)**:
+   - Built on React 18 with TypeScript and Vite.
+   - Decoupled from native OS specifics; calls the host purely via `core/client.ts` typed methods.
+   - Multi-language localization (i18n) supporting Thai, English, and Chinese with interpolation safeguards.
+   - Three independent workspace modes:
+     - **Block Lab**: Blockly visual block-based programming with structured repeat bounds.
+     - **Arm Lab**: 3D kinematics visualization, 6-axis joint slider calibration, trajectory sequence playback, and physical USB controller.
+     - **Code Lab**: Python coding adventure using bounded syntax evaluation.
+     - **Examination**: Timed test attempts, randomized question pools, and auto-submission.
 
-`Run` creates a process per request, handles one response, and terminates on cancellation/5-second deadline.
-Input capped at 64 KB, stdout at 1 MB, diagnostic output at 8 KB. No shell is used.
-Only one request can be active. No networking or filesystem API is exposed by the teaching DSL.
-Cancel waits until the current child exits and releases its slot. An already-active
-`robot.stop` is allowed to finish despite navigation/close cancellation; its five-second
-deadline remains in effect. `cmd.WaitDelay` bounds inherited-pipe draining to one second
-after child exit or context cancellation. Robot Control
-then submits a separate physical `$DST!` request; cancellation alone is not a stop.
-Output beyond the caps is discarded without failing the child's writes, so a verbose engine is not
-killed by a full pipe. Host failures are returned as responses with an `error.code`
-(`ENGINE_BUSY`, `ENGINE_CANCELLED`, `ENGINE_TIMEOUT`, `ENGINE_FAILED`); the host also rejects engine
-responses that break `contracts/engine/response.schema.json`. The frontend decides by code, not by
-message text; codes are listed in `engines/zide/docs/API.md`.
+2. **Go Desktop Host (`app/`)**:
+   - Thin Wails v3 adapter (`DesktopService`) exposing minimal API bindings to JavaScript.
+   - **Engine Manager (`app/internal/engine/`)**: Spawns isolated native processes on demand. Never allows arbitrary shell execution or untrusted path lookups. Enforces 64 KB input ceiling, 1 MB output limit, and a strict 5-second deadline per IPC invocation.
+   - **Local Storage (`app/internal/project/`)**: Atomic file writes (`.tmp` + sync + rename) into `%APPDATA%\SchoolBotPoC` (Windows) or `~/Library/Application Support/SchoolBotPoC` (macOS). Ensures no local learning progress is lost during network disruption.
+   - **Updater Applier (`app/internal/updater/`)**: Background updater with publisher certificate pin verification, atomic binary swap, and rollback recovery.
 
-Native Robot Control starts disconnected and probes a selected device before
-accepting a six-joint calibration profile. UI samples/previews do not call hardware.
-The native workspace serializes motion, invalidates pending work on stop/unmount,
-and reports transmission separately from measured position or verified board storage.
-See `engines/zide/docs/INTEGRATION.md` for its supported operations and limits.
+3. **Native Execution Engines (`engines/`)**:
+   - **Zide C++ Engine (`engines/zide/`)**:
+     - Standalone high-performance C++17 engine compiled via Zig 0.15.2 / Clang.
+     - Communicates with hardware via HID (`hidapi`) and CDC Serial transport on Windows (`setupapi`) and macOS (`IOKit`).
+     - Real-time safety guards: motion bounding, 6-axis velocity/PWM profiling, emergency disconnect torque cutoff (`$DST!`), and dry-run simulation mode.
+   - **Demo Engine (`app/cmd/demo-engine/`)**:
+     - Lightweight Go-based DSL interpreter for classroom block and python adventure execution.
 
-This is **not a sandbox for arbitrary executable student code**. Child-tree cleanup, package verification,
-dynamic discovery, persistent sessions, event streaming and protocol capability negotiation are follow-ups.
+---
 
-## C# API
+## 3. Backend & gRPC Microservices Architecture
 
-- Domain: immutable license/release records and invariants; no persistence/web dependencies
-- Application: use cases, DTOs, `IManagementStore`, injected `TimeProvider`
-- Infrastructure: process-local Memory Store; no EF dependency in Domain/Application
-- Api: composition root, transport validation, auth/rate limits, error→HTTP mapping
+### 3.1 Layered Design (`web/src/`)
+- **Domain Layer (`ServiceSchoolBot.Domain`)**: Pure business logic, immutable domain records, invariants, and validation rules. No database or web dependencies.
+- **Application Layer (`ServiceSchoolBot.Application`)**: Use cases, DTOs, repository interfaces (`ISchoolBotRepositoryScope`), and domain service orchestrators (`AssessmentReadService`, `LearningSubmissionService`, `ScoreExportService`, `QuestionBankService`, `LevelPromotionService`).
+- **Infrastructure Layer (`ServiceSchoolBot.Infrastructure`)**: EF Core PostgreSQL repository implementations (`SchoolBotDbContext`, `SchoolBotUnitOfWork`), memory cache, Protobuf serialization, and external system adapters.
+- **API Composition Root (`ServiceSchoolBot.API`)**: ASP.NET Core .NET 10 host exposing gRPC services, HTTP health probe (`:8081/healthz`), peer authentication filter (`SchoolBotGrpcRunner`), and background task scheduler (`LearningWorker`).
 
-No production business secret is embedded in Desktop. License activation key is sent per call and not persisted.
-Admin key exists only in API environment. No CORS is required for the native Go client.
-API ปัจจุบันใช้ HTTP บน localhost สำหรับพัฒนา. เป้าหมาย online คือ Desktop/Web→HTTP Gateway→gRPC SchoolBot→Application→Domain; browser ผ่าน same-origin BFF. ยังไม่มี gRPC integration ที่พร้อมใช้; ต้องกำหนด RPC/HTTP mapping, trusted JWT tenant และ opaque-session boundary ก่อน. Login HTTP เดิมของ Gateway/decoder และ engine JSON Lines/local hardware คงเดิม ไม่เปิด direct public SchoolBot fallback.
-Desktop distribution builds embed the public API address with `SCHOOL_BOT_BUILD_API_URL`;
-`SCHOOL_BOT_API_URL` remains a runtime override for development. See `DEPLOYMENT.md`.
+### 3.2 Concurrency & Idempotency Controls
+- **Optimistic Concurrency**: Tracked via `UpdateDate` mapped to opaque HTTP ETag tokens (`OpaqueConcurrencyToken.ToETag`). Stale edits receive `VERSION_CONFLICT` (HTTP 412 / gRPC FailedPrecondition).
+- **Idempotent Mutations**: All mutating calls (`StartAttempt`, `SaveAttemptAnswers`, `SetGradeMapping`, `ConfirmScoreExport`) require an `x-idempotency-key` (UUID v4) deduplicated at the database layer via `SchoolBotIdempotency` table.
+- **Transactional Consistency (Decision 051)**: Project creation and revision 1 generation occur in a single atomic database transaction.
 
-## Offline and storage
+### 3.3 Grade Export & Process Isolation (SEC-001-002)
+- To prevent potential lateral movement or unintended writes to the production grading database (`PGGradeDB`), `ServiceSchoolBot.API` does not have write access to `PGGradeDB`.
+- Scores ready for export are saved into an internal `SchoolBotScoreOutbox` queue in `SchoolBotDB`.
+- An isolated background worker deployment (`school-bot-grade-worker`) processes outbox items using Compare-And-Swap (CAS) locking, validates teacher authorization, and issues durable receipts upon successful sync.
 
-Mode execution and Project Save/Load never call the API. User config directory `SchoolBotPoC` holds
-one JSON project per mode plus a random hexadecimal device ID. Project reads check the
-file size before allocation and retain a 1 MB bounded read against concurrent growth. Write uses temporary file + sync + rename.
-This is a local file store, not encrypted student-data storage or a sync database.
+---
 
-Browser preview explicitly opts into simulation with `?preview=1`. Project data uses localStorage there;
-Native behavior and performance must be measured in the Desktop executable, not preview.
+## 4. Database Architecture & Schema
 
-## Product lifecycle
+### 4.1 Schema Distribution
+- **SchoolBotDB (PostgreSQL 15.19)**: 32 tables with 450 fields covering:
+  - Licenses & Bindings: `SchoolBotLicense`, `SchoolBotLicenseBinding`
+  - Sessions & Projects: `SchoolBotSession`, `SchoolBotProject`, `SchoolBotProjectRevision`
+  - Curriculum & Activities: `SchoolBotCurriculum`, `SchoolBotLesson`, `SchoolBotActivity`, `SchoolBotCriterion`
+  - Question Banks & Quizzes: `SchoolBotQuestionBank`, `SchoolBotScoringPolicy`
+  - Assessment Attempts: `SchoolBotAttempt`, `SchoolBotAssessment`, `SchoolBotSubmission`, `SchoolBotRetakeGrant`
+  - Level Promotion: `SchoolBotLevel`, `SchoolBotLevelProposal`, `SchoolBotLevelPromotionPolicy`
+  - Grade Sync & Outbox: `SchoolBotGradeSlot`, `SchoolBotScoreMapping`, `SchoolBotScorePreview`, `SchoolBotScoreOutbox`, `SchoolBotScoreExport`
+  - Audit & Idempotency: `SchoolBotAuditEvent`, `SchoolBotIdempotency`, `SchoolBotStaffRole`, `SchoolBotRelease`
 
-Wails is pinned to a Beta. Dependency updates require rerunning bridge, build and real-device checks.
-The starter intentionally does not install unverified update packages or enforce online licensing.
-API outage never blocks local learning. Signed offline entitlements and revocation policy need a separate design.
+---
+
+## 5. Security & Trust Architecture
+
+| Vector | Control & Implementation |
+|---|---|
+| **Transport Security** | TLS 1.3 enforced at Gateway perimeter; private h2c gRPC within cluster network |
+| **Peer Trust Validation** | `SchoolBotGrpcRunner` verifies `x-caller: api-gateway` and rejects direct external callers |
+| **Tenant Isolation** | Strict `SchoolId` scoping on all queries; cross-school access strictly forbidden |
+| **Device Licensing** | Cryptographically signed device proof (ECDSA P-256) bound to hardware JKT |
+| **Process Isolation** | `PGGRADE_DB_CONNECTION_STRING` isolated solely to the grade worker container |
+| **Engine Safety Limits** | 64 KB input cap, 1 MB stdout limit, non-shell execution, and physical stop timeouts |
+| **Clean Packaging** | Production installers built without debug symbols, map files, or secrets (`.key`, `.pem`, `.pfx`) |

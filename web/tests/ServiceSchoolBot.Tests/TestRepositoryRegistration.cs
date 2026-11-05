@@ -8,10 +8,14 @@ namespace ServiceSchoolBot.Tests;
 
 internal static class TestRepositoryRegistration
 {
-    public static IWebHostBuilder UseSchoolBotMemoryStorage(this IWebHostBuilder builder) =>
-        builder.UseEnvironment("Development").ConfigureAppConfiguration((_, configuration) =>
+    public static IWebHostBuilder UseSchoolBotMemoryStorage(this IWebHostBuilder builder)
+    {
+        Environment.SetEnvironmentVariable("SchoolBot__Storage", "Memory");
+        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
+        return builder.UseEnvironment("Development").ConfigureAppConfiguration((_, configuration) =>
             configuration.AddInMemoryCollection(new Dictionary<string, string?> { ["SchoolBot:Storage"] = "Memory" }))
             .ConfigureServices((context, services) => services.AddInMemoryInfrastructureServices(context.Configuration));
+    }
 
     public static IServiceCollection AddSchoolBotRepositories(
         this IServiceCollection services, ISchoolBotRepositoryScope scope) =>
@@ -41,3 +45,4 @@ internal static class TestRepositoryRegistration
         return services;
     }
 }
+
