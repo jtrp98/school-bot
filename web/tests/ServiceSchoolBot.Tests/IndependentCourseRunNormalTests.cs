@@ -173,8 +173,8 @@ public sealed class IndependentCourseRunNormalTests
                 var parameters = key.ExportParameters(false);
                 var jwk = new DeviceJwk("EC", "P-256", TestLicenseTokenSigner.Base64UrlEncode(parameters.Q.X!),
                     TestLicenseTokenSigner.Base64UrlEncode(parameters.Q.Y!));
-                var proof = CreateProof(key, "normal-challenge", "GET", "/v2/progress", null, "{}");
-                DeviceProofVerifier.VerifyDeviceProof(proof, jwk, "normal-challenge", "GET", "/v2/progress", null,
+                var proof = CreateProof(key, "normal-challenge", "GET", "/api/service-school-bot/progress", null, "{}");
+                DeviceProofVerifier.VerifyDeviceProof(proof, jwk, "normal-challenge", "GET", "/api/service-school-bot/progress", null,
                     DeviceProofVerifier.ComputeBodyHashWithoutProof("{}"));
             }
             var signed = signer.Sign("test", new { school_id = 11, exp = Now.AddDays(10).ToUnixTimeSeconds() });

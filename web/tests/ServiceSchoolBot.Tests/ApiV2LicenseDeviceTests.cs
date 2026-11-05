@@ -99,7 +99,7 @@ public sealed class ApiV2LicenseDeviceTests
     private static string ActivateBody(ECDsa deviceKey, DeviceJwk jwk, string challenge, string key)
     {
         var withoutProof = JsonSerializer.Serialize(new { challenge, device_jwk = jwk, key }, JsonOptions);
-        var proof = CreateProof(deviceKey, challenge, "POST", "/v2/licenses/activate", null, withoutProof);
+        var proof = CreateProof(deviceKey, challenge, "POST", "/api/service-school-bot/licenses/activate", null, withoutProof);
         return JsonSerializer.Serialize(new { key, device_jwk = jwk, challenge, proof }, JsonOptions);
     }
 
@@ -120,7 +120,7 @@ public sealed class ApiV2LicenseDeviceTests
             device_jwk = deviceJwk,
             key
         }, JsonOptions);
-        var proof = CreateProof(deviceKey, challenge, "POST", "/v2/licenses/activate", null, activatePayloadWithoutProof);
+        var proof = CreateProof(deviceKey, challenge, "POST", "/api/service-school-bot/licenses/activate", null, activatePayloadWithoutProof);
 
         var activateBody = JsonSerializer.Serialize(new
         {
@@ -160,7 +160,7 @@ public sealed class ApiV2LicenseDeviceTests
             challenge = challengeVal,
             key
         }, JsonOptions);
-        var proofVal = CreateProof(deviceKey, challengeVal, "POST", "/v2/licenses/validate", null, validatePayloadWithoutProof);
+        var proofVal = CreateProof(deviceKey, challengeVal, "POST", "/api/service-school-bot/licenses/validate", null, validatePayloadWithoutProof);
 
         var validateBody = JsonSerializer.Serialize(new
         {

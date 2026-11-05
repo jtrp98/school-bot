@@ -121,8 +121,8 @@ Device challenge, activate/validate และ update check เป็น **anonym
 | POST | `/admin/releases/{id}/publish` | Publish release metadata |
 | GET | `/updates/check?version=0.1.0&channel=stable&platform=windows-amd64` | Anonymous: published release ที่ใหม่กว่า |
 
-`/v1/licenses/*`, `/v1/admin/licenses`, logout และ web-session exchange ถูกลบแล้ว
-HTTP routes เดิมของ SchoolBot รวม `/v1/admin/releases` ไม่มี fallback; ใช้ Gateway `/admin/releases` ตามตาราง
+HTTP routes เดิมของ SchoolBot รวม logout และ web-session exchange ถูกลบแล้ว
+ไม่มี fallback หรือ version segment; ใช้ Gateway routes ตามตารางเท่านั้น
 Question-bank mutation ใช้ staff roles; assessment/progress ยังต้องเชื่อม `IAssessmentAuthority`
 สำหรับ roster/School DB ซึ่งค่าปริยายคืน `AUTH_NOT_CONFIGURED`
 
@@ -169,13 +169,13 @@ Typed JSON endpoint ที่ Content-Type ไม่ใช่ JSON อาจไ�
 
 201 คืน `{ "license": { ... }, "key": "SBOT-..." }`; key สุ่มและเก็บ hash
 list คืน metadata/activated count โดยไม่คืน plaintext key, key hash หรือ device identifiers
-`device_limit` รองรับ 1 เครื่อง; ใช้ unbind เพื่อย้ายเครื่อง ไม่ใช้ payload แบบ v1 `device_id`
+`device_limit` รองรับ 1 เครื่อง; ใช้ unbind เพื่อย้ายเครื่อง ไม่ใช้ payload เดิม `device_id`
 
 ขอ challenge ด้วย `{ "device_jwk": { "kty": "EC", "crv": "P-256", "x": "...", "y": "..." } }`
 activate ส่ง `key`, `device_jwk`, `challenge`, `proof`; validate ส่ง `key`, `binding_id`, `challenge`, `proof`
 Proof ใช้ ES256 และ hash ของ canonical JSON ที่ตัด `proof` ออก พร้อม challenge, method และ idempotency key
-**ค่า path ภายใน signed proof ยังเป็น `/v2/licenses/activate` หรือ `/v2/licenses/validate` ตาม contract เดิม**
-ค่าเหล่านี้ไม่ใช่ HTTP URL และต้องคงไว้แม้ HTTP route ภายนอกไม่มี version
+ค่า path ภายใน signed proof ตรงกับ HTTP path: `/api/service-school-bot/licenses/activate` หรือ
+`/api/service-school-bot/licenses/validate` ทั้ง Desktop และตัวตรวจ proof ใช้ค่าเดียวกัน ไม่มี alias หรือ path แปลงเวอร์ชัน
 
 สำเร็จคืน `valid`, `license_id`, `binding_id`, `entitlement`, `checked_at`, `expires_at`
 Desktop ส่ง entitlement กลับใน `X-Device-Entitlement` คู่กับ Gateway JWT เมื่อใช้ข้อมูลผู้ใช้
@@ -251,7 +251,8 @@ client/channel ไม่พร้อมคืน 503, peer/trailer ไม่น�
 
 ## ข้อจำกัดก่อนใช้งานร่วมกับ desktop
 
-Desktop ใน `app/` ได้รับการปรับปรุงเส้นทาง REST ให้ชี้ตรงไปยัง Gateway ใต้ `/api/service-school-bot/...` เรียบร้อยแล้ว (เช่น `/api/service-school-bot/device-challenges`, `/api/service-school-bot/licenses/activate`, `/api/service-school-bot/licenses/validate`, `/api/service-school-bot/updates/check`, `/api/service-school-bot/projects/import`) โดยยังคง canonical path ภายใน signed device proof เป็น `/v2/licenses/activate` และ `/v2/licenses/validate` ตามสัญญาการเข้ารหัสของ domain model
+Desktop ใน `app/` ใช้ Gateway ใต้ `/api/service-school-bot/...` สำหรับ device challenge, license, update check และ project import รวมถึง path ภายใน signed device proof
+หน้า Admin ใน sb-helper เรียก BFF `/api/service-school-bot/admin/...` ซึ่งส่งต่อไป Gateway ด้วย prefix เดียวกัน
 การเรียกที่ต้องใช้ตัวตนยังต้องส่ง Gateway JWT และ `X-Device-Entitlement`
 ไม่มี SchoolBot HTTP fallback และไม่ควรเปิด production trust ด้วย test stub เพื่อให้ desktop เก่าทำงาน
 

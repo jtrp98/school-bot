@@ -20,7 +20,7 @@ public sealed class IndependentLicenseGateTests
         Rpc.LicenseService.LicenseServiceClient client, string key, ECDsa device, DeviceJwk jwk, int? binding = null)
     {
         var challenge = await RequestChallenge(client, jwk);
-        var path = binding.HasValue ? "/v2/licenses/validate" : "/v2/licenses/activate";
+        var path = binding.HasValue ? "/api/service-school-bot/licenses/validate" : "/api/service-school-bot/licenses/activate";
         object unsigned = binding.HasValue
             ? new { key, binding_id = binding.Value, challenge }
             : new { key, device_jwk = jwk, challenge };

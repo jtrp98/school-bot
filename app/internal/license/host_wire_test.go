@@ -93,7 +93,7 @@ func TestHostWireAndSecureGenerationSelfCheck(t *testing.T) {
 				Path     string `json:"path"`
 				Key      string `json:"idempotency_key"`
 			}
-			if json.Unmarshal(payload, &claims) != nil || claims.BodyHash != hex.EncodeToString(hash[:]) || claims.Path != "/v2"+strings.TrimPrefix(request.URL.Path, "/api/service-school-bot") || claims.Key != request.Header.Get("Idempotency-Key") {
+			if json.Unmarshal(payload, &claims) != nil || claims.BodyHash != hex.EncodeToString(hash[:]) || claims.Path != request.URL.Path || claims.Key != request.Header.Get("Idempotency-Key") {
 				t.Fatal("proof is not bound to request")
 			}
 			credentials, err := license.OpenCredentials(context.Background(), storage)

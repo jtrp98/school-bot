@@ -60,11 +60,11 @@ internal sealed class QuestionBankFixture : WebApplicationFactory<Program>, IAss
         using var deviceB = CreateDeviceKey().Key;
         foreach (var device in new[] { deviceA, deviceB })
         {
-            var proof = CreateProof(device, "fixture:challenge", "GET", "/v2/attempts", null, "{}");
+            var proof = CreateProof(device, "fixture:challenge", "GET", "/api/service-school-bot/attempts", null, "{}");
             var publicKey = device.ExportParameters(false);
             var jwk = new DeviceJwk("EC", "P-256", TestLicenseTokenSigner.Base64UrlEncode(publicKey.Q.X!),
                 TestLicenseTokenSigner.Base64UrlEncode(publicKey.Q.Y!));
-            DeviceProofVerifier.VerifyDeviceProof(proof, jwk, "fixture:challenge", "GET", "/v2/attempts", null,
+            DeviceProofVerifier.VerifyDeviceProof(proof, jwk, "fixture:challenge", "GET", "/api/service-school-bot/attempts", null,
                 DeviceProofVerifier.ComputeBodyHashWithoutProof("{}"));
         }
         var signed = signer.Sign("fixture", new { school_id = 11, exp = t.AddDays(10).ToUnixTimeSeconds() });

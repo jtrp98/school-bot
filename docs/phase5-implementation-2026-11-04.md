@@ -28,6 +28,8 @@ PostgreSQL repositories participate in the existing atomic unit of work. Memory/
 - Teacher web: `target/sb-tech-upgrade-web-system/src/app/[locale]/pages/academic/school-bot/`; URL `/{locale}/pages/academic/school-bot`, existing teacher web session and BFF.
 - Central content Admin: `target/sb-web-helper/src/app/pages/admin/school-bot/`; URL `/pages/admin/school-bot`, sidebar item **บทเรียนและข้อสอบ**, existing `ADMIN_ACCESS` permission.
 
+The Admin BFF and Gateway both use `/api/service-school-bot/admin/...`, without a version segment. Desktop device proofs use the same versionless path as their HTTP request; the SchoolBot verifier requires that exact path. Client and server must be updated together. This route correction was not built or tested.
+
 The Admin uses the existing sb-helper login. Its server signs an ES256 assertion lasting 60 seconds with `sub=helper user.id`, `admin_id2=session.user.admin_id`, issuer `sb-web-helper`, audience `school-bot-admin`, and scope `schoolbot:content`. The JWT travels server-to-server in `X-SchoolBot-Staff-Assertion`; it is not returned to the browser. Gateway validates it and resolves exactly one active `TAdmin.Id2` to canonical `TAdmin.Id`. Four-eyes audit uses that canonical person. No service account, employee-code fallback, or permission grant was added.
 
 Deployment configuration, without committing private material:

@@ -63,15 +63,12 @@ while ((line = Console.ReadLine()) is not null)
                     : await adminB.RevokeLicenseAsync(admin, created.License.Id, etag, reason: "fixture:revoke");
                 break;
             case "/api/service-school-bot/device-challenges":
-            case "/v2/device-challenges":
                 result = await device.CreateChallengeAsync(JsonSerializer.Deserialize<CreateChallengeRequest>(body, options)!);
                 break;
             case "/api/service-school-bot/licenses/activate":
-            case "/v2/licenses/activate":
                 result = await device.ActivateAsync(JsonSerializer.Deserialize<ActivateLicenseRequest>(body, options)!, body, root.GetProperty("request_key").GetString());
                 break;
             case "/api/service-school-bot/licenses/validate":
-            case "/v2/licenses/validate":
                 result = await device.ValidateAsync(JsonSerializer.Deserialize<ValidateLicenseRequest>(body, options)!, body);
                 break;
             default:

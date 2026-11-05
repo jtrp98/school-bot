@@ -34,7 +34,7 @@ public sealed class IndependentLicenseRaceTests
             using var ownedB = keyB;
             var challengeA = await RequestChallenge(a, jwkA);
             var challengeB = await RequestChallenge(b, jwkB);
-            var path = "/v2/licenses/activate";
+            var path = "/api/service-school-bot/licenses/activate";
             var proofA = CreateProof(keyA, challengeA, "POST", path, null,
                 JsonSerializer.Serialize(new { key, device_jwk = jwkA, challenge = challengeA }, options));
             var proofB = CreateProof(keyB, challengeB, "POST", path, null,

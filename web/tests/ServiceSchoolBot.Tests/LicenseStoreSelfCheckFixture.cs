@@ -69,7 +69,7 @@ internal sealed class LicenseStoreSelfCheckFixture : IDisposable
         LicenseDeviceService service, string key, ECDsa device, DeviceJwk jwk, int? bindingId = null)
     {
         var challenge = await service.CreateChallengeAsync(new CreateChallengeRequest(jwk));
-        var path = bindingId.HasValue ? "/v2/licenses/validate" : "/v2/licenses/activate";
+        var path = bindingId.HasValue ? "/api/service-school-bot/licenses/validate" : "/api/service-school-bot/licenses/activate";
         object unsigned = bindingId.HasValue
             ? new { key, binding_id = bindingId.Value, challenge = challenge.Challenge }
             : new { key, device_jwk = jwk, challenge = challenge.Challenge };

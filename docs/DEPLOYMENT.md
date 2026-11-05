@@ -56,7 +56,7 @@ Rate limiter นับตาม client IP จาก `X-Forwarded-For` และ�
 ถ้า proxy อยู่คนละเครื่องหรือเป็น container network, API จะไม่เชื่อ header และทุก client จะใช้โควต้าร่วมกัน
 ต้องเพิ่ม trusted proxy ในโค้ดก่อนใช้รูปแบบนั้น
 เป้าหมาย production ให้ client ติดต่อ HTTP Gateway และ Gateway ติดต่อ B ด้วย gRPC; host/port/health exposure ยังต้องระบุจาก deployment จริง. `GET /healthz` ของ HTTP local ไม่ยืนยัน readiness ของ Gateway/gRPC และไม่ใช่เงื่อนไขเพียงพอสำหรับแจก Desktop
-Body ใหญ่กว่า 64 KB ถูกปฏิเสธ (413) และโควต้า 30 request/นาที/IP สำหรับ `/v1/licenses/*`, 60 สำหรับ `/v1/updates/check`;
+Body ใหญ่กว่า 64 KB ถูกปฏิเสธ (413) และโควต้า 30 request/นาที/IP สำหรับ `/api/service-school-bot/licenses/*`, 60 สำหรับ `/api/service-school-bot/updates/check`;
 ตัวเลขที่เหลือและรูปแบบ response อยู่ใน `docs/API.md`
 ไม่ส่ง Admin Key ไป Desktop; License activation ไม่ต้องใช้ Admin Key
 

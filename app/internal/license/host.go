@@ -114,7 +114,7 @@ func (h *Host) Check(ctx context.Context, key string, validate bool) (Entitlemen
 		return EntitlementProjection{Status: StatusUnactivated}, err
 	}
 	_, _ = h.service.Evaluate(ctx)
-	challenge, err := h.post(ctx, "/v2/device-challenges", map[string]interface{}{
+	challenge, err := h.post(ctx, "/api/service-school-bot/device-challenges", map[string]interface{}{
 		"device_jwk": publicJWK(h.credentials.key),
 	}, "")
 	if err != nil {
@@ -132,11 +132,11 @@ func (h *Host) Check(ctx context.Context, key string, validate bool) (Entitlemen
 			Message: "invalid challenge response",
 		}
 	}
-	path := "/v2/licenses/activate"
+	path := "/api/service-school-bot/licenses/activate"
 	body := map[string]interface{}{"key": key, "challenge": challengeBody.Challenge}
 	requestKey := ""
 	if validate {
-		path = "/v2/licenses/validate"
+		path = "/api/service-school-bot/licenses/validate"
 		record, _ := h.credentials.Load(ctx)
 		jkt, _ := h.credentials.CurrentDeviceJKT(ctx)
 		if record == nil {
@@ -229,17 +229,8 @@ type cloudResponse struct {
 }
 
 func (h *Host) post(ctx context.Context, path string, body interface{}, requestKey string) (cloudResponse, error) {
-	// Signed proof intents retain their /v2 canonical path; HTTP transport goes through the Gateway.
-	var wirePath string
 	switch path {
-	case "/api/service-school-bot/device-challenges", "/device-challenges":
-		wirePath = "/api/service-school-bot/device-challenges"
-	case "/api/service-school-bot/licenses/activate", "/licenses/activate":
-		wirePath = "/api/service-school-bot/licenses/activate"
-	case "/api/service-school-bot/licenses/validate", "/licenses/validate":
-		wirePath = "/api/service-school-bot/licenses/validate"
-	case "/v2/device-challenges", "/v2/licenses/activate", "/v2/licenses/validate":
-		wirePath = "/api/service-school-bot" + strings.TrimPrefix(path, "/v2")
+	case "/api/service-school-bot/device-challenges", "/api/service-school-bot/licenses/activate", "/api/service-school-bot/licenses/validate":
 	default:
 		return cloudResponse{}, errors.New("unsupported license route")
 	}
@@ -260,7 +251,7 @@ func (h *Host) post(ctx context.Context, path string, body interface{}, requestK
 	}
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
-	request, err := http.NewRequestWithContext(ctx, "POST", h.baseURL+wirePath, bytes.NewReader(payload))
+	request, err := http.NewRequestWithContext(ctx, "POST", h.baseURL+path, bytes.NewReader(payload))
 	if err != nil {
 		return cloudResponse{}, err
 	}

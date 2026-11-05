@@ -54,12 +54,12 @@ internal sealed class CurriculumImportFixture(bool file) : WebApplicationFactory
         using var deviceB = CreateDeviceKey().Key;
         foreach (var device in new[] { deviceA, deviceB })
         {
-            var proof = CreateProof(device, "fixture:challenge", "POST", "/v2/admin/curricula/1/import", null, "{}");
+            var proof = CreateProof(device, "fixture:challenge", "POST", "/api/service-school-bot/admin/curricula/1/import", null, "{}");
             var parameters = device.ExportParameters(false);
             var jwk = new DeviceJwk("EC", "P-256", TestLicenseTokenSigner.Base64UrlEncode(parameters.Q.X!),
                 TestLicenseTokenSigner.Base64UrlEncode(parameters.Q.Y!));
             DeviceProofVerifier.VerifyDeviceProof(proof, jwk, "fixture:challenge", "POST",
-                "/v2/admin/curricula/1/import", null, DeviceProofVerifier.ComputeBodyHashWithoutProof("{}"));
+                "/api/service-school-bot/admin/curricula/1/import", null, DeviceProofVerifier.ComputeBodyHashWithoutProof("{}"));
         }
         var signed = signer.Sign("fixture", new { school_id = 11, exp = now.AddDays(10).ToUnixTimeSeconds() });
         Assert.True(signer.Verify(signed, out var header, out var payload));

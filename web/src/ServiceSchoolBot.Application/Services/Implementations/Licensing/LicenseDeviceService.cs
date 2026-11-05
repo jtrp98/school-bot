@@ -152,7 +152,7 @@ public sealed partial class LicenseDeviceService : ILicenseDeviceService
                 request.DeviceJwk,
                 request.Challenge,
                 "POST",
-                "/v2/licenses/activate",
+                "/api/service-school-bot/licenses/activate",
                 idempotencyKey,
                 expectedBodyHash);
 
@@ -301,7 +301,7 @@ public sealed partial class LicenseDeviceService : ILicenseDeviceService
                 deviceJwk,
                 request.Challenge,
                 "POST",
-                "/v2/licenses/validate",
+                "/api/service-school-bot/licenses/validate",
                 null,
                 expectedBodyHash);
 

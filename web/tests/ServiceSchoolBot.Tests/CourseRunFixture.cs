@@ -42,11 +42,11 @@ internal sealed class CourseRunFixture(bool file) : WebApplicationFactory<Progra
         Assert.NotEqual(deviceA.ExportSubjectPublicKeyInfo(), deviceB.ExportSubjectPublicKeyInfo());
         foreach (var key in new[] { deviceA, deviceB })
         {
-            var proof = CreateProof(key, "fixture:challenge", "GET", "/v2/progress", null, "{}");
+            var proof = CreateProof(key, "fixture:challenge", "GET", "/api/service-school-bot/progress", null, "{}");
             var publicKey = key.ExportParameters(false);
             var jwk = new DeviceJwk("EC", "P-256", TestLicenseTokenSigner.Base64UrlEncode(publicKey.Q.X!),
                 TestLicenseTokenSigner.Base64UrlEncode(publicKey.Q.Y!));
-            DeviceProofVerifier.VerifyDeviceProof(proof, jwk, "fixture:challenge", "GET", "/v2/progress", null,
+            DeviceProofVerifier.VerifyDeviceProof(proof, jwk, "fixture:challenge", "GET", "/api/service-school-bot/progress", null,
                 DeviceProofVerifier.ComputeBodyHashWithoutProof("{}"));
         }
         var signed = signer.Sign("fixture", new
