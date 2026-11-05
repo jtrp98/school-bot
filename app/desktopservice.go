@@ -230,16 +230,35 @@ func (s *DesktopService) ensureUpdater() *updater.Client {
 	local := strings.HasPrefix(s.apiURL, "http://127.0.0.1") ||
 		strings.HasPrefix(s.apiURL, "http://localhost") ||
 		strings.HasPrefix(s.apiURL, "http://[::1]")
+	platform := runtime.GOOS + "-" + runtime.GOARCH
 	s.updater = updater.NewClient(updater.Config{
 		BaseURL:        s.apiURL,
 		DataDir:        s.dataDir,
 		CurrentVersion: appVersion,
 		Channel:        "stable",
-		Platform:       runtime.GOOS + "-" + runtime.GOARCH,
+		Platform:       platform,
 		ExpectedPub:    "SchoolBright",
 		AllowLocalHTTP: local,
+		Applier: &updater.OSInstallerApplier{
+			DataDir:        s.dataDir,
+			InstallDir:     resolveInstallDirectory(),
+			CurrentVersion: appVersion,
+			Platform:       platform,
+		},
 	})
 	return s.updater
+}
+
+func resolveInstallDirectory() string {
+	exe, err := os.Executable()
+	if err != nil {
+		return ""
+	}
+	dir := filepath.Dir(exe)
+	if runtime.GOOS == "darwin" && filepath.Base(dir) == "MacOS" && filepath.Base(filepath.Dir(dir)) == "Contents" {
+		return filepath.Dir(filepath.Dir(dir))
+	}
+	return dir
 }
 
 func (s *DesktopService) LicenseStatus() (license.EntitlementProjection, error) {

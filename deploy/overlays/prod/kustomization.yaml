@@ -1,0 +1,30 @@
+# overlays/prod -> sb-prod (BE-023: Gateway HTTP G -> gRPC B)
+# GATED on G-AUTH, G-CORE, G-LEARN-DB, G-RELEASE-DB, G-SEC, G-RELEASE, and H5/Light human sign-off.
+# Never run kubectl apply from developer machines; deploy only via approved pipeline after human gate closure.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: sb-prod
+namePrefix: prod-sb-
+labels:
+  - pairs:
+      app.kubernetes.io/instance: prod-sb-service-school-bot
+    includeSelectors: true
+resources:
+  - ../../base
+images:
+  - name: swr.ap-southeast-2.myhuaweicloud.com/schoolbright/service-school-bot
+    newName: swr.ap-southeast-2.myhuaweicloud.com/production-school-bright/prod-sb-service-school-bot
+    newTag: 0.1.5-placeholder
+patches:
+  - target: { kind: Deployment, name: service-school-bot }
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/topologySpreadConstraints/0/whenUnsatisfiable
+        value: DoNotSchedule
+configMapGenerator:
+  - name: service-school-bot-config
+    behavior: merge
+    literals:
+      - SchoolBot__EnvironmentKey=prod
+      # Gateway side config key to pair with this overlay:
+      # GrpcServices__ServiceSchoolBot=dns:///prod-sb-service-school-bot.sb-prod.svc.cluster.local:8080

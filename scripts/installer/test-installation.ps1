@@ -1,4 +1,7 @@
-param([string]$PayloadDirectory)
+param(
+    [string]$PayloadDirectory,
+    [switch]$AllowPerUser
+)
 . "$PSScriptRoot/../lib/common.ps1"
 if ($env:OS -ne 'Windows_NT') { throw 'Run the installer smoke test on Windows.' }
 $schoolBotPayload = if ($PayloadDirectory) {
@@ -8,8 +11,8 @@ $schoolBotPayload = if ($PayloadDirectory) {
 }
 $schoolBotTestIdentity = [Security.Principal.WindowsIdentity]::GetCurrent()
 $schoolBotPrincipal = [Security.Principal.WindowsPrincipal]::new($schoolBotTestIdentity)
-if (-not $schoolBotPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    throw 'Run MSI integration tests from an elevated PowerShell or disposable CI VM. No installation was started.'
+if (-not $AllowPerUser -and -not $schoolBotPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    throw 'Run MSI integration tests from an elevated PowerShell, disposable CI VM, or pass -AllowPerUser for Scope="perUser" verification. No installation was started.'
 }
 $schoolBotManifest = Join-Path $SchoolBotRoot 'app/frontend/package.json'
 $schoolBotVersion = (Get-Content -LiteralPath $schoolBotManifest -Raw | ConvertFrom-Json).version

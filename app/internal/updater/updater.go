@@ -26,6 +26,7 @@ const (
 	ErrUpdateManifestInvalid = "UPDATE_MANIFEST_INVALID"
 	ErrUpdateHashMismatch    = "UPDATE_HASH_MISMATCH"
 	ErrUpdateUntrustedSource = "UPDATE_UNTRUSTED_SOURCE"
+	ErrArtifactUntrusted     = "ARTIFACT_UNTRUSTED"
 	ErrUpdateNotSupported    = "UPDATE_NOT_SUPPORTED"
 	ErrUpdateBusy            = "UPDATE_BUSY"
 	ErrUpdateCancelled       = "UPDATE_CANCELLED"
@@ -37,6 +38,11 @@ const (
 	MaxManifestBytes     int   = 65536
 )
 
+type EngineHash struct {
+	ID     string `json:"id"`
+	SHA256 string `json:"sha256"`
+}
+
 type UpdateError struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`
@@ -47,17 +53,23 @@ func (e *UpdateError) Error() string {
 }
 
 type ReleaseManifest struct {
-	Publisher   string `json:"publisher"`
-	Version     string `json:"version"`
-	Channel     string `json:"channel"`
-	Platform    string `json:"platform"`
-	URL         string `json:"url"`
-	SHA256      string `json:"sha256"`
-	Size        int64  `json:"size"`
-	PublishedAt string `json:"published_at"`
-	ExpiresAt   string `json:"expires_at,omitempty"`
-	Withdrawn   bool   `json:"withdrawn,omitempty"`
-	Notes       string `json:"notes,omitempty"`
+	ReleaseID    int          `json:"release_id,omitempty"`
+	Publisher    string       `json:"publisher"`
+	Version      string       `json:"version"`
+	Channel      string       `json:"channel"`
+	Platform     string       `json:"platform"`
+	URL          string       `json:"url"`
+	SHA256       string       `json:"sha256"`
+	Size         int64        `json:"size"`
+	SizeBytes    int64        `json:"size_bytes,omitempty"`
+	PackageKind  string       `json:"package_kind,omitempty"`
+	MinOS        string       `json:"min_os,omitempty"`
+	EngineHashes []EngineHash `json:"engine_hashes,omitempty"`
+	PublishedAt  string       `json:"published_at"`
+	IssuedAt     string       `json:"issued_at,omitempty"`
+	ExpiresAt    string       `json:"expires_at,omitempty"`
+	Withdrawn    bool         `json:"withdrawn,omitempty"`
+	Notes        string       `json:"notes,omitempty"`
 }
 
 type UpdateCheckResponse struct {
@@ -118,24 +130,29 @@ type Applier interface {
 	ApplyStagedUpdate(ctx context.Context, stagingDir string, manifest ReleaseManifest) error
 }
 
+type PublisherVerifier interface {
+	VerifyArtifactPublisher(ctx context.Context, artifactPath string, manifest ReleaseManifest) error
+}
+
 type RecoveryReporter interface {
 	ReportFailedInstall(ctx context.Context, version string, reason error)
 }
 
 type Config struct {
-	BaseURL          string
-	DataDir          string
-	CurrentVersion   string
-	Channel          string
-	Platform         string
-	ExpectedPub      string
-	AllowedHosts     []string
-	AllowLocalHTTP   bool
-	Client           *http.Client
-	Verifier         SignatureVerifier
-	Applier          Applier
-	RecoveryReporter RecoveryReporter
-	NowFunc          func() time.Time
+	BaseURL           string
+	DataDir           string
+	CurrentVersion    string
+	Channel           string
+	Platform          string
+	ExpectedPub       string
+	AllowedHosts      []string
+	AllowLocalHTTP    bool
+	Client            *http.Client
+	Verifier          SignatureVerifier
+	PublisherVerifier PublisherVerifier
+	Applier           Applier
+	RecoveryReporter  RecoveryReporter
+	NowFunc           func() time.Time
 }
 
 type Client struct {
@@ -239,11 +256,25 @@ func (c *Client) validateManifestFields(m *ReleaseManifest) error {
 	if _, err := hex.DecodeString(m.SHA256); err != nil {
 		return &UpdateError{Code: ErrUpdateManifestInvalid, Message: "release sha256 is not valid hex"}
 	}
+	if m.Size == 0 && m.SizeBytes > 0 {
+		m.Size = m.SizeBytes
+	}
 	if m.Size <= 0 || m.Size > MaxArtifactSizeBytes {
 		return &UpdateError{Code: ErrUpdateManifestInvalid, Message: "release artifact size is out of bounds"}
 	}
+	if m.PublishedAt == "" && m.IssuedAt != "" {
+		m.PublishedAt = m.IssuedAt
+	}
 	if _, err := time.Parse(time.RFC3339, m.PublishedAt); err != nil {
 		return &UpdateError{Code: ErrUpdateManifestInvalid, Message: "release published_at must be RFC3339"}
+	}
+	for _, eh := range m.EngineHashes {
+		if (eh.ID != "demo" && eh.ID != "zide") || len(eh.SHA256) != 64 {
+			return &UpdateError{Code: ErrUpdateManifestInvalid, Message: "invalid engine_hashes entry in release manifest"}
+		}
+		if _, err := hex.DecodeString(eh.SHA256); err != nil {
+			return &UpdateError{Code: ErrUpdateManifestInvalid, Message: "engine sha256 is not valid hex"}
+		}
 	}
 	if m.ExpiresAt != "" {
 		exp, err := time.Parse(time.RFC3339, m.ExpiresAt)
@@ -313,7 +344,7 @@ func (c *Client) CheckUpdates(ctx context.Context) (UpdateCheckResponse, error) 
 		"channel":  {c.cfg.Channel},
 		"platform": {c.cfg.Platform},
 	}
-	endpoint := c.cfg.BaseURL + "/v1/updates/check?" + query.Encode()
+	endpoint := c.cfg.BaseURL + "/api/service-school-bot/updates/check?" + query.Encode()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
 	if err != nil {
 		return baseResp, err
@@ -479,6 +510,16 @@ func (c *Client) PrepareUpdate(ctx context.Context, manifestJWS string) (*Prepar
 		return nil, &UpdateError{Code: ErrUpdateHashMismatch, Message: "artifact SHA-256 digest does not match signed manifest"}
 	}
 
+	if c.cfg.PublisherVerifier != nil {
+		if err := c.cfg.PublisherVerifier.VerifyArtifactPublisher(prepCtx, tmpPayload, *manifest); err != nil {
+			var ue *UpdateError
+			if errors.As(err, &ue) {
+				return nil, ue
+			}
+			return nil, &UpdateError{Code: ErrArtifactUntrusted, Message: err.Error()}
+		}
+	}
+
 	finalPayload := filepath.Join(versionDir, "payload.bin")
 	if err := os.Rename(tmpPayload, finalPayload); err != nil {
 		return nil, err
@@ -554,6 +595,17 @@ func (c *Client) InstallPreparedUpdate(ctx context.Context, version string, hasA
 	if !strings.EqualFold(actualHash, manifest.SHA256) {
 		_ = os.RemoveAll(versionDir)
 		return nil, &UpdateError{Code: ErrUpdateHashMismatch, Message: "staged payload SHA-256 tampered before install"}
+	}
+
+	if c.cfg.PublisherVerifier != nil {
+		if err := c.cfg.PublisherVerifier.VerifyArtifactPublisher(ctx, payloadPath, *manifest); err != nil {
+			_ = os.RemoveAll(versionDir)
+			var ue *UpdateError
+			if errors.As(err, &ue) {
+				return nil, ue
+			}
+			return nil, &UpdateError{Code: ErrArtifactUntrusted, Message: err.Error()}
+		}
 	}
 
 	if err := c.cfg.Applier.ApplyStagedUpdate(ctx, versionDir, *manifest); err != nil {

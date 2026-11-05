@@ -64,3 +64,23 @@ Starter ใช้ Memory Store: License และ Release หายเมื่�
 ก่อนใช้งานจริง ระบบปัจจุบันทดลอง online activation/device quota ได้ แต่ยังไม่มี signed activation token
 ที่เก็บข้ามการเปิดแอป หรือการบังคับสิทธิ์แบบ Word/Excel เต็มรูปแบบ ต้องทำส่วนนี้ต่อใน Desktop Core/API
 พร้อมกำหนดอายุ token และนโยบายตรวจซ้ำเมื่อออนไลน์
+
+## Kubernetes / Gateway -> gRPC Deployment Pack (`BE-023`)
+
+ไฟล์คอนฟิกและสคริปต์เตรียมความพร้อมสำหรับ Deploy บน Kubernetes (Kustomize) แบบ `HTTP Gateway (G) -> gRPC SchoolBot (B)` โดยแยก Process ของ Grade Export Worker ตาม `SEC001-002`:
+
+- `deploy/base/school-bot-grpc.yaml` และ `deploy/base/kustomization.yaml`:
+  - `Deployment/service-school-bot`: รับ internal gRPC (`h2c`) ที่พอร์ต `8080` และ HTTP/1.1 health probe (`/healthz`) ที่พอร์ต `8081` โดยถือเฉพาะ Connection String ของ `SchoolBot`, `Master`, `School` และ `Logs` (ไม่มี `PGGRADE_DB_CONNECTION_STRING`)
+  - `Deployment/school-bot-grade-worker`: Isolated worker ที่ถือ `SCHOOL_BOT_DB_CONNECTION_STRING` และ `PGGRADE_DB_CONNECTION_STRING` ตาม `SEC001-002` / `BE-038`
+  - `Service/service-school-bot`: Headless ClusterIP (`clusterIP: None`, `appProtocol: kubernetes.io/h2c`) สำหรับ gRPC client-side load balancing จาก `sb-api-gateway` (`dns:///service-school-bot.schoolbright.svc.cluster.local:8080`)
+  - `NetworkPolicy/service-school-bot-ingress`: จำกัดการเข้าถึงพอร์ต `8080` เฉพาะ Pod ของ `api-gateway` เท่านั้น (ไม่มีการเปิด B ออกสู่สาธารณะโดยตรง)
+- `deploy/overlays/dev/kustomization.yaml` และ `deploy/overlays/prod/kustomization.yaml`: Overlays แยกสภาพแวดล้อม Dev และ Prod
+- สคริปต์ตรวจสอบความพร้อมก่อน Deploy และสคริปต์สำรอง/กู้คืนฐานข้อมูล (`SchoolBot` DB เท่านั้น):
+
+```powershell
+# ตรวจสอบ Manifests, การแยกสิทธิ์ SEC001-002, ความสอดคล้องของ .proto กับ sb-api-gateway และลำดับ Rollout/Rollback (ไม่รันคำสั่ง Deploy จริง):
+./scripts/api/deploy-preflight.ps1 -ReportPath "reports/phase6/be-023-deploy-preflight.json"
+
+# ตรวจสอบโครงสร้างคำสั่ง Backup/Restore สำหรับ SchoolBot DB เท่านั้น (ห้ามแตะ 4 Legacy DBs):
+./scripts/api/backup-restore.ps1 -Action Validate
+```

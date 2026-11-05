@@ -75,7 +75,7 @@ func TestCheckUpdatesMetadataOnlyDoesNotDownloadArtifact(t *testing.T) {
 	var srv *httptest.Server
 	srv = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case "/v1/updates/check":
+		case "/api/service-school-bot/updates/check", "/v1/updates/check":
 			m := ReleaseManifest{
 				Publisher:   "SchoolBright",
 				Version:     "1.2.0",

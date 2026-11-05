@@ -3,7 +3,7 @@
            Version="$(var.AppVersion)" UpgradeCode="61D02E9C-4C33-4DA9-9510-549CA8CDD6AA"
            Scope="perUser" InstallerVersion="500">
     <MajorUpgrade DowngradeErrorMessage="!(loc.Installer_newerVersion)"
-                  Schedule="afterInstallInitialize" IgnoreLanguage="yes" />
+                  Schedule="afterInstallExecute" IgnoreLanguage="yes" />
     <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
     <SummaryInformation Description="School Bot Desktop Installer" />
     <Icon Id="SchoolBotIcon" SourceFile="$(var.AppIcon)" />
@@ -105,8 +105,15 @@
     </Feature>
     <Property Id="ARPNOMODIFY" Value="1" />
     <Property Id="SCHOOLBOT_LAUNCH" Value="1" />
+    <Property Id="SCHOOLBOT_INJECT_FAIL" Secure="yes" />
     <CustomAction Id="LaunchSchoolBot" FileRef="DesktopExe" ExeCommand=""
                   Return="asyncNoWait" Impersonate="yes" />
+    <CustomAction Id="InjectMidUpdateFailure"
+                  Error="Simulated mid-update failure for AC-030-07 MSI rollback verification."
+                  Execute="deferred" Impersonate="yes" />
+    <InstallExecuteSequence>
+      <Custom Action="InjectMidUpdateFailure" After="InstallFiles" Condition="SCHOOLBOT_INJECT_FAIL = &quot;1&quot;" />
+    </InstallExecuteSequence>
     <WixVariable Id="WixUIDialogBmp" Value="$(var.BrandDir)/dialog.bmp" />
     <WixVariable Id="WixUIBannerBmp" Value="$(var.BrandDir)/banner.bmp" />
     <UIRef Id="SchoolBotUI" />

@@ -1,0 +1,32 @@
+# overlays/dev -> sb-dev (BE-023: Gateway HTTP G -> gRPC B)
+# Do NOT apply to cluster until Light/H5 and DBA-003/G-CORE gates are closed by human.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: sb-dev
+namePrefix: dev-sb-
+resources:
+  - ../../base
+images:
+  - name: swr.ap-southeast-2.myhuaweicloud.com/schoolbright/service-school-bot
+    newTag: 0.1.5-placeholder
+patches:
+  - target: { kind: Deployment, name: service-school-bot }
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+      - op: replace
+        path: /spec/template/spec/containers/0/env/0/value
+        value: Staging
+  - target: { kind: PodDisruptionBudget, name: service-school-bot }
+    patch: |-
+      - op: replace
+        path: /spec/minAvailable
+        value: 0
+configMapGenerator:
+  - name: service-school-bot-config
+    behavior: merge
+    literals:
+      - SchoolBot__EnvironmentKey=dev
+      # Gateway side config key to pair with this overlay:
+      # GrpcServices__ServiceSchoolBot=dns:///dev-sb-service-school-bot.sb-dev.svc.cluster.local:8080

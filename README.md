@@ -113,7 +113,7 @@ Robot Control แบบ Native ส่งคำสั่งไป Hardware ได
 SchoolBot ให้บริการ **gRPC เท่านั้น** สำหรับ Projects, Licenses, Curricula, Assessments และ Releases
 HTTP เหลือ `/healthz`; ค่าปริยายคือ gRPC h2c `127.0.0.1:8080` และ health HTTP `127.0.0.1:8081`
 เส้นทางของ client คือ Desktop/Web → HTTP Gateway → gRPC SchoolBot โดย browser ผ่าน same-origin BFF
-สัญญา HTTP อยู่ที่ [docs/API.md](docs/API.md) และใช้ prefix `/api/school-bot/service/` โดยไม่มี v1/v2
+สัญญา HTTP อยู่ที่ [docs/API.md](docs/API.md) และใช้ prefix `/api/service-school-bot/` โดยไม่มี v1/v2
 
 Login ใช้ `POST /api/auth/login` ของ Gateway และส่ง `Authorization: Bearer <Gateway JWT>`
 สำหรับผู้ใช้ที่ login เต็มรูป (`AccessLevel=1`); desktop ส่ง `X-Device-Entitlement` เพิ่มเมื่อเรียกข้อมูลของผู้ใช้

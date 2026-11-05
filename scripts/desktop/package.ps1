@@ -1,6 +1,7 @@
 param(
     [switch]$SkipBuild,
     [switch]$SkipInstall,
+    [switch]$RequireSigned,
     [string]$PayloadDirectory,
     [ValidateSet('th','en','zh')][string]$Language = 'th'
 )
@@ -10,6 +11,7 @@ if ($IsMacOS) {
     $schoolBotArguments = @("$PSScriptRoot/package.sh")
     if ($SkipBuild) { $schoolBotArguments += '--skip-build' }
     if ($SkipInstall) { $schoolBotArguments += '--skip-install' }
+    if ($RequireSigned) { $schoolBotArguments += '--require-signed' }
     Invoke-SchoolBotCommand 'bash' $schoolBotArguments
     return
 }
@@ -55,5 +57,7 @@ Copy-Item -LiteralPath (Join-Path $schoolBotBrandDirectory 'runtime-notices.txt'
     -Destination "$schoolBotSetup.NOTICES.txt" -Force
 $schoolBotSetupHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $schoolBotSetup).Hash.ToLowerInvariant()
 [IO.File]::WriteAllText("$schoolBotSetup.sha256", "$schoolBotSetupHash  $([IO.Path]::GetFileName($schoolBotSetup))`n")
+& "$PSScriptRoot/../installer/sign-and-manifest.ps1" -PayloadDirectory $schoolBotPayload `
+    -InstallerDirectory $schoolBotOutputDir -RequireSigned:$RequireSigned
 Write-Host "Desktop installer ready: $schoolBotSetup (MSI also available: $schoolBotInstaller)"
 Write-Host 'Development EXE/MSI are unsigned. Sign both packages before external distribution.'

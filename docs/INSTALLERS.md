@@ -139,6 +139,14 @@ Smoke test สำหรับ clean Windows account/CI ให้เปิด Pow
 ./scripts/installer/test-installation.ps1
 # ถ้าแพ็กจากโฟลเดอร์แยก ให้ชี้ payload เดียวกัน
 ./scripts/installer/test-installation.ps1 -PayloadDirectory "$env:TEMP\school-bot-payload"
+
+# ทดสอบวงจรชีวิต MSI แบบแยก namespace (Install 0.1.4 -> Upgrade 0.1.5 -> Downgrade Block -> Repair /fa -> AC-030-07 Mid-Update Failure Rollback SCHOOLBOT_INJECT_FAIL=1 -> Uninstall /x)
+./scripts/installer/test-msi-rollback-recovery.ps1 -PayloadDirectory "dist/payload-0.1.5-rc" -ReportPath "reports/phase6/msi-lifecycle-and-rollback-report.json"
+
+# ตรวจสอบ Code Signing, Payload Cleanliness, Third-Party Notices และสร้าง release-manifest.json (BE-022)
+./scripts/installer/sign-and-manifest.ps1 -PayloadDirectory "dist/payload-0.1.5-rc" -InstallerDirectory "dist/installers"
+# บังคับตรวจลายเซ็นจริงก่อนปล่อย Production (Fail-Closed):
+./scripts/installer/sign-and-manifest.ps1 -PayloadDirectory "dist/payload-0.1.5-rc" -InstallerDirectory "dist/installers" -RequireSigned
 ```
 
 ทดสอบ Silent Install ลง path ที่มีช่องว่างใน workspace, checksum ของ payload, Shortcut,
@@ -156,6 +164,12 @@ Wails v3 รองรับ Docker cross-compilation แต่ repository นี
 # ต้องรันบน Mac ที่มี Go, Node และ Xcode Command Line Tools
 # SCHOOL_BOT_BUILD_API_URL=https://api.example.com bash scripts/desktop/package.sh
 bash scripts/desktop/package.sh
+
+# บังคับ Developer ID Application/Installer signing + Notarization/Stapling (Fail-Closed):
+bash scripts/desktop/package.sh --require-signed
+
+# ทดสอบ Universal PKG lifecycle และการกู้คืนเมื่ออัปเดตล้มเหลวกลางคันตาม AC-030-07 (BE-021):
+bash scripts/installer/test-macos-pkg-recovery.sh --pkg "dist/installers/school-bot-0.1.5-macos-universal.pkg" --report "reports/phase6/macos-pkg-recovery-report.json"
 ```
 
 Script Build สอง architecture ด้วย Go/Clang แล้วใช้ `lipo` รวมทั้ง main executable และ Engine
