@@ -9,6 +9,7 @@
 - `app/foundation/`: คอร์สปรับพื้นฐาน Robotics, AI, Scratch
 - `app/robox/`: คู่มือและสเปกหุ่นยนต์ RoboX
 - `app/management/`: จัดการรอบการเรียนและส่งคะแนนเข้า SchoolBright
+- `app/admin/`: จัดการหลักสูตรกลาง บทเรียน เกณฑ์ประเมิน และคลังข้อสอบ (TAdmin)
 
 ## สถาปัตยกรรมและการแบ่งหน้าที่ (Next.js 14)
 - Stack: **Next.js 14 App Router**, **TypeScript**, **Tailwind CSS**, และ **Zustand**
@@ -24,7 +25,8 @@
 
 ## การเชื่อมต่อ Backend และความปลอดภัย
 - เชื่อมต่อผ่าน `lib/api/learning-api.ts` ไปยัง School Bot Backend (`/api/service-school-bot/...`) ผ่าน Gateway
-- รักษา Session cookie ใน `middleware.ts` อย่างเคร่งครัด ห้าม bypass auth เพื่อให้ทดสอบหน้าจอได้
+- รักษา Session cookie ใน `middleware.ts` อย่างเคร่งครัด แยกขาดระหว่าง `sb_auth` (TUser สำหรับเว็บครู) กับ `sb_admin_auth` (TAdmin สำหรับ `/admin`) ห้าม bypass auth
+- ฝั่ง Admin ใช้ Server BFF Route Handler (`/api/service-school-bot/admin/...`) ลงนาม `X-SchoolBot-Staff-Assertion` (ES256) ด้วยกุญแจลับ P-256 ก่อนส่งไปยัง Gateway
 - **Why-only Comments**: อธิบายเฉพาะเหตุผลข้อจำกัดทางเทคนิค หรือความปลอดภัยของระบบ ห้ามใส่ประวัติการแก้ไข
 
 ## คำสั่งตรวจงาน

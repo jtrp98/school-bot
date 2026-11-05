@@ -11,7 +11,7 @@
 - **API Boundary**: School Bot ให้บริการผ่าน typed gRPC (`127.0.0.1:8080`) และ health (`127.0.0.1:8081`) ห้ามเปิด REST endpoint ซ้ำซ้อน
 
 ## Path Configuration ข้ามระบบ (`local.json`)
-- Agent resolve paths จาก `local.json` ที่ root ของ repo (อิง [backend/local.example.json](local.example.json)):
+- Agent resolve paths จาก `local.json` ที่ root ของ repo (อิง [local.example.json](local.example.json)):
   - `gatewayRoot`: ตำแหน่ง repo API Gateway (Default: `C:/src/schoolbright/target/sb-api-gateway`)
   - `teacherWebRoot`: ตำแหน่ง Teacher Web (Default: `./frontend`)
   - `adminWebRoot`: ตำแหน่ง Admin Web FE (Default: `C:/src/schoolbright/target/sb-web-helper`)

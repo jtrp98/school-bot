@@ -12,7 +12,7 @@
 | **3. Teacher Web** | Next.js 14 App Router, แผนการสอน RoboX ป.1–6 | [frontend/AGENTS.md](frontend/AGENTS.md) *(อ้างอิงภายนอก: [docs/teacher-web.md](docs/teacher-web.md))* |
 | **4. Engines** | C++ IPC engines, หุ่นยนต์ RoboX, simulators | [engines/AGENTS.md](engines/AGENTS.md) |
 | **5. Backend API** | C# gRPC microservice, Clean Architecture | [backend/AGENTS.md](backend/AGENTS.md) |
-| **6. Admin Web FE** | sb-web-helper Frontend (เฉพาะงานหน้าจอ Admin) | [docs/admin-web.md](docs/admin-web.md) |
+| **6. Admin Web FE** | School Bot Admin Console (รวมใน frontend/app/admin) | [docs/admin-web.md](docs/admin-web.md) |
 | **7. Build & Scripts** | Script ตรวจสอบ, packaging, build installer | [scripts/AGENTS.md](scripts/AGENTS.md) |
 
 > **Single Source of Truth**: ทุกไฟล์ `CLAUDE.md` มีเพียง `@AGENTS.md` เท่านั้น ไม่คัดลอกกฎซ้ำซ้อนหรือ import กฎลูกทั้งหมดไว้ที่ root

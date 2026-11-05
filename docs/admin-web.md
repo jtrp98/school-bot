@@ -1,6 +1,8 @@
-# หน้า Admin — sb-web-helper (เฉพาะ FE)
+# หน้า Admin — School Bot Admin Console (frontend/app/admin)
 
-ใช้เมื่ออ้างอิงหรือทำงาน Frontend ของหน้า Admin ใน `sb-web-helper` ครอบคลุมหน้าจอ component, state, client-side validation, API client ที่หน้าจอเรียก และ FE tests ไม่ครอบคลุม API route handlers, server services, database/Prisma, cronjobs, deploy หรือ Backend ของ repo นี้
+> **การย้ายระบบ**: ฟีเจอร์ Admin สำหรับ School Bot (จัดการหลักสูตรกลาง, บทเรียน, ภารกิจ, เกณฑ์ประเมิน, คลังข้อสอบ และ Four-Eyes publication) ได้ย้ายมาอยู่ที่ `frontend/app/admin/` ใน repository ของ School Bot โดยตรง โดยแยก Login ระหว่างครู (`TUser` ที่ `/login`) และผู้ดูแลระบบ (`TAdmin` ที่ `/admin/login`) และส่งคำขอยืนยันสิทธิ์ไปยัง Gateway ผ่าน Server BFF ใน `frontend/app/api/service-school-bot/admin/`
+
+เนื้อหาด้านล่างนี้ใช้สำหรับอ้างอิงประวัติหรือเมื่อทำงานร่วมกับหน้า Admin อื่นๆ ของ `sb-web-helper`:
 
 ## ตำแหน่งบนเครื่อง
 

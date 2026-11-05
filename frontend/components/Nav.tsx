@@ -9,6 +9,7 @@ import { curriculumGrades } from "@/lib/new-curriculum";
 
 const utilityLinks = [
   { href: "/management", label: "จัดการเรียนการสอน" },
+  { href: "/admin", label: "Admin หลักสูตร" },
   { href: "/robox", label: "RoboX" },
   { href: "/install", label: "ติดตั้ง" },
 ];
