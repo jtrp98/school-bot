@@ -2,7 +2,7 @@
 
 กฎ Backend อยู่ที่ [AGENTS.md](AGENTS.md) และแยกรายละเอียดโครงสร้าง/gRPC/tests ใน `rules/` ให้อ่านตามขอบเขตงาน
 ตำแหน่ง Gateway checkout สำหรับ agent ตั้งด้วย `gatewayRoot` ใน `local.json` ที่ root ของ School Bot
-คัดลอก [service-school-bot/local.example.json](local.example.json) ไปเป็น `local.json` ที่ root เพื่อปรับค่า; หากไม่กำหนด ใช้ `C:/src/schoolbright/target/sb-api-gateway`
+คัดลอก [backend/local.example.json](local.example.json) ไปเป็น `local.json` ที่ root เพื่อปรับค่า; หากไม่กำหนด ใช้ `C:/src/schoolbright/target/sb-api-gateway`
 Relative path อิง root ของ School Bot ไฟล์ `local.json` ถูก git-ignore และไม่ใช่ config ของ API runtime
 ตัวอย่างเดียวกันมี `teacherWebRoot` สำหรับ [งานเว็บครู](../docs/teacher-web.md) ใช้เมื่อทำงานเชื่อม Frontend/BFF กับ Gateway และ School Bot
 และ `adminWebRoot` สำหรับ [หน้า Admin FE](../docs/admin-web.md) ใน `sb-web-helper` ใช้อ้างอิงเฉพาะ Frontend
@@ -208,7 +208,7 @@ DI ลงทะเบียน legacy contexts และ `SchoolBotDbContext` �
 ไม่เปิด sensitive logging/error details; business repositories ใช้ context ที่ตรงฐาน ส่วน memory/file แยกเป็น development/test
 การ resolve/model self-check ไม่ยืนยัน DB connectivity หรือสิทธิ์ใช้งานจริง
 
-ตั้งค่าจาก `service-school-bot/.env.example` ใน `service-school-bot/.env` ซึ่ง gitignore แล้ว ใส่เฉพาะ DB connections ที่ใช้งาน
+ตั้งค่าจาก `backend/.env.example` ใน `backend/.env` ซึ่ง gitignore แล้ว ใส่เฉพาะ DB connections ที่ใช้งาน
 รักษาค่าที่มีอยู่ และไม่เก็บ connection จริงใน appsettings/source/คำสั่ง CLI
 API ไม่โหลด `.env` เอง: ส่ง environment เข้า process ผ่านระบบ secrets ของเครื่องหรือ deployment เดิม
 สคริปต์ scaffold โหลดเฉพาะ DB setting ที่เลือกจาก `.env` และให้ process environment มีลำดับก่อน
@@ -217,8 +217,8 @@ API ไม่โหลด `.env` เอง: ส่ง environment เข้า p
 รันจาก repository root:
 
 ```powershell
-# Restore local EF tool ตาม manifest ใน service-school-bot/ ก่อนใช้งานครั้งแรก
-Push-Location service-school-bot
+# Restore local EF tool ตาม manifest ใน backend/ ก่อนใช้งานครั้งแรก
+Push-Location backend
 dotnet tool restore
 dotnet restore ServiceSchoolBot.slnx --disable-build-servers -m:1 -p:NuGetAudit=false
 Pop-Location
@@ -245,7 +245,7 @@ raw diagnostics ถูกซ่อนเพราะ provider อาจใส่
 
 ```powershell
 ./scripts/tests/scaffold-databases.test.ps1
-Push-Location service-school-bot
+Push-Location backend
 dotnet build tools/ServiceSchoolBot.DatabaseSelfCheck --disable-build-servers -m:1 -p:NuGetAudit=false
 dotnet run --project tools/ServiceSchoolBot.DatabaseSelfCheck --no-build --no-restore
 dotnet test ServiceSchoolBot.slnx --disable-build-servers -m:1 -p:NuGetAudit=false
@@ -261,9 +261,9 @@ Self-check ตรวจ legacy และ SchoolBot models/DI รวม 32 tables
 ```powershell
 # ใช้ฐานชั่วคราวบน loopback ชื่อ schoolbot_repo_tests ที่มี schema SchoolBot 32 ตารางแล้ว
 $env:SCHOOL_BOT_REPOSITORY_TEST_CONNECTION="Host=127.0.0.1;Port=<isolated-port>;Database=schoolbot_repo_tests;Username=<test-user>;Password=<test-password>"
-dotnet run --project service-school-bot/tools/ServiceSchoolBot.RepositorySelfCheck -p:NuGetAudit=false
+dotnet run --project backend/tools/ServiceSchoolBot.RepositorySelfCheck -p:NuGetAudit=false
 ```
 
 คำสั่งนี้รันจาก repository root ตรวจการบันทึกข้าม DbContext, rollback, ETag, replay, audit และ tenant filters
 สร้าง legacy fixtures และข้อมูลสังเคราะห์เฉพาะฐานทดสอบดังกล่าว ห้ามตั้งค่าเป็นฐานร่วม
-ตัวตรวจปฏิเสธ host อื่นและชื่อฐานอื่น; ไม่อ่าน connection จาก `service-school-bot/.env` และไม่เรียก migrations
+ตัวตรวจปฏิเสธ host อื่นและชื่อฐานอื่น; ไม่อ่าน connection จาก `backend/.env` และไม่เรียก migrations

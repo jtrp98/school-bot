@@ -6,6 +6,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="../../../../../service-school-bot/src/ServiceSchoolBot.Infrastructure/ServiceSchoolBot.Infrastructure.csproj" />
+    <ProjectReference Include="../../../../../backend/src/ServiceSchoolBot.Infrastructure/ServiceSchoolBot.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

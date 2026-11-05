@@ -77,6 +77,6 @@ if ($LASTEXITCODE -ne 0 -or $schoolBotResult.status -ne 'success' -or $schoolBot
     $schoolBotResult.data.delivery -ne 'dry-run') {
     throw 'C++ Zide dry-run smoke test failed.'
 }
-Push-Location (Join-Path $SchoolBotRoot 'service-school-bot')
+Push-Location (Join-Path $SchoolBotRoot 'backend')
 try { Invoke-SchoolBotCommand 'dotnet' @('test','ServiceSchoolBot.slnx','--disable-build-servers','-m:1','--nologo','-v','minimal') } finally { Pop-Location }
 Write-Host 'Frontend, i18n, native desktop build, Go checks, Zide IPC, JSON Lines and C# API tests passed.'

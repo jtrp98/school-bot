@@ -6,11 +6,10 @@
 
 | ส่วน | กฎเฉพาะ |
 |---|---|
-| Desktop / Go + Wails | [app/AGENTS.md](app/AGENTS.md) |
-| Desktop Frontend / React + TypeScript | [app/frontend/AGENTS.md](app/frontend/AGENTS.md) และกฎแม่ใน `app/` |
-| เว็บครู / Next.js ใน repo แยก | [แนวทางอ้างอิงเว็บครู](docs/teacher-web.md) อ่านเมื่อทำงานเว็บครูหรือเชื่อม School Bot กับเว็บครู |
+| 1. Desktop / Go + Wails | [app/AGENTS.md](app/AGENTS.md) (Desktop UI ใน [app/frontend/AGENTS.md](app/frontend/AGENTS.md)) |
+| 2. Teacher Web / Next.js | [frontend/AGENTS.md](frontend/AGENTS.md) และ [แนวทางเว็บครู](docs/teacher-web.md) |
+| 3. Backend / C# API | [backend/AGENTS.md](backend/AGENTS.md) |
 | หน้า Admin / FE ใน sb-web-helper | [แนวทางอ้างอิง Admin FE](docs/admin-web.md) อ่านเฉพาะงานหน้าจอ Admin |
-| Backend / C# API | [service-school-bot/AGENTS.md](service-school-bot/AGENTS.md) |
 | Engines | [engines/AGENTS.md](engines/AGENTS.md) |
 | Scripts / build / package / release | [scripts/AGENTS.md](scripts/AGENTS.md) |
 

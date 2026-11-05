@@ -27,4 +27,4 @@
 
 ## ตรวจงาน
 
-- C# API: รัน `dotnet test ServiceSchoolBot.slnx --disable-build-servers -m:1` จาก `web` เมื่อเปลี่ยน behavior
+- C# API: รัน `dotnet test ServiceSchoolBot.slnx --disable-build-servers -m:1` จาก `backend` เมื่อเปลี่ยน behavior

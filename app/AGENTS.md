@@ -4,7 +4,7 @@
 
 ## Host และหน้าต่างแอป
 
-- Desktop อยู่ใน `app/`: Go + Wails และ React/TypeScript ส่วน C# API อยู่ใน `service-school-bot/`
+- Desktop อยู่ใน `app/`: Go + Wails และ React/TypeScript ส่วน C# API อยู่ใน `backend/`
 - Host เป็นผู้เลือก engine จาก trusted routing เท่านั้น ห้ามรับ executable path จาก frontend หรือ project file
 - รักษาการเปิดแบบ fullscreen/frameless และปุ่มหน้าต่างใน header ของแอป รวมถึง close guards
 

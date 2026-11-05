@@ -46,7 +46,7 @@ func buildHostServer(t *testing.T) string {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
 	defer cancel()
 	command := exec.CommandContext(ctx, "dotnet", "build", project, "--artifacts-path", artifacts, "--disable-build-servers", "-m:1", "-v:q", "-p:NuGetAudit=false", "-p:RestoreConfigFile="+config)
-	command.Dir = filepath.Join(filepath.Dir(project), "../../../../../service-school-bot")
+	command.Dir = filepath.Join(filepath.Dir(project), "../../../../../backend")
 	assets, err := os.ReadFile(filepath.Join(command.Dir, "src/ServiceSchoolBot.Infrastructure/obj/project.assets.json"))
 	if err != nil {
 		t.Fatal(err)

@@ -18,8 +18,8 @@ try {
         [IO.File]::WriteAllText((Join-Path $schoolBotFixture "app/$schoolBotName"), 'excluded fixture')
     }
     foreach ($schoolBotDirectory in @(
-        'app/node_modules','app/bin','app/.build','app/frontend/public/blockly-media','service-school-bot/data',
-        'app/.tmp','app/.vs','app/.idea','app/.cache','app/__pycache__','service-school-bot/reports'
+        'app/node_modules','app/bin','app/.build','app/frontend/public/blockly-media','backend/data',
+        'app/.tmp','app/.vs','app/.idea','app/.cache','app/__pycache__','backend/reports'
     )) {
         New-Item -ItemType Directory -Path (Join-Path $schoolBotFixture $schoolBotDirectory) -Force | Out-Null
         [IO.File]::WriteAllText((Join-Path $schoolBotFixture "$schoolBotDirectory/excluded.txt"), 'excluded fixture')

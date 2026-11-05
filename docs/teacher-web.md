@@ -4,7 +4,7 @@
 
 ## ตำแหน่งบนเครื่อง
 
-อ่าน `teacherWebRoot` จาก `local.json` ที่ root ของ School Bot หากไม่มีไฟล์หรือไม่ได้กำหนด key ใช้ `C:/src/schoolbright/target/sb-tech-upgrade-web-system` เป็นค่าเริ่มต้น ดู [ตัวอย่าง config](../service-school-bot/local.example.json)
+อ่าน `teacherWebRoot` จาก `local.json` ที่ root ของ School Bot หากไม่มีไฟล์หรือไม่ได้กำหนด key ใช้ `C:/src/schoolbright/target/sb-tech-upgrade-web-system` เป็นค่าเริ่มต้น ดู [ตัวอย่าง config](../backend/local.example.json)
 
 Relative path อิง root ของ School Bot ค่าที่กำหนดแต่ใช้ไม่ได้ต้องรายงาน ไม่เลือก checkout อื่นเงียบ ๆ ค่านี้เป็น path เอกสาร/source สำหรับ agent ไม่ใช่ URL หรือ runtime config และ `local.json` ไม่เข้า Git หากไม่มี checkout ให้ระบุส่วนที่ยังตรวจข้าม repo ไม่ได้
 
@@ -34,7 +34,7 @@ Relative path อิง root ของ School Bot ค่าที่กำหน
 ## เชื่อมกับ School Bot และ Gateway
 
 - Browser เรียก same-origin BFF ใต้ `src/app/api/` ใช้ upstream registry และ proxy helpers เดิม ไม่เรียก service gRPC หรือ URL backend ตรงจาก browser และไม่วาง secrets ใน client
-- ตรวจ `src/server/upstream/registry.ts` ก่อนเพิ่ม alias/route ไม่เดาชื่อ upstream หรือถือว่า School Bot ลงทะเบียนแล้ว ใช้ Gateway HTTP contract จาก [API.md](API.md) และ [กฎ gRPC](../service-school-bot/rules/grpc.md)
+- ตรวจ `src/server/upstream/registry.ts` ก่อนเพิ่ม alias/route ไม่เดาชื่อ upstream หรือถือว่า School Bot ลงทะเบียนแล้ว ใช้ Gateway HTTP contract จาก [API.md](API.md) และ [กฎ gRPC](../backend/rules/grpc.md)
 - รักษา auth/session ของเว็บครู และตรวจการส่ง JWT/tenant/entitlement ตาม contract ของ Gateway ห้ามใช้ identity จาก request body หรือเพิ่ม auth bypass เพื่อให้หน้าเรียกได้
 - งานข้าม repo ต้องตรวจ caller, BFF route, Gateway mapping และ RPC ที่เปลี่ยนให้ครบ แก้ repo ปลายทางตามขอบเขตงานและกฎของ repo นั้น ไม่อ้างว่า end-to-end ผ่านจากการทดสอบเพียงฝั่งเดียว
 

@@ -1,6 +1,6 @@
 # หมวดและขอบเขต tests ของ Backend
 
-ปัจจุบันใช้ xUnit ใน `service-school-bot/tests/ServiceSchoolBot.Tests/` คง project เดิม ไม่สร้าง test project/framework เพิ่มเพียงเพื่อจัดหมวด กฎโฟลเดอร์นี้ใช้กับไฟล์ใหม่หรือไฟล์ที่อยู่ในขอบเขตงาน ไม่ต้องย้าย tests เดิมทั้งหมด
+ปัจจุบันใช้ xUnit ใน `backend/tests/ServiceSchoolBot.Tests/` คง project เดิม ไม่สร้าง test project/framework เพิ่มเพียงเพื่อจัดหมวด กฎโฟลเดอร์นี้ใช้กับไฟล์ใหม่หรือไฟล์ที่อยู่ในขอบเขตงาน ไม่ต้องย้าย tests เดิมทั้งหมด
 
 ## การวางไฟล์และตั้งชื่อ
 
@@ -23,11 +23,11 @@
 - RPC: ตรวจ response พร้อม status/trailers, invalid input, NotFound, auth/tenant isolation และ cancellation/deadline ตามส่วนที่เปลี่ยน อย่าใช้การเรียก service ตรงเป็นหลักฐานว่า gRPC transport ผ่าน
 - Mutation: ตรวจ rollback, audit/idempotency, replay กับ payload ต่างกัน, concurrency/ETag และ tenant recheck ตาม behavior ที่แก้ ไม่เพิ่ม retry ที่อาจเขียนซ้ำ
 - Proto/Gateway: ตรวจ hash ของชุด proto และ mapping ที่เปลี่ยน รวม default/optional และ error contract; หากไม่มี Gateway checkout ให้ระบุขอบเขตที่ยังตรวจไม่ได้
-- Persistence: Memory tests ไม่พิสูจน์ SQL, database constraints หรือ transaction จริง ใช้ isolated DB ตาม [service-school-bot/README.md](../README.md) สำหรับงานส่วนนั้น ไม่ใช้ฐานร่วม/production และไม่รัน migration ของ legacy schema เพื่อทดสอบ
+- Persistence: Memory tests ไม่พิสูจน์ SQL, database constraints หรือ transaction จริง ใช้ isolated DB ตาม [backend/README.md](../README.md) สำหรับงานส่วนนั้น ไม่ใช้ฐานร่วม/production และไม่รัน migration ของ legacy schema เพื่อทดสอบ
 - ใช้ fake clock และ deterministic synchronization แทน sleep หรือเวลาจริงเมื่อตรวจ expiry/race แยก state ต่อ test ให้รันซ้ำ/ขนานได้ตามขอบเขต fixture
 
 ## คำสั่งและการรายงาน
 
-- จาก `service-school-bot/`: `dotnet test ServiceSchoolBot.slnx --disable-build-servers -m:1` เมื่อแก้ behavior; ระหว่างพัฒนา filter เฉพาะ tests ที่เกี่ยวข้องได้ แล้วตรวจชุดที่ได้รับผลกระทบก่อนส่งมอบ
+- จาก `backend/`: `dotnet test ServiceSchoolBot.slnx --disable-build-servers -m:1` เมื่อแก้ behavior; ระหว่างพัฒนา filter เฉพาะ tests ที่เกี่ยวข้องได้ แล้วตรวจชุดที่ได้รับผลกระทบก่อนส่งมอบ
 - งานย้ายคลาส/ไฟล์ให้ตรวจ build และ references; เอกสารอย่างเดียวตรวจ diff/ลิงก์ ไม่ต้องรัน tests หรือ rebuild installer
 - รายงาน build, unit, integration, DB และ Gateway checks แยกตามที่รันจริง ห้ามลบ/skip/ผ่อน assertion หรือปิด auth เพื่อให้ผ่าน
